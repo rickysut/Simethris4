@@ -9,14 +9,7 @@
 			<div class="panel" id="panel-1">
 				<div class="panel-hdr">
 					<h2>
-						Data <span class="fw-300"><i>Informasi</i></span>
-					</h2>
-				</div>
-			</div>
-			<div class="panel" id="panel-2">
-				<div class="panel-hdr">
-					<h2>
-						Daftar <span class="fw-300"><i>Realisasi Lokasi dan Pelaksana</i></span>
+						Daftar <span class="fw-300"><i>Spatial CPCL</i></span>
 					</h2>
 					<div class="panel-toolbar">
 						<a href="{{route('2024.spatial.createsingle')}}" class="btn btn-xs btn-primary waves-effect waves-themed" data-toggle="tooltip" data-offset="0,10" data-original-title="Buat Peta Tunggal baru (Manual)">
@@ -106,7 +99,7 @@
 				{data: 'kode_spatial'},
 				{data: 'ktp_petani',
 					render: function (data, type, row) {
-						return row.anggota.nama_petani;
+						return row.nama_petani;
 					}
 				},
 				{
@@ -132,7 +125,7 @@
 				},
 				{data: 'provinsi_id',
 					render: function (data, type, row) {
-						return row.provinsi.nama;
+						return row.nama_provinsi;
 					}
 				},
 
@@ -140,18 +133,21 @@
 					data: 'kode_spatial',
 					render: function(data, type, row) {
 						var kode = data.replace(/[^a-zA-Z0-9]/g, '');
-
 						var url = "{{ route('2024.spatial.edit', ':kode') }}";
+						var kmlFile = row.kml_url;
+						var kmlPath = `{{ asset('storage') }}/${kmlFile}`;
 						url = url.replace(':kode', kode);
-						var link = `
+						var actionBtn = `
 							<div class="justify-content-center">
-								<a href="${url}" class="btn btn-icon btn-xs btn-default waves-effect waves-themed" data-toggle="tooltip" data-offset="0,10" data-original-title="Buat Peta Tunggal baru (Manual)">
+								<a href="${url}" class="btn btn-icon btn-xs btn-default waves-effect waves-themed" data-toggle="tooltip" data-offset="0,10" data-original-title="Lihat Peta">
 									<i class="fal fa-edit"></i>
+								</a>
+								<a href="${kmlPath}" class="btn btn-icon btn-xs btn-default waves-effect waves-themed" title="unduh kml" download>
+									<i class="fal fa-download"></i>
 								</a>
 							</div>
 						`;
-
-						return link;
+						return actionBtn;
 					}
 				}
 			],

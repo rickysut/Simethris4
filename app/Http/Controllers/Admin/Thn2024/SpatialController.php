@@ -42,12 +42,6 @@ class SpatialController extends Controller
 		return view('t2024.spatial.createsingle', compact('module_name', 'page_title', 'page_heading', 'heading_class', 'mapkey'));
 	}
 
-	/**
-	 * Store a newly created resource in storage.
-	 *
-	 * @param  \Illuminate\Http\Request  $request
-	 * @return \Illuminate\Http\Response
-	 */
 	public function storesingle(Request $request)
 	{
 		DB::beginTransaction();
@@ -62,7 +56,7 @@ class SpatialController extends Controller
 				$kdLokasi = $request->input('kode_spatial');
 
 				$filename = $kdLokasi . '_' . time() . '.' . $file->getClientOriginalExtension();
-				$path = 'uploads/kml/';
+				$path = 'uploads/kml';
 				$filePath = $file->storeAs($path, $filename, 'public');
 			} else {
 				throw new \Exception('File not found');
@@ -106,14 +100,6 @@ class SpatialController extends Controller
 		}
 	}
 
-
-
-	/**
-	 * Display the specified resource.
-	 *
-	 * @param  int  $id
-	 * @return \Illuminate\Http\Response
-	 */
 	public function show($id)
 	{
 		$module_name = 'Spatial';
@@ -123,44 +109,37 @@ class SpatialController extends Controller
 
 		$kode = substr_replace($id, '_', 3, 0);
 		$spatial = MasterSpatial::where('kode_spatial', $kode)
-			->with('anggota')
+			->with(['provinsi', 'kabupaten', 'kecamatan', 'desa'])
 			->first();
 
 		$mapkey = ForeignApi::find(1);
 		return view('t2024.spatial.edit', compact('module_name', 'page_title', 'page_heading', 'heading_class', 'mapkey', 'spatial'));
 	}
 
-	/**
-	 * Show the form for editing the specified resource.
-	 *
-	 * @param  int  $id
-	 * @return \Illuminate\Http\Response
-	 */
-	public function edit($id)
+	public function updatesingle(Request $request)
 	{
-		//
+		DB::beginTransaction();
+
+		try {
+
+			MasterSpatial::updateOrCreate(
+				['kode_spatial' => $request->input('kode_spatial')],
+				[
+					'komoditas' => $request->input('komoditas'),
+					'nama_petugas' => $request->input('nama_petugas'),
+					'tgl_peta' => $request->input('tgl_peta'),
+					'tgl_tanam' => $request->input('tgl_tanam'),
+				]
+			);
+
+			DB::commit();
+			return redirect()->route('2024.spatial.index')->with('success', 'Data successfully saved.');
+		} catch (\Exception $e) {
+
+			DB::rollBack();
+
+			return redirect()->back()->with('error', $e->getMessage());
+		}
 	}
 
-	/**
-	 * Update the specified resource in storage.
-	 *
-	 * @param  \Illuminate\Http\Request  $request
-	 * @param  int  $id
-	 * @return \Illuminate\Http\Response
-	 */
-	public function update(Request $request, $id)
-	{
-		//
-	}
-
-	/**
-	 * Remove the specified resource from storage.
-	 *
-	 * @param  int  $id
-	 * @return \Illuminate\Http\Response
-	 */
-	public function destroy($id)
-	{
-		//
-	}
 }

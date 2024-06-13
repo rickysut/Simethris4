@@ -42,16 +42,10 @@
 									<div id="myMap" style="height: 400px; width: 100%;" hidden></div>
 								</div>
 								<div class="col-lg-7">
-									<ul class="list-group" id="exportedData" hidden>
+									<ul class="list-group" id="exportedData">
 									</ul>
 									<div id="myForm" hidden>
 
-										<div class="form-group row">
-											<label for="komoditas" class="col-sm-3 col-form-label">Komoditas</label>
-											<div class="col-sm-9">
-												<input class="form-control" type="text" id="komoditas" name="komoditas" value="" readonly>
-											</div>
-										</div>
 										<div class="form-group row">
 											<label for="kode_spatial" class="col-sm-3 col-form-label">Kode Spatial</label>
 											<div class="col-sm-9">
@@ -77,9 +71,15 @@
 											</div>
 										</div>
 										<div class="form-group row">
-											<label for="altitude" class="col-sm-3 col-form-label">Altitude (mdpl)</label>
+											<label for="altitude" class="col-sm-3 col-form-label">Altitude</label>
 											<div class="col-sm-9">
 												<input class="form-control" type="text" id="altitude" name="altitude" value="" readonly>
+											</div>
+										</div>
+										<div class="form-group row">
+											<label for="ktp_petani" class="col-sm-3 col-form-label">NIK Petani</label>
+											<div class="col-sm-9">
+												<input class="form-control" type="text" id="ktp_petani" name="ktp_petani" value="" readonly>
 											</div>
 										</div>
 										<div class="form-group row">
@@ -92,18 +92,6 @@
 											<label for="nama_lahan" class="col-sm-3 col-form-label">Nama Lahan</label>
 											<div class="col-sm-9">
 												<input class="form-control" type="text" id="nama_lahan" name="nama_lahan" value="" readonly>
-											</div>
-										</div>
-										<div class="form-group row">
-											<label for="ktp_petani" class="col-sm-3 col-form-label">NIK Petani</label>
-											<div class="col-sm-9">
-												<input class="form-control" type="text" id="ktp_petani" name="ktp_petani" value="" readonly>
-											</div>
-										</div>
-										<div class="form-group row">
-											<label for="nama_petani" class="col-sm-3 col-form-label">Nama Petani</label>
-											<div class="col-sm-9">
-												<input class="form-control" type="text" id="nama_petani" name="nama_petani" value="" readonly>
 											</div>
 										</div>
 										<div class="form-group row">
@@ -132,6 +120,12 @@
 											<div class="col-sm-9">
 												<input class="form-control" type="text" id="kelurahan_nama" name="kelurahan_nama" value="" readonly>
 												<input class="form-control" type="hidden" id="kelurahan_id" name="kelurahan_id" value="">
+											</div>
+										</div>
+										<div class="form-group row">
+											<label for="komoditas" class="col-sm-3 col-form-label">Komoditas</label>
+											<div class="col-sm-9">
+												<input class="form-control" type="text" id="komoditas" name="komoditas" value="" readonly>
 											</div>
 										</div>
 										<div class="form-group row">
@@ -319,7 +313,6 @@
 			const id_lahan = placemark.querySelector("SimpleData[name='ID_Lahan']").textContent;
 			const komoditas = placemark.querySelector("SimpleData[name='Komoditas']").textContent;
 			const nikPetani = placemark.querySelector("SimpleData[name='NIK']").textContent;
-			const petani = placemark.querySelector("SimpleData[name='Petani']").textContent;
 			const luas = placemark.querySelector("SimpleData[name='Luas_Lahan']").textContent;
 			const x = parseFloat(placemark.querySelector("SimpleData[name='Latitude']").textContent);
 			const y = parseFloat(placemark.querySelector("SimpleData[name='Longitude']").textContent);
@@ -333,29 +326,29 @@
 			const kabupaten_id = desa_id.substring(0, 4);
 			const provinsi_id = desa_id.substring(0, 2);
 
+			console.log('kabupaten id: ' , kabupaten_id);
+			console.log('provinsi id: ' , provinsi_id);
+
+			document.getElementById("kode_spatial").value = id_lahan;
+			document.getElementById("komoditas").value = komoditas;
+			document.getElementById("kdLokasiTitle").textContent = id_lahan;
+			document.getElementById("ktp_petani").value = nikPetani;
+			document.getElementById("luas_lahan").value = luas;
+			document.getElementById("kelurahan_id").value = desa_id;
+			document.getElementById("kecamatan_id").value = kecamatan_id;
+			document.getElementById("kabupaten_id").value = kabupaten_id;
+			document.getElementById("provinsi_id").value = provinsi_id;
+			document.getElementById("nama_petugas").value = petugas;
+			document.getElementById("tgl_peta").value = tgl_peta;
+			document.getElementById("tgl_tanam").value = tgl_tanam;
+			document.getElementById("altitude").value = altitude;
+
 			const routeUrl = `{{ route('2024.datafeeder.getCpclByNik', ':nik') }}`.replace(':nik', nikPetani);
 
 			const routeDesa = `{{ route('wilayah.getDesaById', ':id') }}`.replace(':id', desa_id);
 			const routeKec = `{{ route('wilayah.getKecById', ':id') }}`.replace(':id', kecamatan_id);
 			const routeKab = `{{ route('wilayah.getKabById', ':id') }}`.replace(':id', kabupaten_id);
 			const routeProv = `{{ route('wilayah.getProvById', ':id') }}`.replace(':id', provinsi_id);
-
-			document.getElementById("kode_spatial").value = id_lahan;
-			document.getElementById("komoditas").value = komoditas;
-			document.getElementById("kdLokasiTitle").textContent = id_lahan;
-			document.getElementById("ktp_petani").value = nikPetani;
-			document.getElementById("nama_petani").value = petani;
-			document.getElementById("luas_lahan").value = luas;
-
-			document.getElementById("kelurahan_id").value = desa_id;
-			document.getElementById("kecamatan_id").value = kecamatan_id;
-			document.getElementById("kabupaten_id").value = kabupaten_id;
-			document.getElementById("provinsi_id").value = provinsi_id;
-
-			document.getElementById("nama_petugas").value = petugas;
-			document.getElementById("tgl_peta").value = tgl_peta;
-			document.getElementById("tgl_tanam").value = tgl_tanam;
-			document.getElementById("altitude").value = altitude;
 
 			Promise.all([
 				fetch(routeUrl).then(response => response.json()),
@@ -364,11 +357,6 @@
 				fetch(routeKab).then(response => response.json()),
 				fetch(routeProv).then(response => response.json())
 			]).then(([petaniData, desaData, kecData, kabData, provData]) => {
-				document.getElementById("kelurahan_nama").value = desaData.nama_desa;
-				document.getElementById("kecamatan_nama").value = kecData.nama_kecamatan;
-				document.getElementById("kabupaten_nama").value = kabData.nama_kab;
-				document.getElementById("provinsi_nama").value = provData.nama;
-
 				const nama_Petani = petaniData.nama_petani;
 				const namaDesa = desaData.nama_desa || 'Desa tidak terdaftar';
 				const namaKecamatan = kecData.nama_kecamatan || 'Kecamatan tidak terdaftar';

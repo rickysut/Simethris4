@@ -52,7 +52,7 @@ class DataFeederController extends Controller
 
 		$commitment = PullRiph::where('no_ijin', $noIjin)->first();
 		$query = Pks::query()
-			->select('id', 'no_ijin', 'poktan_id', 'nama_poktan','no_perjanjian', 'tgl_perjanjian_start', 'tgl_perjanjian_end', 'varietas_tanam', 'periode_tanam', 'berkas_pks')
+			->select('id', 'no_ijin', 'poktan_id', 'nama_poktan', 'no_perjanjian', 'tgl_perjanjian_start', 'tgl_perjanjian_end', 'varietas_tanam', 'periode_tanam', 'berkas_pks')
 			->where('no_ijin', $commitment->no_ijin)
 			->withCount('lokasi')
 			->withSum('lokasi', 'luas_lahan');
@@ -99,21 +99,21 @@ class DataFeederController extends Controller
 		$searchValue = $request->input('search.value', '');
 
 		$pks = Lokasi::select('id', 'no_ijin', 'poktan_id', 'kode_spatial', 'nama_petani', 'ktp_petani')->where('no_ijin', $noIjin)
-        ->where('poktan_id', $poktanId)
-		->with('datarealisasi', 'spatial.anggota')
-		->get();
+			->where('poktan_id', $poktanId)
+			->with('datarealisasi', 'spatial.anggota')
+			->get();
 
 		$query = $pks->map(function ($item) {
 			$datarealisasi = $item->datarealisasi;
 			$spatial = $item->spatial;
-    		$masteranggota = $spatial ? $spatial->anggota : null;
+			$masteranggota = $spatial ? $spatial->anggota : null;
 			return [
 				'id' => $item->id,
 				'nama_kelompok' => $item->nama_poktan,
 				'kode_spatial' => $item->kode_spatial,
 				'ktp_petani' => $item->ktp_petani,
 				'nama_petani' => $item->nama_petani,
-				'spatial_petani' => $masteranggota ? $masteranggota->nama_petani:null,
+				'spatial_petani' => $masteranggota ? $masteranggota->nama_petani : null,
 				'spatial_ktp' => $masteranggota ? $masteranggota->ktp_petani : null,
 				'luas_tanam' => $datarealisasi ? $datarealisasi->luas_tanam : 0,
 				'tgl_tanam' => $datarealisasi ? $datarealisasi->mulai_tanam : null,
@@ -168,29 +168,42 @@ class DataFeederController extends Controller
 		$length = $request->input('length', 10);
 		$searchValue = $request->input('search.value', '');
 
-		$query = MasterSpatial::select('id', 'kode_spatial', 'luas_lahan', 'ktp_petani', 'provinsi_id', 'kabupaten_id')
+		$data = MasterSpatial::select('id', 'kode_spatial', 'luas_lahan', 'ktp_petani', 'nama_petani', 'provinsi_id', 'kabupaten_id', 'kml_url')
 			->with([
-				'anggota:id,poktan_id,nama_petani,ktp_petani',
+				// 'anggota:id,poktan_id,nama_petani,ktp_petani',
 				'provinsi:provinsi_id,nama',
 				'kabupaten:kabupaten_id,nama_kab',
 				'jadwal:kode_spatial,awal_masa,akhir_masa',
-			]);
+			])->get();
 
-		if ($request->has('search') && !empty($request->input('search')['value'])) {
-			$searchValue = $request->input('search')['value'];
-			$query->where(function ($subQuery) use ($searchValue) {
-				$subQuery->where('kode_spatial', 'like', '%' . $searchValue . '%')
-					->orWhere('luas_lahan', 'like', '%' . $searchValue . '%')
-					->orWhere('ktp_petani', 'like', '%' . $searchValue . '%')
-					->orWhereHas('anggota', function ($subSubQuery) use ($searchValue) {
-						$subSubQuery->where('nama_petani', 'like', '%' . $searchValue . '%');
-					})
-					->orWhereHas('provinsi', function ($subSubQuery) use ($searchValue) {
-						$subSubQuery->where('nama', 'like', '%' . $searchValue . '%');
-					})
-					->orWhereHas('kabupaten', function ($subSubQuery) use ($searchValue) {
-						$subSubQuery->where('nama_kab', 'like', '%' . $searchValue . '%');
-					});
+		$query = $data->map(function ($item) {
+			return [
+				'id' => $item->id,
+				'kode_spatial' => $item->kode_spatial,
+				'luas_lahan' => $item->luas_lahan,
+				'ktp_petani' => $item->ktp_petani,
+				'nama_petani' => $item->nama_petani,
+				'kml_url' => $item->kml_url,
+				'provinsi_id' => $item->provinsi_id,
+				'nama_provinsi' => $item->provinsi ? $item->provinsi->nama : null,
+				'kabupaten_id' => $item->kabupaten_id,
+				'nama_kabupaten' => $item->kabupaten ? $item->kabupaten->nama_kab : null,
+				'kecamatan_id' => $item->kecamatan_id,
+				'nama_kecamatan' => $item->kecamatan ? $item->kecamatan->nama_kecamatan : null,
+				'kelurahan_id' => $item->kelurahan_id,
+				'nama_desa' => $item->desa ? $item->desa->nama_desa : null,
+			];
+		});
+
+		if ($searchValue) {
+			$query = $query->filter(function ($item) use ($searchValue) {
+				return strpos(strtolower($item['kode_spatial']), strtolower($searchValue)) !== false ||
+					strpos(strtolower($item['ktp_petani']), strtolower($searchValue)) !== false ||
+					strpos(strtolower($item['nama_petani']), strtolower($searchValue)) !== false ||
+					strpos(strtolower($item['nama_provinsi']), strtolower($searchValue)) !== false ||
+					strpos(strtolower($item['nama_kabupaten']), strtolower($searchValue)) !== false ||
+					strpos(strtolower($item['nama_kecamatan']), strtolower($searchValue)) !== false ||
+					strpos(strtolower($item['nama_desa']), strtolower($searchValue)) !== false;
 			});
 		}
 
@@ -198,13 +211,38 @@ class DataFeederController extends Controller
 			$orderColumn = $request->input('order')[0]['column'];
 			$orderDirection = $request->input('order')[0]['dir'];
 			$columnName = $request->input('columns')[$orderColumn]['data'];
-			$query->orderBy($columnName, $orderDirection);
-		}
-		$totalRecords = MasterSpatial::count();
 
+
+			// Gunakan switch case atau if else untuk menentukan kolom pengurutan
+			switch ($columnName) {
+				case 'kode_spatial':
+					$query = $query->sortBy('kode_spatial');
+					break;
+				case 'ktp_petani':
+					$query = $query->sortByDesc('ktp_petani');
+					break;
+				case 'nama_petani':
+					$query = $query->sortByDesc('nama_petani');
+					break;
+				case 'nama_provinsi':
+					$query = $query->sortByDesc('nama_provinsi');
+					break;
+				case 'nama_kabupaten':
+					$query = $query->sortByDesc('nama_kabupaten');
+					break;
+				case 'nama_kecamatan':
+					$query = $query->sortByDesc('nama_kecamatan');
+					break;
+				case 'nama_desa':
+					$query = $query->sortByDesc('nama_desa');
+					break;
+			}
+		}
+
+		$totalRecords = $data->count();
 		$filteredRecords = $query->count();
 
-		$spatials = $query->offset($start)->limit($length)->get();
+		$spatials = $query->slice($start)->take($length)->values();
 
 		return response()->json([
 			'draw' => $draw,
@@ -309,16 +347,16 @@ class DataFeederController extends Controller
 		$searchValue = $request->input('search.value', '');
 
 		$data = MasterAnggota::with([
-			'provinsi' => function($query) {
+			'provinsi' => function ($query) {
 				$query->select('provinsi_id', 'nama');
 			},
-			'kabupaten' => function($query) {
+			'kabupaten' => function ($query) {
 				$query->select('kabupaten_id', 'nama_kab');
 			},
-			'kecamatan' => function($query) {
+			'kecamatan' => function ($query) {
 				$query->select('kecamatan_id', 'nama_kecamatan');
 			},
-			'desa' => function($query) {
+			'desa' => function ($query) {
 				$query->select('kelurahan_id', 'nama_desa');
 			},
 			'spatial'
@@ -354,7 +392,7 @@ class DataFeederController extends Controller
 					strpos(strtolower($item['nama_kabupaten']), strtolower($searchValue)) !== false ||
 					strpos(strtolower($item['nama_kecamatan']), strtolower($searchValue)) !== false ||
 					strpos(strtolower($item['nama_desa']), strtolower($searchValue)) !== false;
-					strtolower($item['jumlah_spatial']) == strtolower($searchValue);
+				strtolower($item['jumlah_spatial']) == strtolower($searchValue);
 			});
 		}
 

@@ -88,7 +88,7 @@
 												<div class="input-group-prepend">
 													<span class="input-group-text"><i class="fal fa-user"></i></span>
 												</div>
-												<input type="text" value="{{$data['anggota']->nama_petani}}"
+												<input type="text" value="{{$data['spatial']->nama_petani}}"
 													name="nama_petani" id="nama_petani"
 													class="font-weight-bold form-control form-control-sm" readonly />
 											</div>
@@ -100,7 +100,7 @@
 												<div class="input-group-prepend">
 													<span class="input-group-text"><i class="fal fa-address-card"></i></span>
 												</div>
-												<input type="text" value="{{$data['anggota']->ktp_petani}}"
+												<input type="text" value="{{$data['spatial']->ktp_petani}}"
 													name="nik_petani" id="nik_petani"
 													class="font-weight-bold form-control form-control-sm" readonly />
 											</div>
@@ -125,7 +125,7 @@
 													<span class="input-group-text"><i class="fal fa-ruler-combined"></i></span>
 												</div>
 												<input type="text" value="{{$data['spatial']->luas_lahan}}"
-													name="luas_kira" id="luas_kira" readonly
+													name="luas_lahan" id="luas_lahan" readonly
 													class="font-weight-bold form-control form-control-sm" />
 											</div>
 											<span class="help-block">Luas bidang diukur menurut Database.</span>
@@ -214,7 +214,7 @@
 												<div class="input-group-prepend">
 													<span class="input-group-text"><i class="fal fa-calendar-day"></i></span>
 												</div>
-												<input type="date" value="" name="mulai_tanam" id="mulai_tanam" class="font-weight-bold form-control form-control-sm bg-white" />
+												<input type="date" value="{{$data['lokasi']->tgl_tanam}}" name="mulai_tanam" id="mulai_tanam" class="font-weight-bold form-control form-control-sm bg-white" />
 											</div>
 											<span class="help-block">Tanggal mulai penanaman.</span>
 										</div>
@@ -224,12 +224,12 @@
 												<div class="input-group-prepend">
 													<span class="input-group-text"><i class="fal fa-calendar-day"></i></span>
 												</div>
-												<input type="date" value="" name="akhir_tanam" id="akhir_tanam" class="font-weight-bold form-control form-control-sm bg-white" />
+												<input type="date" value="{{$data['lokasi']->tgl_akhir_tanam}}" name="akhir_tanam" id="akhir_tanam" class="font-weight-bold form-control form-control-sm bg-white" />
 											</div>
 											<span class="help-block">Tanggal akhir penanaman.</span>
 										</div>
 										<div class="form-group col-md-4">
-											<label for="luas_lahan">Luas Tanam (ha)<sup class="text-danger"> *</sup></label>
+											<label for="luas_lahan">Luas Tanam (m2)<sup class="text-danger"> *</sup></label>
 											<div class="input-group">
 												<div class="input-group-prepend">
 													<span class="input-group-text"><i class="fal fa-ruller"></i></span>
@@ -237,7 +237,8 @@
 												{{-- tambahkan ini
 												max="{{ $anggota->luas_lahan - $anggota->datarealisasi->sum('luas_lahan') }}"
 												untuk pembatasan dan aktifkan script --}}
-												<input type="number" step="0.001" value="" name="luas_lahan" id="luas_lahan" class="font-weight-bold form-control form-control-sm bg-white" />
+												<input type="number" step="1" value="{{$data['lokasi']->luas_tanam}}" name="luas_tanam" id="luas_tanam" class="font-weight-bold form-control form-control-sm bg-white"
+												max="{{$data['spatial']->luas_tanam }}" />
 											</div>
 											<span class="help-block">Luas lahan yang ditanami.</span>
 										</div>
@@ -253,7 +254,7 @@
 												<div class="input-group-prepend">
 													<span class="input-group-text"><i class="fal fa-calendar-day"></i></span>
 												</div>
-												<input type="date" value="" name="mulai_panen" id="mulai_panen" class="font-weight-bold form-control form-control-sm bg-white" />
+												<input type="date" value="{{$data['lokasi']->tgl_panen}}" name="mulai_panen" id="mulai_panen" class="font-weight-bold form-control form-control-sm bg-white" />
 											</div>
 											<span class="help-block">Tanggal dimulainya pemanenan.</span>
 										</div>
@@ -263,7 +264,7 @@
 												<div class="input-group-prepend">
 													<span class="input-group-text"><i class="fal fa-calendar-day"></i></span>
 												</div>
-												<input type="date" value="" name="akhir_panen" id="akhir_panen" class="font-weight-bold form-control form-control-sm bg-white" />
+												<input type="date" value="{{$data['lokasi']->luas_akhir_panen}}" name="akhir_panen" id="akhir_panen" class="font-weight-bold form-control form-control-sm bg-white" />
 											</div>
 											<span class="help-block">Tanggal akhir dilaksanakannya pemanenan.</span>
 										</div>
@@ -276,7 +277,7 @@
 												{{-- tambahkan ini
 												max="{{ $anggota->luas_lahan - $anggota->datarealisasi->sum('luas_lahan') }}"
 												untuk pembatasan dan aktifkan script --}}
-												<input type="number" step="0.001" value="" name="volume" id="volume" class="font-weight-bold form-control form-control-sm bg-white" />
+												<input type="number" step="1" value="{{$data['lokasi']->volume}}" name="volume" id="volume" class="font-weight-bold form-control form-control-sm bg-white" />
 											</div>
 											<span class="help-block">Total produksi yang diperoleh.</span>
 										</div>
@@ -292,7 +293,7 @@
 												<div class="input-group-prepend">
 													<span class="input-group-text"><i class="fal fa-seedling"></i></span>
 												</div>
-												<input type="number" step="0.001" value="" name="vol_benih" id="vol_benih" class="font-weight-bold form-control form-control-sm bg-white" />
+												<input type="number" step="1" value="{{$data['lokasi']->vol_benih}}" max="{{ $data['lokasi']->volume }}" name="vol_benih" id="vol_benih" class="font-weight-bold form-control form-control-sm bg-white" />
 											</div>
 											<span class="help-block">Total produksi yang disimpan sebagai benih.</span>
 										</div>
@@ -300,9 +301,9 @@
 											<label for="volume">Untuk Dijual (ton)<sup class="text-danger"> *</sup></label>
 											<div class="input-group">
 												<div class="input-group-prepend">
-													<span class="input-group-text"><i class="fal fa-seedling"></i></span>
+													<span class="input-group-text"><i class="fal fa-truck-loading"></i></span>
 												</div>
-												<input type="number" step="0.001" value="" name="vol_jual" id="vol_jual" class="font-weight-bold form-control form-control-sm bg-white" />
+												<input type="number" step="1" value="{{$data['lokasi']->vol_jual}}" name="vol_jual" id="vol_jual" max="{{ $data['lokasi']->volume - $data['lokasi']->vol_benih }}" class="font-weight-bold form-control form-control-sm bg-white" />
 											</div>
 											<span class="help-block">Total produksi yang dilepas ke konsumsi.</span>
 										</div>
@@ -430,7 +431,7 @@
 		var latitudeInput = $('#latitude');
 		var longitudeInput = $('#longitude');
 		var polygonInput = $('#polygon');
-		var luasLahanInput = $('#luas_kira');
+		var luasLahanInput = $('#luas_lahan');
 		var namaPetani = $('#nama_petani');
 		var ktpPetani = $('#ktp_petani');
 
@@ -450,6 +451,70 @@
 				createMarker();
 				createPolygon();
 			});
+		});
+
+		$('#luas_tanam').val('');
+
+		// Validate luas_tanam on input change
+		$('#luas_tanam').on('input', function() {
+			var luasLahan = parseFloat($('#luas_lahan').val());
+			var luasTanam = parseFloat($(this).val());
+
+			// Check if luasTanam is not a number or is negative
+			if (isNaN(luasTanam) || luasTanam < 0) {
+				$(this).val('').attr('placeholder', 'Masukkan nilai luas tanam yang valid.');
+				return;
+			}
+
+			// Check if luasTanam exceeds luasLahan
+			if (luasTanam > luasLahan) {
+				$(this).val('').attr('placeholder', 'Luas tanam tidak boleh melebihi luas lahan.');
+			} else {
+				$(this).attr('placeholder', '');
+			}
+		});
+
+		// Disable vol_benih and vol_jual initially
+		$('#vol_benih, #vol_jual').prop('disabled', true);
+
+		// Reset vol_benih and vol_jual on change of volume
+		$('#volume').on('input', function() {
+			var volume = parseFloat($(this).val());
+			if (isNaN(volume) || volume < 0) {
+				$(this).val('').attr('placeholder', 'Masukkan nilai volume yang valid.');
+				$('#vol_benih, #vol_jual').val('').prop('disabled', true);
+			} else {
+				$(this).attr('placeholder', '');
+				$('#vol_benih, #vol_jual').prop('disabled', false);
+				$('#vol_benih').val('').attr('max', volume);
+				$('#vol_jual').val('').attr('max', volume);
+			}
+		});
+
+		// Reset vol_jual if vol_benih is changed
+		$('#vol_benih').on('input', function() {
+			var volBenih = parseFloat($(this).val());
+			var volume = parseFloat($('#volume').val());
+			if (isNaN(volBenih) || volBenih < 0 || volBenih > volume) {
+				$(this).val('').attr('placeholder', 'Masukkan nilai vol benih yang valid.');
+				$('#vol_jual').val('').prop('disabled', true);
+			} else {
+				$(this).attr('placeholder', '');
+				$('#vol_jual').prop('disabled', false);
+				$('#vol_jual').attr('max', volume - volBenih);
+			}
+		});
+
+		// Validate vol_jual on input change
+		$('#vol_jual').on('input', function() {
+			var volJual = parseFloat($(this).val());
+			var volBenih = parseFloat($('#vol_benih').val());
+			var volume = parseFloat($('#volume').val());
+			if (isNaN(volJual) || volJual < 0 || volJual > (volume - volBenih)) {
+				$(this).val('').attr('placeholder', 'Masukkan nilai vol jual yang valid.');
+			} else {
+				$(this).attr('placeholder', '');
+			}
 		});
 
 		function clearMarkers() {
@@ -524,11 +589,5 @@
 	});
 </script>
 {{-- aktifkan untuk pembatasan max input luas lahan
-	document.getElementById("luas_lahan").addEventListener("input", function() {
-		var maxLuasLahan = parseFloat({{ $data['anggota']->luas_lahan - $data['anggota']->datarealisasi->sum('luas_lahan') }});
-		var inputLuasLahan = parseFloat(this.value);
-		if (inputLuasLahan > maxLuasLahan) {
-			this.value = maxLuasLahan;
-		}
-	}); --}}
+	 --}}
 @endsection

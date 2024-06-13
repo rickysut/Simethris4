@@ -472,7 +472,7 @@ Route::group(['prefix' => '2024', 'as' => '2024.', 'namespace' => 'Admin', 'midd
 
 				//pengisian data realisasi
 				Route::get('{noIjin}/realisasi', 'CommitmentController@realisasi')->name('realisasi');
-				Route::post('{id}/realisasi/storeUserDocs', 'CommitmentController@storeUserDocs')->name('storeUserDocs');
+				Route::post('{noIjin}/storeUserDocs', 'CommitmentController@storeUserDocs')->name('storeUserDocs');
 
 				Route::group(['prefix' => 'pks', 'as' => 'pks.'], function () {
 					Route::get('/{noIjin}/{poktanId}/create', 'PksController@createPks')->name('create');
@@ -500,6 +500,7 @@ Route::group(['prefix' => '2024', 'as' => '2024.', 'namespace' => 'Admin', 'midd
 			Route::get('/createsingle', 'SpatialController@createsingle')->name('createsingle');
 			Route::post('/storesingle', 'SpatialController@storesingle')->name('storesingle');
 			Route::get('/{id}/show', 'SpatialController@show')->name('edit');
+			Route::post('/updatesingle', 'SpatialController@updatesingle')->name('updatesingle');
 		});
 
 		//route untuk cpcl
