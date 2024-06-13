@@ -101,7 +101,7 @@ class PksController extends Controller
 		$lokasi = Lokasi::where('no_ijin',$noIjin)->where('kode_spatial', $spatial)->first();
 		// dd($spatial);
 		$pks = Pks::where('poktan_id', $lokasi->poktan_id)->where('no_ijin', $noIjin)->first();
-		$spatial = MasterSpatial::select('id', 'kode_spatial', 'latitude','longitude', 'polygon', 'altitude', 'luas_lahan', 'kabupaten_id', 'ktp_petani')->where('kode_spatial', $spatial)
+		$spatial = MasterSpatial::select('id', 'kode_spatial', 'nama_petani','latitude','longitude', 'polygon', 'altitude', 'luas_lahan', 'kabupaten_id', 'ktp_petani')->where('kode_spatial', $spatial)
 		->first();
 
 		$kabupatens = MasterKabupaten::select('kabupaten_id', 'nama_kab')->get();
@@ -111,7 +111,6 @@ class PksController extends Controller
 		}
 
 		$data = [
-
 			'npwpCompany' => $npwpCompany,
 			'lokasi' => $lokasi,
 			'pks' => $pks,

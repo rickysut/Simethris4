@@ -130,7 +130,7 @@ class CommitmentController extends Controller
 			substr($noIjin, 12, 4);
 
 		$npwp = Auth::user()->data_user->npwp_company;
-		$commitment = PullRiph::select('id', 'npwp', 'no_ijin', 'status')
+		$commitment = PullRiph::select('id', 'npwp', 'no_ijin', 'status', 'periodetahun')
 			->where('npwp', $npwp)
 			->where('no_ijin',$noIjin)->first();
 
@@ -156,9 +156,6 @@ class CommitmentController extends Controller
 		return view('t2024.commitment.realisasi', compact('module_name', 'page_title', 'page_heading', 'heading_class', 'commitment', 'noIjin','penangkars', 'docs', 'npwp', 'varietass', 'disabled', 'poktans', 'ijin'));
 	}
 
-
-
-
 	public function updatePks(Request $request, $id)
 	{
 		DB::beginTransaction();
@@ -179,7 +176,7 @@ class CommitmentController extends Controller
 			if ($request->hasFile('berkas_pks')) {
 				$file = $request->file('berkas_pks');
 				$request->validate([
-					'berkas_pks' => 'mimes:pdf',
+					'berkas_pks' => 'mimes:pdf|max:2048',
 				]);
 				$filename = 'pks_' . $filenpwp . '_' . $noIjin . '_' . $pks->poktan_id . '_' . time() . '.' . $file->extension();
 				$path = 'uploads/' . $filenpwp . '/' . $commitment->periodetahun;
@@ -203,14 +200,23 @@ class CommitmentController extends Controller
 	}
 
 
-	public function storeUserDocs(Request $request, $id)
+	public function storeUserDocs(Request $request, $ijin)
 	{
-		$commitment = PullRiph::find($id);
+		$noIjin = substr($ijin, 0, 4) . '/' .
+			substr($ijin, 4, 2) . '.' .
+			substr($ijin, 6, 3) . '/' .
+			substr($ijin, 9, 1) . '/' .
+			substr($ijin, 10, 2) . '/' .
+			substr($ijin, 12, 4);
+
+		// dd($noIjin);
+
+		$commitment = PullRiph::where('no_ijin', $noIjin)->first();
 		$realnpwp = $commitment->npwp;
-		$npwp = str_replace(['.', '-'], '', $commitment->npwp);
-		$realNoIjin = $commitment->no_ijin;
-		$noIjin = str_replace(['/', '.'], '', $realNoIjin);
+		$npwp = str_replace(['.', '-'], '', $realnpwp);
 		$userFiles = [];
+
+		// dd($npwp);
 
 		try {
 			DB::beginTransaction();
@@ -235,7 +241,7 @@ class CommitmentController extends Controller
 			$rules = [];
 			$messages = [];
 			foreach ($fileFields as $field) {
-				$rules[$field] = 'mimetypes:application/pdf'; // Hanya izinkan file PDF
+				$rules[$field] = 'mimetypes:application/pdf|max:2048'; // Hanya izinkan file PDF
 
 				// Periksa apakah file ada dalam permintaan sebelum menambahkan pesan kustom
 				if ($request->hasFile($field)) {
@@ -252,7 +258,7 @@ class CommitmentController extends Controller
 					$file = $request->file($field);
 
 					$fileExtension = $file->extension();
-					$file_name = $field . '_' . $noIjin . '_' . time() . '.' . $fileExtension;
+					$file_name = $field . '_' . $ijin . '_' . time() . '.' . $fileExtension;
 					$file_path = $file->storeAs('uploads/' . $npwp . '/' . $commitment->periodetahun, $file_name, 'public');
 					$userFiles[$field] = $file_name;
 				}
@@ -261,8 +267,8 @@ class CommitmentController extends Controller
 			$data = UserDocs::updateOrCreate(
 				[
 					'npwp' => $realnpwp,
-					'commitment_id' => $id,
-					'no_ijin' => $realNoIjin
+					'commitment_id' => $commitment->id,
+					'no_ijin' => $noIjin
 				],
 				array_merge($request->all(), $userFiles) // Menggabungkan data form dan file dalam satu array
 			);

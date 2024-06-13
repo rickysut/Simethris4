@@ -27,6 +27,7 @@ class MasterSpatial extends Model
 		'komoditas',
 		'kode_spatial',
 		'ktp_petani',
+		'nama_petani',
 		'latitude',
 		'longitude',
 		'polygon',

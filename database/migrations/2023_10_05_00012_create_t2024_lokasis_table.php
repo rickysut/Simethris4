@@ -37,7 +37,7 @@ return new class extends Migration
 			$table->string('tanam_pict')->nullable();
 			$table->date('tgl_panen')->nullable();
 			$table->date('tgl_akhir_panen')->nullable();
-			$table->decimal('volume')->nullable();
+			$table->double('volume')->nullable();
 			$table->string('panen_doc')->nullable();
 			$table->string('panen_pict')->nullable();
 			$table->integer('status')->nullable();

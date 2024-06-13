@@ -169,7 +169,7 @@ class PullRiphController extends Controller
 						'no_ijin' => $noijin,
 					])->forceDelete();
 					if (is_array($dtjson->riph->wajib_tanam->kelompoktani->loop)) {
-						$spatialCounter = 97;
+						$spatialCounter = 0;
 						foreach ($dtjson->riph->wajib_tanam->kelompoktani->loop as $poktan) {
 							$namaPoktan = trim($poktan->nama_kelompok, ' ');
 							$namaPetani = trim($poktan->nama_petani, ' ');
@@ -235,7 +235,7 @@ class PullRiphController extends Controller
 							);
 						}
 					} elseif (is_object($dtjson->riph->wajib_tanam->kelompoktani->loop)) {
-						$spatialCounter = 97;
+						$spatialCounter = 0;
 						$poktan = $dtjson->riph->wajib_tanam->kelompoktani->loop;
 						if (!empty($poktan->kode_spatial)) {
 							$kdSpatial = trim($poktan->kode_spatial, ' ');

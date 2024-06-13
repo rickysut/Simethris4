@@ -12,6 +12,9 @@
 @include('t2024.partials.subheader')
 @can('commitment_show')
 @include('t2024.partials.sysalert')
+@php
+	$pathNpwp = str_replace(['.', '-'], '', $npwp);
+@endphp
 	{{-- {{ dd($data_poktan) }} --}}
 	<ul class="nav nav-tabs" role="tablist">
 		<li class="nav-item">
@@ -58,7 +61,7 @@
 			</div>
 		</div>
 		<div class="tab-pane fade" id="panel-6" role="tabpanel" aria-labelledby="panel-6">
-			<form action="{{route('admin.task.commitment.realisasi.storeUserDocs', $commitment->id)}}" method="post" enctype="multipart/form-data" id="docsUpload">
+			<form action="{{route('2024.user.commitment.storeUserDocs', $ijin)}}" method="post" enctype="multipart/form-data" id="docsUpload">
 					@csrf
 				<div class="row mb-3">
 					<div class="col-12">
@@ -97,12 +100,12 @@
 								<label class="col-sm-3 col-form-label" for="sptjmtanam">Form SPTJM (tanam)</label>
 								<div class="col-sm-9">
 									<div class="custom-file input-group">
-										<input type="file" accept=".pdf" class="custom-file-input" name="sptjmtanam" id="sptjmtanam" value="{{ old('sptjmtanam', optional($docs)->sptjmtanam) }}">
+										<input type="file" accept=".pdf" class="custom-file-input size-validation" name="sptjmtanam" id="sptjmtanam" value="{{ old('sptjmtanam', optional($docs)->sptjmtanam) }}" data>
 										<label class="custom-file-label" for="sptjmtanam">{{ $docs ? ($docs->sptjmtanam ? $docs->sptjmtanam : 'Pilih berkas...') : 'Pilih berkas...' }}</label>
 									</div>
 									<span class="help-block">
 										@if($docs && $docs->sptjmtanam)
-											<a href="{{ asset('storage/uploads/'.$npwp.'/'.$commitment->periodetahun.'/'.$docs->sptjmtanam) }}" target="_blank">
+											<a href="{{ asset('storage/uploads/'.$pathNpwp.'/'.$commitment->periodetahun.'/'.$docs->sptjmtanam) }}" target="_blank">
 												Lihat Dokumen diunggah.
 											</a>
 										@else
@@ -115,12 +118,12 @@
 								<label class="col-sm-3 col-form-label" for="rta">Form RTA</label>
 								<div class="col-sm-9">
 									<div class="custom-file input-group">
-										<input type="file" accept=".pdf" class="custom-file-input" name="rta" id="rta" value="{{ old('rta', optional($docs)->rta) }}">
+										<input type="file" accept=".pdf" class="custom-file-input size-validation" name="rta" id="rta" value="{{ old('rta', optional($docs)->rta) }}">
 										<label class="custom-file-label" for="rta">{{ $docs ? ($docs->rta ? $docs->rta : 'Pilih berkas...') : 'Pilih berkas...' }}</label>
 									</div>
 									<span class="help-block">
 										@if($docs && $docs->rta)
-											<a href="{{ asset('storage/uploads/'.$npwp.'/'.$commitment->periodetahun.'/'.$docs->rta) }}" target="_blank">
+											<a href="{{ asset('storage/uploads/'.$pathNpwp.'/'.$commitment->periodetahun.'/'.$docs->rta) }}" target="_blank">
 												Lihat Dokumen diunggah.
 											</a>
 										@else
@@ -133,12 +136,12 @@
 								<label class="col-sm-3 col-form-label" for="sphtanam">SPH-SBS Tanam</label>
 								<div class="col-sm-9">
 									<div class="custom-file input-group">
-										<input type="file" accept=".pdf" class="custom-file-input" name="sphtanam" id="sphtanam" value="{{ old('sphtanam', optional($docs)->sphtanam) }}">
+										<input type="file" accept=".pdf" class="custom-file-input size-validation" name="sphtanam" id="sphtanam" value="{{ old('sphtanam', optional($docs)->sphtanam) }}">
 										<label class="custom-file-label" for="sphtanam">{{ $docs ? ($docs->sphtanam ? $docs->sphtanam : 'Pilih berkas...') : 'Pilih berkas...' }}</label>
 									</div>
 									<span class="help-block">
 										@if($docs && $docs->sphtanam)
-											<a href="{{ asset('storage/uploads/'.$npwp.'/'.$commitment->periodetahun.'/'.$docs->sphtanam) }}" target="_blank">
+											<a href="{{ asset('storage/uploads/'.$pathNpwp.'/'.$commitment->periodetahun.'/'.$docs->sphtanam) }}" target="_blank">
 												Lihat Dokumen diunggah.
 											</a>
 										@else
@@ -151,12 +154,12 @@
 								<label class="col-sm-3 col-form-label" for="logbooktanam">Logbook Tanam</label>
 								<div class="col-sm-9">
 									<div class="custom-file input-group">
-										<input type="file" accept=".pdf" class="custom-file-input" name="logbooktanam" id="logbooktanam" value="{{ old('logbooktanam', optional($docs)->logbooktanam) }}">
+										<input type="file" accept=".pdf" class="custom-file-input size-validation" name="logbooktanam" id="logbooktanam" value="{{ old('logbooktanam', optional($docs)->logbooktanam) }}">
 										<label class="custom-file-label" for="logbooktanam">{{ $docs ? ($docs->logbooktanam ? $docs->logbooktanam : 'Pilih berkas...') : 'Pilih berkas...' }}</label>
 									</div>
 									<span class="help-block">
 										@if($docs && $docs->logbooktanam)
-											<a href="{{ asset('storage/uploads/'.$npwp.'/'.$commitment->periodetahun.'/'.$docs->logbooktanam) }}" target="_blank">
+											<a href="{{ asset('storage/uploads/'.$pathNpwp.'/'.$commitment->periodetahun.'/'.$docs->logbooktanam) }}" target="_blank">
 												Lihat Dokumen diunggah.
 											</a>
 										@else
@@ -179,12 +182,12 @@
 								<label class="col-sm-3 col-form-label" for="spvt">Pengajuan Verifikasi Tanam</label>
 								<div class="col-sm-9">
 									<div class="custom-file input-group">
-										<input type="file" accept=".pdf" class="custom-file-input" name="spvt" id="spvt" value="{{ old('spvt', optional($docs)->spvt) }}">
+										<input type="file" accept=".pdf" class="custom-file-input size-validation" name="spvt" id="spvt" value="{{ old('spvt', optional($docs)->spvt) }}">
 										<label class="custom-file-label" for="spvt">{{ $docs ? ($docs->spvt ? $docs->spvt : 'Pilih berkas...') : 'Pilih berkas...' }}</label>
 									</div>
 									<span class="help-block">
 										@if($docs && $docs->spvt)
-											<a href="{{ asset('storage/uploads/'.$npwp.'/'.$commitment->periodetahun.'/'.$docs->spvt) }}" target="_blank">
+											<a href="{{ asset('storage/uploads/'.$pathNpwp.'/'.$commitment->periodetahun.'/'.$docs->spvt) }}" target="_blank">
 												Lihat Dokumen diunggah.
 											</a>
 										@else
@@ -220,12 +223,12 @@
 								<label class="col-sm-3 col-form-label" for="sptjmproduksi">Form SPTJM (produksi)</label>
 								<div class="col-sm-9">
 									<div class="custom-file input-group">
-										<input type="file" accept=".pdf" class="custom-file-input" name="sptjmproduksi" id="sptjmproduksi" value="{{ old('sptjmproduksi', optional($docs)->sptjmproduksi) }}">
+										<input type="file" accept=".pdf" class="custom-file-input size-validation" name="sptjmproduksi" id="sptjmproduksi" value="{{ old('sptjmproduksi', optional($docs)->sptjmproduksi) }}">
 										<label class="custom-file-label" for="sptjmproduksi">{{ $docs ? ($docs->sptjmproduksi ? $docs->sptjmproduksi : 'Pilih berkas...') : 'Pilih berkas...' }}</label>
 									</div>
 									<span class="help-block">
 										@if($docs && $docs->sptjmproduksi)
-											<a href="{{ asset('storage/uploads/'.$npwp.'/'.$commitment->periodetahun.'/'.$docs->sptjmproduksi) }}" target="_blank">
+											<a href="{{ asset('storage/uploads/'.$pathNpwp.'/'.$commitment->periodetahun.'/'.$docs->sptjmproduksi) }}" target="_blank">
 												Lihat Dokumen diunggah.
 											</a>
 										@else
@@ -238,12 +241,12 @@
 								<label class="col-sm-3 col-form-label" for="rpo">Form RPO</label>
 								<div class="col-sm-9">
 									<div class="custom-file input-group">
-										<input type="file" accept=".pdf" class="custom-file-input" name="rpo" id="rpo" value="{{ old('rpo', optional($docs)->rpo) }}">
+										<input type="file" accept=".pdf" class="custom-file-input size-validation" name="rpo" id="rpo" value="{{ old('rpo', optional($docs)->rpo) }}">
 										<label class="custom-file-label" for="rpo">{{ $docs ? ($docs->rpo ? $docs->rpo : 'Pilih berkas...') : 'Pilih berkas...' }}</label>
 									</div>
 									<span class="help-block">
 										@if($docs && $docs->rpo)
-											<a href="{{ asset('storage/uploads/'.$npwp.'/'.$commitment->periodetahun.'/'.$docs->rpo) }}" target="_blank">
+											<a href="{{ asset('storage/uploads/'.$pathNpwp.'/'.$commitment->periodetahun.'/'.$docs->rpo) }}" target="_blank">
 												Lihat Dokumen diunggah.
 											</a>
 										@else
@@ -256,12 +259,12 @@
 								<label class="col-sm-3 col-form-label" for="sphproduksi">SPH-SBS Produksi</label>
 								<div class="col-sm-9">
 									<div class="custom-file input-group">
-										<input type="file" accept=".pdf" class="custom-file-input" name="sphproduksi" id="sphproduksi" value="{{ old('sphproduksi', optional($docs)->sphproduksi) }}">
+										<input type="file" accept=".pdf" class="custom-file-input size-validation" name="sphproduksi" id="sphproduksi" value="{{ old('sphproduksi', optional($docs)->sphproduksi) }}">
 										<label class="custom-file-label" for="sphproduksi">{{ $docs ? ($docs->sphproduksi ? $docs->sphproduksi : 'Pilih berkas...') : 'Pilih berkas...' }}</label>
 									</div>
 									<span class="help-block">
 										@if($docs && $docs->sphproduksi)
-											<a href="{{ asset('storage/uploads/'.$npwp.'/'.$commitment->periodetahun.'/'.$docs->sphproduksi) }}" target="_blank">
+											<a href="{{ asset('storage/uploads/'.$pathNpwp.'/'.$commitment->periodetahun.'/'.$docs->sphproduksi) }}" target="_blank">
 												Lihat Dokumen diunggah.
 											</a>
 										@else
@@ -274,12 +277,12 @@
 								<label class="col-sm-3 col-form-label" for="logbookproduksi">LogBook</label>
 								<div class="col-sm-9">
 									<div class="custom-file input-group">
-										<input type="file" accept=".pdf" class="custom-file-input" name="logbookproduksi" id="logbookproduksi" value="{{ old('logbookproduksi', optional($docs)->logbookproduksi) }}">
+										<input type="file" accept=".pdf" class="custom-file-input size-validation" name="logbookproduksi" id="logbookproduksi" value="{{ old('logbookproduksi', optional($docs)->logbookproduksi) }}">
 										<label class="custom-file-label" for="logbookproduksi">{{ $docs ? ($docs->logbookproduksi ? $docs->logbookproduksi : 'Pilih berkas...') : 'Pilih berkas...' }}</label>
 									</div>
 									<span class="help-block">
 										@if($docs && $docs->logbookproduksi)
-											<a href="{{ asset('storage/uploads/'.$npwp.'/'.$commitment->periodetahun.'/'.$docs->logbookproduksi) }}" target="_blank">
+											<a href="{{ asset('storage/uploads/'.$pathNpwp.'/'.$commitment->periodetahun.'/'.$docs->logbookproduksi) }}" target="_blank">
 												Lihat Dokumen diunggah.
 											</a>
 										@else
@@ -292,12 +295,12 @@
 								<label class="col-sm-3 col-form-label" for="formLa">Form LA</label>
 								<div class="col-sm-9">
 									<div class="custom-file input-group">
-										<input type="file" accept=".pdf" class="custom-file-input" name="formLa" id="formLa" value="{{ old('formLa', optional($docs)->formLa) }}">
+										<input type="file" accept=".pdf" class="custom-file-input size-validation" name="formLa" id="formLa" value="{{ old('formLa', optional($docs)->formLa) }}">
 										<label class="custom-file-label" for="formLa">{{ $docs ? ($docs->formLa ? $docs->formLa : 'Pilih berkas...') : 'Pilih berkas...' }}</label>
 									</div>
 									<span class="help-block">
 										@if($docs && $docs->formLa)
-											<a href="{{ asset('storage/uploads/'.$npwp.'/'.$commitment->periodetahun.'/'.$docs->formLa) }}" target="_blank">
+											<a href="{{ asset('storage/uploads/'.$pathNpwp.'/'.$commitment->periodetahun.'/'.$docs->formLa) }}" target="_blank">
 												Lihat Dokumen diunggah.
 											</a>
 										@else
@@ -318,12 +321,12 @@
 								<label class="col-sm-3 col-form-label" for="spvp">Pengajuan Verifikasi Produksi</label>
 								<div class="col-sm-9">
 									<div class="custom-file input-group">
-										<input type="file" accept=".pdf" accept=".pdf" class="custom-file-input" name="spvp" id="spvp" value="{{ old('spvp', optional($docs)->spvp) }}">
+										<input type="file" accept=".pdf" accept=".pdf" class="custom-file-input size-validation" name="spvp" id="spvp" value="{{ old('spvp', optional($docs)->spvp) }}">
 										<label class="custom-file-label" for="spvp">{{ $docs ? ($docs->spvp ? $docs->spvp : 'Pilih berkas...') : 'Pilih berkas...' }}</label>
 									</div>
 									<span class="help-block">
 										@if($docs && $docs->spvp)
-											<a href="{{ asset('storage/uploads/'.$npwp.'/'.$commitment->periodetahun.'/'.$docs->spvp) }}" target="_blank">
+											<a href="{{ asset('storage/uploads/'.$pathNpwp.'/'.$commitment->periodetahun.'/'.$docs->spvp) }}" target="_blank">
 												Lihat Dokumen diunggah.
 											</a>
 										@else
@@ -350,7 +353,7 @@
 			<div class="modal-content">
 				<div class="modal-header">
 					<span class="modal-title">
-						<h4 class="fw-500">Data PKS</h4>
+						<h4 class="fw-500">Edit Data PKS</h4>
 						<span>Data Perjanjian Kerjasama dengan Mitra Kelompok Tani</span>
 					</span>
 					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -368,7 +371,7 @@
 									</a>
 								</div>
 								<div class="custom-file">
-									<input type="file" accept=".pdf" class="custom-file-input" id="berkas_pks" name="berkas_pks" onchange="validateFile(this)">
+									<input type="file" accept=".pdf" class="custom-file-input  size-validation" id="berkas_pks" name="berkas_pks" onchange="validateFile(this)">
 									<label class="custom-file-label" for="berkas_pks" id="file-name-label">Pilih file...</label>
 								</div>
 							</div>
@@ -817,6 +820,28 @@
 		}
 	});
 
-
+	//validasi ukuran berkas
+	$(document).ready(function() {
+		$('.size-validation').on('change', function() {
+        var file = this.files[0];
+        if (file) {
+            var fileSize = file.size / 1024 / 1024; // in MB
+            if (fileSize > 2) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Ukuran Berkas',
+                    text: 'Ukuran yang diijinkan tidak melebihi 2MB',
+                });
+                // Clear the input field
+                $(this).val('');
+                // Reset the label
+                $(this).next('.custom-file-label').text('Pilih berkas...');
+            } else {
+                // Update the label with the file name
+                $(this).next('.custom-file-label').text(file.name);
+            }
+        }
+    });
+	});
 </script>
 @endsection

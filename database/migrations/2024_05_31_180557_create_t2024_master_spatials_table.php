@@ -20,6 +20,7 @@ return new class extends Migration
 			// $table->foreign('ktp_petani')->references('ktp_petani')->on('master_anggotas')->onDelete('cascade'); // Menambahkan foreign key
 			$table->integer('poktan_id')->nullable();
 			$table->string('ktp_petani', 16); //contoh: 3313022204510001
+			$table->string('nama_petani', 255); //contoh: 3313022204510001
 			$table->text('latitude');
 			$table->text('longitude');
 			$table->text('polygon');
