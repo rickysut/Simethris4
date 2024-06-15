@@ -29,220 +29,7 @@ td {
 							<th>SKL</th>
 						</thead>
 						<tbody>
-							@foreach ($commitments as $commitment)
-							<tr>
-								<td>
-									<a href="{{ route('2024.user.commitment.show', $noIjin) }}" title="Lihat Data Komitmen" target="_blank">
-										{{$commitment->no_ijin}}
-									</a>
-								</td>
-								<td class="text-center">{{$commitment->periodetahun}}</td>
-								<td>{{$commitment->tgl_ijin}}</td>
-								<td class="text-right">{{ number_format($commitment->volume_riph, 0, ',','.') }} ton</td>
-								<td>
-									<div class="row">
-										<div class="col-3">
-											Tanam
-										</div>
-										<div class="col-9 text-right">
-											{{ number_format($commitment->luas_wajib_tanam, 2, ',','.') }} ha
-										</div>
-									</div>
-									<div class="row">
-										<div class="col-3">
-											Produksi
-										</div>
-										<div class="col-9 text-right">
-											{{ number_format($commitment->volume_produksi, 2, ',','.') }} ton
-										</div>
-									</div>
-								</td>
-								<td class="text-center">
 
-									<a href="{{ route('2024.user.commitment.realisasi', $noIjin) }}"
-										class="btn btn-icon btn-xs btn-primary" data-toggle="tooltip"
-										title data-original-title="Isi Laporan Realisasi Tanam dan Produksi">
-										<i class="fal fa-edit"></i>
-									</a>
-								</td>
-								{{-- tanam --}}
-								<td class="text-center">
-									{{-- @if ($pksFileCount == $pksCount) --}}
-										@if (!empty($commitment->userDocs->sptjmtanam))
-											{{-- Tanam --}}
-											@if (!empty($commitment->userDocs->spvt) && !empty($commitment->userDocs->rta))
-												@if(!$commitment->ajuTanam)
-													@if (!$commitment->ajuskl || in_array(!$commitment->ajuskl->status, [1, 2, 3, 4]))
-														<a href="{{ route('admin.task.commitment.avt', $commitment->id) }}"
-															class="btn btn-xs btn-danger btn-icon" data-toggle="tooltip"
-															title data-original-title="Ajukan Verifikasi Tanam">
-															<i class="fal fa-upload"></i>
-														</a>
-													@endif
-												@elseif($commitment->ajuTanam->status === '1')
-													<a href="{{route('admin.task.pengajuan.tanam.show', $commitment->id)}}"
-														class="btn btn-xs btn-info btn-icon" data-toggle="tooltip"
-														title data-original-title="Verifikasi tanam telah diajukan. Klik untuk Lihat data pengajuan.">
-														<i class="fal fa-upload"></i>
-													</a>
-												@elseif($commitment->ajuTanam->status === '2' || $commitment->ajuTanam->status === '3')
-													<a href="{{route('admin.task.pengajuan.tanam.show', $commitment->id)}}"
-														class="btn btn-xs btn-warning btn-icon" data-toggle="tooltip"
-														title data-original-title="Proses pemeriksaan berkas. Klik untuk Lihat data.">
-														<i class="fal fa-clipboard-list-check"></i>
-													</a>
-												@elseif($commitment->ajuTanam->status === '4')
-													<a href="{{route('admin.task.pengajuan.tanam.show', $commitment->id)}}" class="btn btn-xs btn-success btn-icon" data-toggle="tooltip"
-													title data-original-title="Verifikasi Tanam selesai. Klik untuk Lihat hasil.">
-														<i class="fal fa-check"></i>
-													</a>
-												@elseif($commitment->ajuTanam->status === '5')
-													<div class="dropdown">
-														<a href="#" class="btn btn-danger btn-xs btn-icon" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Perbaiki data dan laporan">
-															<i class="fa fa-exclamation"></i>
-														</a>
-														<div class="dropdown-menu">
-															<a class="dropdown-item" style="text-decoration: none !important;" href="{{route('admin.task.pengajuan.tanam.show', $commitment->id)}}" target="_blank">
-																Lihat Hasil Verifikasi
-															</a >
-															<a class="dropdown-item" style="text-decoration: none !important;" href="{{ route('admin.task.commitment.avt', $commitment->id) }}" target="_blank" data-toggle="tooltip"
-																title data-original-title="Perbaiki data dan laporan. Lalu ajukan verifikasi ulang.">
-																Ajukan Ulang
-															</a>
-														</div>
-													</div>
-												@endif
-											@else
-												<span id="syaratTanam">
-													<i class="fas fa-info-circle text-info"></i>
-												</span>
-											@endif
-										@else
-											<span id="syaratTanam">
-												<i class="fas fa-info-circle text-info"></i>
-											</span>
-										@endif
-									{{-- @endif --}}
-								</td>
-								{{-- produksi --}}
-								<td class="text-center">
-									{{-- @if ($pksFileCount == $pksCount) --}}
-										@if (!empty($commitment->userDocs->sptjmproduksi))
-											{{-- produksi --}}
-											@if (!empty($commitment->userDocs->spvp) && !empty($commitment->userDocs->rpo))
-												@if ($commitment->sumVolume >= $commitment->minThresholdProd)
-													@if(!$commitment->ajuProduksi)
-														@if (!$commitment->ajuskl || in_array(!$commitment->ajuskl->status, [1, 2, 3, 4]))
-															<a href="{{ route('admin.task.commitment.avp', $commitment->id) }}"
-																class="btn btn-xs btn-warning btn-icon" data-toggle="tooltip"
-																title data-original-title="Ajukan Verifikasi Produksi">
-																<i class="fal fa-upload"></i>
-															</a>
-														@endif
-													@elseif($commitment->ajuProduksi->status === '1')
-														<a href="{{route('admin.task.pengajuan.produksi.show', $commitment->id)}}"
-															class="btn btn-xs btn-info btn-icon" data-toggle="tooltip"
-															title data-original-title="Verifikasi produksi telah diajukan. Klik untuk Lihat data pengajuan.">
-															<i class="fal fa-upload"></i>
-														</a>
-													@elseif($commitment->ajuProduksi->status === '2' || $commitment->ajuProduksi->status === '3')
-														<a href="{{route('admin.task.pengajuan.produksi.show', $commitment->id)}}"
-															class="btn btn-xs btn-info btn-icon" data-toggle="tooltip"
-															title data-original-title="Proses pemeriksaan berkas. Klik untuk Lihat data pengajuan.">
-															<i class="fal fa-upload"></i>
-														</a>
-													@elseif($commitment->ajuProduksi->status === '4')
-														<a href="{{route('admin.task.pengajuan.produksi.show', $commitment->id)}}"
-															class="btn btn-xs btn-success btn-icon" data-toggle="tooltip"
-															title data-original-title="Verifikasi Produksi selesai. Klik untuk Lihat data pengajuan.">
-															<i class="fal fa-check"></i>
-														</a>
-													@elseif($commitment->ajuProduksi->status === '5')
-														<div class="dropdown">
-															<a href="#" class="btn btn-danger btn-xs btn-icon" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" >
-																<i class="fa fa-exclamation"></i>
-															</a>
-															<div class="dropdown-menu">
-																<a class="dropdown-item" style="text-decoration: none !important;" href="{{route('admin.task.pengajuan.produksi.show', $commitment->id)}}" target="_blank">
-																	Lihat Hasil Verifikasi
-																</a >
-																<a class="dropdown-item" style="text-decoration: none !important;" href="{{ route('admin.task.commitment.avp', $commitment->id) }}" target="_blank" data-toggle="tooltip"
-																	title data-original-title="Perbaiki data dan laporan. Lalu ajukan verifikasi ulang.">
-																	Ajukan Ulang
-																</a>
-															</div>
-														</div>
-													@endif
-												@endif
-											@else
-												<span id="syaratProduksi">
-													<i class="fas fa-info-circle text-info"></i>
-												</span>
-											@endif
-										@else
-											<span id="syaratProduksi>
-												<i class="fas fa-info-circle text-info"></i>
-											</span>
-										@endif
-									{{-- @endif --}}
-								</td>
-								<td class="text-center">
-									{{-- @if ($pksFileCount == $pksCount) --}}
-										@if (!empty($commitment->userDocs->sptjmproduksi))
-											{{-- skl --}}
-											@if ($commitment->ajuProduksi && $commitment->ajuProduksi->status === '4')
-												@if(!$commitment->ajuSkl)
-													<a href="{{ route('admin.task.commitment.avskl', $commitment->id) }}"
-														class="btn btn-xs btn-warning btn-icon" data-toggle="tooltip"
-														title data-original-title="Ajukan Penerbitan SKL">
-														<i class="fal fa-upload"></i>
-													</a>
-												@elseif($commitment->ajuSkl->status === '1')
-													<a href="{{route('admin.task.pengajuan.skl.show', $commitment->id)}}" class="btn btn-xs btn-info btn-icon" data-toggle="tooltip" title data-original-title="Penerbitan SKL sudah diajukan">
-														<i class="fal fa-upload"></i>
-													</a>
-												@elseif($commitment->ajuSkl->status === '2')
-													<a href="{{route('admin.task.pengajuan.skl.show', $commitment->id)}}" class="btn btn-xs btn-info btn-icon" data-toggle="tooltip" title data-original-title="Rekomendasi Penerbitan SKL">
-														<i class="fal fa-search"></i>
-													</a>
-												@elseif($commitment->ajuSkl->status === '3')
-													<a href="{{route('admin.task.pengajuan.skl.show', $commitment->id)}}" class="btn btn-xs btn-info btn-icon" data-toggle="tooltip" title data-original-title="SKL Disetujui untuk Diterbitkan">
-														<i class="fal fa-thumbs-up"></i>
-													</a>
-												@elseif($commitment->ajuSkl->status === '4')
-													<a href="{{route('admin.task.pengajuan.skl.show', $commitment->id)}}" class="btn btn-xs btn-info btn-icon" data-toggle="tooltip" title data-original-title="SKL sudah Terbit. Klik untuk melihat Ringkasan Verifikasi.">
-														<i class="fal fa-award"></i>
-													</a>
-												@elseif($commitment->ajuSkl->status === '5')
-													<div class="dropdown">
-														<a href="#" class="btn btn-danger btn-xs btn-icon" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" >
-															<i class="fa fa-exclamation"></i>
-														</a>
-														<div class="dropdown-menu dropdown-menu-right">
-															<a class="dropdown-item" style="text-decoration: none !important;" href="{{route('admin.task.pengajuan.skl.show', $commitment->id)}}" target="_blank">
-																Lihat Hasil Verifikasi
-															</a >
-															<a class="dropdown-item" style="text-decoration: none !important;" href="{{ route('admin.task.commitment.avskl', $commitment->id) }}" target="_blank" data-toggle="tooltip"
-																title data-original-title="Perbaiki data dan laporan. Lalu ajukan verifikasi ulang.">
-																Ajukan Ulang
-															</a>
-														</div>
-													</div>
-												@endif
-											@else
-												<span id="syaratSkl" >
-													<i class="fas fa-info-circle text-info"></i>
-												</span>
-											@endif
-										@else
-											<span id="syaratSkl" >
-												<i class="fas fa-info-circle text-info"></i>
-											</span>
-										@endif
-									{{-- @endif --}}
-								</td>
-							</tr>
-							@endforeach
 						</tbody>
 					</table>
 				</div>
@@ -265,10 +52,219 @@ td {
 
 		var table = $('#datatable').DataTable({
 			responsive: true,
-			lengthChange: false,
+			pageLength:10,
+			lengthChange: true,
+			paging: true,
+			ordering: true,
+			processing: true,
+			serverSide: true,
+			order: [[0, 'asc']],
 			language: {
 				searchPlaceholder: "Cari..."
 			},
+			ajax: {
+				url: '{{ route('2024.datafeeder.getAllMyCommitment') }}',
+				type: 'GET',
+			},
+
+			columns: [
+				{
+					data: 'ijin_full',
+					render: function (data, type, row) {
+						var noIjin = row.noIjin;
+						var url = "{{ route('2024.user.commitment.show', ':noIjin') }}".replace(':noIjin', noIjin);
+						return `
+							<a href="`+ url + `" title="Lihat Data" class="" target="_blank">
+								`+ data +`
+							</a>
+						`;
+					}
+				},
+				{ data: 'periodetahun'},
+				{ data: 'tgl_terbit'},
+				{
+					data: 'volume',
+					render: function (data, type, row) {
+						var formattedVolume = new Intl.NumberFormat('id-ID').format(data);
+						return formattedVolume;
+					}
+				},
+				{
+					data: 'wajib_produksi',
+					render: function (data, type, row) {
+						var wajibLuas = row.wajib_tanam; // bagi /1000 Mengonversi meter persegi ke ribuan hektar
+						var formattedLuas = new Intl.NumberFormat('id-ID', { maximumFractionDigits: 3 }).format(wajibLuas);
+						var formattedProd = new Intl.NumberFormat('id-ID', { maximumFractionDigits: 2 }).format(data);
+						return `
+							<div class="row">
+								<div class="col-3">
+									Tanam
+								</div>
+								<div class="col-9 text-right">
+									`+ formattedLuas +` ha
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-3">
+									Produksi
+								</div>
+								<div class="col-9 text-right">
+									`+ formattedProd +` ha ton
+								</div>
+							</div>
+						`;
+					}
+				},
+				{
+					data: 'noIjin',
+					render: function (data, type, row) {
+						var noIjin = row.noIjin;
+						var url = "{{ route('2024.user.commitment.realisasi', ':noIjin') }}".replace(':noIjin', noIjin);
+						return `
+							<a href="`+ url +`"
+								class="btn btn-icon btn-xs btn-primary" data-toggle="tooltip"
+								title data-original-title="Isi Laporan Realisasi Tanam dan Produksi">
+								<i class="fal fa-edit"></i>
+							</a>
+						`;
+					}
+				},
+				{
+					data: 'noIjin',
+					render: function (data, type, row) {
+						var status = row.siapVerifTanam;
+						var avTanamStatus = row.avTanamStatus;
+
+						if (status === 'Belum Siap') {
+							return `
+								<a href='#' class="btn btn-icon btn-xs btn-primary">
+									<i class="fal fa-upload"></i>
+								</a>
+							`;
+						} else if (status === 'Siap') {
+							var buttonClass = '';
+							var buttonText = status;
+
+							switch (avTanamStatus) {
+								case 0:
+									buttonClass = 'btn-primary';
+									buttonText = '<i class="fal fa-upload"></i>';
+									linkRef = 'href="#"';
+									break;
+								case 1:
+									buttonClass = 'btn-info';
+									buttonText = '<i class="fal fa-upload"></i>';
+									linkRef = '';
+									break;
+								case 2:
+								case 3:
+									buttonClass = 'btn-warning';
+									buttonText = '<i class="fal fa-upload"></i>';
+									linkRef = '';
+									break;
+								case 4:
+									buttonClass = 'btn-success';
+									buttonText = '<i class="fal fa-upload"></i>';
+									linkRef = '';
+									break;
+								case 5:
+									buttonClass = 'btn-danger';
+									buttonText = '<i class="fal fa-upload"></i>';
+									linkRef = '';
+									break;
+							}
+
+							return `<a ${linkRef} class="btn ${buttonClass}">${buttonText}</a>`;
+						} else {
+							return '';
+						}
+					}
+				},
+				{
+					data: 'noIjin',
+					render: function (data, type, row) {
+						var status = row.siapVerifProduksi;
+						var avProdStatus = row.avProdStatus;
+
+						if (status === 'Belum Siap') {
+							return status;
+						} else if (status === 'Siap') {
+							var buttonClass = '';
+							switch (avProdStatus) {
+								case 'Tidak ada':
+								case 0:
+									buttonClass = 'btn-primary';
+									buttonText = '<i class="fal fa-upload"></i>';
+									linkRef = 'href="#"';
+									break;
+								case 1:
+									buttonClass = 'btn-info';
+									buttonText = '<i class="fal fa-upload"></i>';
+									linkRef = 'href="#"';
+									break;
+								case 2:
+								case 3:
+									buttonClass = 'btn-warning';
+									buttonText = '<i class="fal fa-upload"></i>';
+									linkRef = 'href="#"';
+									break;
+								case 4:
+									buttonClass = 'btn-success';
+									buttonText = '<i class="fal fa-upload"></i>';
+									linkRef = 'href="#"';
+									break;
+								case 5:
+									buttonClass = 'btn-danger';
+									buttonText = '<i class="fal fa-upload"></i>';
+									linkRef = 'href="#"';
+									break;
+							}
+
+							return `<a ${linkRef} class="btn ${buttonClass}">${buttonText}</a>`;
+						} else {
+							return '';
+						}
+					}
+				},
+				{
+					data: 'noIjin',
+					render: function (data, type, row) {
+						var status = row.siapVerifTanam;
+						var avTanamStatus = row.avTanamStatus;
+
+						if (status === 'Belum Siap') {
+							return status;
+						} else if (status === 'Siap') {
+							var buttonClass = '';
+							var buttonText = status;
+
+							switch (avTanamStatus) {
+								case 'Tidak ada':
+								case 0:
+									buttonClass = 'btn-primary';
+									break;
+								case 1:
+									buttonClass = 'btn-info';
+									break;
+								case 2:
+								case 3:
+									buttonClass = 'btn-warning';
+									break;
+								case 4:
+									buttonClass = 'btn-success';
+									break;
+								case 5:
+									buttonClass = 'btn-danger';
+									break;
+							}
+
+							return `<button class="btn ${buttonClass}">${buttonText}</button>`;
+						} else {
+							return '';
+						}
+					}
+				},
+			],
 			dom:
 				"<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6 d-flex align-items-center justify-content-end'<'select'>>>" + // Move the select element to the left of the datatable buttons
 				"<'row mb-3'<'col-sm-12 col-md-6 d-flex align-items-center justify-content-start'f><'col-sm-12 col-md-6 d-flex align-items-center justify-content-end'B>>" +

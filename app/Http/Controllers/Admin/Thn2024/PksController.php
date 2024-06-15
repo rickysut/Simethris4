@@ -36,91 +36,6 @@ class PksController extends Controller
 {
 	use SimeviTrait;
 
-	public function daftarLokasi($noIjin, $poktanId)
-	{
-		$module_name = 'Realisasi';
-		$page_title = 'Daftar Lokasi Tanam';
-		$page_heading = 'Daftar Lokasi Tanam';
-		$heading_class = 'fal fa-user-hard-hat';
-
-		$npwpCompany = Auth::user()->data_user->npwp_company;
-
-		$ijin = $noIjin;
-
-		$noIjin = substr($noIjin, 0, 4) . '/' .
-			substr($noIjin, 4, 2) . '.' .
-			substr($noIjin, 6, 3) . '/' .
-			substr($noIjin, 9, 1) . '/' .
-			substr($noIjin, 10, 2) . '/' .
-			substr($noIjin, 12, 4);
-
-		$pks = Pks::select('id', 'no_ijin', 'poktan_id', 'no_perjanjian', 'nama_poktan')
-			->where('no_ijin', $noIjin)
-			->where('poktan_id', $poktanId)
-			->first();
-
-		$commitment = PullRiph::where('npwp', $npwpCompany)
-			->where('no_ijin', $noIjin)
-			->first();
-
-		$dataRealisasi = DataRealisasi::select('id', 'no_ijin', 'poktan_id', 'luas_lahan', 'volume')
-		->where('no_ijin', $noIjin)
-		->where('poktan_id', $poktanId)
-		->get();
-
-		$sumLuas = $dataRealisasi->sum('luas_lahan');
-		$sumProduksi = $dataRealisasi->sum('volume');
-
-		if (empty($commitment->status) || $commitment->status == 3 || $commitment->status == 5) {
-			$disabled = false; // input di-enable
-		} else {
-			$disabled = true; // input di-disable
-		}
-
-		return view('t2024.pks.daftarlokasi', compact('module_name', 'page_title', 'page_heading', 'heading_class', 'npwpCompany', 'pks', 'commitment', 'disabled', 'sumLuas', 'sumProduksi', 'ijin'));
-	}
-
-	public function addrealisasi($noIjin, $spatial)
-	{
-		$module_name = 'Realisasi';
-		$page_title = 'Realisasi Tanam-Produksi';
-		$page_heading = 'Realisasi Tanam-Produksi';
-		$heading_class = 'fal fa-farm';
-
-		$noIjin = substr($noIjin, 0, 4) . '/' .
-			substr($noIjin, 4, 2) . '.' .
-			substr($noIjin, 6, 3) . '/' .
-			substr($noIjin, 9, 1) . '/' .
-			substr($noIjin, 10, 2) . '/' .
-			substr($noIjin, 12, 4);
-
-		// dd($spatial);
-
-		$mapkey = ForeignApi::find(1);
-		$npwpCompany = Auth::user()->data_user->npwp_company;
-		$lokasi = Lokasi::where('no_ijin',$noIjin)->where('kode_spatial', $spatial)->first();
-		// dd($spatial);
-		$pks = Pks::where('poktan_id', $lokasi->poktan_id)->where('no_ijin', $noIjin)->first();
-		$spatial = MasterSpatial::select('id', 'kode_spatial', 'nama_petani','latitude','longitude', 'polygon', 'altitude', 'luas_lahan', 'kabupaten_id', 'ktp_petani')->where('kode_spatial', $spatial)
-		->first();
-
-		$kabupatens = MasterKabupaten::select('kabupaten_id', 'nama_kab')->get();
-		if (!$spatial) {
-			// Handle case where spatial is null
-			return redirect()->back()->with('Perhatian', 'Data Spatial tidak ditemukan.');
-		}
-
-		$data = [
-			'npwpCompany' => $npwpCompany,
-			'lokasi' => $lokasi,
-			'pks' => $pks,
-			'spatial' => $spatial,
-			'anggota' => $spatial->anggota,
-		];
-		// dd($data);
-		return view('t2024.pks.addRealisasi', compact('module_name', 'page_title', 'page_heading', 'heading_class','data', 'mapkey', 'kabupatens'));
-	}
-
 	public function createPks($noIjin, $poktanId)
 	{
 		$module_name = 'PKS';
@@ -143,7 +58,8 @@ class PksController extends Controller
 		return view('t2024.pks.create', compact('module_name', 'page_title', 'page_heading', 'heading_class', 'ijin', 'poktanId', 'poktan', 'varietass'));
 	}
 
-	public function storePks(Request $request){
+	public function storePks(Request $request)
+	{
 		DB::beginTransaction();
 
 		try {
@@ -194,9 +110,150 @@ class PksController extends Controller
 		}
 	}
 
+	public function daftarLokasi($noIjin, $poktanId)
+	{
+		$module_name = 'Realisasi';
+		$page_title = 'Daftar Lokasi Tanam';
+		$page_heading = 'Daftar Lokasi Tanam';
+		$heading_class = 'fal fa-user-hard-hat';
 
+		$npwpCompany = Auth::user()->data_user->npwp_company;
 
+		$ijin = $noIjin;
 
+		$noIjin = substr($noIjin, 0, 4) . '/' .
+			substr($noIjin, 4, 2) . '.' .
+			substr($noIjin, 6, 3) . '/' .
+			substr($noIjin, 9, 1) . '/' .
+			substr($noIjin, 10, 2) . '/' .
+			substr($noIjin, 12, 4);
+
+		$pks = Pks::select('id', 'no_ijin', 'poktan_id', 'no_perjanjian', 'nama_poktan')
+			->where('no_ijin', $noIjin)
+			->where('poktan_id', $poktanId)
+			->first();
+
+		$commitment = PullRiph::where('npwp', $npwpCompany)
+			->where('no_ijin', $noIjin)
+			->first();
+
+		$dataRealisasi = Lokasi::select('id', 'no_ijin', 'poktan_id', 'luas_tanam', 'volume')
+			->where('no_ijin', $noIjin)
+			->where('poktan_id', $poktanId)
+			->get();
+
+		$sumLuas = $dataRealisasi->sum('luas_tanam');
+		$sumProduksi = $dataRealisasi->sum('volume');
+
+		if (empty($commitment->status) || $commitment->status == 3 || $commitment->status == 5) {
+			$disabled = false; // input di-enable
+		} else {
+			$disabled = true; // input di-disable
+		}
+
+		return view('t2024.pks.daftarlokasi', compact('module_name', 'page_title', 'page_heading', 'heading_class', 'npwpCompany', 'pks', 'commitment', 'disabled', 'sumLuas', 'sumProduksi', 'ijin'));
+	}
+
+	public function addrealisasi($noIjin, $spatial)
+	{
+		$module_name = 'Realisasi';
+		$page_title = 'Realisasi Tanam-Produksi';
+		$page_heading = 'Realisasi Tanam-Produksi';
+		$heading_class = 'fal fa-farm';
+
+		$ijin = $noIjin;
+
+		$noIjin = substr($noIjin, 0, 4) . '/' .
+			substr($noIjin, 4, 2) . '.' .
+			substr($noIjin, 6, 3) . '/' .
+			substr($noIjin, 9, 1) . '/' .
+			substr($noIjin, 10, 2) . '/' .
+			substr($noIjin, 12, 4);
+
+		// dd($spatial);
+
+		$mapkey = ForeignApi::find(1);
+		$npwpCompany = Auth::user()->data_user->npwp_company;
+		$lokasi = Lokasi::where('no_ijin', $noIjin)->where('kode_spatial', $spatial)->first();
+		// dd($spatial);
+		$pks = Pks::where('poktan_id', $lokasi->poktan_id)->where('no_ijin', $noIjin)->first();
+		$spatial = MasterSpatial::select('id', 'kode_spatial', 'nama_petani', 'latitude', 'longitude', 'polygon', 'altitude', 'luas_lahan', 'kabupaten_id', 'ktp_petani')->where('kode_spatial', $spatial)
+			->first();
+
+		$kabupatens = MasterKabupaten::select('kabupaten_id', 'nama_kab')->get();
+		if (!$spatial) {
+			// Handle case where spatial is null
+			return redirect()->back()->with('Perhatian', 'Data Spatial tidak ditemukan.');
+		}
+
+		$data = [
+			'npwpCompany' => $npwpCompany,
+			'lokasi' => $lokasi,
+			'pks' => $pks,
+			'spatial' => $spatial,
+			'anggota' => $spatial->anggota,
+		];
+		// dd($data);
+		return view('t2024.pks.addRealisasi', compact('module_name', 'page_title', 'page_heading', 'heading_class', 'data', 'mapkey', 'kabupatens', 'ijin'));
+	}
+
+	public function storerealisasi(Request $request, $noIjin, $spatial)
+	{
+		$ijin = $noIjin;
+
+		// Format the $noIjin string
+		$noIjin = substr($noIjin, 0, 4) . '/' .
+			substr($noIjin, 4, 2) . '.' .
+			substr($noIjin, 6, 3) . '/' .
+			substr($noIjin, 9, 1) . '/' .
+			substr($noIjin, 10, 2) . '/' .
+			substr($noIjin, 12, 4);
+
+		// Find the Lokasi record
+		$lokasi = Lokasi::where('no_ijin', $noIjin)
+			->where('kode_spatial', $spatial)
+			->first();
+
+		// Check if the Lokasi record exists and if the user is authorized
+		// if (!$lokasi || Auth::user()->data_user->npwo_company !== $lokasi->npwp) {
+		// 	abort(403, 'Anda tidak memiliki ijin untuk menjalankan ini.');
+		// }
+
+		// Start a database transaction
+		DB::beginTransaction();
+
+		try {
+			// Update or create the Lokasi record
+			Lokasi::updateOrCreate(
+				[
+					'no_ijin' => $noIjin,
+					'kode_spatial' => $spatial,
+				],
+				[
+					'tgl_tanam' => $request->input('mulai_tanam'),
+					'tgl_akhir_tanam' => $request->input('akhir_tanam'),
+					'luas_tanam' => $request->input('luas_tanam'),
+					'tgl_panen' => $request->input('mulai_panen'),
+					'tgl_akhir_panen' => $request->input('akhir_panen'),
+					'volume' => $request->input('volume'),
+					'vol_benih' => $request->input('vol_benih'),
+					'vol_jual' => $request->input('vol_jual'),
+				]
+			);
+
+			// Commit the transaction
+			DB::commit();
+
+			// Return a success response
+			return redirect()->back()->with('success', 'Data berhasil disimpan.');
+		} catch (\Exception $e) {
+			// Rollback the transaction if an error occurs
+			DB::rollBack();
+
+			// Return an error response
+			return redirect()->back()->with('error', $e->getMessage());
+		}
+	}
 
 
 
@@ -729,7 +786,4 @@ class PksController extends Controller
 	{
 		//
 	}
-
-
-
 }

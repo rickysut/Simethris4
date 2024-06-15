@@ -13,10 +13,171 @@ use App\Models2024\PullRiph;
 use App\Models\MasterDesa;
 use App\Models\MasterKecamatan;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Svg\Tag\Rect;
 
 class DataFeederController extends Controller
 {
+	public function getAllMyCommitment(Request $request)
+	{
+		$draw = $request->input('draw', 1);
+		$start = $request->input('start', 0);
+		$length = $request->input('length', 10);
+		$searchValue = $request->input('search.value', '');
+		$order = $request->input('order', []);
+		$columns = $request->input('columns', []);
+
+		$npwp = Auth::user()->data_user->npwp_company;
+
+		// Base query
+		$query = PullRiph::select('id', 'no_ijin', 'periodetahun', 'tgl_ijin', 'volume_riph', 'luas_wajib_tanam', 'volume_produksi')
+			->where('npwp', $npwp)
+			->with(['skl', 'lokasi', 'pks', 'ajutanam', 'ajuproduksi', 'ajuskl', 'completed', 'userDocs']);
+
+		// Calculate total records
+		$totalRecords = $query->count();
+
+		// Apply search filter
+		if (!empty($searchValue)) {
+			$query = $query->where(function ($q) use ($searchValue) {
+				$q->where('no_ijin', 'like', "%{$searchValue}%")
+					->orWhere('periodetahun', 'like', "%{$searchValue}%")
+					->orWhere('tgl_ijin', 'like', "%{$searchValue}%")
+					->orWhere('volume_riph', 'like', "%{$searchValue}%")
+					->orWhere('luas_wajib_tanam', 'like', "%{$searchValue}%")
+					->orWhere('volume_produksi', 'like', "%{$searchValue}%");
+			});
+		}
+
+		// Calculate filtered records
+		$filteredRecords = $query->count();
+
+		// Apply ordering
+		if (!empty($order)) {
+			$orderColumnIndex = $order[0]['column'];
+			$orderDirection = $order[0]['dir'];
+			$orderColumn = $columns[$orderColumnIndex]['data'];
+
+			// Pastikan kolom yang diurutkan adalah kolom yang valid di basis data
+			switch ($orderColumn) {
+				case 'ijin_full':
+					// Jika menggunakan 'ijin_full', mungkin Anda ingin mengganti ke kolom 'no_ijin'
+					$query = $query->orderBy('no_ijin', $orderDirection);
+					break;
+				case 'periodetahun':
+					$query = $query->orderBy('periodetahun', $orderDirection);
+					break;
+					// Tambahkan case lain jika ada kolom lain yang perlu diurutkan
+				default:
+					// Default pengurutan jika tidak ada yang cocok
+					$query = $query->orderBy('id', 'asc');
+					break;
+			}
+		}
+
+
+		// Apply pagination
+		$data = $query->skip($start)
+			->take($length)
+			->get();
+
+		// Process data
+		if ($data) {
+			foreach ($data as $commitment) {
+				$commitment->sumRealisasiLuas = $commitment->lokasi->sum('luas_tanam');
+				$commitment->sumRealisasiPanen = $commitment->lokasi->sum('volume');
+				$commitment->pksCount = $commitment->pks->count();
+				$commitment->pksFileCount = $commitment->pks->whereNotNull('berkas_pks')->count();
+
+				if ($commitment->pksCount > 0 || $commitment->pksFileCount > 0) {
+					$commitment->pksComplete = ($commitment->pksCount === $commitment->pksFileCount) ? 'Lengkap' : 'Belum Lengkap';
+				} else {
+					$commitment->pksComplete = 'Belum Lengkap';
+				}
+
+				$tanamDocsFields = ['spvt', 'sptjmtanam', 'rta', 'sphtanam', 'logbooktanam'];
+				$produksiDocsFields = ['spvp', 'sptjmproduksi', 'rpo', 'sphproduksi', 'logbookproduksi', 'formLa'];
+
+				$tanamDocsComplete = true;
+				foreach ($tanamDocsFields as $field) {
+					if (empty($commitment->userDocs->$field)) {
+						$tanamDocsComplete = false;
+						break;
+					}
+				}
+				$commitment->tanamDocs = $tanamDocsComplete ? "Lengkap" : "Belum Lengkap";
+
+				$produksiDocsComplete = true;
+				foreach ($produksiDocsFields as $field) {
+					if (empty($commitment->userDocs->$field)) {
+						$produksiDocsComplete = false;
+						break;
+					}
+				}
+				$commitment->produksiDocs = $produksiDocsComplete ? "Lengkap" : "Belum Lengkap";
+
+				$ijin = $commitment->no_ijin;
+				$commitment->noIjin = str_replace(['/', '.'], "", $ijin);
+
+				// Statuses
+				$commitment->avTanamStatus = $commitment->ajutanam()->exists() ? $commitment->ajutanam()->latest()->first()->status : "Tidak ada";
+				$commitment->avProdStatus = $commitment->ajuproduksi()->exists() ? $commitment->ajuproduksi()->latest()->first()->status : "Tidak ada";
+				$commitment->avSklStatus = $commitment->ajuskl()->exists() ? $commitment->ajuskl()->latest()->first()->status : "Tidak ada";
+				$commitment->completeStatus = $commitment->completed()->exists() ? 'Lunas' : "Belum Lunas";
+				if ($commitment->sumRealisasiLuasEmpty || $commitment->pksComplete !== 'Lengkap' || $commitment->tanamDocs !== 'Lengkap') {
+					$commitment->siapVerifTanam = 'Belum Siap';
+				} elseif ($commitment->avProdStatus === 'Siap') {
+					$commitment->siapVerifTanam = 'Tidak Perlu';
+				} else {
+					$commitment->siapVerifTanam = 'Siap';
+				}
+
+				// Determine siapVerifProduksi status
+				if ($commitment->sumRealisasiPanen === 0 || $commitment->sumRealisasiPanen === null) {
+					$commitment->siapVerifProduksi = 'Belum Siap';
+				} else {
+					$commitment->siapVerifProduksi = 'Siap';
+				}
+
+			}
+		}
+
+		// Map data to the required format
+		$query = $data->map(function ($item) {
+			return [
+				'id' => $item->id,
+				'ijin_full' => $item->no_ijin,
+				'noIjin' => $item->noIjin,
+				'periodetahun' => $item->periodetahun,
+				'tgl_terbit' => $item->tgl_ijin,
+				'volume' => $item->volume_riph,
+				'wajib_tanam' => $item->luas_wajib_tanam,
+				'wajib_produksi' => $item->volume_produksi,
+				'sumRealisasiLuas' => $item->sumRealisasiLuas,
+				'sumRealisasiPanen' => $item->sumRealisasiPanen,
+				'pksComplete' => $item->pksComplete,
+				'tanamDocs' => $item->tanamDocs,
+				'siapVerifTanam' => $item->siapVerifTanam,
+				'produksiDocs' => $item->produksiDocs,
+				'siapVerifProduksi' => $item->siapVerifProduksi,
+				'avTanamStatus' => $item->avTanamStatus,
+				'avProdStatus' => $item->avProdStatus,
+				'avSklStatus' => $item->avSklStatus,
+				'completeStatus' => $item->completeStatus,
+			];
+		});
+
+		// Return response in JSON format
+		return response()->json([
+			'draw' => $draw,
+			'recordsTotal' => $totalRecords,
+			'recordsFiltered' => $filteredRecords,
+			'data' => $query,
+		]);
+	}
+
+
+
 	public function getPksById($id)
 	{
 		$pks = Pks::select('id', 'npwp', 'no_ijin', 'no_perjanjian', 'tgl_perjanjian_start', 'tgl_perjanjian_end', 'varietas_tanam', 'periode_tanam', 'berkas_pks')
@@ -86,6 +247,7 @@ class DataFeederController extends Controller
 
 	public function getLokasiByPks(Request $request, $noIjin, $poktanId)
 	{
+		// Format the noIjin parameter
 		$noIjin = substr($noIjin, 0, 4) . '/' .
 			substr($noIjin, 4, 2) . '.' .
 			substr($noIjin, 6, 3) . '/' .
@@ -97,40 +259,78 @@ class DataFeederController extends Controller
 		$start = $request->input('start', 0);
 		$length = $request->input('length', 10);
 		$searchValue = $request->input('search.value', '');
+		$order = $request->input('order', []);
+		$columns = $request->input('columns', []);
 
-		$pks = Lokasi::select('id', 'no_ijin', 'poktan_id', 'kode_spatial', 'nama_petani', 'ktp_petani')->where('no_ijin', $noIjin)
+		// Base query
+		$query = Lokasi::where('no_ijin', $noIjin)
 			->where('poktan_id', $poktanId)
-			->with('datarealisasi', 'spatial.anggota')
+			->with('spatial');
+
+		// Calculate total records
+		$totalRecords = $query->count();
+
+		// Apply search filter if any
+		if (!empty($searchValue)) {
+			$query = $query->where(function ($q) use ($searchValue) {
+				$q->where('nama_petani', 'like', "%{$searchValue}%")
+					->orWhere('ktp_petani', 'like', "%{$searchValue}%")
+					->orWhere('kode_spatial', 'like', "%{$searchValue}%");
+			});
+		}
+
+		// Calculate filtered records
+		$filteredRecords = $query->count();
+
+		// Apply order
+		if (!empty($order)) {
+			$orderColumnIndex = $order[0]['column'];
+			$orderDirection = $order[0]['dir'];
+			$orderColumn = $columns[$orderColumnIndex]['data'];
+
+			switch ($orderColumn) {
+				case 'nama_kelompok':
+				case 'ktp_petani':
+				case 'nama_petani':
+				case 'kode_spatial':
+				case 'spatial_ktp':
+					$query = $query->orderBy($orderColumn, $orderDirection);
+					break;
+			}
+		}
+
+		// Apply pagination
+		$pks = $query->skip($start)
+			->take($length)
 			->get();
 
-		$query = $pks->map(function ($item) {
-			$datarealisasi = $item->datarealisasi;
+		// Map data to the required format
+		$data = $pks->map(function ($item) {
 			$spatial = $item->spatial;
-			$masteranggota = $spatial ? $spatial->anggota : null;
 			return [
 				'id' => $item->id,
 				'nama_kelompok' => $item->nama_poktan,
 				'kode_spatial' => $item->kode_spatial,
 				'ktp_petani' => $item->ktp_petani,
 				'nama_petani' => $item->nama_petani,
-				'spatial_petani' => $masteranggota ? $masteranggota->nama_petani : null,
-				'spatial_ktp' => $masteranggota ? $masteranggota->ktp_petani : null,
-				'luas_tanam' => $datarealisasi ? $datarealisasi->luas_tanam : 0,
-				'tgl_tanam' => $datarealisasi ? $datarealisasi->mulai_tanam : null,
-				'volume_panen' => $datarealisasi ? $datarealisasi->volume : 0,
-				'tgl_panen' => $datarealisasi ? $datarealisasi->mulai_panen : null,
+				'spatial_petani' => $spatial ? $spatial->nama_petani : null,
+				'spatial_ktp' => $spatial ? $spatial->ktp_petani : null,
+				'luas_tanam' => $item->luas_tanam,
+				'tgl_tanam' => $item->tgl_tanam ? date('d-m-Y', strtotime($item->tgl_tanam)) : null,
+				'volume_panen' => $item->volume,
+				'tgl_panen' => $item->tgl_panen ? date('d-m-Y', strtotime($item->tgl_panen)) : null,
 			];
 		});
 
-		// dd($pks);
-
+		// Return response in JSON format
 		return response()->json([
 			'draw' => $draw,
-			// 'recordsTotal' => $totalRecords,
-			// 'recordsFiltered' => $filteredRecords,
-			'data' => $query,
+			'recordsTotal' => $totalRecords,
+			'recordsFiltered' => $filteredRecords,
+			'data' => $data,
 		]);
 	}
+
 
 	public function getSpatialByKecamatan(Request $request, $kecId)
 	{

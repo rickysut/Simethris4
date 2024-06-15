@@ -420,6 +420,7 @@ Route::group(['prefix' => '2024', 'as' => '2024.', 'namespace' => 'Admin', 'midd
 	Route::group(['namespace' => 'Thn2024'], function () {
 
 		Route::group(['prefix' => 'datafeeder', 'as' => 'datafeeder.'], function () {
+			Route::get('/getAllMyCommitment', 'DataFeederController@getAllMyCommitment')->name('getAllMyCommitment');
 			Route::get('/getPksById/{id}', 'DataFeederController@getPksById')->name('getPksById');
 			Route::get('/getPksByIjin/{noIjin}', 'DataFeederController@getPksByIjin')->name('getPksByIjin');
 			Route::get('/getLokasiByPks/{noIjin}/{poktanId}', 'DataFeederController@getLokasiByPks')->name('getLokasiByPks');
@@ -480,9 +481,10 @@ Route::group(['prefix' => '2024', 'as' => '2024.', 'namespace' => 'Admin', 'midd
 				});
 				Route::get('daftarlokasi/{noIjin}/{poktanId}', 'PksController@daftarLokasi')->name('daftarLokasi');
 				Route::get('addrealisasi/{noIjin}/{spatial}', 'PksController@addrealisasi')->name('addrealisasi');
+				Route::post('storerealisasi/{noIjin}/{spatial}', 'PksController@storerealisasi')->name('storerealisasi');
 
-				Route::get('{id}/penangkar', 'PenangkarRiphController@mitra')->name('penangkar');
-				Route::post('{id}/penangkar/store', 'PenangkarRiphController@store')->name('penangkar.store');
+				// Route::get('{id}/penangkar', 'PenangkarRiphController@mitra')->name('penangkar');
+				// Route::post('{id}/penangkar/store', 'PenangkarRiphController@store')->name('penangkar.store');
 				Route::delete('/commitmentmd', 'CommitmentController@massDestroy')->name('massDestroy');
 
 				//daftar anggota & lokasi by pks

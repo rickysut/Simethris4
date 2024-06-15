@@ -3,7 +3,7 @@
 namespace App\Models2024;
 
 use App\Models\DataUser;
-use App\Models\PenangkarRiph;
+// use App\Models\PenangkarRiph;
 use App\Models\User;
 use App\Models\UserDocs;
 use App\Traits\Auditable;
@@ -18,7 +18,7 @@ class PullRiph extends Model
 	use SoftDeletes;
 	use Auditable;
 
-	public $table = 'pull_riphs';
+	public $table = 't2024_pull_riphs';
 
 	protected $fillable = [
 		'user_id',
@@ -73,7 +73,7 @@ class PullRiph extends Model
 
 	public function userDocs()
 	{
-		return $this->hasOne(UserDocs::class, 'commitment_id');
+		return $this->hasOne(UserDocs::class, 'no_ijin', 'no_ijin');
 	}
 
 	public function penangkar_riph()
@@ -93,17 +93,17 @@ class PullRiph extends Model
 
 	public function ajutanam()
 	{
-		return $this->hasOne(AjuVerifTanam::class, 'no_ijin', 'no_ijin');
+		return $this->hasMany(AjuVerifTanam::class, 'no_ijin', 'no_ijin');
 	}
 
 	public function ajuproduksi()
 	{
-		return $this->hasOne(AjuVerifProduksi::class, 'no_ijin', 'no_ijin');
+		return $this->hasMany(AjuVerifProduksi::class, 'no_ijin', 'no_ijin');
 	}
 
 	public function ajuskl()
 	{
-		return $this->hasOne(AjuVerifSkl::class, 'no_ijin', 'no_ijin');
+		return $this->hasMany(AjuVerifSkl::class, 'no_ijin', 'no_ijin');
 	}
 
 	public function skl()

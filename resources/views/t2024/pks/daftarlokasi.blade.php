@@ -139,9 +139,10 @@
 					}
 				},
 				{ data: 'luas_tanam'},
-				{ data: 'tgl_tanam'},
+				{ data: 'tgl_tanam' },
+
 				{ data: 'volume_panen'},
-				{ data: 'tgl_panen'},
+				{ data: 'tgl_panen' },
 				{
 					data: 'kode_spatial',
 					render: function(data, type, row) {
@@ -149,10 +150,6 @@
 							if(data){
 								return `<a href="{{route('2024.user.commitment.addrealisasi', ['noIjin' => ':ijin', 'spatial' => ':spatial'])}}" title="Isi/ubah data realisasi tanam" class="btn btn-primary btn-icon btn-xs text-white" >
 										<i class="fa fa-edit"></i>
-									</a>
-
-									<a href="" title="ubah data tanam" class="btn btn-warning btn-icon btn-xs text-white" >
-										<i class="fa fa-dolly"></i>
 									</a>
 									<a href="" title="ubah data tanam" class="btn btn-info btn-icon btn-xs text-white" >
 										<i class="fa fa-images"></i>
