@@ -67,6 +67,17 @@ td {
 				type: 'GET',
 			},
 
+			columnDefs:[
+				{
+					targets: [5, 6, 7, 8],
+					className: "text-center"
+				},
+				{
+					targets: [4,5,6,7,8],
+					orderable: false
+				}
+			],
+
 			columns: [
 				{
 					data: 'ijin_full',
@@ -118,7 +129,7 @@ td {
 				{
 					data: 'noIjin',
 					render: function (data, type, row) {
-						var noIjin = row.noIjin;
+						var noIjin = data;
 						var url = "{{ route('2024.user.commitment.realisasi', ':noIjin') }}".replace(':noIjin', noIjin);
 						return `
 							<a href="`+ url +`"
@@ -130,60 +141,66 @@ td {
 					}
 				},
 				{
-					data: 'noIjin',
+					data: 'siapVerifTanam',
 					render: function (data, type, row) {
-						var status = row.siapVerifTanam;
+						var noIjin = row.noIjin;
+						var status = 'Siap';
 						var avTanamStatus = row.avTanamStatus;
 
+						console.log(avTanamStatus);
+
 						if (status === 'Belum Siap') {
-							return `
-								<a href='#' class="btn btn-icon btn-xs btn-primary">
-									<i class="fal fa-upload"></i>
-								</a>
-							`;
+							return `Belum Siap`;
 						} else if (status === 'Siap') {
 							var buttonClass = '';
 							var buttonText = status;
 
-							switch (avTanamStatus) {
-								case 0:
-									buttonClass = 'btn-primary';
-									buttonText = '<i class="fal fa-upload"></i>';
-									linkRef = 'href="#"';
-									break;
-								case 1:
-									buttonClass = 'btn-info';
-									buttonText = '<i class="fal fa-upload"></i>';
-									linkRef = '';
-									break;
-								case 2:
-								case 3:
-									buttonClass = 'btn-warning';
-									buttonText = '<i class="fal fa-upload"></i>';
-									linkRef = '';
-									break;
-								case 4:
-									buttonClass = 'btn-success';
-									buttonText = '<i class="fal fa-upload"></i>';
-									linkRef = '';
-									break;
-								case 5:
-									buttonClass = 'btn-danger';
-									buttonText = '<i class="fal fa-upload"></i>';
-									linkRef = '';
-									break;
+							if (avTanamStatus === 'Tidak Ada'){
+								formAvt = "{{ route('2024.user.commitment.formavt', ':noIjin') }}".replace(':noIjin', noIjin);
+								return `<a href="${formAvt}" class="btn btn-icon btn-xs btn-primary">
+									<i class="fal fa-upload"></i>
+									</a>`;
+							}else if (avTanamStatus == '1'){
+								formAvt = "{{ route('2024.user.commitment.formavt', ':noIjin') }}".replace(':noIjin', noIjin);
+								return `<a href="${formAvt}" class="btn btn-icon btn-xs btn-info">
+									<i class="fal fa-clock"></i>
+									</a>`;
+							} else if (avTanamStatus == '2' || avTanamStatus == '3'){
+								formAvt = "{{ route('2024.user.commitment.formavt', ':noIjin') }}".replace(':noIjin', noIjin);
+								return `<a href="${formAvt}" class="btn btn-icon btn-xs btn-warning">
+									<i class="fal fa-hourglass"></i>
+									</a>`;
+							} else if (avTanamStatus == '4'){
+								formAvt = "{{ route('2024.user.commitment.formavt', ':noIjin') }}".replace(':noIjin', noIjin);
+								return `<a href="${formAvt}" class="btn btn-icon btn-xs btn-success">
+									<i class="fal fa-check"></i>
+									</a>`;
+							} else if (avTanamStatus == '5'){
+								formAvt = "{{ route('2024.user.commitment.formavt', ':noIjin') }}".replace(':noIjin', noIjin);
+								return `<div class="dropdown">
+									<a href="#" class="btn btn-danger btn-xs btn-icon" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" >
+										<i class="fa fa-exclamation"></i>
+									</a>
+									<div class="dropdown-menu">
+										<a class="dropdown-item" style="text-decoration: none !important;" href="${formAvt}" target="_blank">
+											Lihat Hasil Verifikasi
+										</a >
+										<a class="dropdown-item" style="text-decoration: none !important;" href="${formAvt}" target="_blank" data-toggle="tooltip"
+											title data-original-title="Perbaiki data dan laporan. Lalu ajukan verifikasi ulang.">
+											Ajukan Ulang
+										</a>
+									</div>
+								</div>`;
 							}
-
-							return `<a ${linkRef} class="btn ${buttonClass}">${buttonText}</a>`;
 						} else {
 							return '';
 						}
 					}
 				},
 				{
-					data: 'noIjin',
+					data: 'siapVerifProduksi',
 					render: function (data, type, row) {
-						var status = row.siapVerifProduksi;
+						var status = data;
 						var avProdStatus = row.avProdStatus;
 
 						if (status === 'Belum Siap') {
@@ -266,7 +283,7 @@ td {
 				},
 			],
 			dom:
-				"<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6 d-flex align-items-center justify-content-end'<'select'>>>" + // Move the select element to the left of the datatable buttons
+				"<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6 d-flex align-items-center justify-content-end'>>" + // Move the select element to the left of the datatable buttons
 				"<'row mb-3'<'col-sm-12 col-md-6 d-flex align-items-center justify-content-start'f><'col-sm-12 col-md-6 d-flex align-items-center justify-content-end'B>>" +
 				"<'row'<'col-sm-12'tr>>" +
 				"<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
@@ -342,25 +359,6 @@ td {
 				}
 			]
 		});
-
-		// Get the unique values of the "Year" column
-		var years = table.column(1).data().unique().sort();
-
-		// Create the select element and add the options
-		var select = $('<select>')
-			.addClass('custom-select custom-select-sm col-3 mr-2')
-			.on('change', function() {
-				var year = $.fn.dataTable.util.escapeRegex($(this).val());
-				table.column(1).search(year ? '^' + year + '$' : '', true, false).draw();
-			});
-
-		$('<option>').val('').text('Semua Tahun').appendTo(select);
-		$.each(years, function(i, year) {
-			$('<option>').val(year).text(year).appendTo(select);
-		});
-
-		// Add the select element before the first datatable button
-		$('.dt-buttons').before(select);
 	});
 </script>
 @endsection

@@ -1,35 +1,35 @@
-@extends('layouts.admin')
+@extends('t2024.layouts.admin')
 @section('styles')
-<style>
-	a {
-		text-decoration: none !important;
-	}
-	/* Remove outer border from the entire DataTable */
-	.dataTables_wrapper {
-		border: none;
-	}
+	<style>
+		a {
+			text-decoration: none !important;
+		}
+		/* Remove outer border from the entire DataTable */
+		.dataTables_wrapper {
+			border: none;
+		}
 
-	/* Remove cell borders within the DataTable */
-	table.dataTable td,
-	table.dataTable th {
-		border: none;
-	}
+		/* Remove cell borders within the DataTable */
+		table.dataTable td,
+		table.dataTable th {
+			border: none;
+		}
 
-	/* Remove the header border */
-	table.dataTable thead th {
-		border-bottom: none;
-	}
+		/* Remove the header border */
+		table.dataTable thead th {
+			border-bottom: none;
+		}
 
-	/* Remove the footer border (if applicable) */
-	table.dataTable tfoot th {
-		border-top: none;
-	}
-</style>
+		/* Remove the footer border (if applicable) */
+		table.dataTable tfoot th {
+			border-top: none;
+		}
+	</style>
 @endsection
 @section('content')
 {{-- @include('partials.breadcrumb') --}}
-@include('partials.subheader')
-@include('partials.sysalert')
+@include('t2024.partials.subheader')
+@include('t2024.partials.sysalert')
 @can('pengajuan_create')
 @php
 	$npwp = str_replace(['.', '-'], '', $commitment->npwp);
@@ -717,40 +717,40 @@
 		});
 
 		$('#dataTable').DataTable({
-				responsive: true,
-				"ordering": false,
-				lengthChange: false,
-				pageLength: -1,
-				dom:
-				"<'row mb-3'<'col-sm-12 col-md-6 d-flex align-items-center justify-content-start'><'col-sm-12 col-md-6 d-flex align-items-center justify-content-end'B>>" +
-				"<'row'<'col-sm-12'tr>>" +
-				"<'row'<'col-sm-12 col-md-5'><'col-sm-12 col-md-7'>>",
-				buttons: [
-					{
-						extend: 'excelHtml5',
-						text: '<i class="fa fa-file-excel"></i>',
-						title: 'Ringkasan Pengajuan {{$page_heading}}',
-						titleAttr: 'Ekspor data ke MS. Excel',
-						className: 'btn-outline-success btn-xs btn-icon ml-3 mr-1'
-					},
-					{
-						extend: 'print',
-						text: '<i class="fa fa-print"></i>',
-						title: 'Ringkasan Pengajuan {{$page_heading}}',
-						titleAttr: 'Cetak halaman data.',
-						className: 'btn-outline-primary btn-xs btn-icon mr-1'
-					},
-					// {
-					// 	text: 'Ajukan',
-					// 	titleAttr: 'Lihat Detail',
-					// 	className: 'btn btn-outline-info btn-xs',
-					// 	action: function () {
-					// 		// Replace 'to_somewhere' with your actual route and $key->id with the parameter value
+			responsive: true,
+			"ordering": false,
+			lengthChange: false,
+			pageLength: -1,
+			dom:
+			"<'row mb-3'<'col-sm-12 col-md-6 d-flex align-items-center justify-content-start'><'col-sm-12 col-md-6 d-flex align-items-center justify-content-end'B>>" +
+			"<'row'<'col-sm-12'tr>>" +
+			"<'row'<'col-sm-12 col-md-5'><'col-sm-12 col-md-7'>>",
+			buttons: [
+				{
+					extend: 'excelHtml5',
+					text: '<i class="fa fa-file-excel"></i>',
+					title: 'Ringkasan Pengajuan {{$page_heading}}',
+					titleAttr: 'Ekspor data ke MS. Excel',
+					className: 'btn-outline-success btn-xs btn-icon ml-3 mr-1'
+				},
+				{
+					extend: 'print',
+					text: '<i class="fa fa-print"></i>',
+					title: 'Ringkasan Pengajuan {{$page_heading}}',
+					titleAttr: 'Cetak halaman data.',
+					className: 'btn-outline-primary btn-xs btn-icon mr-1'
+				},
+				// {
+				// 	text: 'Ajukan',
+				// 	titleAttr: 'Lihat Detail',
+				// 	className: 'btn btn-outline-info btn-xs',
+				// 	action: function () {
+				// 		// Replace 'to_somewhere' with your actual route and $key->id with the parameter value
 
-					// 	}
-					// }
-				],
-			});
+				// 	}
+				// }
+			],
+		});
 	});
 </script>
 

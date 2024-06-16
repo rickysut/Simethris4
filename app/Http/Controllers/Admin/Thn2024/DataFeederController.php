@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\Admin\Thn2024;
 
 use App\Http\Controllers\Controller;
+use App\Models2024\AjuVerifProduksi;
+use App\Models2024\AjuVerifSkl;
+use App\Models2024\AjuVerifTanam;
 use App\Models2024\DataRealisasi;
 use App\Models2024\Lokasi;
 use App\Models2024\MasterAnggota;
@@ -10,8 +13,10 @@ use App\Models2024\MasterPoktan;
 use App\Models2024\MasterSpatial;
 use App\Models2024\Pks;
 use App\Models2024\PullRiph;
+use App\Models\AjuVerifSkl as ModelsAjuVerifSkl;
 use App\Models\MasterDesa;
 use App\Models\MasterKecamatan;
+use App\Models\UserDocs;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Svg\Tag\Rect;
@@ -138,7 +143,6 @@ class DataFeederController extends Controller
 				} else {
 					$commitment->siapVerifProduksi = 'Siap';
 				}
-
 			}
 		}
 
@@ -175,8 +179,6 @@ class DataFeederController extends Controller
 			'data' => $query,
 		]);
 	}
-
-
 
 	public function getPksById($id)
 	{
@@ -697,5 +699,157 @@ class DataFeederController extends Controller
 			'nama_petani' => 'KTP tidak terdaftar',
 		];
 		return response()->json($data);
+	}
+
+	public function getDataPengajuan($noIjin)
+	{
+		$noIjin = substr($noIjin, 0, 4) . '/' .
+			substr($noIjin, 4, 2) . '.' .
+			substr($noIjin, 6, 3) . '/' .
+			substr($noIjin, 9, 1) . '/' .
+			substr($noIjin, 10, 2) . '/' .
+			substr($noIjin, 12, 4);
+
+
+		$commitment = PullRiph::where('no_ijin', $noIjin)->first();
+		$verifTanam = AjuVerifTanam::where('no_ijin', $noIjin)->latest()->first() ?? new AjuVerifTanam();
+		$verifProduksi = AjuVerifProduksi::where('no_ijin', $noIjin)->latest()->first() ?? new AjuVerifProduksi();
+		$verifSkl = AjuVerifSkl::where('no_ijin', $noIjin)->latest()->first() ?? new AjuVerifSkl();
+		$userDocs = UserDocs::where('no_ijin', $noIjin)->first() ?? new UserDocs();
+		$pks = Pks::where('no_ijin', $noIjin)->get() ?? new Pks();
+		$lokasis = Lokasi::where('no_ijin', $noIjin)->get() ?? new Lokasi();
+
+		$data = [
+			'company' => $commitment->datauser->company_name,
+			'noIjin' => $commitment->no_ijin,
+			'periode' => $commitment->periodetahun,
+			'avtDate' => $verifTanam->created_at,
+			'avtVerifAt' => $verifTanam->verif_at,
+			'avtStatus' => $verifTanam->status,
+			'avtMetode' => $verifTanam->metode,
+			'avtNote' => $verifTanam->note,
+
+			'avpDate' => $verifProduksi->created_at,
+			'avpVerifAt' => $verifProduksi->verif_at,
+			'avpStatus' => $verifProduksi->status,
+			'avpMetode' => $verifProduksi->metode,
+			'avpNote' => $verifProduksi->note,
+
+			'avsklDate' => $verifSkl->created_at,
+			'avsklVerifAt' => $verifSkl->verif_at,
+			'avsklStatus' => $verifSkl->status,
+			'avsklMetode' => $verifSkl->metode,
+			'avsklNote' => $verifSkl->note,
+
+			'publishedAt' => $verifSkl->published_date,
+			'wajibTanam' => $commitment->luas_wajib_tanam,
+			'wajibProduksi' => $commitment->volume_produksi,
+			'realisasiTanam' => $commitment->lokasi->sum('luas_tanam'),
+			'realisasiProduksi' => $commitment->lokasi->sum('volume'),
+			'countAnggota' => $commitment->lokasi->groupBy('ktp_petani')->count(),
+			'countPoktan' => $commitment->lokasi->groupBy('poktan_id')->count(),
+			'countPks' => $pks->where('berkas_pks', '!=', null)->count(),
+			'countSpatial' => $lokasis->count(),
+			'countTanam' => $lokasis->where('luas_tanam', '!=', null)->count(),
+			'userDocs' => $userDocs,
+		];
+
+		return response()->json($data);
+	}
+
+	public function getVerifTanamHistory(Request $request, $noIjin)
+	{
+		// Format the $noIjin
+		$noIjin = substr($noIjin, 0, 4) . '/' .
+			substr($noIjin, 4, 2) . '.' .
+			substr($noIjin, 6, 3) . '/' .
+			substr($noIjin, 9, 1) . '/' .
+			substr($noIjin, 10, 2) . '/' .
+			substr($noIjin, 12, 4);
+
+		// Get the request inputs
+		$draw = $request->input('draw', 1);
+		$start = $request->input('start', 0);
+		$length = $request->input('length', 10);
+		$searchValue = $request->input('search.value', '');
+		$order = $request->input('order', []);
+		$columns = $request->input('columns', []);
+
+		// Build the query
+		$query = AjuVerifTanam::select('id', 'no_ijin', 'check_by', 'verif_at', 'status', 'note')
+			->where('no_ijin', $noIjin)
+			->with('verifikator');
+
+		// Get total records count
+		$totalRecords = $query->count();
+
+		// Apply search filter
+		if (!empty($searchValue)) {
+			$query = $query->where(function ($q) use ($searchValue) {
+				$q->where('check_by', 'like', "%{$searchValue}%")
+					->orWhere('verif_at', 'like', "%{$searchValue}%")
+					->orWhere('status', 'like', "%{$searchValue}%")
+					->orWhere('note', 'like', "%{$searchValue}%");
+			});
+		}
+
+		// Get filtered records count
+		$filteredRecords = $query->count();
+
+		// Apply ordering
+		if (!empty($order)) {
+			$orderColumnIndex = $order[0]['column'];
+			$orderDirection = $order[0]['dir'];
+			$orderColumn = $columns[$orderColumnIndex]['data'];
+
+			switch ($orderColumn) {
+				case 'status':
+					$query = $query->orderBy('status', $orderDirection);
+					break;
+				case 'check_by':
+					$query = $query->orderBy('check_by', $orderDirection);
+					break;
+				case 'verif_at':
+					$query = $query->orderBy('verif_at', $orderDirection);
+					break;
+				case 'note':
+					$query = $query->orderBy('note', $orderDirection);
+					break;
+				default:
+					$query = $query->orderBy('id', 'desc');
+					break;
+			}
+		}
+
+		// Apply pagination
+		$data = $query->skip($start)
+			->take($length)
+			->get();
+
+		// Process the data
+		if ($data) {
+			foreach ($data as $history) {
+				$history->checkBy = ($history->check_by && $history->verifikator) ? $history->verifikator->name : null;
+			}
+		}
+
+		// Format the response
+		$response = $data->map(function ($item) {
+			return [
+				'id' => $item->id,
+				'checkBy' => $item->checkBy,
+				'status' => $item->status,
+				'verifAt' => $item->verif_at,
+				'note' => $item->note,
+			];
+		});
+
+		// Return JSON response
+		return response()->json([
+			'draw' => $draw,
+			'recordsTotal' => $totalRecords,
+			'recordsFiltered' => $filteredRecords,
+			'data' => $response,
+		]);
 	}
 }

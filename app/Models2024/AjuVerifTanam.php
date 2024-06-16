@@ -3,6 +3,7 @@
 namespace App\Models2024;
 
 use App\Models\DataUser;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
@@ -83,5 +84,10 @@ class AjuVerifTanam extends Model
 	public function datauser()
 	{
 		return $this->belongsTo(DataUser::class, 'npwp', 'npwp_company');
+	}
+
+	public function verifikator()
+	{
+		return $this->belongsTo(User::class, 'check_by', 'id');
 	}
 }

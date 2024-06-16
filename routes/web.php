@@ -431,6 +431,8 @@ Route::group(['prefix' => '2024', 'as' => '2024.', 'namespace' => 'Admin', 'midd
 			Route::get('/getAllCpcl', 'DataFeederController@getAllCpcl')->name('getAllCpcl');
 			Route::get('/{kecId}/getAllCpclByKec', 'DataFeederController@getAllCpclByKec')->name('getAllCpclByKec');
 			Route::get('/{nik}/getCpclByNik', 'DataFeederController@getCpclByNik')->name('getCpclByNik');
+			Route::get('/getDataPengajuan/{noIjin}', 'DataFeederController@getDataPengajuan')->name('getDataPengajuan');
+			Route::get('/getVerifTanamHistory/{noIjin}', 'DataFeederController@getVerifTanamHistory')->name('getVerifTanamHistory');
 
 
 			//ini jangan dijalankan lagi
@@ -486,6 +488,10 @@ Route::group(['prefix' => '2024', 'as' => '2024.', 'namespace' => 'Admin', 'midd
 				// Route::get('{id}/penangkar', 'PenangkarRiphController@mitra')->name('penangkar');
 				// Route::post('{id}/penangkar/store', 'PenangkarRiphController@store')->name('penangkar.store');
 				Route::delete('/commitmentmd', 'CommitmentController@massDestroy')->name('massDestroy');
+
+				//pengajuan verifikasi tanam
+				Route::get('{noIjin}/formavt', 'AjuVerifTanamController@index')->name('formavt');
+				Route::post('{noIjin}/formavt/store', 'AjuVerifTanamController@submitPengajuan')->name('submitPengajuan');
 
 				//daftar anggota & lokasi by pks
 				// Route::get('/', 'CommitmentController@index')->name('index');
