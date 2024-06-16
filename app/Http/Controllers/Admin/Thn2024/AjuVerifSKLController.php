@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin\Thn2024;
 
 use App\Http\Controllers\Controller;
-use App\Models2024\AjuVerifTanam;
+use App\Models2024\AjuVerifSkl;
 use App\Models2024\PullRiph;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -13,14 +13,14 @@ use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Storage;
 
-class AjuVerifTanamController extends Controller
+class AjuVerifSKLController extends Controller
 {
 	//halaman show Ringkasan Pengajuan Verifikasi
     public function index(Request $request, $noIjin)
     {
         $module_name = 'Komitmen';
-		$page_title = 'Pengajuan Verifikasi Tanam';
-		$page_heading = 'Pengajuan Verifikasi Tanam';
+		$page_title = 'Pengajuan Verifikasi Produksi';
+		$page_heading = 'Pengajuan Verifikasi Produksi';
 		$heading_class = 'fal fa-file-invoice';
 
 		$ijin = $noIjin;
@@ -35,7 +35,7 @@ class AjuVerifTanamController extends Controller
 		$npwp_company = Auth::user()->data_user->npwp_company;
 		$commitment = PullRiph::where('no_ijin', $noIjin)->first();
 
-		return view('t2024.pengajuan.veriftanam.show', compact('module_name', 'page_title', 'page_heading', 'heading_class', 'commitment', 'ijin'));
+		return view('t2024.pengajuan.verifskl.show', compact('module_name', 'page_title', 'page_heading', 'heading_class', 'commitment', 'ijin'));
     }
 
 	//store pengajuan
@@ -63,7 +63,7 @@ class AjuVerifTanamController extends Controller
 
 		$npwp = Auth::user()->data_user->npwp_company;
 		$commitment = PullRiph::where('npwp', $npwp)->where('no_ijin', $noIjin)->firstOrFail();
-		AjuVerifTanam::create(
+		AjuVerifSkl::create(
 			[
 				'npwp' => $npwp,
 				'commitment_id' => $commitment->id,
@@ -72,7 +72,7 @@ class AjuVerifTanamController extends Controller
 			],
 		);
 
-		return redirect()->back()->with('success', 'Verifikasi Tanam berhasil diajukan.');
+		return redirect()->back()->with('success', 'Verifikasi Produksi berhasil diajukan.');
     }
 
     /**

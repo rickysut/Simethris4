@@ -17,7 +17,7 @@
 7. php artisan serve
 8. run php artisan schedule:test, select 0 then.
 
-## Perubahan terbaru
+## Existing Version
 
 1. addLokasi dan editLokasi.blade pembatasan input max luas lahan di remark
 2. data step menjadi 3 digit
@@ -30,11 +30,20 @@
 9. New Template SKL Heading
 
 
-## Next Dev
+## Current Dev
 1. Reduce data load on initmap (attempt: 2)
-2. Give Administrator ability to reject the SKL Approval Submission
-3. Give user ability to change the data after Approval rejection
+2. Give Administrator ability to reject the SKL Approval Submission.
+3. Give user ability to change the data after Approval rejection.
 4. Add new fields for Administrator to report where the product shall be go (sales in weight, keep in weight) in SKL Approval form.
-5. Advance. Change user behavior from map drawing and or uploading the KML to only select available area based on the farmer National ID.
-a. this will need new modules and database table
-b. new crud
+5. Advance. Change user behavior from map drawing and or uploading the KML. Now the location are system provided.
+   a. this will need new modules and database table
+   b. new crud
+6. New Modules
+   a. Master Spatial Data incl. CRUD and
+   b. Master CPCL data incl. CRUD
+   c. Master Poktan data incl. CRUD
+7. User able to re-submit their rejected submission by di Verificator or Administrator after they fullfill the requirements. The histories of the submmision are now available for each Commitment ID.
+8. To prevent the the data faulty, the tables are seperated from the previous version.
+9. Flagging Enhancement for some data. makes it easier to determined the statuses of the data.
+10. Android Beta version for development preview are now available.
+11. Product Distribution features are now available. This features were added to determined the final distribution of the product (garlic): Market Release or stored as seeds.

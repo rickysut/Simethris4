@@ -59,9 +59,6 @@ td {
 			processing: true,
 			serverSide: true,
 			order: [[0, 'asc']],
-			language: {
-				searchPlaceholder: "Cari..."
-			},
 			ajax: {
 				url: '{{ route('2024.datafeeder.getAllMyCommitment') }}',
 				type: 'GET',
@@ -144,140 +141,156 @@ td {
 					data: 'siapVerifTanam',
 					render: function (data, type, row) {
 						var noIjin = row.noIjin;
-						var status = 'Siap';
+						var status = data;
 						var avTanamStatus = row.avTanamStatus;
+						var formAvt = "{{ route('2024.user.commitment.formavt', ':noIjin') }}".replace(':noIjin', noIjin);
 
-						console.log(avTanamStatus);
+						console.log("noIjin: " + noIjin);
+						console.log("status: " + status);
+						console.log("avTanamStatus: " + avTanamStatus);
 
-						if (status === 'Belum Siap') {
-							return `Belum Siap`;
-						} else if (status === 'Siap') {
-							var buttonClass = '';
-							var buttonText = status;
-
-							if (avTanamStatus === 'Tidak Ada'){
-								formAvt = "{{ route('2024.user.commitment.formavt', ':noIjin') }}".replace(':noIjin', noIjin);
-								return `<a href="${formAvt}" class="btn btn-icon btn-xs btn-primary">
-									<i class="fal fa-upload"></i>
-									</a>`;
-							}else if (avTanamStatus == '1'){
-								formAvt = "{{ route('2024.user.commitment.formavt', ':noIjin') }}".replace(':noIjin', noIjin);
-								return `<a href="${formAvt}" class="btn btn-icon btn-xs btn-info">
-									<i class="fal fa-clock"></i>
-									</a>`;
-							} else if (avTanamStatus == '2' || avTanamStatus == '3'){
-								formAvt = "{{ route('2024.user.commitment.formavt', ':noIjin') }}".replace(':noIjin', noIjin);
-								return `<a href="${formAvt}" class="btn btn-icon btn-xs btn-warning">
-									<i class="fal fa-hourglass"></i>
-									</a>`;
-							} else if (avTanamStatus == '4'){
-								formAvt = "{{ route('2024.user.commitment.formavt', ':noIjin') }}".replace(':noIjin', noIjin);
-								return `<a href="${formAvt}" class="btn btn-icon btn-xs btn-success">
-									<i class="fal fa-check"></i>
-									</a>`;
-							} else if (avTanamStatus == '5'){
-								formAvt = "{{ route('2024.user.commitment.formavt', ':noIjin') }}".replace(':noIjin', noIjin);
-								return `<div class="dropdown">
-									<a href="#" class="btn btn-danger btn-xs btn-icon" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" >
-										<i class="fa fa-exclamation"></i>
-									</a>
-									<div class="dropdown-menu">
-										<a class="dropdown-item" style="text-decoration: none !important;" href="${formAvt}" target="_blank">
-											Lihat Hasil Verifikasi
-										</a >
-										<a class="dropdown-item" style="text-decoration: none !important;" href="${formAvt}" target="_blank" data-toggle="tooltip"
-											title data-original-title="Perbaiki data dan laporan. Lalu ajukan verifikasi ulang.">
-											Ajukan Ulang
-										</a>
-									</div>
-								</div>`;
+						if (status === "Belum Siap") {
+							return "Belum Siap";
+						} else if (status === "Siap") {
+							switch (avTanamStatus) {
+								case "Tidak ada":
+									return `<a href="${formAvt}" class="btn btn-icon btn-xs btn-warning">
+												<i class="fal fa-upload"></i>
+											</a>`;
+								case "1":
+									return `<a href="${formAvt}" class="btn btn-icon btn-xs btn-info">
+												<i class="fal fa-clock"></i>
+											</a>`;
+								case "2":
+								case "3":
+									return `<a href="${formAvt}" class="btn btn-icon btn-xs btn-warning">
+												<i class="fal fa-hourglass"></i>
+											</a>`;
+								case "4":
+									return `<a href="${formAvt}" class="btn btn-icon btn-xs btn-success">
+												<i class="fal fa-check"></i>
+											</a>`;
+								case "5":
+									return `<div class="dropdown">
+												<a href="#" class="btn btn-danger btn-xs btn-icon" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+													<i class="fa fa-exclamation"></i>
+												</a>
+												<div class="dropdown-menu">
+													<a class="dropdown-item" style="text-decoration: none !important;" href="${formAvt}" target="_blank">
+														Lihat Hasil Verifikasi
+													</a>
+													<a class="dropdown-item" style="text-decoration: none !important;" href="${formAvt}" target="_blank" data-toggle="tooltip" title="Perbaiki data dan laporan. Lalu ajukan verifikasi ulang.">
+														Ajukan Ulang
+													</a>
+												</div>
+											</div>`;
+								default:
+									return '';
 							}
 						} else {
-							return '';
+							return "error";
 						}
 					}
 				},
 				{
 					data: 'siapVerifProduksi',
 					render: function (data, type, row) {
+						var noIjin = row.noIjin;
 						var status = data;
 						var avProdStatus = row.avProdStatus;
+						var formAvp = "{{ route('2024.user.commitment.formavp', ':noIjin') }}".replace(':noIjin', noIjin);
 
-						if (status === 'Belum Siap') {
-							return status;
-						} else if (status === 'Siap') {
-							var buttonClass = '';
+						if (status === "Belum Siap") {
+							return "Belum Siap";
+						} else if (status === "Siap") {
 							switch (avProdStatus) {
-								case 'Tidak ada':
-								case 0:
-									buttonClass = 'btn-primary';
-									buttonText = '<i class="fal fa-upload"></i>';
-									linkRef = 'href="#"';
-									break;
-								case 1:
-									buttonClass = 'btn-info';
-									buttonText = '<i class="fal fa-upload"></i>';
-									linkRef = 'href="#"';
-									break;
-								case 2:
-								case 3:
-									buttonClass = 'btn-warning';
-									buttonText = '<i class="fal fa-upload"></i>';
-									linkRef = 'href="#"';
-									break;
-								case 4:
-									buttonClass = 'btn-success';
-									buttonText = '<i class="fal fa-upload"></i>';
-									linkRef = 'href="#"';
-									break;
-								case 5:
-									buttonClass = 'btn-danger';
-									buttonText = '<i class="fal fa-upload"></i>';
-									linkRef = 'href="#"';
-									break;
+								case "Tidak ada":
+									return `<a href="${formAvp}" class="btn btn-icon btn-xs btn-warning">
+												<i class="fal fa-upload"></i>
+											</a>`;
+								case "1":
+									return `<a href="${formAvp}" class="btn btn-icon btn-xs btn-info">
+												<i class="fal fa-clock"></i>
+											</a>`;
+								case "2":
+								case "3":
+									return `<a href="${formAvp}" class="btn btn-icon btn-xs btn-warning">
+												<i class="fal fa-hourglass"></i>
+											</a>`;
+								case "4":
+									return `<a href="${formAvp}" class="btn btn-icon btn-xs btn-success">
+												<i class="fal fa-check"></i>
+											</a>`;
+								case "5":
+									return `<div class="dropdown">
+												<a href="#" class="btn btn-danger btn-xs btn-icon" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+													<i class="fa fa-exclamation"></i>
+												</a>
+												<div class="dropdown-menu">
+													<a class="dropdown-item" style="text-decoration: none !important;" href="${formAvp}" target="_blank">
+														Lihat Hasil Verifikasi
+													</a>
+													<a class="dropdown-item" style="text-decoration: none !important;" href="${formAvp}" target="_blank" data-toggle="tooltip" title="Perbaiki data dan laporan. Lalu ajukan verifikasi ulang.">
+														Ajukan Ulang
+													</a>
+												</div>
+											</div>`;
+								default:
+									return '';
 							}
-
-							return `<a ${linkRef} class="btn ${buttonClass}">${buttonText}</a>`;
 						} else {
-							return '';
+							return "error";
 						}
 					}
 				},
 				{
-					data: 'noIjin',
+					data: 'siapVerifSkl',
 					render: function (data, type, row) {
-						var status = row.siapVerifTanam;
-						var avTanamStatus = row.avTanamStatus;
+						var noIjin = row.noIjin;
+						var status = data;
+						var avSklStatus = row.avSklStatus;
+						var formAvSkl = "{{ route('2024.user.commitment.formavskl', ':noIjin') }}".replace(':noIjin', noIjin);
 
-						if (status === 'Belum Siap') {
-							return status;
-						} else if (status === 'Siap') {
-							var buttonClass = '';
-							var buttonText = status;
-
-							switch (avTanamStatus) {
-								case 'Tidak ada':
-								case 0:
-									buttonClass = 'btn-primary';
-									break;
-								case 1:
-									buttonClass = 'btn-info';
-									break;
-								case 2:
-								case 3:
-									buttonClass = 'btn-warning';
-									break;
-								case 4:
-									buttonClass = 'btn-success';
-									break;
-								case 5:
-									buttonClass = 'btn-danger';
-									break;
+						if (status === "Belum Siap") {
+							return "Belum Siap";
+						} else if (status === "Siap") {
+							switch (avSklStatus) {
+								case "Tidak ada":
+									return `<a href="${formAvSkl}" class="btn btn-icon btn-xs btn-warning">
+												<i class="fal fa-upload"></i>
+											</a>`;
+								case "1":
+									return `<a href="${formAvSkl}" class="btn btn-icon btn-xs btn-info">
+												<i class="fal fa-clock"></i>
+											</a>`;
+								case "2":
+								case "3":
+									return `<a href="${formAvSkl}" class="btn btn-icon btn-xs btn-warning">
+												<i class="fal fa-hourglass"></i>
+											</a>`;
+								case "4":
+									return `<a href="${formAvSkl}" class="btn btn-icon btn-xs btn-success">
+												<i class="fal fa-check"></i>
+											</a>`;
+								case "5":
+									return `<div class="dropdown">
+												<a href="#" class="btn btn-danger btn-xs btn-icon" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+													<i class="fa fa-exclamation"></i>
+												</a>
+												<div class="dropdown-menu">
+													<a class="dropdown-item" style="text-decoration: none !important;" href="${formAvSkl}" target="_blank">
+														Lihat Hasil Verifikasi
+													</a>
+													<a class="dropdown-item" style="text-decoration: none !important;" href="${formAvp}" target="_blank" data-toggle="tooltip" title="Perbaiki data dan laporan. Lalu ajukan verifikasi ulang.">
+														Ajukan Ulang
+													</a>
+												</div>
+											</div>`;
+								default:
+									return '';
 							}
-
-							return `<button class="btn ${buttonClass}">${buttonText}</button>`;
 						} else {
-							return '';
+							return "error";
 						}
 					}
 				},

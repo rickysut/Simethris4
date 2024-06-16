@@ -162,6 +162,7 @@
 		<script src="{{ asset('js/pdfmake/pdfmake.min.js') }}"></script>
 		<script src="{{ asset('js/pdfmake/vfs_fonts.js') }}"></script>
 		<script src="{{ asset('js/jszip/jszip.min.js') }}"></script>
+		<script src="{{ asset('js/datatable-global-setting.js') }}"></script>
 
 		<!-- search bar -->
 		<script type="text/javascript">

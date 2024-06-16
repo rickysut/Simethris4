@@ -1,309 +1,189 @@
 @extends('t2024.layouts.admin')
-@section('styles')
-	<style>
-		a {
-			text-decoration: none !important;
-		}
-		/* Remove outer border from the entire DataTable */
-		.dataTables_wrapper {
-			border: none;
-		}
-
-		/* Remove cell borders within the DataTable */
-		table.dataTable td,
-		table.dataTable th {
-			border: none;
-		}
-
-		/* Remove the header border */
-		table.dataTable thead th {
-			border-bottom: none;
-		}
-
-		/* Remove the footer border (if applicable) */
-		table.dataTable tfoot th {
-			border-top: none;
-		}
-	</style>
-@endsection
 @section('content')
-{{-- @include('partials.breadcrumb') --}}
-@include('t2024.partials.subheader')
-@include('t2024.partials.sysalert')
-@can('pengajuan_create')
-@php
-	$npwp = str_replace(['.', '-'], '', $commitment->npwp);
-@endphp
-<div class="row">
-	<div class="col-12">
-		<div class="text-center">
-			<i class="fal fa-badge-check fa-3x subheader-icon"></i>
-			<h2>Ringkasan Data</h2>
-			<div class="row justify-content-center">
-				<p class="lead">Ringkasan {{$page_heading}}.</p>
+	{{-- @include('partials.breadcrumb') --}}
+	@include('t2024.partials.subheader')
+	@include('t2024.partials.sysalert')
+
+	<div class="row">
+		<div class="col-12">
+			<div class="text-center">
+				<i class="fal fa-badge-check fa-3x subheader-icon"></i>
+				<h2>Ringkasan Data</h2>
+				<div class="row justify-content-center">
+					<p class="lead">Ringkasan {{$page_heading}}.</p>
+				</div>
 			</div>
-		</div>
 
-		<div id="panel-1" class="panel">
-			<div class="panel-container">
-				<div class="panel-content">
-					<table class="table table-hover table-sm w-100" style="border: none; border-top:none; border-bottom:none;" id="dataTable">
-						<thead>
-							<th  style="width: 32%"></th>
-							<th style="width: 1%"></th>
-							<th></th>
-							<th></th>
-						</thead>
-						<tbody>
-							<tr>
-								<td class="text-uppercase fw-500 h6">RINGKASAN UMUM</td>
-								<td></td>
-								<td></td>
-								<td></td>
-							</tr>
-							<tr>
-								<td class="text-muted">Perusahaan</td>
-								<td>:</td>
-								<td class="fw-500">{{$company}}</td>
-								<td></td>
-							</tr>
-							<tr>
-								<td class="text-muted">Nomor Ijin (RIPH)</td>
-								<td>:</td>
-								<td class="fw-500">{{$noIjin}}</td>
-								<td></td>
-							</tr>
-							<tr>
-								<td class="text-muted">Periode RIPH</td>
-								<td>:</td>
-								<td class="fw-500">Tahun {{$periode}}</td>
-								<td></td>
-							</tr>
-							<tr class="bg-primary-50" style="height: 25px; opacity: 0.2">
-								<td></td>
-								<td></td>
-								<td></td>
-								<td></td>
-							</tr>
-							<tr>
-								<td class="text-uppercase fw-500 h6">RINGKASAN KEWAJIBAN DAN REALISASI</td>
-								<td></td>
-								<td></td>
-								<td></td>
-							</tr>
-							<tr>
-								<td class="text-muted">Luas Wajib Tanam</td>
-								<td>:</td>
-								<td class="fw-500">{{ number_format($wajibTanam, 2, ',', '.') }} ha</td>
-								<td></td>
-							</tr>
-							<tr>
-								<td class="text-muted">Realisasi Tanam</td>
-								<td>:</td>
-								<td class="fw-500">
-									@if($wajibTanam > $realisasiTanam)
-										<span class="text-warning">{{ number_format($realisasiTanam, 2, ',', '.') }} ha</span>
-										<i class="fas fa-exclamation-circle text-warning ml-1"></i>
-									@else
-										{{ number_format($realisasiTanam, 2, ',', '.') }} ha
-										<i class="fas fa-check text-success mr-1"></i>
-									@endif
-								</td>
-								<td></td>
-							</tr>
-							<tr>
-								<td class="text-muted">Jumlah Lokasi Tanam/Spasial</td>
-								<td>:</td>
-								<td class="fw-500">{{ $hasGeoloc }} titik</td>
-								<td></td>
-							</tr>
-							<tr>
-								<td class="text-muted">Volume Wajib Produksi</td>
-								<td>:</td>
-								<td class="fw-500">{{ number_format($wajibProduksi, 2, ',', '.') }} ton</td>
-								<td></td>
-							</tr>
-							<tr>
-								<td class="text-muted">Realisasi Produksi</td>
-								<td>:</td>
-								<td class="fw-500">
-									@if($wajibProduksi > $realisasiProduksi)
-										<span class="text-danger">{{ number_format($realisasiProduksi, 2, ',', '.') }} ton</span>
-										<i class="fas fa-exclamation-circle text-danger ml-1"></i>
-									@else
-										<span>{{ number_format($realisasiProduksi, 2, ',', '.') }} ton</span>
-										<i class="fas fa-check text-success mr-1"></i>
-									@endif
-								</td>
-								<td></td>
-							</tr>
-							<tr class="bg-primary-50" style="height: 25px; opacity: 0.2">
-								<td></td>
-								<td></td>
-								<td></td>
-								<td></td>
-							</tr>
-							<tr>
-								<td class="text-uppercase fw-500 h6">RINGKASAN KEMITRAAN</td>
-								<td></td>
-								<td></td>
-								<td></td>
-							</tr>
-							<tr>
-								<td class="text-muted">Jumlah Kelompok Tani Mitra</td>
-								<td>:</td>
-								<td class="fw-500">{{ $countPoktan }} kelompok</td>
-								<td></td>
-							</tr>
-							<tr>
-								<td class="text-muted">Jumlah Anggota Kelompok</td>
-								<td>:</td>
-								<td class="fw-500">{{ $countAnggota }} anggota</td>
-								<td></td>
-							</tr>
-							<tr>
-								<td class="text-muted">Jumlah Perjanjian (PKS) diunggah</td>
-								<td>:</td>
-								<td class="fw-500">{{ $countPks }} berkas</td>
-								<td></td>
-							</tr>
-							<tr class="bg-primary-50" style="height: 25px; opacity: 0.2">
-								<td></td>
-								<td></td>
-								<td></td>
-								<td></td>
-							</tr>
+			<div id="panel-1" class="panel">
+				<div class="panel-container">
+					<div class="panel-content">
+						<table class="table table-hover table-sm w-100" style="border: none; border-top:none; border-bottom:none;" id="dataTable">
+							<thead class="">
+								<th  style="width: 32%"></th>
+								<th style="width: 1%"></th>
+								<th></th>
+								<th></th>
+							</thead>
+							<tbody>
+								<tr>
+									<td class="text-uppercase fw-500 h6">RINGKASAN UMUM</td>
+									<td></td>
+									<td></td>
+									<td></td>
+								</tr>
+								<tr>
+									<td class="text-muted">Perusahaan</td>
+									<td>:</td>
+									<td class="fw-500" id="companyName"></td>
+									<td></td>
+								</tr>
+								<tr>
+									<td class="text-muted">Nomor Ijin (RIPH)</td>
+									<td>:</td>
+									<td class="fw-500" id="noIjin"></td>
+									<td></td>
+								</tr>
+								<tr>
+									<td class="text-muted">Periode RIPH</td>
+									<td>:</td>
+									<td class="fw-500" id="periode"></td>
+									<td></td>
+								</tr>
+								<tr class="bg-primary-50" style="height: 25px; opacity: 0.2">
+									<td></td>
+									<td></td>
+									<td></td>
+									<td></td>
+								</tr>
+								<tr>
+									<td class="text-uppercase fw-500 h6">RINGKASAN KEWAJIBAN DAN REALISASI</td>
+									<td></td>
+									<td></td>
+									<td></td>
+								</tr>
+								<tr>
+									<td class="text-muted">Luas Wajib Tanam</td>
+									<td>:</td>
+									<td class="fw-500" id="wajibTanam"></td>
+									<td></td>
+								</tr>
+								<tr>
+									<td class="text-muted">Volume Wajib Produksi</td>
+									<td>:</td>
+									<td class="fw-500" id="wajibProduksi"></td>
+									<td></td>
+								</tr>
+								<tr>
+									<td class="text-muted">Realisasi Tanam</td>
+									<td>:</td>
+									<td class="fw-500" id="realisasiTanam">
+										<span></span>
+										<i></i>
+									</td>
+									<td></td>
+								</tr>
+								<tr>
+									<td class="text-muted">Jumlah Lokasi Tanam/Spasial</td>
+									<td>:</td>
+									<td class="fw-500" id="countSpatial"></td>
+									<td></td>
+								</tr>
+								<tr>
+									<td class="text-muted">Realisasi Produksi</td>
+									<td>:</td>
+									<td class="fw-500" id="sumPanen"></td>
+									<td></td>
+								</tr>
+								<tr class="" style="height: 25px;">
+									<td></td>
+									<td></td>
+									<td></td>
+									<td></td>
+								</tr>
+								<tr>
+									<td class="text-uppercase fw-500 h6">RINGKASAN KEMITRAAN</td>
+									<td></td>
+									<td></td>
+									<td></td>
+								</tr>
+								<tr>
+									<td class="text-muted">Jumlah Petani Mitra</td>
+									<td>:</td>
+									<td class="fw-500" id="countAnggota"></td>
+									<td></td>
+								</tr>
+								<tr>
+									<td class="text-muted">Jumlah Kelompok Tani Mitra</td>
+									<td>:</td>
+									<td class="fw-500" id="countPoktan"></td>
+									<td></td>
+								</tr>
+								<tr>
+									<td class="text-muted">Jumlah Perjanjian (PKS) diunggah</td>
+									<td>:</td>
+									<td class="fw-500" id="countPks">
+									</td>
+									<td></td>
+								</tr>
+								<tr class="bg-primary-50" style="height: 25px; opacity: 0.2">
+									<td></td>
+									<td></td>
+									<td></td>
+									<td></td>
+								</tr>
 
-							<tr>
-								<td class="text-uppercase fw-500">KELENGKAPAN BERKAS</td>
-								<td></td>
-								<td></td>
-								<td></td>
-							</tr>
-							<tr>
-								<td class="text-uppercase fw-500">A. TAHAP TANAM</td>
-								<td></td>
-								<td></td>
-								<td></td>
-							</tr>
-							<tr>
-								<td class="text-muted pl-4">Surat Pengajuan Verifikasi Tanam</td>
-								<td>:</td>
-								<td class="fw-500">
-									@if ($userDocs->spvt)
-										@if ($userDocs->spvtcheck === 'sesuai')
-											<a href="#" data-toggle="modal" data-target="#viewDocs" data-doc="{{ asset('storage/uploads/'.$npwp.'/'.$commitment->periodetahun.'/'.$userDocs->spvt) }}">
-												Ada
-											</a>
-											<i class="fa fa-check text-success ml-1"></i>
-										@else
-											<a href="#" data-toggle="modal" data-target="#viewDocs" data-doc="{{ asset('storage/uploads/'.$npwp.'/'.$commitment->periodetahun.'/'.$userDocs->spvt) }}">
-												Ada
-											</a>
-											<i class="fas fa-exclamation-circle text-danger ml-1"></i>
-										@endif
-									@else
-										<span class="text-danger">Tidak ada berkas</span>
-										<i class="fas fa-exclamation-circle text-danger ml-1"></i>
-									@endif
-								</td>
-								<td></td>
-							</tr>
-							<tr>
-								<td class="text-muted pl-4">Surat Pertanggungjawaban Mutlak (Tanam)</td>
-								<td>:</td>
-								<td class="fw-500">
-									@if ($userDocs->sptjmtanam)
-										@if ($userDocs->sptjmtanamcheck === 'sesuai')
-											<a href="#" data-toggle="modal" data-target="#viewDocs" data-doc="{{ asset('storage/uploads/'.$npwp.'/'.$commitment->periodetahun.'/'.$userDocs->sptjmtanam) }}">
-												Ada
-											</a>
-											<i class="fa fa-check text-success ml-1"></i>
-										@else
-											<a href="#" data-toggle="modal" data-target="#viewDocs" data-doc="{{ asset('storage/uploads/'.$npwp.'/'.$commitment->periodetahun.'/'.$userDocs->sptjmtanam) }}">
-												Ada
-											</a>
-											<i class="fas fa-exclamation-circle text-danger ml-1"></i>
-										@endif
-									@else
-										<span class="text-danger">Tidak ada berkas</span>
-										<i class="fas fa-exclamation-circle text-danger ml-1"></i>
-									@endif
-								</td>
-								<td></td>
-							</tr>
-							<tr>
-								<td class="text-muted pl-4">Form Realisasi Tanam</td>
-								<td>:</td>
-								<td class="fw-500">
-									@if ($userDocs->rta)
-										@if ($userDocs->rtacheck === 'sesuai')
-											<a href="#" data-toggle="modal" data-target="#viewDocs" data-doc="{{ asset('storage/uploads/'.$npwp.'/'.$commitment->periodetahun.'/'.$userDocs->rta) }}">
-												Ada
-											</a>
-											<i class="fa fa-check text-success ml-1"></i>
-										@else
-											<a href="#" data-toggle="modal" data-target="#viewDocs" data-doc="{{ asset('storage/uploads/'.$npwp.'/'.$commitment->periodetahun.'/'.$userDocs->rta) }}">
-												Ada
-											</a>
-											<i class="fas fa-exclamation-circle text-danger ml-1"></i>
-										@endif
-									@else
-										<span class="text-danger">Tidak ada berkas</span>
-										<i class="fas fa-exclamation-circle text-danger ml-1"></i>
-									@endif
-								</td>
-								<td></td>
-							</tr>
-							<tr>
-								<td class="text-muted pl-4">SPH-SBS (Tanam)</td>
-								<td>:</td>
-								<td class="fw-500">
-									@if ($userDocs->sphtanam)
-										@if ($userDocs->sphtanamcheck === 'sesuai')
-											<a href="#" data-toggle="modal" data-target="#viewDocs" data-doc="{{ asset('storage/uploads/'.$npwp.'/'.$commitment->periodetahun.'/'.$userDocs->sphtanam) }}">
-												Ada
-											</a>
-											<i class="fa fa-check text-success ml-1"></i>
-										@else
-											<a href="#" data-toggle="modal" data-target="#viewDocs" data-doc="{{ asset('storage/uploads/'.$npwp.'/'.$commitment->periodetahun.'/'.$userDocs->sphtanam) }}">
-												Ada
-											</a>
-											<i class="fas fa-exclamation-circle text-danger ml-1"></i>
-										@endif
-									@else
-										<span class="text-danger">Tidak ada berkas</span>
-										<i class="fas fa-exclamation-circle text-danger ml-1"></i>
-									@endif
-								</td>
-								<td></td>
-							</tr>
-							<tr>
-								<td class="text-muted pl-4">Logbook (s.d Tanam)</td>
-										<td>:</td>
-										<td class="fw-500">
-											@if ($userDocs->logbooktanam)
-												@if ($userDocs->logbooktanamcheck === 'sesuai')
-													<a href="#" data-toggle="modal" data-target="#viewDocs" data-doc="{{ asset('storage/uploads/'.$npwp.'/'.$commitment->periodetahun.'/'.$userDocs->logbooktanam) }}">
-														Ada
-													</a>
-													<i class="fa fa-check text-success ml-1"></i>
-												@else
-													<a href="#" data-toggle="modal" data-target="#viewDocs" data-doc="{{ asset('storage/uploads/'.$npwp.'/'.$commitment->periodetahun.'/'.$userDocs->logbooktanam) }}">
-														Ada
-													</a>
-													<i class="fas fa-exclamation-circle text-danger ml-1"></i>
-												@endif
-											@else
-												<span class="text-danger">Tidak ada berkas</span>
-												<i class="fas fa-exclamation-circle text-danger ml-1"></i>
-											@endif
-										</td>
-								<td></td>
-							</tr>
+								<tr>
+									<td class="text-uppercase fw-500">KELENGKAPAN BERKAS</td>
+									<td></td>
+									<td></td>
+									<td></td>
+								</tr>
+								{{-- tanam --}}
+								<tr>
+									<td class="text-uppercase fw-500">A. TAHAP TANAM</td>
+									<td></td>
+									<td></td>
+									<td></td>
+								</tr>
+								<tr>
+									<td class="text-muted pl-4">Surat Pengajuan Verifikasi Tanam</td>
+									<td>:</td>
+									<td class="fw-500" id="spvt">
+									</td>
+									<td></td>
+								</tr>
+								<tr>
+									<td class="text-muted pl-4">Surat Pertanggungjawaban Mutlak (Tanam)</td>
+									<td>:</td>
+									<td class="fw-500" id="sptjmtanam"></td>
+									<td></td>
+								</tr>
+								<tr>
+									<td class="text-muted pl-4">Form Realisasi Tanam</td>
+									<td>:</td>
+									<td class="fw-500" id="rta"></td>
+									<td></td>
+								</tr>
+								<tr>
+									<td class="text-muted pl-4">SPH-SBS (Tanam)</td>
+									<td>:</td>
+									<td class="fw-500" id="sphsbstanam"></td>
+									<td></td>
+								</tr>
+								<tr>
+									<td class="text-muted pl-4">Logbook (s.d Tanam)</td>
+									<td>:</td>
+									<td class="fw-500" id="logTanam"></td>
+									<td></td>
+								</tr>
 
-							{{-- berkas produksi --}}
-							@if(!(request()->is('admin/task/commitment/*/pengajuan/tanam/show') || request()->is('admin/task/commitment/*/formavt')))
+								<tr class="" style="height: 25px;">
+									<td></td>
+									<td></td>
+									<td></td>
+									<td></td>
+								</tr>
+								{{-- produksi --}}
 								<tr>
 									<td class="text-uppercase fw-500">B. TAHAP PRODUKSI</td>
 									<td></td>
@@ -313,212 +193,97 @@
 								<tr>
 									<td class="text-muted pl-4">Surat Pengajuan Verifikasi Produksi</td>
 									<td>:</td>
-									<td class="fw-500">
-										@if ($userDocs->spvp)
-											@if ($userDocs->spvpcheck === 'sesuai')
-												<a href="#" data-toggle="modal" data-target="#viewDocs" data-doc="{{ asset('storage/uploads/'.$npwp.'/'.$commitment->periodetahun.'/'.$userDocs->spvp) }}">
-													Ada
-												</a>
-												<i class="fa fa-check text-success ml-1"></i>
-											@else
-												<a href="#" data-toggle="modal" data-target="#viewDocs" data-doc="{{ asset('storage/uploads/'.$npwp.'/'.$commitment->periodetahun.'/'.$userDocs->spvp) }}">
-													Ada
-												</a>
-												<i class="fas fa-exclamation-circle text-danger ml-1"></i>
-											@endif
-										@else
-											<span class="text-danger">Tidak ada berkas</span>
-											<i class="fas fa-exclamation-circle text-danger ml-1"></i>
-										@endif
-									</td>
+									<td class="fw-500" id="spvp"></td>
 									<td></td>
 								</tr>
 								<tr>
 									<td class="text-muted pl-4">Surat Pertanggungjawaban Mutlak (Produksi)</td>
 									<td>:</td>
-									<td class="fw-500">
-										@if ($userDocs->sptjmproduksi)
-											@if ($userDocs->sptjmproduksicheck === 'sesuai')
-												<a href="#" data-toggle="modal" data-target="#viewDocs" data-doc="{{ asset('storage/uploads/'.$npwp.'/'.$commitment->periodetahun.'/'.$userDocs->sptjmproduksi) }}">
-													Ada
-												</a>
-												<i class="fa fa-check text-success ml-1"></i>
-											@else
-												<a href="#" data-toggle="modal" data-target="#viewDocs" data-doc="{{ asset('storage/uploads/'.$npwp.'/'.$commitment->periodetahun.'/'.$userDocs->sptjmproduksi) }}">
-													Ada
-												</a>
-												<i class="fas fa-exclamation-circle text-danger ml-1"></i>
-											@endif
-										@else
-											<span class="text-danger">Tidak ada berkas</span>
-											<i class="fas fa-exclamation-circle text-danger ml-1"></i>
-										@endif
-									</td>
+									<td class="fw-500" id="sptjmProduksi"></td>
 									<td></td>
 								</tr>
 								<tr>
 									<td class="text-muted pl-4">Form Realisasi Produksi</td>
 									<td>:</td>
-									<td class="fw-500">
-										@if ($userDocs->rpo)
-											@if ($userDocs->rpocheck === 'sesuai')
-												<a href="#" data-toggle="modal" data-target="#viewDocs" data-doc="{{ asset('storage/uploads/'.$npwp.'/'.$commitment->periodetahun.'/'.$userDocs->rpo) }}">
-													Ada
-												</a>
-												<i class="fa fa-check text-success ml-1"></i>
-											@else
-												<a href="#" data-toggle="modal" data-target="#viewDocs" data-doc="{{ asset('storage/uploads/'.$npwp.'/'.$commitment->periodetahun.'/'.$userDocs->rpo) }}">
-													Ada
-												</a>
-												<i class="fas fa-exclamation-circle text-danger ml-1"></i>
-											@endif
-										@else
-											<span class="text-danger">Tidak ada berkas</span>
-											<i class="fas fa-exclamation-circle text-danger ml-1"></i>
-										@endif
-									</td>
+									<td class="fw-500" id="rpo"></td>
 									<td></td>
 								</tr>
 								<tr>
 									<td class="text-muted pl-4">SPH-SBS (Produksi)</td>
 									<td>:</td>
-									<td class="fw-500">
-										@if ($userDocs->sphproduksi)
-											@if ($userDocs->sphproduksicheck === 'sesuai')
-												<a href="#" data-toggle="modal" data-target="#viewDocs" data-doc="{{ asset('storage/uploads/'.$npwp.'/'.$commitment->periodetahun.'/'.$userDocs->sphproduksi) }}">
-													Ada
-												</a>
-												<i class="fa fa-check text-success ml-1"></i>
-											@else
-												<a href="#" data-toggle="modal" data-target="#viewDocs" data-doc="{{ asset('storage/uploads/'.$npwp.'/'.$commitment->periodetahun.'/'.$userDocs->sphproduksi) }}">
-													Ada
-												</a>
-												<i class="fas fa-exclamation-circle text-danger ml-1"></i>
-											@endif
-										@else
-											<span class="text-danger">Tidak ada berkas</span>
-											<i class="fas fa-exclamation-circle text-danger ml-1"></i>
-										@endif
-									</td>
+									<td class="fw-500" id="sphProduksi"></td>
 									<td></td>
 								</tr>
 								<tr>
 									<td class="text-muted pl-4">Logbook (s.d Produksi)</td>
 									<td>:</td>
-									<td class="fw-500">
-										@if ($userDocs->logbookproduksi)
-											@if ($userDocs->logbookproduksicheck === 'sesuai')
-												<a href="#" data-toggle="modal" data-target="#viewDocs" data-doc="{{ asset('storage/uploads/'.$npwp.'/'.$commitment->periodetahun.'/'.$userDocs->logbookproduksi) }}">
-													Ada
-												</a>
-												<i class="fa fa-check text-success ml-1"></i>
-											@else
-												<a href="#" data-toggle="modal" data-target="#viewDocs" data-doc="{{ asset('storage/uploads/'.$npwp.'/'.$commitment->periodetahun.'/'.$userDocs->logbookproduksi) }}">
-													Ada
-												</a>
-												<i class="fas fa-exclamation-circle text-danger ml-1"></i>
-											@endif
-										@else
-											<span class="text-danger">Tidak ada berkas</span>
-											<i class="fas fa-exclamation-circle text-danger ml-1"></i>
-										@endif
-									</td>
+									<td class="fw-500" id="logProduksi"></td>
 									<td></td>
 								</tr>
 								<tr>
 									<td class="text-muted pl-4">Laporan Akhir</td>
 									<td>:</td>
-									<td class="fw-500">
-										@if ($userDocs->formLa)
-											@if ($userDocs->formLacheck === 'sesuai')
-												<a href="#" data-toggle="modal" data-target="#viewDocs" data-doc="{{ asset('storage/uploads/'.$npwp.'/'.$commitment->periodetahun.'/'.$userDocs->formLa) }}">
-													Ada
-												</a>
-												<i class="fa fa-check text-success ml-1"></i>
-											@else
-												<a href="#" data-toggle="modal" data-target="#viewDocs" data-doc="{{ asset('storage/uploads/'.$npwp.'/'.$commitment->periodetahun.'/'.$userDocs->formLa) }}">
-													Ada
-												</a>
-												<i class="fas fa-exclamation-circle text-danger ml-1"></i>
-											@endif
-										@else
-											<span class="text-danger">Tidak ada berkas</span>
-											<i class="fas fa-exclamation-circle text-danger ml-1"></i>
-										@endif
+									<td class="fw-500" id="formLa"></td>
+									<td></td>
+								</tr>
+
+								{{-- hasil pemeriksaan --}}
+								<tr class="bg-primary-50" style="height: 25px; opacity: 0.2">
+									<td></td>
+									<td></td>
+									<td></td>
+									<td></td>
+								</tr>
+								<tr>
+									<td class="text-uppercase fw-500 h6">RINGKASAN HASIL</td>
+									<td></td>
+									<td></td>
+									<td></td>
+								</tr>
+								<tr>
+									<td class="text-uppercase fw-500">A. VERIFIKASI TANAM</td>
+									<td></td>
+									<td></td>
+									<td></td>
+								</tr>
+								<tr>
+									<td class="text-muted pl-4">Tanggal Pengajuan</td>
+									<td>:</td>
+									<td class="fw-500" id="avtDate"></td>
+									<td></td>
+								</tr>
+								<tr>
+									<td class="text-muted pl-4">Tanggal Verifikasi</td>
+									<td>:</td>
+									<td class="fw-500" id="avtVerifAt"></td>
+									<td></td>
+								</tr>
+								<tr>
+									<td class="text-muted pl-4">Metode Verifikasi</td>
+									<td>:</td>
+									<td class="fw-500" id="avtMetode"></td>
+									<td></td>
+								</tr>
+								<tr>
+									<td class="text-muted pl-4">Catatan Verifikasi</td>
+									<td>:</td>
+									<td class="fw-500" id="avtNote">
+										<p></p>
 									</td>
 									<td></td>
 								</tr>
-							@endif
-
-							{{-- hasil pemeriksaan --}}
-							<tr class="bg-primary-50" style="height: 25px; opacity: 0.2">
-								<td></td>
-								<td></td>
-								<td></td>
-								<td></td>
-							</tr>
-							<tr>
-								<td class="text-uppercase fw-500 h6">RINGKASAN HASIL</td>
-								<td></td>
-								<td></td>
-								<td></td>
-							</tr>
-							<tr>
-								<td class="text-uppercase fw-500">A. VERIFIKASI TANAM</td>
-								<td></td>
-								<td></td>
-								<td></td>
-							</tr>
-							<tr>
-								<td class="text-muted pl-4">Tanggal Pengajuan</td>
-								<td>:</td>
-								<td class="fw-500">{{ $avtDate ? \Carbon\Carbon::parse($avtDate)->format('d F Y') : '-' }}</td>
-								<td></td>
-							</tr>
-							<tr>
-								<td class="text-muted pl-4">Tanggal Verifikasi</td>
-								<td>:</td>
-								<td class="fw-500">{{ $avtVerifAt ? \Carbon\Carbon::parse($avtVerifAt)->format('d F Y') : '-'}}</td>
-								<td></td>
-							</tr>
-							<tr>
-								<td class="text-muted pl-4">Metode Verifikasi</td>
-								<td>:</td>
-								<td class="fw-500">{{ $avtMetode ? $avtMetode : '-' }}</td>
-								<td></td>
-							</tr>
-							<tr>
-								<td class="text-muted pl-4">Catatan Verifikasi</td>
-								<td>:</td>
-								<td class="fw-500">{{ $avtNote ? $avtNote : '-'}}</td>
-								<td></td>
-							</tr>
-							<tr>
-								<td class="text-muted pl-4">Hasil Verifikasi</td>
-								<td>:</td>
-								<td class="fw-500">
-									@if ($avtStatus)
-										@if ($avtStatus === '1')
-											<span class="text-danger">Verifikasi sedang diajukan</span>
-											<i class="fas fa-exclamation-circle text-warning ml-1"></i>
-										@elseif($avtStatus === '2' || $avtStatus === '3')
-											<span class="text-danger">Dalam proses pemeriksaan/verifikasi oleh Petugas</span>
-											<i class="fas fa-exclamation-circle text-warning ml-1"></i>
-										@elseif($avtStatus === '4')
-											<span class="text-success">Pemeriksaan/Verifikasi telah Selesai</span>
-											<i class="fas fa-check text-success ml-1"></i>
-										@elseif($avtStatus === '5')
-											<span class="text-danger">Perbaiki Laporan</span>
-											<i class="fas fa-exclamation-circle text-danger ml-1"></i>
-										@endif
-									@else
-										Belum/Tidak ada pengajuan
-										<i class="fas fa-exclamation-circle text-warning ml-1"></i>
-									@endif
-								</td>
-								<td></td>
-							</tr>
-							@if(!(request()->is('admin/task/commitment/*/pengajuan/tanam/show') || request()->is('admin/task/commitment/*/formavt')))
+								<tr>
+									<td class="text-muted pl-4">Hasil Verifikasi</td>
+									<td>:</td>
+									<td class="fw-500" id="avtStatus"></td>
+									<td></td>
+								</tr>
+								<tr class="" style="height: 25px;">
+									<td></td>
+									<td></td>
+									<td></td>
+									<td></td>
+								</tr>
 								<tr>
 									<td class="text-uppercase fw-500">B. VERIFIKASI PRODUKSI</td>
 									<td></td>
@@ -528,251 +293,528 @@
 								<tr>
 									<td class="text-muted pl-4">Tanggal Pengajuan</td>
 									<td>:</td>
-									<td class="fw-500">{{ $avpDate ? \Carbon\Carbon::parse($avpDate)->format('d F Y') : '-'}}</td>
+									<td class="fw-500" id="avpDate"></td>
 									<td></td>
 								</tr>
 								<tr>
 									<td class="text-muted pl-4">Tanggal Verifikasi</td>
 									<td>:</td>
-									<td class="fw-500">{{ $avpVerifAt ? \Carbon\Carbon::parse($avpVerifAt)->format('d F Y') : '-'}}</td>
+									<td class="fw-500" id="avpVerifAt"></td>
 									<td></td>
 								</tr>
 								<tr>
 									<td class="text-muted pl-4">Metode Verifikasi</td>
 									<td>:</td>
-									<td class="fw-500">{{ $avpMetode ? $avpMetode : '-'}}</td>
+									<td class="fw-500" id="avpMetode"></td>
 									<td></td>
 								</tr>
 								<tr>
 									<td class="text-muted pl-4">Catatan Verifikasi</td>
 									<td>:</td>
-									<td class="fw-500">{{ $avpNote ? $avpNote : '-'}}</td>
+									<td class="fw-500" id="avpNote">
+										<p></p>
+									</td>
 									<td></td>
 								</tr>
 								<tr>
 									<td class="text-muted pl-4">Hasil Verifikasi</td>
 									<td>:</td>
-									<td class="fw-500">
-										@if ($avpStatus)
-											@if ($avpStatus === '1')
-												<span class="text-danger">Verifikasi sedang diajukan</span>
-												<i class="fas fa-exclamation-circle text-warning ml-1"></i>
-											@elseif($avpStatus === '2' || $avpStatus === '3')
-												<span class="text-danger">Dalam proses pemeriksaan/verifikasi oleh Petugas</span>
-												<i class="fas fa-exclamation-circle text-warning ml-1"></i>
-											@elseif($avpStatus === '4')
-												<span class="text-success">Pemeriksaan/Verifikasi telah Selesai</span>
-												<i class="fas fa-check text-success ml-1"></i>
-											@elseif($avpStatus === '5')
-												<span class="text-danger">Perbaiki Laporan</span>
-												<i class="fas fa-exclamation-circle text-danger ml-1"></i>
-											@endif
-										@else
-											<span class="text-danger">Belum/Tidak ada pengajuan</span>
-											<i class="fas fa-exclamation-circle text-danger ml-1"></i>
-										@endif
+									<td class="fw-500" id="avpStatus"></td>
+									<td></td>
+								</tr>
+								<tr class="" style="height: 25px;">
+									<td></td>
+									<td></td>
+									<td></td>
+									<td></td>
+								</tr>
+								<tr>
+									<td class="text-uppercase fw-500">C. PENGAJUAN SKL</td>
+									<td></td>
+									<td></td>
+									<td></td>
+								</tr>
+								<tr>
+									<td class="text-muted pl-4">Tanggal Pengajuan</td>
+									<td>:</td>
+									<td class="fw-500" id="avsklDate"></td>
+									<td></td>
+								</tr>
+								<tr>
+									<td class="text-muted pl-4">Tanggal Verifikasi</td>
+									<td>:</td>
+									<td class="fw-500" id="avsklVerifAt"></td>
+									<td></td>
+								</tr>
+								<tr>
+									<td class="text-muted pl-4">Catatan Verifikasi</td>
+									<td>:</td>
+									<td class="fw-500" id="avsklNote">
+										<p></p>
 									</td>
 									<td></td>
 								</tr>
-								@if(request()->is('admin/task/commitment/*/pengajuan/skl/show'))
-									@if ($commitment->ajuskl)
-										<tr>
-											<td class="text-uppercase fw-500">C. PENGAJUAN SKL</td>
-											<td></td>
-											<td></td>
-											<td></td>
-										</tr>
-										<tr>
-											<td class="text-muted pl-4">Tanggal Pengajuan</td>
-											<td>:</td>
-											<td class="fw-500">{{ $avsklDate ? \Carbon\Carbon::parse($avsklDate)->format('d F Y') : '-'}}</td>
-											<td></td>
-										</tr>
-										<tr>
-											<td class="text-muted pl-4">Tanggal Rekomendasi</td>
-											<td>:</td>
-											<td class="fw-500">{{ $avsklVerifAt ? \Carbon\Carbon::parse($avsklVerifAt)->format('d F Y') : '-'}}</td>
-											<td></td>
-										</tr>
-										<tr>
-											<td class="text-muted pl-4">Catatan Rekomendasi</td>
-											<td>:</td>
-											<td class="fw-500">{{ $avsklNote ? $avsklNote : '-'}}</td>
-											<td></td>
-										</tr>
-										<tr>
-											<td class="text-muted pl-4">Progress Pengajuan</td>
-											<td>:</td>
-											<td class="fw-500">
-												@if ($avsklStatus)
-													@if ($avsklStatus === '1')
-														<span class="">Pengajuan SKL</span>
-													@elseif($avsklStatus === '2')
-														<span class="">Proses Rekomendasi</span>
-													@elseif($avsklStatus === '3')
-														<span class="">Telah Disetujui</span>
-													@elseif($avsklStatus === '4')
-														<span class="">Telah Diterbitkan</span>
-														<i class="fas fa-check text-success ml-1"></i>
-													@elseif($avsklStatus === '5')
-														<span class="text-danger">Perbaiki Laporan</span>
-														<i class="fas fa-exclamation-circle text-danger ml-1"></i>
-													@endif
-												@else
-													<span class="text-danger">Belum/Tidak ada pengajuan</span>
-													<i class="fas fa-exclamation-circle text-danger ml-1"></i>
-												@endif
-											</td>
-											<td></td>
-										</tr>
-									@endif
-								@endif
-							@endif
-						</tbody>
-					</table>
+								<tr class="" style="height: 25px;">
+									<td></td>
+									<td></td>
+									<td></td>
+									<td></td>
+								</tr>
+								<tr>
+									<td class="text-muted pl-4">Tanggal Rekomendasi</td>
+									<td>:</td>
+									<td class="fw-500" id="avsklRecomendAt"></td>
+									<td></td>
+								</tr>
+								<tr>
+									<td class="text-muted pl-4">Catatan Rekomendasi</td>
+									<td>:</td>
+									<td class="fw-500" id="avsklRecomendNote">
+										<p></p>
+									</td>
+									<td></td>
+								</tr>
+								<tr class="" style="height: 25px;">
+									<td></td>
+									<td></td>
+									<td></td>
+									<td></td>
+								</tr>
+								<tr>
+									<td class="text-muted pl-4">Tanggal Disetujui</td>
+									<td>:</td>
+									<td class="fw-500" id="avsklApprovedAt"></td>
+									<td></td>
+								</tr>
+								<tr>
+									<td class="text-muted pl-4">Tanggal Terbit</td>
+									<td>:</td>
+									<td class="fw-500" id="avsklPublishedAt"></td>
+									<td></td>
+								</tr>
+								<tr>
+									<td class="text-muted pl-4">Progress Pengajuan</td>
+									<td>:</td>
+									<td class="fw-500" id="avsklStatus"></td>
+									<td></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+
+				<div class="card-footer d-flex justify-content-end">
+					<a href="{{ route('2024.user.commitment.index') }}"
+						class="btn btn-xs btn-info mr-1" data-toggle="tooltip"
+						title data-original-title="Kembali">
+						<i class="fal fa-undo mr-1"></i>
+						Kembali
+					</a>
+					{{-- Form pengajuan --}}
+					{{-- pengajuan tanam --}}
+					<form action="{{route('2024.user.commitment.formavskl.submitPengajuan', $ijin)}}" method="post">
+						@csrf
+						<button type="submit" class="btn btn-xs btn-warning" data-toggle="tooltip" title data-original-title="Ajukan Verifikasi Tanam" id="btnSubmit">
+							<i class="fal fa-upload mr-1"></i>
+							Ajukan
+						</button>
+					</form>
 				</div>
 			</div>
+		</div>
+	</div>
 
-			<div class="card-footer d-flex justify-content-end">
-				<a href="{{ route('admin.task.commitment') }}"
-					class="btn btn-xs btn-info mr-1" data-toggle="tooltip"
-					title data-original-title="Kembali">
-					<i class="fal fa-undo mr-1"></i>
-					Kembali
-				</a>
-				{{-- Form pengajuan --}}
-				{{-- pengajuan tanam --}}
-				@if(request()->is('admin/task/commitment/*/formavt') || request()->is('admin/task/commitment/*/pengajuan/tanam/show'))
-					<form action="{{route('admin.task.commitment.avt.store', $commitment->id)}}" method="post">
-						@csrf
-						@if(!$commitment->ajuTanam || !in_array($commitment->ajuTanam->status, ['1', '2', '3', '4']))
-							<button type="submit" class="btn btn-xs btn-warning" data-toggle="tooltip"
-							title data-original-title="Ajukan Verifikasi Tanam">
-								<i class="fal fa-upload mr-1"></i>
-								Ajukan
-							</button>
-						@endif
-					</form>
-				@endif
-				{{-- pengajuan produksi --}}
-				@if(request()->is('admin/task/commitment/*/formavp') || request()->is('admin/task/commitment/*/pengajuan/produksi/show'))
-					<form action="{{route('admin.task.commitment.avp.store', $commitment->id)}}" method="post">
-						@csrf
-						@if(!$commitment->ajuProduksi || !in_array($commitment->ajuProduksi->status, ['1', '2', '3', '4']))
-							<button type="submit" class="btn btn-xs btn-warning" data-toggle="tooltip"
-							title data-original-title="Ajukan Verifikasi Produksi">
-								<i class="fal fa-upload mr-1"></i>
-								Ajukan
-							</button>
-						@endif
-					</form>
-				@endif
-				{{-- pengajuan skl --}}
-				@if(request()->is('admin/task/commitment/*/formavskl') || request()->is('admin/task/commitment/*/pengajuan/skl/show'))
-					<form action="{{route('admin.task.commitment.avskl.store', $commitment->id)}}" method="post">
-						@csrf
-						@if(!$commitment->ajuskl || !in_array($commitment->ajuskl->status, ['1', '2', '3', '4']))
-							<button type="submit" class="btn btn-xs btn-warning" data-toggle="tooltip"
-							title data-original-title="Ajukan penerbitan SKL dan status Lunas">
-								<i class="fal fa-upload mr-1"></i>
-								Ajukan
-							</button>
-						@endif
-					</form>
-				@endif
+	<div class="row">
+		<div class="col-12">
+			<div id="panel-1" class="panel">
+				<div class="panel-hdr">
+					<h5>Riwayat Pengajuan Verifikasi</h5>
+				</div>
+				<div class="panel-container show">
+					<div class="panel-content">
+						<table class="table table-hover table-sm w-100" style="border: none; border-top:none; border-bottom:none;" id="tblVerifHistory">
+							<thead class="">
+								<th>Tanggal Diajukan</th>
+								<th>Verifikator</th>
+								<th>Tanggal Verifikasi</th>
+								<th>Status</th>
+								<th>Catatan</th>
+							</thead>
+							<tbody></tbody>
+						</table>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
-</div>
 
-{{-- modal view doc --}}
-<div class="modal fade" id="viewDocs" tabindex="-1" role="dialog" aria-labelledby="document" aria-hidden="true">
-	<div class="modal-dialog modal-dialog-right" role="document">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h5 class="modal-title" id="exampleModalLabel">
-					Berkas <span class="fw-300"><i>lampiran </i></span>
-				</h5>
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-					<span aria-hidden="true">&times;</span>
-				</button>
-			</div>
-			<div class="modal-body embed-responsive embed-responsive-16by9">
-				<iframe class="embed-responsive-item" src="" width="100%"  frameborder="0"></iframe>
-			</div>
-		</div>
-	</div>
-</div>
 
-@endcan
 @endsection
 
 @section('scripts')
-@parent
-<script>
-	$(document).ready(function() {
-		$('#viewDocs').on('shown.bs.modal', function (e) {
-			var docUrl = $(e.relatedTarget).data('doc');
-			$('iframe').attr('src', docUrl);
-		});
+	@parent
+	<script>
+		$(document).ready(function() {
+			var noIjin = '{{$ijin}}';
+			var formattedNoIjin = noIjin.replace(/[\/.]/g, '');
 
-		$('#dataTable').DataTable({
-			responsive: true,
-			"ordering": false,
-			lengthChange: false,
-			pageLength: -1,
-			dom:
-			"<'row mb-3'<'col-sm-12 col-md-6 d-flex align-items-center justify-content-start'><'col-sm-12 col-md-6 d-flex align-items-center justify-content-end'B>>" +
-			"<'row'<'col-sm-12'tr>>" +
-			"<'row'<'col-sm-12 col-md-5'><'col-sm-12 col-md-7'>>",
-			buttons: [
-				{
-					extend: 'excelHtml5',
-					text: '<i class="fa fa-file-excel"></i>',
-					title: 'Ringkasan Pengajuan {{$page_heading}}',
-					titleAttr: 'Ekspor data ke MS. Excel',
-					className: 'btn-outline-success btn-xs btn-icon ml-3 mr-1'
+			$.ajax({
+				url: "{{ route('2024.datafeeder.getDataPengajuan', [':noIjin']) }}".replace(':noIjin', formattedNoIjin),
+				type: "GET",
+				success: function(data) {
+					// Ringkasan Umum
+					$('#companyName').text(data.company);
+					$('#noIjin').text(data.noIjin);
+					$('#periode').text(data.periode);
+
+					//Ringkasan Realisasi dan Kewajiban
+					$('#wajibTanam').text(data.wajibTanam + ' ha');
+					$('#wajibProduksi').text(data.wajibProduksi + ' ton');
+
+					var luasTanam = data.realisasiTanam + ' / ' + data.wajibTanam + ' ha';
+					if (data.realisasiTanam == '0' || data.realisasiTanam == null || data.realisasiTanam == undefined){
+						$('#realisasiTanam').html('<span class="text-danger">' + luasTanam + '</span>');
+					}else if (data.wajibTanam > data.realisasiTanam){
+						$('#realisasiTanam').html('<span class="text-warning">' + luasTanam + '</span>');
+					}else{
+						$('#realisasiTanam').html('<span class="text-success">' + luasTanam + '</span>');
+					}
+
+					var titikTanam = data.countTanam + ' / ' + data.countSpatial + ' titik';
+
+					if (data.countSpatial > data.countTanam){
+						$('#countSpatial').html('<span class="text-danger">' + titikTanam + '</span>');
+					}else{
+						$('#countSpatial').html('<span class="text-success">' + titikTanam + '</span>');
+					}
+
+					var volProduksi = data.realisasiProduksi + ' / ' + data.wajibProduksi + ' ton';
+					if (data.wajibProduksi > data.realisasiProduksi){
+						$('#sumPanen').html('<span class="text-danger">' + volProduksi +'</span>');
+					}else{
+						$('#sumPanen').html('<span class="text-success">' + volProduksi +'</span>');
+					}
+
+					//Ringkasan Kemitraan
+					$('#countAnggota').text(data.countAnggota + ' orang');
+					$('#countPoktan').text(data.countPoktan + ' kelompok');
+
+					if (data.countPoktan > data.countPks) {
+						$('#countPks').html('<span class="text-danger">' + data.countPks +' PKS</span>');
+					} else {
+						$('#countPks').html('<span class="text-danger">' + data.countPks +' PKS</span>');
+					}
+
+
+					//Kelengkapan Berkas
+					//A. Berkas-berkas Tanam
+					$('#spvt').html(data.spvt ? '<span class="text-success">Ada</i></span>' : '<span class="text-danger">Tidak Ada</span>');
+
+					$('#sptjmtanam').html(data.sptjmtanam ? '<span class="text-success">Ada</span>' : '<span class="text-danger">Tidak Ada</span>');
+
+					$('#rta').html(data.rta ? '<span class="text-success">Ada</span>' : '<span class="text-danger">Tidak Ada</span>');
+
+					$('#sphsbstanam').html(data.sphtanam ? '<span class="text-success">Ada</span>' : '<span class="text-danger">Tidak Ada</span>');
+
+					$('#logTanam').html(data.logbooktanam ? '<span class="text-success">Ada</span>' : '<span class="text-danger">Tidak Ada</span>');
+
+
+					//B. Berkas-berkas Produksi
+					$('#spvp').html(data.spvp ? '<span class="text-success">Ada</span>' : '<span class="text-danger">Tidak Ada</span>');
+
+					$('#sptjmProduksi').html(data.sptjmproduksi ? '<span class="text-success">Ada</span>' : '<span class="text-danger">Tidak Ada</span>');
+
+					$('#rpo').html(data.rpo ? '<span class="text-success">Ada</span>' : '<span class="text-danger">Tidak Ada</span>');
+
+					$('#sphProduksi').html(data.sphproduksi ? '<span class="text-success">Ada</span>' : '<span class="text-danger">Tidak Ada</span>');
+
+					$('#logProduksi').html(data.logbookproduksi ? '<span class="text-success">Ada</span>' : '<span class="text-danger">Tidak Ada</span>');
+
+					$('#formLa').html(data.formLa ? '<span class="text-success">Ada</span>' : '<span class="text-danger">Tidak Ada</span>');
+
+
+					var options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+
+					//Ringkasan Hasil
+					//A. Verifikasi Tanam
+					var avtDate = data.avtDate ? new Date(data.avtDate) : null;
+					var formattedAvtDate = avtDate ? avtDate.toLocaleDateString('id-ID', options) : '-';
+
+					var avtVerifAt = data.avtVerifAt ? new Date(data.avtVerifAt) : null;
+					var formattedAvtVerifAt = avtVerifAt ? avtVerifAt.toLocaleDateString('id-ID', options) : '-';
+
+					$('#avtDate').text(formattedAvtDate ?? '-');
+					$('#avtVerifAt').text(formattedAvtVerifAt ?? '-');
+
+					$('#avtMetode').text(data.avtMetode ?? '-');
+
+					if (data.avtNote) {
+						$('#avtNote p').text(data.avtNote);
+					} else {
+						$('#avtNote p').text('Tidak ada catatan.');
+					}
+
+					if (data.avtStatus == '1') {
+                    	$('#avtStatus').html('<span class="text-primary">Verifikasi sudah diajukan. </span> <i class="fas fa-check text-primary ml-1"></i>');
+					} else if (data.avtStatus == '2' || data.avtStatus == '3') {
+						$('#avtStatus').html('<span class="text-warning">Dalam proses pemeriksaan/verifikasi oleh Petugas. </span> <i class="fas fa-clock text-warning ml-1"></i>');
+					} else if (data.avtStatus == '4') {
+						$('#avtStatus').html('<span class="text-success">Pemeriksaan/Verifikasi telah Selesai. </span> <i class="fas fa-check ml-1"></i>');
+					} else if (data.avtStatus == '5') {
+						$('#avtStatus').html('<span class="text-danger">Laporan Realisasi harus diperbaiki (lihat catatan verifikasi). </span> <i class="fas fa-exclamation-circle ml-1"></i>');
+					} else {
+						$('#avtStatus').text('Belum/Tidak ada pengajuan.');
+					}
+
+					//B. Verifikasi Produksi
+					var avpDate = data.avpDate ? new Date(data.avpDate) : null;
+					var formattedAvpDate = avpDate ? avpDate.toLocaleDateString('id-ID', options) : '-';
+
+					var avpVerifAt = data.avpVerifAt ? new Date(data.avpVerifAt) : null;
+					var formattedAvpVerifAt = avpVerifAt ? avpVerifAt.toLocaleDateString('id-ID', options) : '-';
+
+					$('#avpDate').text(formattedAvpDate ?? '-');
+					$('#avpVerifAt').text(formattedAvpVerifAt ?? '-');
+
+					$('#avpMetode').text(data.avpMetode ?? '-');
+
+					if (data.avpNote) {
+						$('#avpNote p').text(data.avpNote);
+					} else {
+						$('#avpNote p').text('Tidak ada catatan.');
+					}
+
+					if (data.avpStatus == '1') {
+                    	$('#avpStatus').html('<span class="text-primary">Verifikasi sudah diajukan. </span> <i class="fas fa-check text-primary ml-1"></i>');
+					} else if (data.avpStatus == '2' || data.avpStatus == '3') {
+						$('#avpStatus').html('<span class="text-warning">Dalam proses pemeriksaan/verifikasi oleh Petugas. </span> <i class="fas fa-clock text-warning ml-1"></i>');
+					} else if (data.avpStatus == '4') {
+						$('#avpStatus').html('<span class="text-success">Pemeriksaan/Verifikasi telah Selesai. </span> <i class="fas fa-check ml-1"></i>');
+					} else if (data.avpStatus == '5') {
+						$('#avpStatus').html('<span class="text-danger">Laporan Realisasi harus diperbaiki (lihat catatan verifikasi). </span> <i class="fas fa-exclamation-circle ml-1"></i>');
+					} else {
+						$('#avpStatus').text('Belum/Tidak ada pengajuan.');
+					}
+
+					//C. Pengajuan SKL
+					var avsklDate = data.avsklDate ? new Date(data.avsklDate) : null;
+					var formattedavsklDate = avsklDate ? avsklDate.toLocaleDateString('id-ID', options) : '-';
+
+					var avsklVerifAt = data.avsklVerifAt ? new Date(data.avsklVerifAt) : null;
+					var formattedavsklVerifAt = avsklVerifAt ? avsklVerifAt.toLocaleDateString('id-ID', options) : '-';
+
+					$('#avsklDate').text(formattedavsklDate ?? '-');
+					$('#avsklVerifAt').text(formattedavsklVerifAt ?? '-');
+
+					if (data.avsklNote) {
+						$('#avsklNote p').text(data.avsklNote);
+					} else {
+						$('#avsklNote p').text('Tidak ada catatan.');
+					}
+
+					var avsklRecomendAt = data.avsklRecomendAt ? new Date(data.avsklRecomendAt) : null;
+					var formattedavsklRecomendAt = avsklRecomendAt ? avsklRecomendAt.toLocaleDateString('id-ID', options) : '-';
+
+					$('#avsklRecomendAt').text(formattedavsklRecomendAt ?? '-');
+
+					if (data.avsklRecomendNote) {
+						$('#avsklRecomendNote p').text(data.avsklRecomendNote);
+					} else {
+						$('#avsklRecomendNote p').text('Tidak ada catatan.');
+					}
+
+					var avsklApprovedAt = data.avsklApprovedAt ? new Date(data.avsklApprovedAt) : null;
+					var avsklPublishedAt = data.avsklPublishedAt ? new Date(data.avsklPublishedAt) : null;
+
+					var formattedavsklApprovedAt = avsklApprovedAt ? avsklApprovedAt.toLocaleDateString('id-ID', options) : '-';
+					var formattedavsklPublishedAt = avsklPublishedAt ? avsklPublishedAt.toLocaleDateString('id-ID', options) : '-';
+
+					$('#avsklApprovedAt').text(formattedavsklApprovedAt ?? '-');
+					$('#avsklPublishedAt').text(formattedavsklPublishedAt ?? '-');
+
+					if (data.avsklStatus == '1') {
+                    	$('#avsklStatus').html('<span class="text-primary">Verifikasi sudah diajukan. </span> <i class="fas fa-check text-primary ml-1"></i>');
+					} else if (data.avsklStatus == '2' || data.avsklStatus == '3') {
+						$('#avsklStatus').html('<span class="text-warning">Dalam proses pemeriksaan/verifikasi oleh Petugas. </span> <i class="fas fa-clock text-warning ml-1"></i>');
+					} else if (data.avsklStatus == '4') {
+						$('#avsklStatus').html('<span class="text-success">Pemeriksaan/Verifikasi telah Selesai. </span> <i class="fas fa-check ml-1"></i>');
+					} else if (data.avsklStatus == '5') {
+						$('#avsklStatus').html('<span class="text-danger">Laporan Realisasi harus diperbaiki (lihat catatan verifikasi). </span> <i class="fas fa-exclamation-circle ml-1"></i>');
+					} else {
+						$('#avsklStatus').text('Belum/Tidak ada pengajuan.');
+					}
+
+					$('#btnSubmit').text('Ajukan');
+					var avsklStatus = data.avsklStatus;
+					if (avsklStatus === null && data.avpStatus === '4') {
+						$('#btnSubmit').removeClass('d-none');
+					} else if (avsklStatus === '5' ) {
+						$('#btnSubmit').removeClass('d-none');
+						$('#btnSubmit').text('Ajukan Ulang');
+					} else {
+						$('#btnSubmit').addClass('d-none');
+					}
 				},
-				{
-					extend: 'print',
-					text: '<i class="fa fa-print"></i>',
-					title: 'Ringkasan Pengajuan {{$page_heading}}',
-					titleAttr: 'Cetak halaman data.',
-					className: 'btn-outline-primary btn-xs btn-icon mr-1'
+				error: function(xhr, status, error) {
+					console.error('Error fetching data:', error);
+				}
+			});
+
+			$('#dataTable').dataTable(
+			{
+				responsive: true,
+				lengthChange: false,
+				ordering: false,
+				pageLength: -1,
+				dom:
+					"<'row mb-3'<'col-sm-12 col-md-6 d-flex align-items-center justify-content-start'><'col-sm-12 col-md-6 d-flex align-items-center justify-content-end'B>>" +
+					"<'row'<'col-sm-12'tr>>" +
+					"<'row'<'col-sm-12 col-md-5'><'col-sm-12 col-md-7'>>",
+				buttons: [
+					{
+						extend: 'pdfHtml5',
+						text: '<i class="fa fa-file-pdf"></i>',
+						titleAttr: 'Generate PDF',
+						className: 'btn-outline-danger btn-sm btn-icon mr-1',
+						customize: function(doc) {
+							doc.pageMargins = [10, 20, 10, 20];
+							doc.styles.tableHeader = {
+								fontSize: 12,
+								bold: true,
+								alignment: 'center'
+							};
+							doc.defaultStyle = {
+								fontSize: 10
+							};
+							doc.content[1].table.widths = [
+								'25%',
+								'5%',
+								'12%',
+								'13%',
+								'45%',
+							];
+						},
+						exportOptions: {
+							columns: [0, 2]
+						}
+					},
+					{
+						extend: 'excelHtml5',
+						text: '<i class="fa fa-file-excel"></i>',
+						titleAttr: 'Generate Excel',
+						className: 'btn-outline-success btn-sm btn-icon mr-1',
+						exportOptions: {
+							columns: [0, 2]
+						},
+						customize: function(xlsx) {
+							var sheet = xlsx.xl.worksheets['sheet1.xml'];
+
+							// Mengatur lebar kolom
+							$('col', sheet).each(function() {
+								$(this).attr('width', 30);
+							});
+
+							// Menambahkan gaya khusus
+							$('row c[r^="C"]', sheet).each(function() {
+								if ($('is t', this).text() == 'Some Text') {
+									$(this).attr('s', '42');
+								}
+							});
+
+							// Menambahkan border ke header
+							$('row:first c', sheet).attr('s', '2');
+						}
+					},
+					{
+						extend: 'print',
+						text: '<i class="fa fa-print"></i>',
+						titleAttr: 'Print Table',
+						className: 'btn-outline-primary btn-sm btn-icon mr-1',
+						exportOptions: {
+							columns: [0, 2]
+						},
+					}
+				]
+			});
+
+			var table = $('#tblVerifHistory').DataTable({
+				responsive: true,
+				pageLength: 10,
+				lengthChange: true,
+				paging: true,
+				ordering: true,
+				processing: true,
+				serverSide: true,
+				order: [[0, 'asc']],
+				ajax: {
+					url: "{{ route('2024.datafeeder.getVerifSklHistory', [':noIjin']) }}".replace(':noIjin', formattedNoIjin),
+					type: 'GET',
+					error: function (xhr, error, thrown) {
+						if (xhr.status === 404) {
+							console.log("Data tidak ditemukan");
+						} else {
+							console.error("Terjadi kesalahan: " + xhr.status);
+						}
+					}
 				},
-				// {
-				// 	text: 'Ajukan',
-				// 	titleAttr: 'Lihat Detail',
-				// 	className: 'btn btn-outline-info btn-xs',
-				// 	action: function () {
-				// 		// Replace 'to_somewhere' with your actual route and $key->id with the parameter value
+				dom:
+					"<'row mb-3'<'col-sm-12 col-md-6 d-flex align-items-center justify-content-start'><'col-sm-12 col-md-6 d-flex align-items-center justify-content-end'>>" +
+					"<'row'<'col-sm-12'tr>>" +
+					"<'row'<'col-sm-12 col-md-5'><'col-sm-12 col-md-7'>>",
+				columns: [
+					{
+						data: 'createdAt',
+						render: function (data, type, row) {
+							var options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+							var createdDate = data ? new Date(data) : null;
+							var formattedCreate = createdDate ? createdDate.toLocaleDateString('id-ID', options) : '-';
+							return formattedCreate;
+						}
+					},
+					{
+						data: 'verifAt',
+						render: function (data, type, row) {
+							var options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+							var verifDate = data ? new Date(data) : null;
+							var formattedVerif = verifDate ? verifDate.toLocaleDateString('id-ID', options) : '-';
+							return formattedVerif;
+						}
+					},
+					{ data: 'checkBy' },
+					{
+						data: 'status',
+						render: function (data, type, row) {
+							let currentStatus;
+							let htmlClass = ''; // Variabel untuk menentukan kelas HTML jika diperlukan
+							if (data == null || data == undefined) {
+								currentStatus = '-';
+							} else if (data === '1') {
+								currentStatus = 'Pengajuan';
+								htmlClass = 'text-primary';
+							} else if (data === '2' || data === '3') {
+								currentStatus = 'Diperiksa';
+								htmlClass = 'text-info';
+							} else if (data === '4') {
+								currentStatus = 'Selesai';
+								htmlClass = 'text-success';
+							} else if (data === '5') {
+								currentStatus = 'Perbaikan';
+								htmlClass = 'text-danger';
+							} else {
+								currentStatus = '-';
+							}
+							return `<span class='${htmlClass}'>${currentStatus}</span>`;
+						}
+					},
+					{
+						data: 'note',
+						render: function (data, type, row) {
+							return data ? `<p>${data}</p>` : '-';
+						}
+					},
+				],
+			});
 
-				// 	}
-				// }
-			],
 		});
-	});
-</script>
-
-<script>
-	function validateInput() {
-		// get the input value and the current username from the page
-		var inputVal = document.getElementById('validasi').value;
-		var currentUsername = '{{ Auth::user()->username }}';
-
-		// check if the input is not empty and matches the current username
-		if (inputVal !== '' && inputVal === currentUsername) {
-			return true; // allow form submission
-		} else {
-			alert('Input validasi harus diisi dan bernilai sama dengan username Anda.');
-			return false; // prevent form submission
-		}
-	}
-
-	//back button
-	function cancelBtn() {
-		history.go(-1);
-	}
-</script>
-
+	</script>
 @endsection

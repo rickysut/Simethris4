@@ -3,12 +3,13 @@
 namespace App\Models2024;
 
 use App\Models\DataUser;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class AjuVerifSkl extends Model
 {
-	public $table = 'avskls';
+	public $table = 't2024_avskls';
 
 	protected $fillable = [
 		'npwp',
@@ -16,7 +17,6 @@ class AjuVerifSkl extends Model
 		'no_ijin',
 		'no_pengajuan',
 		'status',
-		'note',
 
 
 		//file upload
@@ -26,6 +26,15 @@ class AjuVerifSkl extends Model
 		'check_by',
 		'verif_at',
 		'metode',
+		'verif_note',
+
+		'recomend_by',
+		'recomend_at',
+		'recomend_note',
+
+		'approved_by',
+		'approved_at',
+		'published_at',
 	];
 
 	public function commitment()
@@ -61,5 +70,10 @@ class AjuVerifSkl extends Model
 	public function skl()
 	{
 		return $this->hasOne(Skl::class, 'pengajuan_id', 'id');
+	}
+
+	public function verifikator()
+	{
+		return $this->belongsTo(User::class, 'check_by', 'id');
 	}
 }

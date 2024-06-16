@@ -233,7 +233,7 @@
 					</a>
 					{{-- Form pengajuan --}}
 					{{-- pengajuan tanam --}}
-					<form action="{{route('2024.user.commitment.submitPengajuan', $ijin)}}" method="post">
+					<form action="{{route('2024.user.commitment.formavt.submitPengajuan', $ijin)}}" method="post">
 						@csrf
 						<button type="submit" class="btn btn-xs btn-warning d-none" data-toggle="tooltip" title data-original-title="Ajukan Verifikasi Tanam" id="btnSubmit">
 							<i class="fal fa-upload mr-1"></i>
@@ -460,43 +460,38 @@
 
 			var table = $('#tblVerifHistory').DataTable({
 				responsive: true,
-				pageLength:10,
+				pageLength: 10,
 				lengthChange: true,
 				paging: true,
 				ordering: true,
 				processing: true,
 				serverSide: true,
 				order: [[0, 'asc']],
-				language: {
-					searchPlaceholder: "Cari..."
-				},
 				ajax: {
 					url: "{{ route('2024.datafeeder.getVerifTanamHistory', [':noIjin']) }}".replace(':noIjin', formattedNoIjin),
 					type: 'GET',
+					error: function (xhr, error, thrown) {
+						// Menangani kesalahan ketika AJAX request gagal atau tidak ada data
+						if (xhr.status === 404) {
+							console.log("Data tidak ditemukan");
+						} else {
+							console.error("Terjadi kesalahan: " + xhr.status);
+						}
+					}
 				},
 				dom:
 					"<'row mb-3'<'col-sm-12 col-md-6 d-flex align-items-center justify-content-start'><'col-sm-12 col-md-6 d-flex align-items-center justify-content-end'>>" +
 					"<'row'<'col-sm-12'tr>>" +
 					"<'row'<'col-sm-12 col-md-5'><'col-sm-12 col-md-7'>>",
 				columns: [
-					{ data: 'created_at' }
-					{
-						data: 'verifAt',
-						render: function (data, type, row) {
-							if (data) {
-								var date = new Date(data);
-								var options = { year: 'numeric', month: 'long', day: 'numeric' };
-								return date.toLocaleDateString('id-ID', options);
-							} else {
-								return '-';
-							}
-						}
-					},
+					{ data: 'createdAt' },
+					{ data: 'verifAt' },
 					{ data: 'checkBy' },
 					{
 						data: 'status',
 						render: function (data, type, row) {
 							let currentStatus;
+							let htmlClass = ''; // Variabel untuk menentukan kelas HTML jika diperlukan
 							if (data == null || data == undefined) {
 								currentStatus = '-';
 							} else if (data === '1') {
@@ -513,9 +508,8 @@
 								htmlClass = 'text-danger';
 							} else {
 								currentStatus = '-';
-								htmlClass = '';
 							}
-							return `<span class='`+ htmlClass +`'>`+currentStatus+`</span>`;
+							return `<span class='${htmlClass}'>${currentStatus}</span>`;
 						}
 					},
 					{
@@ -526,6 +520,7 @@
 					},
 				],
 			});
+
 		});
 	</script>
 @endsection

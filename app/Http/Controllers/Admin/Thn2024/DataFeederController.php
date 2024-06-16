@@ -31,16 +31,12 @@ class DataFeederController extends Controller
 		$searchValue = $request->input('search.value', '');
 		$order = $request->input('order', []);
 		$columns = $request->input('columns', []);
-
 		$npwp = Auth::user()->data_user->npwp_company;
 
 		// Base query
 		$query = PullRiph::select('id', 'no_ijin', 'periodetahun', 'tgl_ijin', 'volume_riph', 'luas_wajib_tanam', 'volume_produksi')
 			->where('npwp', $npwp)
 			->with(['skl', 'lokasi', 'pks', 'ajutanam', 'ajuproduksi', 'ajuskl', 'completed', 'userDocs']);
-
-		// Calculate total records
-		$totalRecords = $query->count();
 
 		// Apply search filter
 		if (!empty($searchValue)) {
@@ -54,7 +50,8 @@ class DataFeederController extends Controller
 			});
 		}
 
-		// Calculate filtered records
+		// Calculate total and filtered records
+		$totalRecords = $query->count();
 		$filteredRecords = $query->count();
 
 		// Apply ordering
@@ -62,92 +59,64 @@ class DataFeederController extends Controller
 			$orderColumnIndex = $order[0]['column'];
 			$orderDirection = $order[0]['dir'];
 			$orderColumn = $columns[$orderColumnIndex]['data'];
-
-			// Pastikan kolom yang diurutkan adalah kolom yang valid di basis data
 			switch ($orderColumn) {
 				case 'ijin_full':
-					// Jika menggunakan 'ijin_full', mungkin Anda ingin mengganti ke kolom 'no_ijin'
 					$query = $query->orderBy('no_ijin', $orderDirection);
 					break;
 				case 'periodetahun':
 					$query = $query->orderBy('periodetahun', $orderDirection);
 					break;
-					// Tambahkan case lain jika ada kolom lain yang perlu diurutkan
 				default:
-					// Default pengurutan jika tidak ada yang cocok
 					$query = $query->orderBy('id', 'asc');
 					break;
 			}
 		}
 
-
 		// Apply pagination
-		$data = $query->skip($start)
-			->take($length)
-			->get();
+		$data = $query->skip($start)->take($length)->get();
 
 		// Process data
-		if ($data) {
-			foreach ($data as $commitment) {
-				$commitment->sumRealisasiLuas = $commitment->lokasi->sum('luas_tanam');
-				$commitment->sumRealisasiPanen = $commitment->lokasi->sum('volume');
-				$commitment->pksCount = $commitment->pks->count();
-				$commitment->pksFileCount = $commitment->pks->whereNotNull('berkas_pks')->count();
+		foreach ($data as $commitment) {
+			$commitment->sumRealisasiLuas = $commitment->lokasi->sum('luas_tanam');
+			$commitment->sumRealisasiPanen = $commitment->lokasi->sum('volume');
+			$commitment->pksCount = $commitment->pks->count();
+			$commitment->pksFileCount = $commitment->pks->whereNotNull('berkas_pks')->count();
 
-				if ($commitment->pksCount > 0 || $commitment->pksFileCount > 0) {
-					$commitment->pksComplete = ($commitment->pksCount === $commitment->pksFileCount) ? 'Lengkap' : 'Belum Lengkap';
-				} else {
-					$commitment->pksComplete = 'Belum Lengkap';
-				}
+			$commitment->pksComplete = ($commitment->pksCount === $commitment->pksFileCount) ? 'Lengkap' : 'Belum Lengkap';
 
-				$tanamDocsFields = ['spvt', 'sptjmtanam', 'rta', 'sphtanam', 'logbooktanam'];
-				$produksiDocsFields = ['spvp', 'sptjmproduksi', 'rpo', 'sphproduksi', 'logbookproduksi', 'formLa'];
+			$tanamDocsFields = ['spvt', 'sptjmtanam', 'rta', 'sphtanam', 'logbooktanam'];
+			$produksiDocsFields = ['spvp', 'sptjmproduksi', 'rpo', 'sphproduksi', 'logbookproduksi', 'formLa'];
 
-				$tanamDocsComplete = true;
-				foreach ($tanamDocsFields as $field) {
-					if (empty($commitment->userDocs->$field)) {
-						$tanamDocsComplete = false;
-						break;
-					}
-				}
-				$commitment->tanamDocs = $tanamDocsComplete ? "Lengkap" : "Belum Lengkap";
+			$tanamDocsComplete = !array_filter($tanamDocsFields, function ($field) use ($commitment) {
+				return empty($commitment->userDocs->$field);
+			});
+			$commitment->tanamDocs = $tanamDocsComplete ? "Lengkap" : "Belum Lengkap";
 
-				$produksiDocsComplete = true;
-				foreach ($produksiDocsFields as $field) {
-					if (empty($commitment->userDocs->$field)) {
-						$produksiDocsComplete = false;
-						break;
-					}
-				}
-				$commitment->produksiDocs = $produksiDocsComplete ? "Lengkap" : "Belum Lengkap";
+			$produksiDocsComplete = !array_filter($produksiDocsFields, function ($field) use ($commitment) {
+				return empty($commitment->userDocs->$field);
+			});
+			$commitment->produksiDocs = $produksiDocsComplete ? "Lengkap" : "Belum Lengkap";
 
-				$ijin = $commitment->no_ijin;
-				$commitment->noIjin = str_replace(['/', '.'], "", $ijin);
+			$commitment->noIjin = str_replace(['/', '.'], "", $commitment->no_ijin);
+			$commitment->avTanamStatus = $commitment->ajutanam()->exists() ? $commitment->ajutanam()->latest()->first()->status : "Tidak ada";
+			$commitment->avProdStatus = $commitment->ajuproduksi()->exists() ? $commitment->ajuproduksi()->latest()->first()->status : "Tidak ada";
+			$commitment->avSklStatus = $commitment->ajuskl()->exists() ? $commitment->ajuskl()->latest()->first()->status : "Tidak ada";
+			$commitment->completeStatus = $commitment->completed()->exists() ? 'Lunas' : "Belum Lunas";
 
-				// Statuses
-				$commitment->avTanamStatus = $commitment->ajutanam()->exists() ? $commitment->ajutanam()->latest()->first()->status : "Tidak ada";
-				$commitment->avProdStatus = $commitment->ajuproduksi()->exists() ? $commitment->ajuproduksi()->latest()->first()->status : "Tidak ada";
-				$commitment->avSklStatus = $commitment->ajuskl()->exists() ? $commitment->ajuskl()->latest()->first()->status : "Tidak ada";
-				$commitment->completeStatus = $commitment->completed()->exists() ? 'Lunas' : "Belum Lunas";
-				if ($commitment->sumRealisasiLuasEmpty || $commitment->pksComplete !== 'Lengkap' || $commitment->tanamDocs !== 'Lengkap') {
-					$commitment->siapVerifTanam = 'Belum Siap';
-				} elseif ($commitment->avProdStatus === 'Siap') {
-					$commitment->siapVerifTanam = 'Tidak Perlu';
-				} else {
-					$commitment->siapVerifTanam = 'Siap';
-				}
+			$commitment->siapVerifTanam = (
+				$commitment->sumRealisasiLuas === 0 ||
+				$commitment->pksComplete !== 'Lengkap' ||
+				$commitment->tanamDocs !== 'Lengkap') ? 'Belum Siap' : 'Siap';
 
-				// Determine siapVerifProduksi status
-				if ($commitment->sumRealisasiPanen === 0 || $commitment->sumRealisasiPanen === null) {
-					$commitment->siapVerifProduksi = 'Belum Siap';
-				} else {
-					$commitment->siapVerifProduksi = 'Siap';
-				}
-			}
+			$commitment->siapVerifProduksi = ($commitment->volume_produksi > $commitment->sumRealisasiPanen || $commitment->pksComplete !== 'Lengkap' || $commitment->tanamDocs !== 'Lengkap' || $commitment->prduksiDocs !== 'Lengkap') ? 'Belum Siap' : 'Siap';
+
+			// $commitment->siapVerifSkl = ($commitment->pksComplete !== 'Lengkap' || $commitment->tanamDocs !== 'Lengkap' || $commitment->produksiDocs !== 'Lengkap' || $commitment->avProdStatus !== '4') ? 'Belum Siap' : 'Siap';
+			$commitment->siapVerifSkl = ( $commitment->avProdStatus !== '4') ? 'Belum Siap' : 'Siap';
+
 		}
 
 		// Map data to the required format
-		$query = $data->map(function ($item) {
+		$mappedData = $data->map(function ($item) {
 			return [
 				'id' => $item->id,
 				'ijin_full' => $item->no_ijin,
@@ -166,19 +135,21 @@ class DataFeederController extends Controller
 				'siapVerifProduksi' => $item->siapVerifProduksi,
 				'avTanamStatus' => $item->avTanamStatus,
 				'avProdStatus' => $item->avProdStatus,
+				'siapVerifSkl' => $item->siapVerifSkl,
 				'avSklStatus' => $item->avSklStatus,
 				'completeStatus' => $item->completeStatus,
 			];
 		});
 
-		// Return response in JSON format
 		return response()->json([
 			'draw' => $draw,
 			'recordsTotal' => $totalRecords,
 			'recordsFiltered' => $filteredRecords,
-			'data' => $query,
+			'data' => $mappedData,
 		]);
 	}
+
+
 
 	public function getPksById($id)
 	{
@@ -731,17 +702,21 @@ class DataFeederController extends Controller
 
 			'avpDate' => $verifProduksi->created_at,
 			'avpVerifAt' => $verifProduksi->verif_at,
-			'avpStatus' => $verifProduksi->status,
 			'avpMetode' => $verifProduksi->metode,
 			'avpNote' => $verifProduksi->note,
-
+			'avpStatus' => $verifProduksi->status,
 			'avsklDate' => $verifSkl->created_at,
 			'avsklVerifAt' => $verifSkl->verif_at,
 			'avsklStatus' => $verifSkl->status,
 			'avsklMetode' => $verifSkl->metode,
 			'avsklNote' => $verifSkl->note,
+			'avsklRecomendBy' => $verifSkl->recomend_by,
+			'avsklRecomendAt' => $verifSkl->recomend_at,
+			'avsklRecomendNote' => $verifSkl->recomend_note,
+			'avsklApprovedBy' => $verifSkl->approved_by,
+			'avsklApprovedAt' => $verifSkl->approved_at,
+			'avsklPublishedAt' => $verifSkl->published_at,
 
-			'publishedAt' => $verifSkl->published_date,
 			'wajibTanam' => $commitment->luas_wajib_tanam,
 			'wajibProduksi' => $commitment->volume_produksi,
 			'realisasiTanam' => $commitment->lokasi->sum('luas_tanam'),
@@ -837,10 +812,204 @@ class DataFeederController extends Controller
 		$response = $data->map(function ($item) {
 			return [
 				'id' => $item->id,
+				'createdAt' => $item->created_at,
 				'checkBy' => $item->checkBy,
 				'status' => $item->status,
 				'verifAt' => $item->verif_at,
 				'note' => $item->note,
+			];
+		});
+
+		// Return JSON response
+		return response()->json([
+			'draw' => $draw,
+			'recordsTotal' => $totalRecords,
+			'recordsFiltered' => $filteredRecords,
+			'data' => $response,
+		]);
+	}
+
+	public function getVerifProdHistory(Request $request, $noIjin)
+	{
+		// Format the $noIjin
+		$noIjin = substr($noIjin, 0, 4) . '/' .
+			substr($noIjin, 4, 2) . '.' .
+			substr($noIjin, 6, 3) . '/' .
+			substr($noIjin, 9, 1) . '/' .
+			substr($noIjin, 10, 2) . '/' .
+			substr($noIjin, 12, 4);
+
+		// Get the request inputs
+		$draw = $request->input('draw', 1);
+		$start = $request->input('start', 0);
+		$length = $request->input('length', 10);
+		$searchValue = $request->input('search.value', '');
+		$order = $request->input('order', []);
+		$columns = $request->input('columns', []);
+
+		// Build the query
+		$query = AjuVerifProduksi::select('id', 'no_ijin', 'check_by', 'verif_at', 'status', 'note', 'created_at')
+			->where('no_ijin', $noIjin)
+			->with('verifikator');
+
+		// Get total records count
+		$totalRecords = $query->count();
+
+		// Apply search filter
+		if (!empty($searchValue)) {
+			$query = $query->where(function ($q) use ($searchValue) {
+				$q->where('check_by', 'like', "%{$searchValue}%")
+					->orWhere('verif_at', 'like', "%{$searchValue}%")
+					->orWhere('status', 'like', "%{$searchValue}%")
+					->orWhere('note', 'like', "%{$searchValue}%");
+			});
+		}
+
+		// Get filtered records count
+		$filteredRecords = $query->count();
+
+		// Apply ordering
+		if (!empty($order)) {
+			$orderColumnIndex = $order[0]['column'];
+			$orderDirection = $order[0]['dir'];
+			$orderColumn = $columns[$orderColumnIndex]['data'];
+
+			switch ($orderColumn) {
+				case 'status':
+					$query = $query->orderBy('status', $orderDirection);
+					break;
+				case 'check_by':
+					$query = $query->orderBy('check_by', $orderDirection);
+					break;
+				case 'verif_at':
+					$query = $query->orderBy('verif_at', $orderDirection);
+					break;
+				case 'note':
+					$query = $query->orderBy('note', $orderDirection);
+					break;
+				default:
+					$query = $query->orderBy('id', 'desc');
+					break;
+			}
+		}
+
+		// Apply pagination
+		$data = $query->skip($start)
+			->take($length)
+			->get();
+
+		// Process the data
+		if ($data) {
+			foreach ($data as $history) {
+				$history->checkBy = ($history->check_by && $history->verifikator) ? $history->verifikator->name : null;
+			}
+		}
+
+		// Format the response
+		$response = $data->map(function ($item) {
+			return [
+				'id' => $item->id,
+				'createdAt' => $item->created_at,
+				'checkBy' => $item->checkBy,
+				'status' => $item->status,
+				'verifAt' => $item->verif_at,
+				'note' => $item->note,
+			];
+		});
+
+		// Return JSON response
+		return response()->json([
+			'draw' => $draw,
+			'recordsTotal' => $totalRecords,
+			'recordsFiltered' => $filteredRecords,
+			'data' => $response,
+		]);
+	}
+	public function getVerifSklHistory(Request $request, $noIjin)
+	{
+		// Format the $noIjin
+		$noIjin = substr($noIjin, 0, 4) . '/' .
+			substr($noIjin, 4, 2) . '.' .
+			substr($noIjin, 6, 3) . '/' .
+			substr($noIjin, 9, 1) . '/' .
+			substr($noIjin, 10, 2) . '/' .
+			substr($noIjin, 12, 4);
+
+		// Get the request inputs
+		$draw = $request->input('draw', 1);
+		$start = $request->input('start', 0);
+		$length = $request->input('length', 10);
+		$searchValue = $request->input('search.value', '');
+		$order = $request->input('order', []);
+		$columns = $request->input('columns', []);
+
+		// Build the query
+		$query = AjuVerifSkl::select('id', 'no_ijin', 'check_by', 'verif_at', 'status', 'verif_note', 'created_at')
+			->where('no_ijin', $noIjin)
+			->with('verifikator');
+
+		// Get total records count
+		$totalRecords = $query->count();
+
+		// Apply search filter
+		if (!empty($searchValue)) {
+			$query = $query->where(function ($q) use ($searchValue) {
+				$q->where('check_by', 'like', "%{$searchValue}%")
+					->orWhere('verif_at', 'like', "%{$searchValue}%")
+					->orWhere('status', 'like', "%{$searchValue}%")
+					->orWhere('verif_note', 'like', "%{$searchValue}%");
+			});
+		}
+
+		// Get filtered records count
+		$filteredRecords = $query->count();
+
+		// Apply ordering
+		if (!empty($order)) {
+			$orderColumnIndex = $order[0]['column'];
+			$orderDirection = $order[0]['dir'];
+			$orderColumn = $columns[$orderColumnIndex]['data'];
+
+			switch ($orderColumn) {
+				case 'status':
+					$query = $query->orderBy('status', $orderDirection);
+					break;
+				case 'check_by':
+					$query = $query->orderBy('check_by', $orderDirection);
+					break;
+				case 'verif_at':
+					$query = $query->orderBy('verif_at', $orderDirection);
+					break;
+				case 'verif_note':
+					$query = $query->orderBy('note', $orderDirection);
+					break;
+				default:
+					$query = $query->orderBy('id', 'desc');
+					break;
+			}
+		}
+
+		// Apply pagination
+		$data = $query->skip($start)
+			->take($length)
+			->get();
+
+		// Process the data
+		if ($data) {
+			foreach ($data as $history) {
+				$history->checkBy = ($history->check_by && $history->verifikator) ? $history->verifikator->name : null;
+			}
+		}
+
+		// Format the response
+		$response = $data->map(function ($item) {
+			return [
+				'id' => $item->id,
+				'createdAt' => $item->created_at,
+				'checkBy' => $item->checkBy,
+				'status' => $item->status,
+				'verifAt' => $item->verif_at,
+				'note' => $item->verif_note,
 			];
 		});
 

@@ -433,6 +433,8 @@ Route::group(['prefix' => '2024', 'as' => '2024.', 'namespace' => 'Admin', 'midd
 			Route::get('/{nik}/getCpclByNik', 'DataFeederController@getCpclByNik')->name('getCpclByNik');
 			Route::get('/getDataPengajuan/{noIjin}', 'DataFeederController@getDataPengajuan')->name('getDataPengajuan');
 			Route::get('/getVerifTanamHistory/{noIjin}', 'DataFeederController@getVerifTanamHistory')->name('getVerifTanamHistory');
+			Route::get('/getVerifProdHistory/{noIjin}', 'DataFeederController@getVerifProdHistory')->name('getVerifProdHistory');
+			Route::get('/getVerifSklHistory/{noIjin}', 'DataFeederController@getVerifSklHistory')->name('getVerifSklHistory');
 
 
 			//ini jangan dijalankan lagi
@@ -491,7 +493,15 @@ Route::group(['prefix' => '2024', 'as' => '2024.', 'namespace' => 'Admin', 'midd
 
 				//pengajuan verifikasi tanam
 				Route::get('{noIjin}/formavt', 'AjuVerifTanamController@index')->name('formavt');
-				Route::post('{noIjin}/formavt/store', 'AjuVerifTanamController@submitPengajuan')->name('submitPengajuan');
+				Route::post('{noIjin}/formavt/store', 'AjuVerifTanamController@submitPengajuan')->name('formavt.submitPengajuan');
+
+				//Pengajuan verifikasi produksi
+				Route::get('{noIjin}/formavp', 'AjuVerifProdController@index')->name('formavp');
+				Route::post('{noIjin}/formavp/store', 'AjuVerifProdController@submitPengajuan')->name('formavp.submitPengajuan');
+
+				//pengajuan penerbitan skl
+				Route::get('{noIjin}/formavskl', 'AjuVerifSKLController@index')->name('formavskl');
+				Route::post('{noIjin}/formavskl/store', 'AjuVerifSKLController@submitPengajuan')->name('formavskl.submitPengajuan');
 
 				//daftar anggota & lokasi by pks
 				// Route::get('/', 'CommitmentController@index')->name('index');
