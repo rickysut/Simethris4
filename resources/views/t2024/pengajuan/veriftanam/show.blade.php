@@ -255,8 +255,9 @@
 					<div class="panel-content">
 						<table class="table table-hover table-sm w-100" style="border: none; border-top:none; border-bottom:none;" id="tblVerifHistory">
 							<thead class="">
-								<th>Tanggal Verifikasi</th>
+								<th>Tanggal Diajukan</th>
 								<th>Verifikator</th>
+								<th>Tanggal Verifikasi</th>
 								<th>Status</th>
 								<th>Catatan</th>
 							</thead>
@@ -478,6 +479,7 @@
 					"<'row'<'col-sm-12'tr>>" +
 					"<'row'<'col-sm-12 col-md-5'><'col-sm-12 col-md-7'>>",
 				columns: [
+					{ data: 'created_at' }
 					{
 						data: 'verifAt',
 						render: function (data, type, row) {

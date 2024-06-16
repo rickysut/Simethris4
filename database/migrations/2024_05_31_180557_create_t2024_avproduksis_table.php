@@ -13,17 +13,18 @@ return new class extends Migration
 	 */
 	public function up()
 	{
-		Schema::create('t2024_avtanams', function (Blueprint $table) {
+		Schema::create('t2024_avproduksis', function (Blueprint $table) {
 			$table->bigIncrements('id');
 			$table->string('npwp');
 			$table->unsignedBigInteger('commitment_id');
 			$table->string('no_ijin');
+			$table->string('no_pengajuan');
 			$table->string('status')->nullable(); //
 			$table->text('note')->nullable();
 
-			//file verifikasi
-			$table->string('batanam')->nullable();
-			$table->string('ndhprt')->nullable(); //nota dinas hasil pemeriksaan realisasi tanam
+			//file upload
+			$table->string('baproduksi')->nullable();
+			$table->string('ndhprp')->nullable(); //nota dinas hasil pemeriksaan realisasi produksi
 
 			$table->bigInteger('check_by')->nullable();
 			$table->date('verif_at')->nullable();
@@ -40,6 +41,6 @@ return new class extends Migration
 	 */
 	public function down()
 	{
-		Schema::dropIfExists('t2024_avtanams');
+		Schema::dropIfExists('t2024_avproduksis');
 	}
 };

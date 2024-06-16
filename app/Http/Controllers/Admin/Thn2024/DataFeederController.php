@@ -776,7 +776,7 @@ class DataFeederController extends Controller
 		$columns = $request->input('columns', []);
 
 		// Build the query
-		$query = AjuVerifTanam::select('id', 'no_ijin', 'check_by', 'verif_at', 'status', 'note')
+		$query = AjuVerifTanam::select('id', 'no_ijin', 'check_by', 'verif_at', 'status', 'note', 'created_at')
 			->where('no_ijin', $noIjin)
 			->with('verifikator');
 

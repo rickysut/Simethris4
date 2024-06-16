@@ -3,13 +3,14 @@
 namespace App\Models2024;
 
 use App\Models\DataUser;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 
 class AjuVerifProduksi extends Model
 {
-	public $table = 'avproduksis';
+	public $table = 't2024_avproduksis';
 
 	protected $fillable = [
 		'npwp',
@@ -84,5 +85,10 @@ class AjuVerifProduksi extends Model
 					->orWhereNull('check_by');
 			})
 			->get();
+	}
+
+	public function verifikator()
+	{
+		return $this->belongsTo(User::class, 'check_by', 'id');
 	}
 }
