@@ -46,7 +46,7 @@
 				<i class="fal fa-angle-down"></i>
 			</a>
 		</div>
-		<div class="container bg-primary-50">
+		<div class="container bg-primary">
 			<ul id="date" class="list-table m-auto pt-3 pb-3">
 				<li>
 					{{-- <span class="d-inline-block" style="color:white"

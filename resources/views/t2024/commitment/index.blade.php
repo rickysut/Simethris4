@@ -281,7 +281,7 @@ td {
 													<a class="dropdown-item" style="text-decoration: none !important;" href="${formAvSkl}" target="_blank">
 														Lihat Hasil Verifikasi
 													</a>
-													<a class="dropdown-item" style="text-decoration: none !important;" href="${formAvp}" target="_blank" data-toggle="tooltip" title="Perbaiki data dan laporan. Lalu ajukan verifikasi ulang.">
+													<a class="dropdown-item" style="text-decoration: none !important;" href="${formAvSkl}" target="_blank" data-toggle="tooltip" title="Perbaiki data dan laporan. Lalu ajukan verifikasi ulang.">
 														Ajukan Ulang
 													</a>
 												</div>
