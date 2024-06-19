@@ -644,16 +644,16 @@
 						$('#avsklStatus').text('Belum/Tidak ada pengajuan.');
 					}
 
-					$('#btnSubmit').text('Ajukan');
-					var avsklStatus = data.avsklStatus;
-					if (avsklStatus === null && data.avpStatus === '4') {
-						$('#btnSubmit').removeClass('d-none');
-					} else if (avsklStatus === '5' ) {
-						$('#btnSubmit').removeClass('d-none');
-						$('#btnSubmit').text('Ajukan Ulang');
-					} else {
-						$('#btnSubmit').addClass('d-none');
-					}
+					// $('#btnSubmit').text('Ajukan');
+					// var avsklStatus = data.avsklStatus;
+					// if (avsklStatus === null && data.avpStatus === '4') {
+					// 	$('#btnSubmit').removeClass('d-none');
+					// } else if (avsklStatus === '5' ) {
+					// 	$('#btnSubmit').removeClass('d-none');
+					// 	$('#btnSubmit').text('Ajukan Ulang');
+					// } else {
+					// 	$('#btnSubmit').addClass('d-none');
+					// }
 				},
 				error: function(xhr, status, error) {
 					console.error('Error fetching data:', error);

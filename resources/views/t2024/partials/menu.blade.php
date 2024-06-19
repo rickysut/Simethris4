@@ -256,16 +256,15 @@
 			@can('verificator_task_access')
 				<li class="nav-title" data-i18n="nav.administation">PENGAJUAN VERIFIKASI</li>
 				@can('online_access')
-					<li class="c-sidebar-nav-item {{ request()->is('verification/tanam')
-						|| request()->is('verification/tanam*') ? 'active' : '' }}">
-						<a href="{{ route('verification.tanam') }}"
+					<li class="c-sidebar-nav-item {{ request()->is('verification/tanam*') ? 'active' : '' }}">
+						<a href="{{ route('2024.verifikator.tanam.home') }}"
 							data-filter-tags="verifikasi tanam">
 							<i class="fal fa-seedling c-sidebar-nav-icon"></i>
 							<span class="nav-link-text">
 								Verifikasi Tanam
 							</span>
 							@php
-								$pengajuan = new \App\Models\AjuVerifTanam();
+								$pengajuan = new \App\Models2024\AjuVerifTanam();
 								$unverified = $pengajuan->NewRequest();
 								$proceed = $pengajuan->proceedVerif();
 							@endphp

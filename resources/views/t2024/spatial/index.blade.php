@@ -87,7 +87,7 @@
 				"<'row'<'col-sm-12'tr>>" +
 				"<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
 			ajax: {
-				url: "{{ route('2024.datafeeder.getAllSpatials')}}",
+				url: "{{ route('2024.datafeeder.getRequestVerifTanam')}}",
 				type: "GET",
 				dataSrc: "data"
 			},

@@ -435,7 +435,8 @@ Route::group(['prefix' => '2024', 'as' => '2024.', 'namespace' => 'Admin', 'midd
 			Route::get('/getVerifTanamHistory/{noIjin}', 'DataFeederController@getVerifTanamHistory')->name('getVerifTanamHistory');
 			Route::get('/getVerifProdHistory/{noIjin}', 'DataFeederController@getVerifProdHistory')->name('getVerifProdHistory');
 			Route::get('/getVerifSklHistory/{noIjin}', 'DataFeederController@getVerifSklHistory')->name('getVerifSklHistory');
-
+			Route::get('/getRequestVerifTanam', 'DataFeederController@getRequestVerifTanam')->name('getRequestVerifTanam');
+			Route::get('/getVerifTanamByIjin/{noIjin}', 'DataFeederController@getVerifTanamByIjin')->name('getVerifTanamByIjin');
 
 			//ini jangan dijalankan lagi
 			Route::get('/updateOrCreateDesa', 'DataFeederController@updateOrCreateDesa')->name('updateOrCreateDesa');
@@ -454,6 +455,13 @@ Route::group(['prefix' => '2024', 'as' => '2024.', 'namespace' => 'Admin', 'midd
 		//route untuk verifikator
 		Route::group(['prefix' => 'verifikator', 'as' => 'verifikator.'], function () {
 			Route::get('/', 'HomeController@index')->name('home');
+
+			Route::group(['prefix' => 'tanam', 'as' => 'tanam.'], function () {
+				Route::get('/', 'VerifTanamController@index')->name('home');
+				Route::get('/check/{noIjin}', 'VerifTanamController@check')->name('check');
+				Route::post('/check/{noIjin}/store', 'VerifTanamController@store')->name('store');
+				Route::get('/result/{noIjin}', 'VerifTanamController@check')->name('result');
+			});
 		});
 
 		//route untuk pelaku usaha
