@@ -313,6 +313,17 @@
 				responsive: true,
 				lengthChange: false,
 				ordering: true,
+				ajax: {
+					url: "{{ route('2024.datafeeder.getPksByIjin', [':noIjin']) }}".replace(':noIjin', noIjin),
+					type: "GET",
+				},
+				columns: [
+					{data: 'no_perjanjian'},
+					{data: 'nama_poktan'},
+					{data: 'tgl_perjanjian_start'},
+					{data: 'tgl_perjanjian_end'},
+					{data: 'no_perjanjian'},
+				],
 				rowCallback: function(row, data) {
 					$(row).on('click', function() {
 						$('#pksCheck tbody tr').removeClass('selected');
@@ -322,7 +333,7 @@
 							$(this).next().remove();
 						} else {
 							var formHTML = '<tr class="expanded-row"><td colspan="5">';
-							formHTML += '<a href="#" download>{{$noIjin}}</a>';
+							formHTML += '<span>Berkas: </span><a href="#" download>berkas_pks</a>';
 							formHTML += '<form id="expandForm">';
 							formHTML += '<label for="input1">Input 1:</label>';
 							formHTML += '<input class="form-control" type="text" id="input1" name="input1"><br>';

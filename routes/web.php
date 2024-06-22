@@ -527,6 +527,7 @@ Route::group(['prefix' => '2024', 'as' => '2024.', 'namespace' => 'Admin', 'midd
 			Route::post('/storesingle', 'SpatialController@storesingle')->name('storesingle');
 			Route::get('/{id}/show', 'SpatialController@show')->name('edit');
 			Route::post('/updatesingle', 'SpatialController@updatesingle')->name('updatesingle');
+			Route::post('/updateStatus/{kodeSpatial}', 'SpatialController@updateStatus')->name('updateStatus');
 		});
 
 		//route untuk cpcl

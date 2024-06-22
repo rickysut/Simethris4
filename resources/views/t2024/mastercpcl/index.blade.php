@@ -15,7 +15,7 @@
 						<div class="btn-group">
 							<a href="{{route('2024.cpcl.anggota.create')}}" type="button" class="btn btn-sm btn-primary" data-toggle="tooltip" data-offset="0,10" data-original-title="Tambah CPCL">
 								<i class="fal fa-user-plus"></i>
-								Registrasi CPCL Baru
+								Registrasi Anggota Baru
 							</a>
 						</div>
 					</div>
@@ -87,7 +87,7 @@
 							</li>
 							<li class='list-group-items d-flex justify-content-between align-item-center'>
 								<span>Luas</span>
-								<span>`+ row.total_luas +` ha</span>
+								<span>`+ row.total_luas / 10000 +` ha</span>
 							</li>
 							</ul>
 							`;

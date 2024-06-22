@@ -283,18 +283,21 @@
 				url: "{{ route('2024.datafeeder.getDataPengajuan', [':noIjin']) }}".replace(':noIjin', formattedNoIjin),
 				type: "GET",
 				success: function(data) {
-					// Populate the HTML elements with the data
+					// Ringkasan Umum
 					$('#companyName').text(data.company);
 					$('#noIjin').text(data.noIjin);
 					$('#periode').text(data.periode);
+
+					//Ringkasan Realisasi dan Kewajiban
 					$('#wajibTanam').text(data.wajibTanam + ' ha');
 
-					if (data.wajibTanam > data.realisasiTanam) {
-						$('#realisasiTanam span').text(data.realisasiTanam + ' ha').addClass('text-warning');
-						$('#realisasiTanam i').addClass('fas fa-exclamation-circle text-warning ml-1');
-					} else {
-						$('#realisasiTanam span').text(data.realisasiTanam + ' ha');
-						$('#realisasiTanam i').addClass('fas fa-check ml-1');
+					var luasTanam = data.realisasiTanam + ' / ' + data.wajibTanam + ' ha';
+					if (data.realisasiTanam == '0' || data.realisasiTanam == null || data.realisasiTanam == undefined){
+						$('#realisasiTanam').html('<span class="text-danger">' + luasTanam + '</span>');
+					}else if (data.wajibTanam > data.realisasiTanam){
+						$('#realisasiTanam').html('<span class="text-warning">' + luasTanam + '</span>');
+					}else{
+						$('#realisasiTanam').html('<span class="text-success">' + luasTanam + '</span>');
 					}
 
 					var titikTanam = data.countTanam + ' / ' + data.countSpatial + ' titik';
@@ -305,29 +308,34 @@
 						$('#countSpatial').html('<span class="text-success">' + titikTanam + '</span>');
 					}
 
+					//Ringkasan Kemitraan
 					$('#countAnggota').text(data.countAnggota + ' orang');
 					$('#countPoktan').text(data.countPoktan + ' kelompok');
 
 					if (data.countPoktan > data.countPks) {
-						$('#countPks span').text(data.countPks + ' berkas').addClass('text-warning');
-						$('#countPks i').addClass('fas fa-exclamation-circle text-warning ml-1');
+						$('#countPks').html('<span class="text-danger">' + data.countPks +' PKS</span>');
 					} else {
-						$('#countPks span').text(data.countPks + ' berkas');
-						$('#countPks i').addClass('fas fa-check ml-1');
+						$('#countPks').html('<span class="text-danger">' + data.countPks +' PKS</span>');
 					}
 
-					$('#spvt').html(data.spvt ? '<span class="text-success">Ada <i class="fal fa-check"></i></span>' : '<span class="text-danger">Tidak Ada <i class="fas fa-exclamation-circle"></i></span>');
 
-					$('#sptjmtanam').html(data.sptjmtanam ? '<span class="text-success">Ada <i class="fal fa-check"></i></span>' : '<span class="text-danger">Tidak Ada <i class="fas fa-exclamation-circle"></i></span>');
+					//Kelengkapan Berkas
+					//A. Berkas-berkas Tanam
+					$('#spvt').html(data.spvt ? '<span class="text-success">Ada</i></span>' : '<span class="text-danger">Tidak Ada</span>');
 
-					$('#rta').html(data.rta ? '<span class="text-success">Ada <i class="fal fa-check"></i></span>' : '<span class="text-danger">Tidak Ada <i class="fas fa-exclamation-circle"></i></span>');
+					$('#sptjmtanam').html(data.sptjmtanam ? '<span class="text-success">Ada</span>' : '<span class="text-danger">Tidak Ada</span>');
 
-					$('#sphsbstanam').html(data.sphtanam ? '<span class="text-success">Ada <i class="fal fa-check"></i></span>' : '<span class="text-danger">Tidak Ada <i class="fas fa-exclamation-circle"></i></span>');
+					$('#rta').html(data.rta ? '<span class="text-success">Ada</span>' : '<span class="text-danger">Tidak Ada</span>');
 
-					$('#logTanam').html(data.logbooktanam ? '<span class="text-success">Ada <i class="fal fa-check"></i></span>' : '<span class="text-danger">Tidak Ada <i class="fas fa-exclamation-circle"></i></span>');
+					$('#sphsbstanam').html(data.sphtanam ? '<span class="text-success">Ada</span>' : '<span class="text-danger">Tidak Ada</span>');
+
+					$('#logTanam').html(data.logbooktanam ? '<span class="text-success">Ada</span>' : '<span class="text-danger">Tidak Ada</span>');
+
 
 					var options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
 
+					//Ringkasan Hasil
+					//A. Verifikasi Tanam
 					var avtDate = data.avtDate ? new Date(data.avtDate) : null;
 					var formattedAvtDate = avtDate ? avtDate.toLocaleDateString('id-ID', options) : '-';
 
@@ -357,24 +365,19 @@
 						$('#avtStatus').text('Belum/Tidak ada pengajuan.');
 					}
 
-					//set submit button
-					//1. jika tidak ada status realisasi sudah ada, dan pks juga lengkap
-					//2. jika status adalah 5,
-					//3. jika selain itu
-
-					$('#btnSubmit').text('Ajukan');
-					var avtStatus = data.avtStatus;
-					var realisasiTanam = data.realisasiTanam;
-					var countPoktan = data.countPoktan;
-					var countPks = data.countPks;
-					if (avtStatus === null && realisasiTanam > 0 && countPks === countPoktan) {
-						$('#btnSubmit').removeClass('d-none');
-					} else if (avtStatus === '5' ) { //&& realisasiTanam > 0 && countPks === countPoktan
-						$('#btnSubmit').removeClass('d-none');
-						$('#btnSubmit').text('Ajukan Ulang');
-					} else {
-						$('#btnSubmit').addClass('d-none');
-					}
+					// $('#btnSubmit').text('Ajukan');
+					// var avpStatus = data.avpStatus;
+					// var realisasiProduksi = data.realisasiProduksi;
+					// var countPoktan = data.countPoktan;
+					// var countPks = data.countPks;
+					// if (avpStatus === null && realisasiProduksi >= data.wajibProduksi) {
+					// 	$('#btnSubmit').removeClass('d-none');
+					// } else if (avpStatus === '5' && realisasiProduksi >= data.wajibProduksi) {
+					// 	$('#btnSubmit').removeClass('d-none');
+					// 	$('#btnSubmit').text('Ajukan Ulang');
+					// } else {
+					// 	$('#btnSubmit').addClass('d-none');
+					// }
 				},
 				error: function(xhr, status, error) {
 					console.error('Error fetching data:', error);
@@ -484,9 +487,25 @@
 					"<'row'<'col-sm-12'tr>>" +
 					"<'row'<'col-sm-12 col-md-5'><'col-sm-12 col-md-7'>>",
 				columns: [
-					{ data: 'createdAt' },
-					{ data: 'verifAt' },
+					{
+						data: 'createdAt',
+						render: function (data, type, row) {
+							var options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+							var avtDate = data ? new Date(data) : null;
+							var formattedAvtDate = avtDate ? avtDate.toLocaleDateString('id-ID', options) : '-';
+							return formattedAvtDate;
+						}
+					},
 					{ data: 'checkBy' },
+					{
+						data: 'verifAt',
+						render: function (data, type, row) {
+							var options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+							var verifDate = data ? new Date(data) : null;
+							var formattedverifDate = verifDate ? verifDate.toLocaleDateString('id-ID', options) : 'belum diverifikasi';
+							return formattedverifDate;
+						}
+					},
 					{
 						data: 'status',
 						render: function (data, type, row) {

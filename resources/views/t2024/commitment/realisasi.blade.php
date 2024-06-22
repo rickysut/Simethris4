@@ -597,9 +597,17 @@
 					}
 				},
 				{
-					data: 'lokasi_sum_luas_lahan',
+					data: 'total_luas_lahan',
 					render: function (data, type, row) {
-						return parseFloat(data).toFixed(3).replace(/\d(?=(\d{3})+\.)/g, '$&,') + ' ha';
+						var hectares = data / 10000; // 1 hectare = 10,000 square meters
+
+						// Format number with Indonesian thousands separator and up to 3 decimal places
+						var formatted = new Intl.NumberFormat('id-ID', {
+							minimumFractionDigits: 0,
+							maximumFractionDigits: 3
+						}).format(hectares);
+
+						return formatted + ' ha';
 					}
 				},
 				{

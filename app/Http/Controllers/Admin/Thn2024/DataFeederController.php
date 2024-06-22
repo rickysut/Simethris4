@@ -186,10 +186,13 @@ class DataFeederController extends Controller
 
 		$commitment = PullRiph::where('no_ijin', $noIjin)->first();
 		$query = Pks::query()
-			->select('id', 'no_ijin', 'poktan_id', 'nama_poktan', 'no_perjanjian', 'tgl_perjanjian_start', 'tgl_perjanjian_end', 'varietas_tanam', 'periode_tanam', 'berkas_pks')
+			->select('id', 'no_ijin', 'poktan_id', 'nama_poktan', 'no_perjanjian', 'tgl_perjanjian_start', 'tgl_perjanjian_end', 'varietas_tanam', 'periode_tanam', 'berkas_pks', 'status')
 			->where('no_ijin', $commitment->no_ijin)
 			->withCount('lokasi')
-			->withSum('lokasi', 'luas_lahan');
+			->with(['lokasi' => function ($query) {
+				$query->selectRaw('poktan_id, no_ijin, sum(luas_lahan) as total_luas_lahan')
+					  ->groupBy('poktan_id', 'no_ijin');
+			}]);
 
 		// Paginasi sesuai permintaan DataTables
 		$draw = $request->input('draw');
@@ -204,10 +207,12 @@ class DataFeederController extends Controller
 		$items = $data->items();
 		foreach ($items as $item) {
 			if (is_null($item->tgl_perjanjian_start) || is_null($item->varietas_tanam) || is_null($item->berkas_pks)) {
-				$item->status = null;
+				$item->statusData = null;
 			} else {
-				$item->status = 'Filled'; // Atur status yang sesuai jika tidak null
+				$item->statusData = 'Filled'; // Atur status yang sesuai jika tidak null
 			}
+
+			$item->total_luas_lahan = $item->lokasi->sum('total_luas_lahan');
 		}
 
 		return response()->json([
@@ -227,6 +232,14 @@ class DataFeederController extends Controller
 			substr($noIjin, 9, 1) . '/' .
 			substr($noIjin, 10, 2) . '/' .
 			substr($noIjin, 12, 4);
+
+		$dataRealisasi = Lokasi::select('no_ijin', 'poktan_id', 'luas_tanam', 'volume')
+		->where('no_ijin', $noIjin)
+		->where('poktan_id', $poktanId)
+		->get();
+
+		$realisasiLuasTanam = $dataRealisasi->sum('luas_tanam');
+		$realisasiProduksi = $dataRealisasi->sum('volume');
 
 		$draw = $request->input('draw', 1);
 		$start = $request->input('start', 0);
@@ -300,6 +313,8 @@ class DataFeederController extends Controller
 			'draw' => $draw,
 			'recordsTotal' => $totalRecords,
 			'recordsFiltered' => $filteredRecords,
+			'totalRealisasiLuas' => $realisasiLuasTanam,
+			'totalRealisasiProduksi' => $realisasiProduksi,
 			'data' => $data,
 		]);
 	}
@@ -341,7 +356,7 @@ class DataFeederController extends Controller
 		$length = $request->input('length', 10);
 		$searchValue = $request->input('search.value', '');
 
-		$data = MasterSpatial::select('id', 'kode_spatial', 'luas_lahan', 'ktp_petani', 'nama_petani', 'provinsi_id', 'kabupaten_id', 'kml_url')
+		$data = MasterSpatial::select('id', 'kode_spatial', 'luas_lahan', 'ktp_petani', 'nama_petani', 'provinsi_id', 'kabupaten_id', 'kml_url', 'status')
 			->with([
 				// 'anggota:id,poktan_id,nama_petani,ktp_petani',
 				'provinsi:provinsi_id,nama',
@@ -365,6 +380,7 @@ class DataFeederController extends Controller
 				'nama_kecamatan' => $item->kecamatan ? $item->kecamatan->nama_kecamatan : null,
 				'kelurahan_id' => $item->kelurahan_id,
 				'nama_desa' => $item->desa ? $item->desa->nama_desa : null,
+				'status' => $item->status ? $item->status : null,
 			];
 		});
 

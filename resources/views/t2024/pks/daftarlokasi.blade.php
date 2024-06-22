@@ -73,12 +73,12 @@
 									<th class="text-right" colspan="7">TOTAL REALISASI</th>
 								</tr>
 								<tr>
-									<th class="text-right" colspan="6">Luas Tanam: </th>
-									<th class="text-right">{{$sumLuas}} ha</th>
+									<th class="text-right" colspan="6">Realisasi Luas Tanam: </th>
+									<th class="text-right" id="totalRealisasiLuas"> ha</th>
 								</tr>
 								<tr>
-									<th class="text-right" colspan="6">Volume Panen</th>
-									<th class="text-right">{{$sumProduksi}} ton</th>
+									<th class="text-right" colspan="6">Realisasi Volume Panen</th>
+									<th class="text-right" id="totalRealisasiProduksi"> ton</th>
 								</tr>
 							</tfoot>
 						</table>
@@ -120,6 +120,17 @@
 				ajax: {
 					url: "{{ route('2024.datafeeder.getLokasiByPks', [':noIjin', ':poktanId']) }}".replace(':noIjin', formattedNoIjin).replace(':poktanId', poktanId),
 					type: "GET",
+					dataFilter: function(data){
+						var json = JSON.parse(data);
+						// Update the span with id=totalRealisasiProduksi
+						$('#totalRealisasiProduksi').text(json.totalRealisasiProduksi + ' ton');
+						var luasInHectares = json.totalRealisasiLuas / 10000; // Convert square meters to hectares
+						var formattedLuas = luasInHectares.toLocaleString('id-ID', { maximumFractionDigits: 4 });
+
+						// Update totalRealisasiLuas span
+						$('#totalRealisasiLuas').text(formattedLuas + ' ha');
+						return data;
+					}
 				},
 
 				columns: [

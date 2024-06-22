@@ -18,8 +18,8 @@ class MasterCpclController extends Controller
     public function index()
     {
        $module_name = $this->module_name;
-		$page_title = 'Daftar CPCL';
-		$page_heading = 'Daftar CPCL';
+		$page_title = 'Daftar Anggota Poktan';
+		$page_heading = 'Daftar Anggota Poktan';
 		$heading_class = 'fal fa-users';
 
 		return view('t2024.mastercpcl.index', compact('module_name', 'page_title', 'page_heading', 'heading_class'));
@@ -28,8 +28,8 @@ class MasterCpclController extends Controller
     public function create()
     {
 		$module_name = $this->module_name;
-		$page_title = 'Registrasi CPCL Baru';
-		$page_heading = 'Registrasi CPCL Baru';
+		$page_title = 'Registrasi Anggota Baru';
+		$page_heading = 'Registrasi Anggota Baru';
 		$heading_class = 'fal fa-user-plus';
 
 		return view('t2024.mastercpcl.create', compact('module_name', 'page_title', 'page_heading', 'heading_class'));
@@ -43,8 +43,8 @@ class MasterCpclController extends Controller
     public function show($nik)
     {
         $module_name = $this->module_name;
-		$page_title = 'Profil CPCL';
-		$page_heading = 'Profil CPCL';
+		$page_title = 'Profil Anggota';
+		$page_heading = 'Profil Anggota';
 		$heading_class = 'fal fa-address-card';
 
 		$cpcl = MasterAnggota::where('ktp_petani', $nik)->first();

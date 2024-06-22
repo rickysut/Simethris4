@@ -51,6 +51,7 @@ class Pks extends Model
 		return $this->hasMany(Lokasi::class, ['poktan_id', 'no_ijin'], ['poktan_id', 'no_ijin']);
 	}
 
+
 	public function masterpoktan()
 	{
 		return $this->belongsTo(MasterPoktan::class, 'poktan_id');

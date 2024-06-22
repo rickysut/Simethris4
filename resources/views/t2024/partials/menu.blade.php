@@ -648,7 +648,7 @@
 					<a href="{{route('2024.cpcl.anggota.index')}}" title="Coming soon!"
 					data-filter-tags="data cpcl anggota">
 						<i class="fal fa-user"></i>
-						<span class="nav-link-text">Daftar CPCL</span>
+						<span class="nav-link-text">Daftar Anggota Poktan</span>
 					</a>
 				</li>
 
@@ -660,13 +660,13 @@
 						<span class="nav-link-text">Daftar Lokasi</span>
 					</a>
 				</li>
-				<li class="c-sidebar-nav-item">
+				{{-- <li class="c-sidebar-nav-item">
 					<a href="javascript:void(0);" title="Coming soon!"
 					data-filter-tags="data spatial spasial">
 						<i class="fal fa-map-marker-plus"></i>
 						<span class="nav-link-text">Peta Lokasi Baru</span>
 					</a>
-				</li>
+				</li> --}}
 			@endcan
 
 			{{-- support --}}

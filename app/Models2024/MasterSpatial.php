@@ -43,7 +43,8 @@ class MasterSpatial extends Model
 		'kml_url',
 		'nama_petugas',
 		'tgl_peta',
-		'tgl_tanam'
+		'tgl_tanam',
+		'status',
 	];
 
 	public function anggota()

@@ -12,9 +12,6 @@ use App\Models2024\AjuVerifTanam;
 use App\Models2024\Completed;
 use App\Models2024\DataRealisasi;
 use App\Models2024\Lokasi;
-use App\Models2024\MasterAnggota;
-use App\Models2024\MasterPoktan;
-use App\Models2024\MasterSpatial;
 use App\Models2024\Pks;
 use Exception;
 use Gate;
@@ -155,46 +152,170 @@ class PullRiphController extends Controller
 			$dtjson = json_decode($datariph);
 			if ($riph) {
 				$lastPoktan = '';
-				DataRealisasi::where([
-					'npwp_company' => $stnpwp,
-					'no_ijin' => $noijin,
-				])->forceDelete();
+				if ($dtjson->riph->wajib_tanam->kelompoktani->loop === null) {
+					return redirect()->back()->with('error', 'Gagal menyimpan. Data Kelompok tani tidak lengkap.');
+				} else {
+					DataRealisasi::where([
+						'npwp_company' => $stnpwp,
+						'no_ijin' => $noijin,
+					])->forceDelete();
 
-				Lokasi::where([
-					'npwp' => $stnpwp,
-					'no_ijin' => $noijin,
-				])->forceDelete();
-				PKS::where([
-					'npwp' => $stnpwp,
-					'no_ijin' => $noijin,
-				])->forceDelete();
-
-				$spatials = MasterSpatial::where('status', 1)->with('anggota')->get()->toArray();
-
-				$uniquePoktanIds = collect($spatials)
-					->pluck('anggota.poktan_id')
-					->filter()
-					->unique();
-
-				$poktans = MasterPoktan::whereIn('id', $uniquePoktanIds)->get()->toArray();
-				foreach ($poktans as $poktan) {
-					Pks::create([
+					Lokasi::where([
 						'npwp' => $stnpwp,
 						'no_ijin' => $noijin,
-						'poktan_id' => $poktan['id'],
-						'nama_poktan' => $poktan['nama_kelompok'],
-					]);
-				}
-				foreach ($spatials as $spatial) {
-					Lokasi::create([
+					])->forceDelete();
+					PKS::where([
 						'npwp' => $stnpwp,
 						'no_ijin' => $noijin,
-						'kode_spatial' => $spatial['kode_spatial'],
-						'luas_lahan' => $spatial['luas_lahan'],
-						'ktp_petani' => $spatial['ktp_petani'],
-						'nama_petani' => isset($spatial['anggota']) ? $spatial['anggota']['nama_petani'] : null,
-						'poktan_id' => isset($spatial['anggota']) ? $spatial['anggota']['poktan_id'] : null,
-					]);
+					])->forceDelete();
+					if (is_array($dtjson->riph->wajib_tanam->kelompoktani->loop)) {
+						$spatialCounter = 0;
+						foreach ($dtjson->riph->wajib_tanam->kelompoktani->loop as $poktan) {
+							$namaPoktan = trim($poktan->nama_kelompok, ' ');
+							$namaPetani = trim($poktan->nama_petani, ' ');
+							if (!empty($poktan->kode_spatial)) {
+								$kdSpatial = trim($poktan->kode_spatial, ' ');
+							} else {
+								// Jika tidak ada kode_spatial, gunakan nilai increment
+								$spatialCounter++;
+								$kdSpatial = 'TMG_' . str_pad($spatialCounter, 5, '0', STR_PAD_LEFT);
+							}
+							$luas = trim($poktan->luas_lahan, ' ');
+							$ktp = isset($poktan->ktp_petani) ? $poktan->ktp_petani : '';
+							if (is_string($ktp)) {
+								// Menghapus karakter yang tidak diperlukan
+								$ktp = preg_replace('/[^0-9\p{Latin}\pP\p{Sc}@\s]+/u', '', $ktp);
+								$ktp = trim($ktp, "\u{00a0}");
+								$ktp = trim($ktp, "\u{00c2}");
+							} else {
+								// Kesalahan terdeteksi jika $ktp bukan string
+								$ktp = "";
+							}
+
+							$periodeTanam = isset($poktan->periode_tanam) ? $poktan->periode_tanam : '';
+							if (is_string($periodeTanam)) {
+								$periodeTanam = $poktan->periode_tanam;
+							} else {
+								// Kesalahan terdeteksi jika $ktp bukan string
+								$periodeTanam = "";
+							}
+
+							$idpoktan = isset($poktan->id_poktan) ? trim($poktan->id_poktan, ' ') : '';
+							$idpetani = isset($poktan->id_petani) ? trim($poktan->id_petani, ' ') : '';
+							$idkabupaten = isset($poktan->id_kabupaten) ? trim($poktan->id_kabupaten, ' ') : '';
+							$idkecamatan = isset($poktan->id_kecamatan) ? trim($poktan->id_kecamatan, ' ') : '';
+							$idkelurahan = isset($poktan->id_kelurahan) && is_string($poktan->id_kelurahan) ? trim($poktan->id_kelurahan, ' ') : '';
+							$lastPoktan = $idpoktan;
+							Pks::updateOrCreate(
+								[
+									'npwp' => $stnpwp,
+									'no_ijin' => $noijin,
+									'poktan_id' => $idpoktan,
+									'nama_poktan' => $namaPoktan
+								],
+								[
+									'kabupaten_id' => $idkabupaten,
+									'kecamatan_id' => $idkecamatan,
+									'kelurahan_id' => $idkelurahan
+								]
+							);
+
+							Lokasi::create(
+								[
+									'npwp' => $stnpwp,
+									'no_ijin' => $noijin,
+									'kode_spatial' => $kdSpatial,
+									'poktan_id' => $idpoktan,
+									'ktp_petani' => $ktp,
+									'nama_petani' => $namaPetani,
+									'anggota_id' => $idpetani,
+									'luas_lahan' => $luas,
+									'periode_tanam' => $periodeTanam,
+								],
+							);
+						}
+					} elseif (is_object($dtjson->riph->wajib_tanam->kelompoktani->loop)) {
+						$spatialCounter = 0;
+						$poktan = $dtjson->riph->wajib_tanam->kelompoktani->loop;
+						if (!empty($poktan->kode_spatial)) {
+							$kdSpatial = trim($poktan->kode_spatial, ' ');
+						} else {
+							// Jika tidak ada kode_spatial, gunakan nilai increment
+							$spatialCounter++;
+							$kdSpatial = 'TMG_' . str_pad($spatialCounter, 5, '0', STR_PAD_LEFT);
+						}
+						$namaPoktan = trim($poktan->nama_kelompok, ' ');
+						$namaPetani = trim($poktan->nama_petani, ' ');
+						$luas = trim($poktan->luas_lahan, ' ');
+						$ktp = isset($poktan->ktp_petani) ? $poktan->ktp_petani : '';
+						if (is_string($ktp)) {
+							// Menghapus karakter yang tidak diperlukan
+							$ktp = preg_replace('/[^0-9\p{Latin}\pP\p{Sc}@\s]+/u', '', $ktp);
+							$ktp = trim($ktp, "\u{00a0}");
+							$ktp = trim($ktp, "\u{00c2}");
+						} else {
+							// Kesalahan terdeteksi jika $ktp bukan string
+							$ktp = "";
+						}
+
+						$periodeTanam = isset($poktan->periode_tanam) ? $poktan->periode_tanam : '';
+						if (is_string($periodeTanam)) {
+							$periodeTanam = $poktan->periode_tanam;
+						} else {
+							// Kesalahan terdeteksi jika $ktp bukan string
+							$periodeTanam = "";
+						}
+						$idpoktan = isset($poktan->id_poktan) ? trim($poktan->id_poktan, ' ') : '';
+						$idpetani = isset($poktan->id_petani) ? trim($poktan->id_petani, ' ') : '';
+						$idkabupaten = isset($poktan->id_kabupaten) ? trim($poktan->id_kabupaten, ' ') : '';
+						$idkecamatan = isset($poktan->id_kecamatan) ? trim($poktan->id_kecamatan, ' ') : '';
+						$idkelurahan = isset($poktan->id_kelurahan) && is_string($poktan->id_kelurahan) ? trim($poktan->id_kelurahan, ' ') : '';
+
+						DataRealisasi::where([
+							'npwp_company' => $stnpwp,
+							'no_ijin' => $noijin,
+						])->forceDelete();
+
+						Lokasi::where([
+							'npwp' => $stnpwp,
+							'no_ijin' => $noijin,
+							'poktan_id' => $idpoktan,
+							'anggota_id' => $idpetani,
+						])->forceDelete();
+						PKS::where([
+							'npwp' => $stnpwp,
+							'no_ijin' => $noijin,
+							'poktan_id' => $idpoktan,
+						])->forceDelete();
+						$lastPoktan = $idpoktan;
+						Pks::updateOrCreate(
+							[
+								'npwp' => $stnpwp,
+								'no_ijin' => $noijin,
+								'poktan_id' => $idpoktan,
+								'nama_poktan' => $namaPoktan
+							],
+							[
+								'kabupaten_id' => $idkabupaten,
+								'kecamatan_id' => $idkecamatan,
+								'kelurahan_id' => $idkelurahan
+							]
+						);
+
+						Lokasi::create(
+							[
+								'npwp' => $stnpwp,
+								'no_ijin' => $noijin,
+								'kode_spatial' => $kdSpatial,
+								'poktan_id' => $idpoktan,
+								'ktp_petani' => $ktp,
+								'nama_petani' => $namaPetani,
+								'anggota_id' => $idpetani,
+								'luas_lahan' => $luas,
+								'periode_tanam' => $periodeTanam,
+							],
+						);
+					}
 				}
 			}
 			DB::commit();
