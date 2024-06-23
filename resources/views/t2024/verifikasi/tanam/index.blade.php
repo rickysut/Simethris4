@@ -99,9 +99,10 @@
 						data: 'ijin',
 						render: function (data, type, row) {
 							var noIjin = data;
+							var tcode = row.tcode;
 							var status = row.status;
 							var viewStat = '{{ route("2024.verifikator.tanam.result", ":noIjin") }}'.replace(':noIjin', noIjin);
-							var checkStat = '{{ route("2024.verifikator.tanam.check", ":noIjin") }}'.replace(':noIjin', noIjin);
+							var checkStat = '{{ route("2024.verifikator.tanam.check", [":noIjin", ":tcode"]) }}'.replace(':noIjin', noIjin).replace(':tcode', tcode);
 							if(status === '4'){
 								return `
 									<a href='`+ viewStat +`' data-toggle="tooltip" title="Lihat hasil" class="mr-1 btn btn-xs btn-icon btn-info">

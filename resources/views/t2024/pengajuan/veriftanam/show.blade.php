@@ -365,19 +365,19 @@
 						$('#avtStatus').text('Belum/Tidak ada pengajuan.');
 					}
 
-					// $('#btnSubmit').text('Ajukan');
-					// var avpStatus = data.avpStatus;
-					// var realisasiProduksi = data.realisasiProduksi;
-					// var countPoktan = data.countPoktan;
-					// var countPks = data.countPks;
-					// if (avpStatus === null && realisasiProduksi >= data.wajibProduksi) {
-					// 	$('#btnSubmit').removeClass('d-none');
-					// } else if (avpStatus === '5' && realisasiProduksi >= data.wajibProduksi) {
-					// 	$('#btnSubmit').removeClass('d-none');
-					// 	$('#btnSubmit').text('Ajukan Ulang');
-					// } else {
-					// 	$('#btnSubmit').addClass('d-none');
-					// }
+					$('#btnSubmit').text('Ajukan');
+					var avpStatus = data.avpStatus;
+					var realisasiProduksi = data.realisasiProduksi;
+					var countPoktan = data.countPoktan;
+					var countPks = data.countPks;
+					if (avpStatus === null && realisasiProduksi >= data.wajibProduksi) {
+						$('#btnSubmit').removeClass('d-none');
+					} else if (avpStatus === '5' && realisasiProduksi >= data.wajibProduksi) {
+						$('#btnSubmit').removeClass('d-none');
+						$('#btnSubmit').text('Ajukan Ulang');
+					} else {
+						$('#btnSubmit').addClass('d-none');
+					}
 				},
 				error: function(xhr, status, error) {
 					console.error('Error fetching data:', error);

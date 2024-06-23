@@ -56,6 +56,6 @@ return new class extends Migration
 	 */
 	public function down()
 	{
-		Schema::dropIfExists('data_realisasi');
+		Schema::dropIfExists('t2024_data_realisasi');
 	}
 };

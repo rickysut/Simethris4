@@ -179,6 +179,7 @@ class PullRiphController extends Controller
 				$poktans = MasterPoktan::whereIn('id', $uniquePoktanIds)->get()->toArray();
 				foreach ($poktans as $poktan) {
 					Pks::create([
+						'tcode' => time(),
 						'npwp' => $stnpwp,
 						'no_ijin' => $noijin,
 						'poktan_id' => $poktan['id'],

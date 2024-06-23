@@ -27,6 +27,7 @@ class Pks extends Model
 	];
 
 	protected $fillable = [
+		'tcode',
 		'npwp',
 		'no_ijin',
 		'poktan_id',
@@ -43,6 +44,7 @@ class Pks extends Model
 		'kecamatan_id',
 		'kelurahan_id',
 		'status',
+		'note',
 		'berkas_pks',
 	];
 

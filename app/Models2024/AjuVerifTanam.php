@@ -15,6 +15,7 @@ class AjuVerifTanam extends Model
 	public $table = 't2024_avtanams';
 
 	protected $fillable = [
+		'tcode',
 		'npwp',
 		'commitment_id',
 		'no_ijin',

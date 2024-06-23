@@ -424,6 +424,9 @@ Route::group(['prefix' => '2024', 'as' => '2024.', 'namespace' => 'Admin', 'midd
 			Route::get('/getPksById/{id}', 'DataFeederController@getPksById')->name('getPksById');
 			Route::get('/getPksByIjin/{noIjin}', 'DataFeederController@getPksByIjin')->name('getPksByIjin');
 			Route::get('/getLokasiByPks/{noIjin}/{poktanId}', 'DataFeederController@getLokasiByPks')->name('getLokasiByPks');
+			Route::get('/getLokasiByIjin/{noIjin}', 'DataFeederController@getLokasiByIjin')->name('getLokasiByIjin');
+			Route::get('/timeline/{noIjin}', 'DataFeederController@timeline')->name('timeline');
+			Route::get('/getLokasiByIjinNik/{noIjin}/{nik}', 'DataFeederController@getLokasiByIjinNik')->name('getLokasiByIjinNik');
 			Route::get('/getSpatialByKecamatan/{kecId}', 'DataFeederController@getSpatialByKecamatan')->name('getSpatialByKecamatan');
 			Route::get('/getSpatialByKode/{spatial}', 'DataFeederController@getSpatialByKode')->name('getSpatialByKode');
 			Route::get('/getAllSpatials', 'DataFeederController@getAllSpatials')->name('getAllSpatials');
@@ -458,7 +461,11 @@ Route::group(['prefix' => '2024', 'as' => '2024.', 'namespace' => 'Admin', 'midd
 
 			Route::group(['prefix' => 'tanam', 'as' => 'tanam.'], function () {
 				Route::get('/', 'VerifTanamController@index')->name('home');
-				Route::get('/check/{noIjin}', 'VerifTanamController@check')->name('check');
+				Route::get('/check/{noIjin}/{tcode}', 'VerifTanamController@check')->name('check');
+				Route::post('/saveCheckBerkas/{noIjin}', 'VerifTanamController@saveCheckBerkas')->name('saveCheckBerkas');
+				Route::post('/verifPksStore/{tcode}', 'VerifTanamController@verifPksStore')->name('verifPksStore');
+				Route::post('/markStatus/{noIjin}/{tcode}/{status}', 'VerifTanamController@markStatus')->name('markStatus');
+				Route::post('/storelokasicheck/{noIjin}/{spatial}', 'VerifTanamController@storelokasicheck')->name('storelokasicheck');
 				Route::post('/check/{noIjin}/store', 'VerifTanamController@store')->name('store');
 				Route::get('/result/{noIjin}', 'VerifTanamController@check')->name('result');
 			});

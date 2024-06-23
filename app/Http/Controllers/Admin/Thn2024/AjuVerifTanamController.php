@@ -52,11 +52,12 @@ class AjuVerifTanamController extends Controller
 		$commitment = PullRiph::where('npwp', $npwp)->where('no_ijin', $noIjin)->firstOrFail();
 		AjuVerifTanam::create(
 			[
+				'tcode' => time(),
 				'npwp' => $npwp,
 				'commitment_id' => $commitment->id,
 				'no_ijin' => $noIjin,
 				'status' => 1,
-			],
+			]
 		);
 
 		return redirect()->back()->with('success', 'Verifikasi Tanam berhasil diajukan.');

@@ -60,6 +60,6 @@ return new class extends Migration
 	 */
 	public function down()
 	{
-		Schema::dropIfExists('pull_riphs');
+		Schema::dropIfExists('t2024_pull_riphs');
 	}
 };

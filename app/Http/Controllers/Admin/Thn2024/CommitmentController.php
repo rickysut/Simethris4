@@ -159,7 +159,7 @@ class CommitmentController extends Controller
 
 		try {
 			$npwp_company = Auth::user()->data_user->npwp_company;
-			$pks = Pks::findOrFail($id);
+			$pks = Pks::where('tcode', $id)->first();
 			$commitment = PullRiph::where('no_ijin', $pks->no_ijin)->first();
 			$noIjin = str_replace(['/', '.'], '', $commitment->no_ijin);
 
