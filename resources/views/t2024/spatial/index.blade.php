@@ -128,7 +128,6 @@
 						return row.nama_provinsi;
 					}
 				},
-
 				{
 					data: 'kode_spatial',
 					render: function(data, type, row) {
@@ -137,19 +136,28 @@
 						var kmlFile = row.kml_url;
 						var kmlPath = `{{ asset('storage') }}/${kmlFile}`;
 						url = url.replace(':kode', kode);
+						var status = row.status;
+
+						// Determine the checked state based on the status
+						var checked = status == 1 ? 'checked' : '';
+
 						var actionBtn = `
-							<div class="justify-content-center">
+							<div class="justify-content-center fs-sm d-flex align-items-center">
 								<a href="${url}" class="btn btn-icon btn-xs btn-default waves-effect waves-themed" data-toggle="tooltip" data-offset="0,10" data-original-title="Lihat Peta">
 									<i class="fal fa-edit"></i>
 								</a>
-								<a href="${kmlPath}" class="btn btn-icon btn-xs btn-default waves-effect waves-themed" title="unduh kml" download>
+								<a href="${kmlPath}" class="btn btn-icon btn-xs btn-default waves-effect waves-themed ml-1" title="unduh kml" download>
 									<i class="fal fa-download"></i>
 								</a>
+								<div class="custom-control custom-switch ml-1">
+									<input type="checkbox" class="custom-control-input form-control-sm status-switch" id="customSwitch_${kode}" ${checked} data-kode="${data}">
+									<label class="custom-control-label" for="customSwitch_${kode}"></label>
+								</div>
 							</div>
 						`;
 						return actionBtn;
 					}
-				}
+				},
 			],
 			buttons: [
 				{
@@ -176,6 +184,41 @@
 			]
 		});
 	});
+
+	$(document).on('change', '.status-switch', function() {
+		var kode = $(this).data('kode');
+		var status = $(this).is(':checked') ? 1 : 0;
+
+		$.ajax({
+			url: "{{ route('2024.spatial.updateStatus', ':kode') }}".replace(':kode', kode),
+			method: 'POST',
+			data: {
+				_token: '{{ csrf_token() }}',
+				status: status
+			},
+			success: function(response) {
+				if(response.success) {
+					$('#tblSpatial').DataTable().ajax.reload();
+					var action = status ? 'diaktifkan' : 'dinonaktifkan';
+					var message = `Lokasi ${kode} ${action}`;
+					Swal.fire({
+						icon: 'success',
+						title: 'Aktivasi Lokasi',
+						text: message,
+						timer: 2000,
+						showConfirmButton: false
+					});
+				} else {
+					alert('Failed to update status.');
+				}
+			},
+			error: function() {
+				alert('Error updating status.');
+			}
+		});
+	});
+
+
 </script>
 @endsection
 

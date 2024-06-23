@@ -39,7 +39,8 @@
 									<label class="form-label" for="poktan_id">Kelompok Tani <span class="text-danger">*</span></label>
 									<select id="poktan_id" name="poktan_id" class="form-control w-100 @error('poktan_id') is-invalid @enderror" required>
 										<option value="" hidden></option>
-										<option value="{{$cpcl->poktan_id}}" selected>{{$cpcl->masterpoktan->nama_kelompok}}</option>
+										<option value="{{$cpcl->poktan_id}}" selected>{{$cpcl->masterpoktan ?$cpcl->masterpoktan->nama_kelompok : ''}}</option>
+										<option value=""></option>
 									</select>
 									<span class="help-block" id="help-poktan"></span>
 								</div>
@@ -49,7 +50,7 @@
 									<label class="form-label" for="provinsi_id">Provinsi <span class="text-danger">*</span></label>
 									<select id="provinsi_id" name="provinsi_id" class="form-control w-100 @error('provinsi_id') is-invalid @enderror" required>
 										<option value="" hidden></option>
-										<option value="{{$cpcl->provinsi_id}}" selected>{{$cpcl->provinsi->nama}}</option>
+										<option value="{{$cpcl->provinsi_id}}" selected>{{$cpcl->provinsi ? $cpcl->provinsi->nama : ''}}</option>
 									</select>
 									<span class="help-block" id="help-provinsi"></span>
 								</div>
@@ -57,7 +58,7 @@
 									<label class="form-label" for="kabupaten_id">Kabupaten <span class="text-danger">*</span></label>
 									<select id="kabupaten_id" name="kabupaten_id" class="form-control w-100 @error('kabupaten_id') is-invalid @enderror" required>
 										<option value="" hidden></option>
-										<option value="{{$cpcl->kabupaten_id}}" selected>{{$cpcl->kabupaten->nama_kab}}</option>
+										<option value="{{$cpcl->kabupaten_id}}" selected>{{$cpcl->kabupaten ? $cpcl->kabupaten->nama_kab : ''}}</option>
 									</select>
 									<div class="help-block" id="help-kabupaten"></div>
 								</div>
@@ -67,7 +68,7 @@
 									<label class="form-label" for="kecamatan_id">Kecamatan <span class="text-danger">*</span></label>
 									<select id="kecamatan_id" name="kecamatan_id" class="form-control @error('kecamatan_id') is-invalid @enderror" required>
 										<option value="" hidden></option>
-										<option value="{{$cpcl->kecamatan_id}}" selected>{{$cpcl->kecamatan->nama_kecamatan}}</option>
+										<option value="{{$cpcl->kecamatan_id}}" selected>{{$cpcl->kecamatan ? $cpcl->kecamatan->nama_kecamatan : ''}}</option>
 									</select>
 									<div class="help-block" id="help-kecamatan"></div>
 								</div>
@@ -75,7 +76,7 @@
 									<label class="form-label" for="kelurahan_id">Desa/Kelurahan <span class="text-danger">*</span></label>
 									<select id="kelurahan_id" name="kelurahan_id" class="form-control @error('kelurahan_id') is-invalid @enderror" required>
 										<option value="" hidden></option>
-										<option value="{{$cpcl->kelurahan_id}}" selected>{{$cpcl->desa->nama_desa}}</option>
+										<option value="{{$cpcl->kelurahan_id}}" selected>{{$cpcl->desa ? $cpcl->desa->nama_desa : ''}}</option>
 									</select>
 									<div class="help-block" id="help-desa"></div>
 								</div>
@@ -124,19 +125,27 @@
 			placeholder: "-- pilih desa"
 		});
 
-		$.get('{{ route("2024.datafeeder.getAllPoktan") }}', function (data) {
-			$.each(data, function (key, value) {
-				var option = $('<option>', {
-					value: value.id,
-					text: value.nama_kelompok
+		$.get('{{ route("2024.datafeeder.getAllPoktan") }}', function(response) {
+			console.log(response); // Log response to ensure it is being retrieved
+
+			if (response.data && response.data.length > 0) {
+				$.each(response.data, function(index, poktan) {
+					var option = $('<option>', {
+						value: poktan.id,
+						text: poktan.nama_kelompok
+					});
+
+					// Check if this option should be selected based on old input or current value
+					var selected = ('{{ old("poktan_id") }}' == poktan.id || '{{ $poktan_id ?? "" }}' == poktan.id) ? 'selected' : '';
+
+					// Append the option to the select element
+					poktanSelect.append(option.prop('selected', selected));
 				});
-
-				if ('{{ old(" ") }}' == value.provinsi_id) {
-					option.attr('selected', 'selected');
-				}
-
-				provinsiSelect.append(option);
-			});
+			} else {
+				console.log('No data returned or data is empty');
+			}
+		}).fail(function() {
+			console.log('Error fetching data from server');
 		});
 
 		$.get('{{ route("wilayah.getAllProvinsi") }}', function (data) {

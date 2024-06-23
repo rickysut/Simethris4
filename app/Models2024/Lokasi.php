@@ -2,6 +2,8 @@
 
 namespace App\Models2024;
 
+use App\Models2024\FotoProduksi;
+use App\Models2024\FotoTanam;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -36,11 +38,15 @@ class Lokasi extends Model
 		'polygon',
 		'luas_kira',
 		'tgl_tanam',
+		'tgl_akhir_tanam',
 		'luas_tanam',
 		'tanam_doc',
 		'tanam_pict',
 		'tgl_panen',
+		'tgl_akhir_panen',
 		'volume',
+		'vol_benih',
+		'vol_jual',
 		'panen_doc',
 		'panen_pict',
 		'status',
@@ -70,5 +76,14 @@ class Lokasi extends Model
 	public function spatial()
 	{
 		return $this->belongsTo(MasterSpatial::class, 'kode_spatial', 'kode_spatial');
+	}
+
+	public function fototanam()
+	{
+		return $this->hasMany(FotoTanam::class);
+	}
+	public function fotoproduksi()
+	{
+		return $this->hasMany(FotoProduksi::class);
 	}
 }

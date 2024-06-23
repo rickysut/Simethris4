@@ -73,12 +73,12 @@
 									<th class="text-right" colspan="7">TOTAL REALISASI</th>
 								</tr>
 								<tr>
-									<th class="text-right" colspan="6">Luas Tanam: </th>
-									<th class="text-right">{{$sumLuas}} ha</th>
+									<th class="text-right" colspan="6">Realisasi Luas Tanam: </th>
+									<th class="text-right" id="totalRealisasiLuas"> ha</th>
 								</tr>
 								<tr>
-									<th class="text-right" colspan="6">Volume Panen</th>
-									<th class="text-right">{{$sumProduksi}} ton</th>
+									<th class="text-right" colspan="6">Realisasi Volume Panen</th>
+									<th class="text-right" id="totalRealisasiProduksi"> ton</th>
 								</tr>
 							</tfoot>
 						</table>
@@ -94,121 +94,127 @@
 
 <!-- start script for this page -->
 @section('scripts')
-@parent
+	@parent
+	<script>
+		$(document).ready(function() {
+			var noIjin = '{{$commitment->no_ijin}}';
+			var formattedNoIjin = noIjin.replace(/[\/.]/g, '');
+			var poktanId = '{{$pks->poktan_id}}';
+			var ijin = '{{$ijin}}';
 
-<script>
-	$(document).ready(function()
-	{
-		var noIjin = '{{$commitment->no_ijin}}';
-		var formattedNoIjin = noIjin.replace(/[\/.]/g, '');
-		var poktanId = '{{$pks->poktan_id}}';
-		var ijin = '{{$ijin}}';
+			$('#tblLokasi').dataTable(
+			{
+				responsive: true,
+				pageLength:10,
+				lengthChange: true,
+				paging: true,
+				ordering: true,
+				processing: true,
+				serverSide: true,
+				order: [[0, 'asc']],
+				dom:
+					"<'row mb-3'<'col-sm-12 col-md-6 d-flex align-items-center justify-content-start'f><'col-sm-12 col-md-6 d-flex align-items-center justify-content-end'B>>" +
+					"<'row'<'col-sm-12'tr>>" +
+					"<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
 
-		$('#tblLokasi').dataTable(
-		{
-			responsive: true,
-			pageLength:10,
-			lengthChange: true,
-			paging: true,
-			ordering: true,
-			processing: true,
-			serverSide: true,
-			order: [[0, 'asc']],
-			dom:
-				"<'row mb-3'<'col-sm-12 col-md-6 d-flex align-items-center justify-content-start'f><'col-sm-12 col-md-6 d-flex align-items-center justify-content-end'B>>" +
-				"<'row'<'col-sm-12'tr>>" +
-				"<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+				ajax: {
+					url: "{{ route('2024.datafeeder.getLokasiByPks', [':noIjin', ':poktanId']) }}".replace(':noIjin', formattedNoIjin).replace(':poktanId', poktanId),
+					type: "GET",
+					dataFilter: function(data){
+						var json = JSON.parse(data);
+						// Update the span with id=totalRealisasiProduksi
+						$('#totalRealisasiProduksi').text(json.totalRealisasiProduksi + ' ton');
+						var luasInHectares = json.totalRealisasiLuas / 10000; // Convert square meters to hectares
+						var formattedLuas = luasInHectares.toLocaleString('id-ID', { maximumFractionDigits: 4 });
 
-			ajax: {
-				url: "{{ route('2024.datafeeder.getLokasiByPks', [':noIjin', ':poktanId']) }}".replace(':noIjin', formattedNoIjin).replace(':poktanId', poktanId),
-				type: "GET",
-			},
-
-			columns: [
-				{
-					data: 'kode_spatial',
-					render: function (data, type, row) {
+						// Update totalRealisasiLuas span
+						$('#totalRealisasiLuas').text(formattedLuas + ' ha');
 						return data;
 					}
 				},
-				{
-					data: 'ktp_petani',
-					name: 'nama_petani',
-					render: function (data, type, row) {
-						return row.nama_petani + ' / ' + data;
-					}
-				},
-				{ data: 'luas_tanam'},
-				{ data: 'tgl_tanam'},
-				{ data: 'volume_panen'},
-				{ data: 'tgl_panen'},
-				{
-					data: 'kode_spatial',
-					render: function(data, type, row) {
-						if (data) {
-							if(data){
-								return `<a href="{{route('2024.user.commitment.addrealisasi', ['noIjin' => ':ijin', 'spatial' => ':spatial'])}}" title="Isi/ubah data realisasi tanam" class="btn btn-primary btn-icon btn-xs text-white" >
-										<i class="fa fa-edit"></i>
-									</a>
 
-									<a href="" title="ubah data tanam" class="btn btn-warning btn-icon btn-xs text-white" >
-										<i class="fa fa-dolly"></i>
-									</a>
-									<a href="" title="ubah data tanam" class="btn btn-info btn-icon btn-xs text-white" >
-										<i class="fa fa-images"></i>
-									</a>
-									`.replace(':ijin', ijin).replace(':spatial', data);
-							}else{
-								return `<a href="" title="isi data tanam" class="btn btn-warning btn-icon btn-xs text-white" >
-									<i class="fa fa-map"></i>
-								</a>`;
-							}
-						} else {
-							return ``;
+				columns: [
+					{
+						data: 'kode_spatial',
+						render: function (data, type, row) {
+							return data;
 						}
+					},
+					{
+						data: 'ktp_petani',
+						name: 'nama_petani',
+						render: function (data, type, row) {
+							return row.nama_petani + ' / ' + data;
+						}
+					},
+					{ data: 'luas_tanam'},
+					{ data: 'tgl_tanam' },
+
+					{ data: 'volume_panen'},
+					{ data: 'tgl_panen' },
+					{
+						data: 'kode_spatial',
+						render: function(data, type, row) {
+							if (data) {
+								if(data){
+									return `<a href="{{route('2024.user.commitment.addrealisasi', ['noIjin' => ':ijin', 'spatial' => ':spatial'])}}" title="Isi/ubah data realisasi tanam" class="btn btn-primary btn-icon btn-xs text-white" >
+											<i class="fa fa-edit"></i>
+										</a>
+										<a href="" title="ubah data tanam" class="btn btn-info btn-icon btn-xs text-white" >
+											<i class="fa fa-images"></i>
+										</a>
+										`.replace(':ijin', ijin).replace(':spatial', data);
+								}else{
+									return `<a href="" title="isi data tanam" class="btn btn-warning btn-icon btn-xs text-white" >
+										<i class="fa fa-map"></i>
+									</a>`;
+								}
+							} else {
+								return ``;
+							}
+						}
+					},
+				],
+				columnDefs: [
+					{
+						targets: [6],
+						className: 'text-center'
+					},
+					{
+						targets: [2, 4],
+						className: 'text-right'
+					},
+					{
+						orderable: false,
+						targets: [2, 3, 4, 5, 6]
+					},
+				],
+				buttons: [
+					{
+						extend: 'pdfHtml5',
+						text: '<i class="fa fa-file-pdf"></i>',
+						title: 'Daftar Realisasi Lokasi dan Pelaksana',
+						titleAttr: 'Generate PDF',
+						className: 'btn-outline-danger btn-sm btn-icon mr-1'
+					},
+					{
+						extend: 'excelHtml5',
+						text: '<i class="fa fa-file-excel"></i>',
+						title: 'Daftar Realisasi Lokasi dan Pelaksana',
+						titleAttr: 'Generate Excel',
+						className: 'btn-outline-success btn-sm btn-icon mr-1'
+					},
+					{
+						extend: 'print',
+						text: '<i class="fa fa-print"></i>',
+						title: 'Daftar Realisasi Lokasi dan Pelaksana',
+						titleAttr: 'Print Table',
+						className: 'btn-outline-primary btn-sm btn-icon mr-1'
 					}
-				},
-			],
-			columnDefs: [
-				{
-					targets: [6],
-					className: 'text-center'
-				},
-				{
-					targets: [2, 4],
-					className: 'text-right'
-				},
-				{
-					orderable: false,
-					targets: [2, 3, 4, 5, 6]
-				},
-			],
-			buttons: [
-				{
-					extend: 'pdfHtml5',
-					text: '<i class="fa fa-file-pdf"></i>',
-					title: 'Daftar Realisasi Lokasi dan Pelaksana',
-					titleAttr: 'Generate PDF',
-					className: 'btn-outline-danger btn-sm btn-icon mr-1'
-				},
-				{
-					extend: 'excelHtml5',
-					text: '<i class="fa fa-file-excel"></i>',
-					title: 'Daftar Realisasi Lokasi dan Pelaksana',
-					titleAttr: 'Generate Excel',
-					className: 'btn-outline-success btn-sm btn-icon mr-1'
-				},
-				{
-					extend: 'print',
-					text: '<i class="fa fa-print"></i>',
-					title: 'Daftar Realisasi Lokasi dan Pelaksana',
-					titleAttr: 'Print Table',
-					className: 'btn-outline-primary btn-sm btn-icon mr-1'
-				}
-			]
+				]
+			});
 		});
-	});
-</script>
+	</script>
 @endsection
 
 {{-- {{ route('admin.task.commitments.pksmitra', $commitment->id) }} --}}

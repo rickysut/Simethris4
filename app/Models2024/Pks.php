@@ -27,6 +27,7 @@ class Pks extends Model
 	];
 
 	protected $fillable = [
+		'tcode',
 		'npwp',
 		'no_ijin',
 		'poktan_id',
@@ -43,6 +44,7 @@ class Pks extends Model
 		'kecamatan_id',
 		'kelurahan_id',
 		'status',
+		'note',
 		'berkas_pks',
 	];
 
@@ -50,6 +52,7 @@ class Pks extends Model
 	{
 		return $this->hasMany(Lokasi::class, ['poktan_id', 'no_ijin'], ['poktan_id', 'no_ijin']);
 	}
+
 
 	public function masterpoktan()
 	{

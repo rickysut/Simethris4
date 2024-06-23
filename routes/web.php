@@ -420,9 +420,13 @@ Route::group(['prefix' => '2024', 'as' => '2024.', 'namespace' => 'Admin', 'midd
 	Route::group(['namespace' => 'Thn2024'], function () {
 
 		Route::group(['prefix' => 'datafeeder', 'as' => 'datafeeder.'], function () {
+			Route::get('/getAllMyCommitment', 'DataFeederController@getAllMyCommitment')->name('getAllMyCommitment');
 			Route::get('/getPksById/{id}', 'DataFeederController@getPksById')->name('getPksById');
 			Route::get('/getPksByIjin/{noIjin}', 'DataFeederController@getPksByIjin')->name('getPksByIjin');
 			Route::get('/getLokasiByPks/{noIjin}/{poktanId}', 'DataFeederController@getLokasiByPks')->name('getLokasiByPks');
+			Route::get('/getLokasiByIjin/{noIjin}', 'DataFeederController@getLokasiByIjin')->name('getLokasiByIjin');
+			Route::get('/timeline/{noIjin}', 'DataFeederController@timeline')->name('timeline');
+			Route::get('/getLokasiByIjinNik/{noIjin}/{nik}', 'DataFeederController@getLokasiByIjinNik')->name('getLokasiByIjinNik');
 			Route::get('/getSpatialByKecamatan/{kecId}', 'DataFeederController@getSpatialByKecamatan')->name('getSpatialByKecamatan');
 			Route::get('/getSpatialByKode/{spatial}', 'DataFeederController@getSpatialByKode')->name('getSpatialByKode');
 			Route::get('/getAllSpatials', 'DataFeederController@getAllSpatials')->name('getAllSpatials');
@@ -430,7 +434,12 @@ Route::group(['prefix' => '2024', 'as' => '2024.', 'namespace' => 'Admin', 'midd
 			Route::get('/getAllCpcl', 'DataFeederController@getAllCpcl')->name('getAllCpcl');
 			Route::get('/{kecId}/getAllCpclByKec', 'DataFeederController@getAllCpclByKec')->name('getAllCpclByKec');
 			Route::get('/{nik}/getCpclByNik', 'DataFeederController@getCpclByNik')->name('getCpclByNik');
-
+			Route::get('/getDataPengajuan/{noIjin}', 'DataFeederController@getDataPengajuan')->name('getDataPengajuan');
+			Route::get('/getVerifTanamHistory/{noIjin}', 'DataFeederController@getVerifTanamHistory')->name('getVerifTanamHistory');
+			Route::get('/getVerifProdHistory/{noIjin}', 'DataFeederController@getVerifProdHistory')->name('getVerifProdHistory');
+			Route::get('/getVerifSklHistory/{noIjin}', 'DataFeederController@getVerifSklHistory')->name('getVerifSklHistory');
+			Route::get('/getRequestVerifTanam', 'DataFeederController@getRequestVerifTanam')->name('getRequestVerifTanam');
+			Route::get('/getVerifTanamByIjin/{noIjin}', 'DataFeederController@getVerifTanamByIjin')->name('getVerifTanamByIjin');
 
 			//ini jangan dijalankan lagi
 			Route::get('/updateOrCreateDesa', 'DataFeederController@updateOrCreateDesa')->name('updateOrCreateDesa');
@@ -449,6 +458,17 @@ Route::group(['prefix' => '2024', 'as' => '2024.', 'namespace' => 'Admin', 'midd
 		//route untuk verifikator
 		Route::group(['prefix' => 'verifikator', 'as' => 'verifikator.'], function () {
 			Route::get('/', 'HomeController@index')->name('home');
+
+			Route::group(['prefix' => 'tanam', 'as' => 'tanam.'], function () {
+				Route::get('/', 'VerifTanamController@index')->name('home');
+				Route::get('/check/{noIjin}/{tcode}', 'VerifTanamController@check')->name('check');
+				Route::post('/saveCheckBerkas/{noIjin}', 'VerifTanamController@saveCheckBerkas')->name('saveCheckBerkas');
+				Route::post('/verifPksStore/{tcode}', 'VerifTanamController@verifPksStore')->name('verifPksStore');
+				Route::post('/markStatus/{noIjin}/{tcode}/{status}', 'VerifTanamController@markStatus')->name('markStatus');
+				Route::post('/storelokasicheck/{noIjin}/{spatial}', 'VerifTanamController@storelokasicheck')->name('storelokasicheck');
+				Route::post('/check/{noIjin}/store', 'VerifTanamController@store')->name('store');
+				Route::get('/result/{noIjin}', 'VerifTanamController@check')->name('result');
+			});
 		});
 
 		//route untuk pelaku usaha
@@ -480,10 +500,23 @@ Route::group(['prefix' => '2024', 'as' => '2024.', 'namespace' => 'Admin', 'midd
 				});
 				Route::get('daftarlokasi/{noIjin}/{poktanId}', 'PksController@daftarLokasi')->name('daftarLokasi');
 				Route::get('addrealisasi/{noIjin}/{spatial}', 'PksController@addrealisasi')->name('addrealisasi');
+				Route::post('storerealisasi/{noIjin}/{spatial}', 'PksController@storerealisasi')->name('storerealisasi');
 
-				Route::get('{id}/penangkar', 'PenangkarRiphController@mitra')->name('penangkar');
-				Route::post('{id}/penangkar/store', 'PenangkarRiphController@store')->name('penangkar.store');
+				// Route::get('{id}/penangkar', 'PenangkarRiphController@mitra')->name('penangkar');
+				// Route::post('{id}/penangkar/store', 'PenangkarRiphController@store')->name('penangkar.store');
 				Route::delete('/commitmentmd', 'CommitmentController@massDestroy')->name('massDestroy');
+
+				//pengajuan verifikasi tanam
+				Route::get('{noIjin}/formavt', 'AjuVerifTanamController@index')->name('formavt');
+				Route::post('{noIjin}/formavt/store', 'AjuVerifTanamController@submitPengajuan')->name('formavt.submitPengajuan');
+
+				//Pengajuan verifikasi produksi
+				Route::get('{noIjin}/formavp', 'AjuVerifProdController@index')->name('formavp');
+				Route::post('{noIjin}/formavp/store', 'AjuVerifProdController@submitPengajuan')->name('formavp.submitPengajuan');
+
+				//pengajuan penerbitan skl
+				Route::get('{noIjin}/formavskl', 'AjuVerifSKLController@index')->name('formavskl');
+				Route::post('{noIjin}/formavskl/store', 'AjuVerifSKLController@submitPengajuan')->name('formavskl.submitPengajuan');
 
 				//daftar anggota & lokasi by pks
 				// Route::get('/', 'CommitmentController@index')->name('index');
@@ -501,6 +534,7 @@ Route::group(['prefix' => '2024', 'as' => '2024.', 'namespace' => 'Admin', 'midd
 			Route::post('/storesingle', 'SpatialController@storesingle')->name('storesingle');
 			Route::get('/{id}/show', 'SpatialController@show')->name('edit');
 			Route::post('/updatesingle', 'SpatialController@updatesingle')->name('updatesingle');
+			Route::post('/updateStatus/{kodeSpatial}', 'SpatialController@updateStatus')->name('updateStatus');
 		});
 
 		//route untuk cpcl

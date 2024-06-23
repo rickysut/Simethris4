@@ -46,7 +46,7 @@
 				<i class="fal fa-angle-down"></i>
 			</a>
 		</div>
-		<div class="container bg-primary-50">
+		<div class="container bg-primary">
 			<ul id="date" class="list-table m-auto pt-3 pb-3">
 				<li>
 					{{-- <span class="d-inline-block" style="color:white"
@@ -256,16 +256,15 @@
 			@can('verificator_task_access')
 				<li class="nav-title" data-i18n="nav.administation">PENGAJUAN VERIFIKASI</li>
 				@can('online_access')
-					<li class="c-sidebar-nav-item {{ request()->is('verification/tanam')
-						|| request()->is('verification/tanam*') ? 'active' : '' }}">
-						<a href="{{ route('verification.tanam') }}"
+					<li class="c-sidebar-nav-item {{ request()->is('verification/tanam*') ? 'active' : '' }}">
+						<a href="{{ route('2024.verifikator.tanam.home') }}"
 							data-filter-tags="verifikasi tanam">
 							<i class="fal fa-seedling c-sidebar-nav-icon"></i>
 							<span class="nav-link-text">
 								Verifikasi Tanam
 							</span>
 							@php
-								$pengajuan = new \App\Models\AjuVerifTanam();
+								$pengajuan = new \App\Models2024\AjuVerifTanam();
 								$unverified = $pengajuan->NewRequest();
 								$proceed = $pengajuan->proceedVerif();
 							@endphp
@@ -649,7 +648,7 @@
 					<a href="{{route('2024.cpcl.anggota.index')}}" title="Coming soon!"
 					data-filter-tags="data cpcl anggota">
 						<i class="fal fa-user"></i>
-						<span class="nav-link-text">Daftar CPCL</span>
+						<span class="nav-link-text">Daftar Anggota Poktan</span>
 					</a>
 				</li>
 
@@ -661,13 +660,13 @@
 						<span class="nav-link-text">Daftar Lokasi</span>
 					</a>
 				</li>
-				<li class="c-sidebar-nav-item">
+				{{-- <li class="c-sidebar-nav-item">
 					<a href="javascript:void(0);" title="Coming soon!"
 					data-filter-tags="data spatial spasial">
 						<i class="fal fa-map-marker-plus"></i>
 						<span class="nav-link-text">Peta Lokasi Baru</span>
 					</a>
-				</li>
+				</li> --}}
 			@endcan
 
 			{{-- support --}}

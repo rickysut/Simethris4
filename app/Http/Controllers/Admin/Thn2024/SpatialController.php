@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin\Thn2024;
 
 use App\Http\Controllers\Controller;
 use App\Models2024\ForeignApi;
+use App\Models2024\MasterAnggota;
 use App\Models2024\MasterSpatial;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -62,13 +63,12 @@ class SpatialController extends Controller
 				throw new \Exception('File not found');
 			}
 
-			// dd($request->input('tgl_peta'), $request->input('tgl_tanam'), $filePath);
-
 			MasterSpatial::updateOrCreate(
 				['kode_spatial' => $request->input('kode_spatial')],
 				[
 					'komoditas' => $request->input('komoditas'),
 					'ktp_petani' => $request->input('ktp_petani'),
+					'nama_petani' => $request->input('nama_petani'),
 					'latitude' => $request->input('latitude'),
 					'longitude' => $request->input('longitude'),
 					'polygon' => $request->input('polygon'),
@@ -84,6 +84,15 @@ class SpatialController extends Controller
 					'tgl_tanam' => $request->input('tgl_tanam'),
 					'kml_url' => $filePath,
 				]
+			);
+
+			MasterAnggota::updateOrCreate(
+				[
+					'ktp_petani' => $request->input('ktp_petani'),
+				],
+				[
+					'nama_petani' => $request->input('nama_petani'),
+				],
 			);
 
 			DB::commit();
@@ -142,4 +151,21 @@ class SpatialController extends Controller
 		}
 	}
 
+	public function updateStatus(Request $request, $kodeSpatial)
+	{
+		$validated = $request->validate([
+			'status' => 'required|integer',
+		]);
+
+		$spatial = MasterSpatial::where('kode_spatial', $kodeSpatial)->first();
+
+		if ($spatial) {
+			$spatial->status = $validated['status'];
+			$spatial->save();
+
+			return response()->json(['success' => true]);
+		} else {
+			return response()->json(['success' => false, 'message' => 'Spatial data not found.'], 404);
+		}
+	}
 }

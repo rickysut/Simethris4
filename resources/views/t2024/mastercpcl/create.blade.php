@@ -119,19 +119,27 @@
 			placeholder: "-- pilih desa"
 		});
 
-		$.get('{{ route("2024.datafeeder.getAllPoktan") }}', function (data) {
-			$.each(data, function (key, value) {
-				var option = $('<option>', {
-					value: value.id,
-					text: value.nama_kelompok
+		$.get('{{ route("2024.datafeeder.getAllPoktan") }}', function(response) {
+			console.log(response); // Log response to ensure it is being retrieved
+
+			if (response.data && response.data.length > 0) {
+				$.each(response.data, function(index, poktan) {
+					var option = $('<option>', {
+						value: poktan.id,
+						text: poktan.nama_kelompok
+					});
+
+					// Check if this option should be selected based on old input or current value
+					var selected = ('{{ old("poktan_id") }}' == poktan.id || '{{ $poktan_id ?? "" }}' == poktan.id) ? 'selected' : '';
+
+					// Append the option to the select element
+					poktanSelect.append(option.prop('selected', selected));
 				});
-
-				if ('{{ old(" ") }}' == value.provinsi_id) {
-					option.attr('selected', 'selected');
-				}
-
-				provinsiSelect.append(option);
-			});
+			} else {
+				console.log('No data returned or data is empty');
+			}
+		}).fail(function() {
+			console.log('Error fetching data from server');
 		});
 
 		$.get('{{ route("wilayah.getAllProvinsi") }}', function (data) {
