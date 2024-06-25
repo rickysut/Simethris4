@@ -1,4 +1,5 @@
 Catatan untuk bahan diskusi
+github action running sekarang
 "PENGEMBANGAN DAN RINTISAN PENGUATAN DATA SPASIAL PADA APLIKASI SIMETHRIS"
 
 ## Media Kolaborasi:
