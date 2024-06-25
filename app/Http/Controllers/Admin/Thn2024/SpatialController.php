@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models2024\ForeignApi;
 use App\Models2024\MasterAnggota;
 use App\Models2024\MasterSpatial;
+use App\Models2024\PullRiph;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -167,5 +168,18 @@ class SpatialController extends Controller
 		} else {
 			return response()->json(['success' => false, 'message' => 'Spatial data not found.'], 404);
 		}
+	}
+
+	public function simulatorJarak (Request $request)
+	{
+		$module_name = 'Spatial';
+		$page_title = 'Simulator Spatial';
+		$page_heading = 'Marker Finder Simulator';
+		$heading_class = 'fal fa-map-marked-alt';
+
+		$ijins = PullRiph::select('no_ijin')->get();
+
+		$mapkey = ForeignApi::find(1);
+		return view('t2024.spatial.simulator', compact('module_name', 'page_title', 'page_heading', 'heading_class', 'mapkey', 'ijins'));
 	}
 }
