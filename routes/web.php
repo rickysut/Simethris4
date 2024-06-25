@@ -440,6 +440,10 @@ Route::group(['prefix' => '2024', 'as' => '2024.', 'namespace' => 'Admin', 'midd
 			Route::get('/getVerifSklHistory/{noIjin}', 'DataFeederController@getVerifSklHistory')->name('getVerifSklHistory');
 			Route::get('/getRequestVerifTanam', 'DataFeederController@getRequestVerifTanam')->name('getRequestVerifTanam');
 			Route::get('/getVerifTanamByIjin/{noIjin}', 'DataFeederController@getVerifTanamByIjin')->name('getVerifTanamByIjin');
+			Route::post('/responseGetLocByRad', 'DataFeederController@responseGetLocByRad')->name('responseGetLocByRad');
+
+			Route::get('/getLocDataByIjinBySpatial/{noIjin}/{spatial}', 'DataFeederController@getLocDataByIjinBySpatial')->name('getLocDataByIjinBySpatial');
+			Route::post('/postLocDataByIjinBySpatial', 'DataFeederController@postLocDataByIjinBySpatial')->name('postLocDataByIjinBySpatial');
 
 			//ini jangan dijalankan lagi
 			Route::get('/updateOrCreateDesa', 'DataFeederController@updateOrCreateDesa')->name('updateOrCreateDesa');
@@ -535,6 +539,8 @@ Route::group(['prefix' => '2024', 'as' => '2024.', 'namespace' => 'Admin', 'midd
 			Route::get('/{id}/show', 'SpatialController@show')->name('edit');
 			Route::post('/updatesingle', 'SpatialController@updatesingle')->name('updatesingle');
 			Route::post('/updateStatus/{kodeSpatial}', 'SpatialController@updateStatus')->name('updateStatus');
+
+			Route::get('/simulator', 'SpatialController@simulatorJarak')->name('simulatorJarak');
 		});
 
 		//route untuk cpcl

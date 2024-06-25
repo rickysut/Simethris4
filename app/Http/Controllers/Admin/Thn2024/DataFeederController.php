@@ -23,6 +23,16 @@ use Svg\Tag\Rect;
 
 class DataFeederController extends Controller
 {
+	private function formatNoIjin($noIjin)
+	{
+		return substr($noIjin, 0, 4) . '/' .
+			substr($noIjin, 4, 2) . '.' .
+			substr($noIjin, 6, 3) . '/' .
+			substr($noIjin, 9, 1) . '/' .
+			substr($noIjin, 10, 2) . '/' .
+			substr($noIjin, 12, 4);
+	}
+
 	public function getAllMyCommitment(Request $request)
 	{
 		$draw = $request->input('draw', 1);
@@ -176,12 +186,7 @@ class DataFeederController extends Controller
 	public function timeline(Request $request, $noIjin)
 	{
 		// Format the noIjin parameter
-		$noIjin = substr($noIjin, 0, 4) . '/' .
-			substr($noIjin, 4, 2) . '.' .
-			substr($noIjin, 6, 3) . '/' .
-			substr($noIjin, 9, 1) . '/' .
-			substr($noIjin, 10, 2) . '/' .
-			substr($noIjin, 12, 4);
+		$noIjin = $this->formatNoIjin($noIjin);
 
 		$draw = $request->input('draw', 1);
 		$start = $request->input('start', 0);
@@ -191,11 +196,11 @@ class DataFeederController extends Controller
 		$columns = $request->input('columns', []);
 
 		// Base query
-		$query = Lokasi::select('id', 'kode_spatial', 'poktan_id','no_ijin', 'tgl_tanam', 'tgl_akhir_tanam', 'tgl_panen', 'tgl_akhir_panen')
+		$query = Lokasi::select('id', 'kode_spatial', 'poktan_id', 'no_ijin', 'tgl_tanam', 'tgl_akhir_tanam', 'tgl_panen', 'tgl_akhir_panen')
 			->where('no_ijin', $noIjin)
 			->with([
 				'pks' => function ($query) {
-					$query->select('id', 'no_ijin','poktan_id', 'tgl_perjanjian_start', 'tgl_perjanjian_end');
+					$query->select('id', 'no_ijin', 'poktan_id', 'tgl_perjanjian_start', 'tgl_perjanjian_end');
 				},
 				'pullriph' => function ($query) {
 					$query->select('id', 'no_ijin', 'tgl_ijin', 'tgl_akhir');
@@ -260,15 +265,9 @@ class DataFeederController extends Controller
 		]);
 	}
 
-
 	public function getPksByIjin(Request $request, $noIjin)
 	{
-		$noIjin = substr($noIjin, 0, 4) . '/' .
-			substr($noIjin, 4, 2) . '.' .
-			substr($noIjin, 6, 3) . '/' .
-			substr($noIjin, 9, 1) . '/' .
-			substr($noIjin, 10, 2) . '/' .
-			substr($noIjin, 12, 4);
+		$noIjin = $this->formatNoIjin($noIjin);
 
 		$commitment = PullRiph::where('no_ijin', $noIjin)->first();
 		$query = Pks::query()
@@ -312,12 +311,7 @@ class DataFeederController extends Controller
 	public function getLokasiByPks(Request $request, $noIjin, $poktanId)
 	{
 		// Format the noIjin parameter
-		$noIjin = substr($noIjin, 0, 4) . '/' .
-			substr($noIjin, 4, 2) . '.' .
-			substr($noIjin, 6, 3) . '/' .
-			substr($noIjin, 9, 1) . '/' .
-			substr($noIjin, 10, 2) . '/' .
-			substr($noIjin, 12, 4);
+		$noIjin = $this->formatNoIjin($noIjin);
 
 		$dataRealisasi = Lokasi::select('no_ijin', 'poktan_id', 'luas_tanam', 'volume')
 			->where('no_ijin', $noIjin)
@@ -408,12 +402,7 @@ class DataFeederController extends Controller
 	public function getLokasiByIjin(Request $request, $noIjin)
 	{
 		// Format the noIjin parameter
-		$noIjin = substr($noIjin, 0, 4) . '/' .
-			substr($noIjin, 4, 2) . '.' .
-			substr($noIjin, 6, 3) . '/' .
-			substr($noIjin, 9, 1) . '/' .
-			substr($noIjin, 10, 2) . '/' .
-			substr($noIjin, 12, 4);
+		$noIjin = $this->formatNoIjin($noIjin);
 
 		$dataRealisasi = Lokasi::select('no_ijin', 'luas_tanam', 'volume')
 			->where('no_ijin', $noIjin)
@@ -506,12 +495,7 @@ class DataFeederController extends Controller
 
 	public function getLokasiByIjinNik($noIjin, $nik)
 	{
-		$noIjin = substr($noIjin, 0, 4) . '/' .
-			substr($noIjin, 4, 2) . '.' .
-			substr($noIjin, 6, 3) . '/' .
-			substr($noIjin, 9, 1) . '/' .
-			substr($noIjin, 10, 2) . '/' .
-			substr($noIjin, 12, 4);
+		$noIjin = $this->formatNoIjin($noIjin);
 
 		// Base query
 		$query = Lokasi::where('no_ijin', $noIjin)
@@ -937,12 +921,7 @@ class DataFeederController extends Controller
 
 	public function getDataPengajuan($noIjin)
 	{
-		$noIjin = substr($noIjin, 0, 4) . '/' .
-			substr($noIjin, 4, 2) . '.' .
-			substr($noIjin, 6, 3) . '/' .
-			substr($noIjin, 9, 1) . '/' .
-			substr($noIjin, 10, 2) . '/' .
-			substr($noIjin, 12, 4);
+		$noIjin = $this->formatNoIjin($noIjin);
 
 
 		$commitment = PullRiph::where('no_ijin', $noIjin)->first();
@@ -998,12 +977,7 @@ class DataFeederController extends Controller
 	public function getVerifTanamHistory(Request $request, $noIjin)
 	{
 		// Format the $noIjin
-		$noIjin = substr($noIjin, 0, 4) . '/' .
-			substr($noIjin, 4, 2) . '.' .
-			substr($noIjin, 6, 3) . '/' .
-			substr($noIjin, 9, 1) . '/' .
-			substr($noIjin, 10, 2) . '/' .
-			substr($noIjin, 12, 4);
+		$noIjin = $this->formatNoIjin($noIjin);
 
 		// Get the request inputs
 		$draw = $request->input('draw', 1);
@@ -1095,12 +1069,7 @@ class DataFeederController extends Controller
 	public function getVerifProdHistory(Request $request, $noIjin)
 	{
 		// Format the $noIjin
-		$noIjin = substr($noIjin, 0, 4) . '/' .
-			substr($noIjin, 4, 2) . '.' .
-			substr($noIjin, 6, 3) . '/' .
-			substr($noIjin, 9, 1) . '/' .
-			substr($noIjin, 10, 2) . '/' .
-			substr($noIjin, 12, 4);
+		$noIjin = $this->formatNoIjin($noIjin);
 
 		// Get the request inputs
 		$draw = $request->input('draw', 1);
@@ -1191,12 +1160,7 @@ class DataFeederController extends Controller
 	public function getVerifSklHistory(Request $request, $noIjin)
 	{
 		// Format the $noIjin
-		$noIjin = substr($noIjin, 0, 4) . '/' .
-			substr($noIjin, 4, 2) . '.' .
-			substr($noIjin, 6, 3) . '/' .
-			substr($noIjin, 9, 1) . '/' .
-			substr($noIjin, 10, 2) . '/' .
-			substr($noIjin, 12, 4);
+		$noIjin = $this->formatNoIjin($noIjin);
 
 		// Get the request inputs
 		$draw = $request->input('draw', 1);
@@ -1380,12 +1344,7 @@ class DataFeederController extends Controller
 	public function getVerifTanamByIjin(Request $request, $noIjin)
 	{
 		$userId = Auth::user()->id;
-		$noIjin = substr($noIjin, 0, 4) . '/' .
-			substr($noIjin, 4, 2) . '.' .
-			substr($noIjin, 6, 3) . '/' .
-			substr($noIjin, 9, 1) . '/' .
-			substr($noIjin, 10, 2) . '/' .
-			substr($noIjin, 12, 4);
+		$noIjin = $this->formatNoIjin($noIjin);
 
 		$query = AjuVerifTanam::select('id', 'npwp', 'no_ijin', 'check_by', 'verif_at', 'status', 'note', 'created_at')
 			->where('no_ijin', $noIjin)
@@ -1426,5 +1385,174 @@ class DataFeederController extends Controller
 			'userId' => $userId,
 			'data' => $data,
 		]);
+	}
+
+	private function haversineDistance($lat1, $lon1, $lat2, $lon2)
+	{
+		$deltaLat = deg2rad($lat2 - $lat1);
+		$deltaLon = deg2rad($lon2 - $lon1);
+		$a = sin($deltaLat / 2) * sin($deltaLat / 2) + cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * sin($deltaLon / 2) * sin($deltaLon / 2);
+		$c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+		$distance = 6371 * $c;
+
+		return $distance;
+	}
+
+	//response saat android mengirim data current location dan nomor riph (no_ijin)
+	public function responseGetLocByRad(Request $request)
+	{
+		$request->validate([
+			'noIjin' => 'required|string',
+			'latitude' => 'required|string',
+			'longitude' => 'required|string',
+			'radius' => 'required|integer', //remark jika tidak digunakan atau menggunakan nilai statis
+		]);
+
+		$formattedNoIjin = $request->input('noIjin');
+		$centerLat = $request->input('latitude');
+		$centerLng = $request->input('longitude');
+		$radius = $request->input('radius'); //beri nilai default jika statis
+
+		$locations = Lokasi::select('id', 'no_ijin', 'kode_spatial')
+			->with(['spatial' => function ($query) {
+				$query->select('kode_spatial', 'latitude', 'longitude');
+			}])
+			->where('no_ijin', $formattedNoIjin)
+			->get();
+
+		$filteredLocations = $locations->filter(function ($location) use ($centerLat, $centerLng, $radius) {
+			$latitude = $location->spatial->latitude;
+			$longitude = $location->spatial->longitude;
+			$distance = $this->haversineDistance($centerLat, $centerLng, $latitude, $longitude);
+			return $distance <= $radius;
+		});
+
+		return response()->json([
+			'Jarak (km)' => $radius,
+			'No Ijin' => $formattedNoIjin,
+			'Device Location' => 'Lat: ' . $centerLat . ' || Long: ' . $centerLng,
+			'Jumlah titik' => $filteredLocations->count(),
+			'data' => $filteredLocations,
+		]);
+	}
+
+	//response saat marker diklik dalam responseGetLocByDRad data dari header
+	public function getLocDataByIjinBySpatial($noIjin, $spatial)
+	{
+		$noIjin = $this->formatNoIjin($noIjin);
+
+		$query = Lokasi::where('no_ijin', $noIjin)
+			->where('kode_spatial', $spatial)
+			->with(['spatial', 'masteranggota.masterpoktan', 'fototanam', 'fotoproduksi'])
+			->get();
+
+		$data = $query->map(function ($item) {
+			$spatial = $item->spatial;
+			$masterAnggota = $item->masteranggota->first();
+			$nama_kelompok = optional(optional($masterAnggota)->masterpoktan)->nama_kelompok;
+
+			$fotoTanam = $item->fototanam->map(function ($foto) {
+				return [
+					'id' => $foto->id,
+					'url' => $foto->filename,
+				];
+			});
+
+			$fotoProduksi = $item->fotoproduksi->map(function ($foto) {
+				return [
+					'id' => $foto->id,
+					'url' => $foto->filename,
+				];
+			});
+
+			return [
+				'id' => $item->id,
+				'nama_kelompok' => $item->nama_poktan,
+				'kode_spatial' => optional($spatial)->kode_spatial,
+				'ktp_petani' => $item->ktp_petani,
+				'nama_petani' => optional($item->masteranggota)->nama_petani,
+				'nama_kelompok_poktan' => $nama_kelompok,
+				'spatial_petani' => optional($spatial)->nama_petani,
+				'spatial_ktp' => optional($spatial)->ktp_petani,
+				'latitude' => optional($spatial)->latitude,
+				'longitude' => optional($spatial)->longitude,
+				'polygon' => optional($spatial)->polygon,
+				'luas_lahan' => $item->luas_lahan,
+				'luas_tanam' => $item->luas_tanam,
+				'awal_tanam' => $item->tgl_tanam ? date('d-m-Y', strtotime($item->tgl_tanam)) : null,
+				'akhir_tanam' => $item->tgl_akhir_tanam ? date('d-m-Y', strtotime($item->tgl_akhir_tanam)) : null,
+				'volume_panen' => $item->volume,
+				'tgl_panen' => $item->tgl_panen ? date('d-m-Y', strtotime($item->tgl_panen)) : null,
+				'status' => $item->status,
+				'fototanam' => $fotoTanam,
+				'fotoProduksi' => $fotoProduksi,
+			];
+		});
+
+		// Return response in JSON format
+		return response()->json($data);
+	}
+
+	//response saat marker diklik dalam responseGetLocByDRad data dari body
+	public function postLocDataByIjinBySpatial(Request $request)
+	{
+		$request->validate([
+			'noIjin' => 'required|string',
+			'kode_spatial' => 'required|string',
+		]);
+
+		$noIjin = $request->input('noIjin');
+		$kdspatial = $request->input('kode_spatial');
+
+		$query = Lokasi::where('no_ijin', $noIjin)
+			->where('kode_spatial', $kdspatial)
+			->with(['spatial', 'masteranggota.masterpoktan', 'fototanam', 'fotoproduksi'])
+			->get();
+
+		$data = $query->map(function ($item) {
+			$spatial = $item->spatial;
+			$masterAnggota = $item->masteranggota->first();
+			$nama_kelompok = optional(optional($masterAnggota)->masterpoktan)->nama_kelompok;
+
+			$fotoTanam = $item->fototanam->map(function ($foto) {
+				return [
+					'id' => $foto->id,
+					'url' => $foto->filename,
+				];
+			});
+
+			$fotoProduksi = $item->fotoproduksi->map(function ($foto) {
+				return [
+					'id' => $foto->id,
+					'url' => $foto->filename,
+				];
+			});
+
+			return [
+				'id' => $item->id,
+				'nama_kelompok' => $item->nama_poktan,
+				'kode_spatial' => optional($spatial)->kode_spatial,
+				'ktp_petani' => $item->ktp_petani,
+				'nama_petani' => optional($item->masteranggota)->nama_petani,
+				'nama_kelompok_poktan' => $nama_kelompok,
+				'spatial_petani' => optional($spatial)->nama_petani,
+				'spatial_ktp' => optional($spatial)->ktp_petani,
+				'latitude' => optional($spatial)->latitude,
+				'longitude' => optional($spatial)->longitude,
+				'polygon' => optional($spatial)->polygon,
+				'luas_lahan' => $item->luas_lahan,
+				'luas_tanam' => $item->luas_tanam,
+				'awal_tanam' => $item->tgl_tanam ? date('d-m-Y', strtotime($item->tgl_tanam)) : null,
+				'akhir_tanam' => $item->tgl_akhir_tanam ? date('d-m-Y', strtotime($item->tgl_akhir_tanam)) : null,
+				'volume_panen' => $item->volume,
+				'tgl_panen' => $item->tgl_panen ? date('d-m-Y', strtotime($item->tgl_panen)) : null,
+				'status' => $item->status,
+				'fototanam' => $fotoTanam,
+				'fotoProduksi' => $fotoProduksi,
+			];
+		});
+
+		// Return response in JSON format
+		return response()->json($data);
 	}
 }

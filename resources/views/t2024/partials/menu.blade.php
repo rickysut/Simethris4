@@ -660,6 +660,13 @@
 						<span class="nav-link-text">Daftar Lokasi</span>
 					</a>
 				</li>
+				<li class="c-sidebar-nav-item {{ request()->is('2024/spatial/simulator') ? 'active' : '' }}">
+					<a href="{{route('2024.spatial.simulatorJarak')}}" title="Coming soon!"
+					data-filter-tags="simulator spatial spasial">
+						<i class="fal fa-map"></i>
+						<span class="nav-link-text">Simulator</span>
+					</a>
+				</li>
 				{{-- <li class="c-sidebar-nav-item">
 					<a href="javascript:void(0);" title="Coming soon!"
 					data-filter-tags="data spatial spasial">
