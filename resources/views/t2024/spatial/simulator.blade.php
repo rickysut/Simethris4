@@ -13,7 +13,7 @@
 						{{-- <form action="{{route('2024.spatial.responseGetLocByRad')}}" enctype="multipart/form-data" method="POST" id="formSubmit">
 							@csrf --}}
 							<div class="row d-flex justify-content-between">
-								<div class="col-6 mb-5">
+								<div class="col-lg-6 mb-5">
 									<div id="myMap" style="height: 400px; width: 100%;"></div>
 								</div>
 								<div class="col-lg-6">
