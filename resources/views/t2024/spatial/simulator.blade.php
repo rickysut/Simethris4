@@ -223,9 +223,6 @@
 	var markers = [];
 
     function initMap() {
-
-
-		addYourLocationButton(map, marker);
         // Default center coordinate
         var centerLat = parseFloat($('#latitude').val()) || -7.34115;
         var centerLng = parseFloat($('#longitude').val()) || 110.075;
@@ -290,6 +287,8 @@
             var newRadius = parseFloat($(this).val());
             circle.setRadius(newRadius * 1000);
         });
+
+		addYourLocationButton(map, marker);
     }
 
 	function clearMarkers() {
