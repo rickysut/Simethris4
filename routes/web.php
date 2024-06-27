@@ -9,6 +9,7 @@ Route::get('/', function () {
 	return redirect()->route('login');
 });
 
+
 Route::get('/v2/register', function () {
 	return view('v2register');
 });
@@ -562,4 +563,11 @@ Route::group(['prefix' => '2024', 'as' => '2024.', 'namespace' => 'Admin', 'midd
 			});
 		});
 	});
-});
+});	
+
+Route::group(['prefix' => 'mobile', 'as' => 'mobile.', 'namespace' => 'Mobile'], function () {
+	Route::get('/login', 'LoginController@index')->name('login');
+});	
+Route::group(['prefix' => 'mobile', 'as' => 'mobile.', 'namespace' => 'Mobile', 'middleware' => ['auth']], function () {
+	Route::get('/', 'HomeController@index')->name('home');
+});	
