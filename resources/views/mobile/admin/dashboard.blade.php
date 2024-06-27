@@ -11,7 +11,7 @@
 
         <div class="header header-fixed header-logo-app header-auto-show">
             <a href="index.html" class="header-title">ADMIN</a>
-            <a href="#" data-menu="menu-main" class="header-icon header-icon-1"><i class="fas fa-bars"></i></a>
+            <a href="#" data-menu="menu-main" class="header-icon header-icon-1" onclick="event.preventDefault(); document.getElementById('logoutform').submit();"><i class="fas fa-bars"></i></a>
             <a href="#" data-toggle-theme class="header-icon header-icon-2"><i class="fas fa-lightbulb"></i></a>
             <a href="#" data-menu="menu-highlights" class="header-icon header-icon-3"><i class="fas fa-brush"></i></a>
         </div>
@@ -21,10 +21,10 @@
 
             <div class="page-title-large color-white bottom-30">
                 <h1 data-username="Enabled!" class="greeting-text"></h1>
-                <a href="#" data-menu="menu-main" class="shadow-huge scale-box bg-fade-gray2-dark"></a>
+                <a href="#" data-menu="menu-main" class="shadow-huge scale-box bg-fade-gray2-dark"  onclick="event.preventDefault(); document.getElementById('logoutform').submit();"></a>
             </div>
-            <div data-height="210" class="page-title-bg preload-image" data-src="images/pictures/20s.jpg"><!-- image -->
-            </div>
+            <a data-height="210" class="page-title-bg preload-image" data-src="images/pictures/20s.jpg" onclick="event.preventDefault(); document.getElementById('logoutform').submit();"><!-- image -->
+            </a>
             <div data-height="210" class="page-title-bg dark-mode-tint"><!-- contrast for dark mode --></div>
             <div data-height="210" class="page-title-bg opacity-90 bg-highlight"><!-- background color --></div>
 

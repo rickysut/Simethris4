@@ -15,7 +15,9 @@
 <body class="theme-light"  data-highlight="blue2">
     @yield('content')        
 
-
+    <form id="logoutform" action="{{ route('mobile.logout') }}" method="POST" style="display: none;">
+        {{ csrf_field() }}
+    </form>
 <script type="text/javascript" src="/mobile/scripts/jquery.js"></script>
 <script type="text/javascript" src="/mobile/scripts/plugins.js"></script>
 <script type="text/javascript" src="/mobile/scripts/custom.js"></script>

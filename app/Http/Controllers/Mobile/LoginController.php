@@ -309,7 +309,7 @@ class LoginController extends Controller
 
 		return $request->wantsJson()
 			? new JsonResponse([], 204)
-			: redirect('/');
+			: redirect('/mobile');
 	}
 
 	/**
@@ -320,7 +320,7 @@ class LoginController extends Controller
 	 */
 	protected function loggedOut(Request $request)
 	{
-		//
+		return redirect('/mobile');
 	}
 
 	/**

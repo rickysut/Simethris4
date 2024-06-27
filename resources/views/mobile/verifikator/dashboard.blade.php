@@ -21,7 +21,7 @@
 
             <div class="page-title-large color-white bottom-30">
                 <h1 data-username="Enabled!" class="greeting-text"></h1>
-                <a href="#" data-menu="menu-main" class="shadow-huge scale-box bg-fade-gray2-dark"></a>
+                <a href="#" data-menu="menu-main" class="shadow-huge scale-box bg-fade-gray2-dark"  onclick="event.preventDefault(); document.getElementById('logoutform').submit();"></a>
             </div>
             <div data-height="210" class="page-title-bg preload-image" data-src="images/pictures/20s.jpg"><!-- image -->
             </div>

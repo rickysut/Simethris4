@@ -570,5 +570,6 @@ Route::group(['prefix' => 'mobile', 'as' => 'mobile.', 'namespace' => 'Mobile'],
 	Route::post('/login', 'LoginController@login')->name('login');
 });	
 Route::group(['prefix' => 'mobile', 'as' => 'mobile.', 'namespace' => 'Mobile', 'middleware' => ['auth']], function () {
+	Route::post('/logout', 'LoginController@logout')->name('logout');
 	Route::get('/', 'HomeController@index')->name('home');
 });	
