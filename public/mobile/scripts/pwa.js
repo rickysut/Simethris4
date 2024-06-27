@@ -2,7 +2,7 @@
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function() {
 //    navigator.serviceWorker.register('_service-worker.js');
-      navigator.serviceWorker.register('/labs/azrale1/_service-worker.js', {scope: '/labs/azrale1/'})
+      navigator.serviceWorker.register('/mobile/_service-worker.js', {scope: '/mobile/'})
   });
 }
 
@@ -21,7 +21,7 @@ $(document).ready(function(){
     setTimeout(function(){
         $('.pwa-dismiss').on('click',function(){
             console.log('User Closed Add to Home / PWA Prompt')
-            createCookie('Azures_pwa_rejected_install', true, 1);
+            createCookie('Simethris_pwa_rejected_install', true, 1);
             $('body').find('#menu-install-pwa-android, #menu-install-pwa-ios, .menu-hider').removeClass('menu-active'); 
         });
     },1500);
@@ -85,7 +85,7 @@ $(document).ready(function(){
         if(!isInWebAppiOS){
             console.log('iOS Detected');
             if($('#menu-install-pwa-ios, .add-to-home').length){
-                if (!readCookie('Azures_pwa_rejected_install')) {
+                if (!readCookie('Simethris_pwa_rejected_install')) {
                     console.log('Triggering PWA / Add to Home Screen Prompt for iOS');
                     setTimeout(function(){
                         $('.add-to-home').addClass('add-to-home-visible add-to-home-ios');
