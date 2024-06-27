@@ -19,7 +19,7 @@
         <div class="content-boxed content-boxed-full left-20 right-20 shadow-large">
             <div class="content top-60 bottom-20">
                 <div class="title-center" style="display: ruby-text; align-items: center">
-                    <img src="/img/favicon.png" alt="">
+                    <img src="{{ asset('/mobile/img/logo-simet.png') }}" alt="simethris" style="width: 60%; height: 60px;">
                 </div>
                 <div class="input-style has-icon input-style-1 input-required">
                     <i class="input-icon fa fa-user font-12"></i>
