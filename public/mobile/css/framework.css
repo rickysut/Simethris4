@@ -513,12 +513,12 @@ h5{font-size:16px; line-height:22px}
 .content-background{z-index:1; background-size:cover;}
 
 /*--Page Content Settings---*/
-.page-content{background-color:#f5f5f5; transition:transform 300ms ease;}
+.page-content{background-color:#FFFFFF; transition:transform 300ms ease;}
 .header, .menu-active, .menu{transition: transform 300ms ease; will-change: transform, opacity;}
 .menu-hider{transition:opacity 300ms ease; will-change:opacity;}
-.page-content{box-shadow:0 5px 30px 0 rgba(0,0,0,0.11); z-index:90;}
+.page-content{z-index:90;}
 .page-bg{
-    position:fixed;
+    position:fixed; 
     top:-100px;
     bottom:-100px;
     left:0px;
