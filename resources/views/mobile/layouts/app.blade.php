@@ -12,7 +12,7 @@
 <link rel="apple-touch-icon" sizes="180x180" href="/mobile/app/icons/icon-192x192.png">
 </head>
     
-<body>
+<body class="theme-dark"  data-highlight="blue2">
     @yield('content')        
 
 

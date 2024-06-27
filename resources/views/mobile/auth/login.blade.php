@@ -50,13 +50,13 @@
                             </div>
                             <div class="clear"></div>
                             <a href="#"
-                                class="back-button button button-full button-m shadow-large button-round-small bg- top-30 bottom-0">LOGIN</a>
+                                class="back-button button button-full button-m shadow-large button-round-small bg-twitter top-30 bottom-0">LOGIN</a>
                             <div class="divider top-30"></div>
                             
                         </div>
                     </div>
-                    <div class="caption-overlay bg-black opacity-90"></div>
-                    <div class="caption-bg" style="background-image:url(images/pictures/29t.jpg)"></div>
+                    <div class="caption-overlay bg-black opacity-60"></div>
+                    {{-- <div class="caption-bg" style="background-image:url(/mobile/img/favicon.png)"></div> --}}
                 </div>
             </div>
 
