@@ -134,15 +134,15 @@ $(function() {
                 },200);
                 $('body').toggleClass('theme-dark theme-light');
                 if($('body').hasClass('detect-theme')){$('body').removeClass('detect-theme');}
-                if($('body').hasClass('theme-light')){eraseCookie('Azures_dark_mode'); createCookie('Azures_light_mode', true, 1);} 
-                if($('body').hasClass('theme-dark')){eraseCookie('Azures_light_mode'); createCookie('Azures_dark_mode', true, 1);}
+                if($('body').hasClass('theme-light')){eraseCookie('Simethris_dark_mode'); createCookie('Simethris_light_mode', true, 1);} 
+                if($('body').hasClass('theme-dark')){eraseCookie('Simethris_light_mode'); createCookie('Simethris_dark_mode', true, 1);}
                 //e.preventDefault;
                 return false;
             });      
         },1000);
         
-        if (readCookie('Azures_dark_mode')) {$('body').removeClass('theme-light').addClass('theme-dark');}
-        if (readCookie('Azures_light_mode')) {$('body').removeClass('theme-dark').addClass('theme-light');}
+        if (readCookie('Simethris_dark_mode')) {$('body').removeClass('theme-light').addClass('theme-dark');}
+        if (readCookie('Simethris_light_mode')) {$('body').removeClass('theme-dark').addClass('theme-light');}
 
         //Auto Dark Mode Detection
         function activateDarkMode(){
@@ -590,8 +590,8 @@ $(function() {
 //            Unblock the lines below to automatically share the link to the page
 //            var share_link = window.location.href;
 //            var share_title = document.title;
-            var share_link = 'https://preview.enableds.com?theme=azures';
-            var share_title = 'Azures | Mobile Template & PWA';
+            var share_link = 'https://preview.enableds.com?theme=Simethris';
+            var share_title = 'Simethris | Mobile Template & PWA';
             $('.shareToFacebook').prop("href", "https://www.facebook.com/sharer/sharer.php?u="+share_link)
             $('.shareToGooglePlus').prop("href", "https://plus.google.com/share?url="+share_link)
             $('.shareToLinkedIn').prop("href", "https://www.linkedin.com/shareArticle?mini=true&url="+share_link+"&title="+share_title+"&summary=&source=")

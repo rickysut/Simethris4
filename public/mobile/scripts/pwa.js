@@ -41,7 +41,7 @@ $(document).ready(function(){
         function showInstallPromotion(){
             console.log('Triggering PWA Prompt for Android');
             if($('#menu-install-pwa-android, .add-to-home').length){
-                if (!readCookie('Azures_pwa_rejected_install')) {
+                if (!readCookie('Simethris_pwa_rejected_install')) {
                     setTimeout(function(){
                         $('.add-to-home').addClass('add-to-home-visible add-to-home-android');
                         $('#menu-install-pwa-android, .menu-hider').addClass('menu-active')
@@ -55,7 +55,7 @@ $(document).ready(function(){
             deferredPrompt = e;
             showInstallPromotion();
             if($('#menu-install-pwa-android, .add-to-home').length){
-                if (!readCookie('Azures_pwa_rejected_install')) {
+                if (!readCookie('Simethris_pwa_rejected_install')) {
                     setTimeout(function(){
                         $('.add-to-home').addClass('add-to-home-visible add-to-home-android');
                         $('#menu-install-pwa-android').addClass('menu-active');
