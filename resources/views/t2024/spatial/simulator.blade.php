@@ -154,6 +154,69 @@
 		});
 	});
 
+	function addYourLocationButton(map, marker) {
+		var controlDiv = document.createElement('div');
+
+		var firstChild = document.createElement('button');
+		firstChild.style.backgroundColor = '#fff';
+		firstChild.style.border = 'none';
+		firstChild.style.outline = 'none';
+		firstChild.style.width = '40px';
+		firstChild.style.height = '40px';
+		firstChild.style.borderRadius = '2px';
+		firstChild.style.boxShadow = '0 2px 6px rgba(0,0,0,.3)';
+		firstChild.style.cursor = 'pointer';
+		firstChild.style.marginRight = '10px';
+		firstChild.style.padding = '0';
+		firstChild.title = 'Your Location';
+		controlDiv.appendChild(firstChild);
+
+		var secondChild = document.createElement('div');
+		secondChild.style.margin = '10px';
+		secondChild.style.width = '18px';
+		secondChild.style.height = '18px';
+		secondChild.style.backgroundImage = 'url(https://maps.gstatic.com/tactile/mylocation/mylocation-sprite-1x.png)';
+		secondChild.style.backgroundSize = '180px 18px';
+		secondChild.style.backgroundPosition = '0px 0px';
+		secondChild.style.backgroundRepeat = 'no-repeat';
+		secondChild.id = 'you_location_img';
+		firstChild.appendChild(secondChild);
+
+		google.maps.event.addListener(map, 'dragend', function() {
+			$('#you_location_img').css('background-position', '0px 0px');
+		});
+
+		firstChild.addEventListener('click', function() {
+			var imgX = '0';
+			var animationInterval = setInterval(function() {
+				if (imgX == '-18') imgX = '0';
+				else imgX = '-18';
+				$('#you_location_img').css('background-position', imgX + 'px 0px');
+			}, 500);
+			if (navigator.geolocation) {
+				navigator.geolocation.getCurrentPosition(function(position) {
+					var latlng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+					marker.setPosition(latlng);
+					map.setCenter(latlng);
+					map.setZoom(14);
+					document.getElementById('latitude').value = position.coords.latitude;
+					document.getElementById('longitude').value = position.coords.longitude;
+					clearInterval(animationInterval);
+					$('#you_location_img').css('background-position', '-144px 0px');
+				}, function() {
+					clearInterval(animationInterval);
+					$('#you_location_img').css('background-position', '0px 0px');
+				});
+			} else {
+				clearInterval(animationInterval);
+				$('#you_location_img').css('background-position', '0px 0px');
+			}
+		});
+
+		controlDiv.index = 1;
+		map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(controlDiv);
+	}
+
     var map;
     var marker;
     var circle;
@@ -171,7 +234,7 @@
         map = new google.maps.Map(document.getElementById('myMap'), {
 			mapTypeId: google.maps.MapTypeId.HYBRID,
             center: { lat: centerLat, lng: centerLng },
-            zoom: 15,
+            zoom: 14,
 			mapTypeControl: false,
 			streetViewControl: false,
 			scaleControl: true,
@@ -224,6 +287,8 @@
             var newRadius = parseFloat($(this).val());
             circle.setRadius(newRadius * 1000);
         });
+
+		addYourLocationButton(map, marker);
     }
 
 	function clearMarkers() {

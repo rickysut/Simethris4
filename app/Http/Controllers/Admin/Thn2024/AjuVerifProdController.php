@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Storage;
 
+// cek action
+
 class AjuVerifProdController extends Controller
 {
 	//halaman show Ringkasan Pengajuan Verifikasi

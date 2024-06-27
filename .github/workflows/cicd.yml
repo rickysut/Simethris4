@@ -1,0 +1,19 @@
+name: CICD Simethris
+
+on:
+  push:
+    branches: ["master"]
+
+jobs:
+  build-master:
+    runs-on: self-hosted
+    if: github.ref == 'refs/heads/master'
+    steps:
+
+      - uses: actions/checkout@v3
+      - name: Run Script
+        run: |
+          cd ${{vars.GIT_WORKDIR_MASTER}}
+          git pull
+          php artisan optimize:clear
+          cd ..
