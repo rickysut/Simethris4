@@ -27,7 +27,7 @@ class LoginController extends Controller
     |
     */
 
-	// use AuthenticatesUsers;
+	use AuthenticatesUsers;
 
 	/**
 	 * Where to redirect users after login.
@@ -68,82 +68,82 @@ class LoginController extends Controller
 	public function login(Request $request)
 	{
 
-		if ($request->string('roleaccess') == '2') {
+		// if ($request->string('roleaccess') == '2') {
 
-			try {
-				$options = array(
-					'soap_version' => SOAP_1_1,
-					'exceptions' => true,
-					'trace' => 1,
-					'cache_wsdl' => WSDL_CACHE_MEMORY,
-					// 'login' => $system['webuser'],
-					// 'password' => $system['webpass'],
-					'connection_timeout' => 25,
-					'style' => SOAP_RPC,
-					'use' => SOAP_ENCODED,
-				);
+		// 	try {
+		// 		$options = array(
+		// 			'soap_version' => SOAP_1_1,
+		// 			'exceptions' => true,
+		// 			'trace' => 1,
+		// 			'cache_wsdl' => WSDL_CACHE_MEMORY,
+		// 			// 'login' => $system['webuser'],
+		// 			// 'password' => $system['webpass'],
+		// 			'connection_timeout' => 25,
+		// 			'style' => SOAP_RPC,
+		// 			'use' => SOAP_ENCODED,
+		// 		);
 
-				$client = new \SoapClient('https://riph.pertanian.go.id/api.php/simethris?wsdl', $options);
-				$parameter = array(
-					'user' => 'simethris',
-					'pass' => 'wsriphsimethris',
-					'user_riph' => $request->string('username'),
-					'pass_riph' =>  $request->string('password')
-				);
-				$response = $client->__soapCall('get_akses', $parameter);
-			} catch (\Exception $e) {
-				$errorMessage = $e->getMessage();
-				// Log pesan kesalahan ke dalam file log laravel
-				Log::error("Error: $errorMessage. Code: " . $e->getCode() . ". Trace: " . $e->getTraceAsString());
-				return redirect()->back()->with('error', 'Login Error. Error while trying to retrieve login data. Please Contact Administrator for this error: (' . $errorMessage . ')');
-				// throw new \Exception('Problem with SOAP call');
-				$response = null;
-			}
-			//$res = json_decode(json_encode((array)simplexml_load_string($response)),true);
-			if ($response) {
-				$res = simplexml_load_string($response);
-				// dd((string)$res->riph->company_profile->fax);
-				if ((string)$res->keterangan == 'SUCCESS') {
+		// 		$client = new \SoapClient('https://riph.pertanian.go.id/api.php/simethris?wsdl', $options);
+		// 		$parameter = array(
+		// 			'user' => 'simethris',
+		// 			'pass' => 'wsriphsimethris',
+		// 			'user_riph' => $request->string('username'),
+		// 			'pass_riph' =>  $request->string('password')
+		// 		);
+		// 		$response = $client->__soapCall('get_akses', $parameter);
+		// 	} catch (\Exception $e) {
+		// 		$errorMessage = $e->getMessage();
+		// 		// Log pesan kesalahan ke dalam file log laravel
+		// 		Log::error("Error: $errorMessage. Code: " . $e->getCode() . ". Trace: " . $e->getTraceAsString());
+		// 		return redirect()->back()->with('error', 'Login Error. Error while trying to retrieve login data. Please Contact Administrator for this error: (' . $errorMessage . ')');
+		// 		// throw new \Exception('Problem with SOAP call');
+		// 		$response = null;
+		// 	}
+		// 	//$res = json_decode(json_encode((array)simplexml_load_string($response)),true);
+		// 	if ($response) {
+		// 		$res = simplexml_load_string($response);
+		// 		// dd((string)$res->riph->company_profile->fax);
+		// 		if ((string)$res->keterangan == 'SUCCESS') {
 
-					$user = User::firstOrCreate(
-						['username' => $request->string('username'), 'roleaccess' => 2],
-						['name' => (string)$res->riph->user_profile->nama, 'password' => Hash::make($request->string('password')), 'email' => (string)$res->riph->user_profile->email]
-					);
+		// 			$user = User::firstOrCreate(
+		// 				['username' => $request->string('username'), 'roleaccess' => 2],
+		// 				['name' => (string)$res->riph->user_profile->nama, 'password' => Hash::make($request->string('password')), 'email' => (string)$res->riph->user_profile->email]
+		// 			);
 
-					if ($user) {
-						if ($user->wasRecentlyCreated) {
-							$user->roles()->attach(2); // user V3
-						}
-						$user->update(
-							['password' => Hash::make($request->string('password'))]
-						);
-						$npwp = (string)$res->riph->company_profile->npwp;
-						$mask = "%s%s.%s%s%s.%s%s%s.%s-%s%s%s.%s%s%s";
-						$formatedNpwp = vsprintf($mask, str_split($npwp));
-						$datauser = DataUser::updateOrCreate(
-							['user_id' => $user->id, 'company_name' =>  (string)$res->riph->company_profile->nama],
-							[
-								'name' => (string)$res->riph->user_profile->nama,
-								'mobile_phone' => (string)$res->riph->user_profile->telepon,
-								'fix_phone' => (string)$res->riph->company_profile->telepon,
-								'pic_name' => (string)$res->riph->company_profile->penanggung_jawab,
-								'jabatan' => (string)$res->riph->company_profile->jabatan,
-								'npwp_company' => $formatedNpwp,
-								'nib_company' => (string)$res->riph->company_profile->nib,
-								'address_company' => (string)$res->riph->company_profile->alamat,
-								'provinsi' => (string)$res->riph->company_profile->kdprop,
-								'kabupaten' => (string)$res->riph->company_profile->kdkab,
-								'kodepos' => (string)$res->riph->company_profile->kodepos,
-								'ktp' => (string)$res->riph->user_profile->ktp,
-								'fax' => (string)$res->riph->company_profile->fax,
-								'email_company' => (string)$res->riph->company_profile->email
-							]
-						);
-						// if ($datauser) dd('updated...'); else dd('update or create fail');
-					};
-				}
-			}
-		}
+		// 			if ($user) {
+		// 				if ($user->wasRecentlyCreated) {
+		// 					$user->roles()->attach(2); // user V3
+		// 				}
+		// 				$user->update(
+		// 					['password' => Hash::make($request->string('password'))]
+		// 				);
+		// 				$npwp = (string)$res->riph->company_profile->npwp;
+		// 				$mask = "%s%s.%s%s%s.%s%s%s.%s-%s%s%s.%s%s%s";
+		// 				$formatedNpwp = vsprintf($mask, str_split($npwp));
+		// 				$datauser = DataUser::updateOrCreate(
+		// 					['user_id' => $user->id, 'company_name' =>  (string)$res->riph->company_profile->nama],
+		// 					[
+		// 						'name' => (string)$res->riph->user_profile->nama,
+		// 						'mobile_phone' => (string)$res->riph->user_profile->telepon,
+		// 						'fix_phone' => (string)$res->riph->company_profile->telepon,
+		// 						'pic_name' => (string)$res->riph->company_profile->penanggung_jawab,
+		// 						'jabatan' => (string)$res->riph->company_profile->jabatan,
+		// 						'npwp_company' => $formatedNpwp,
+		// 						'nib_company' => (string)$res->riph->company_profile->nib,
+		// 						'address_company' => (string)$res->riph->company_profile->alamat,
+		// 						'provinsi' => (string)$res->riph->company_profile->kdprop,
+		// 						'kabupaten' => (string)$res->riph->company_profile->kdkab,
+		// 						'kodepos' => (string)$res->riph->company_profile->kodepos,
+		// 						'ktp' => (string)$res->riph->user_profile->ktp,
+		// 						'fax' => (string)$res->riph->company_profile->fax,
+		// 						'email_company' => (string)$res->riph->company_profile->email
+		// 					]
+		// 				);
+		// 				// if ($datauser) dd('updated...'); else dd('update or create fail');
+		// 			};
+		// 		}
+		// 	}
+		// }
 
 
 		$this->validateLogin($request);
@@ -192,9 +192,8 @@ class LoginController extends Controller
 		//     $this->username() => 'Username is required!'
 		// ];
 		$request->validate([
-			'roleaccess' => 'required|integer',
 			$this->username() => 'required|string',
-			//'password' => 'required|string',
+			'password' => 'required|string',
 		]);
 	}
 
@@ -221,7 +220,7 @@ class LoginController extends Controller
 	protected function credentials(Request $request)
 	{
 
-		return $request->only($this->username(), 'password', 'roleaccess');
+		return $request->only($this->username(), 'password');
 	}
 
 	/**
@@ -269,15 +268,15 @@ class LoginController extends Controller
 	{
 
 		throw ValidationException::withMessages([
-			$this->username() => [trans('auth.failed')],
-			'roleaccess' => $request->input('roleaccess')
+			$this->username() => [trans('auth.failed')]
+			
 		]);
 	}
 	protected function sendFailedLoginResponse2(Request $request)
 	{
 
 		throw ValidationException::withMessages([
-			'roleaccess' => [trans('auth.roleaccess')]
+			$this->username() => [trans('auth.failed')]
 		]);
 	}
 	/**

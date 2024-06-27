@@ -21,29 +21,44 @@
                 <div class="title-center" style="display: ruby-text; align-items: center">
                     <img src="{{ asset('/mobile/img/logo-simet.png') }}" alt="simethris" style="width: 60%; height: 60px;">
                 </div>
-                <div class="input-style has-icon input-style-1 input-required">
-                    <i class="input-icon fa fa-user font-12"></i>
-                    <span>Username</span>
-                    <em>(required)</em>
-                    <input type="name" placeholder="Username">
-                </div>
-                <div class="input-style has-icon input-style-1 input-required">
-                    <i class="input-icon fa fa-lock font-12"></i>
-                    <span>Password</span>
-                    <em>(required)</em>
-                    <input type="password" placeholder="Password">
-                </div>
-                <div class="clear"></div>
-                <a href="#"
-                    class="button button-full button-m shadow-large button-round-small bg-green1-dark top-30 bottom-0">LOGIN</a>
-                <div class="divider top-30"></div>
-                
-                {{-- <div class="one-half">
-                    <a href="pageapp-register.html" class="font-11 color-theme opacity-50">Create Account</a>
-                </div>
-                <div class="one-half last-column">
-                    <a href="pageapp-forgot.html" class="text-right font-11 color-theme opacity-50">Fogot Credentials</a>
-                </div> --}}
+                <form id="js-login" novalidate="" method="POST" action="{{ route('mobile.login') }}">
+                    @csrf
+                    <div class="input-style has-icon input-style-1 input-required">
+                        <i class="input-icon fa fa-user font-12"></i>
+                        <span>Username</span>
+
+                        <input id="username" name="username" type="name"
+                            class="{{ $errors->has('username') ? ' is-invalid' : '' }}" required
+                            autocomplete="{{ trans('global.login_username') }}" autofocus
+                            placeholder="{{ trans('global.login_username') }}" value="{{ old('username', null) }}">
+                        @if ($errors->has('username'))
+                            <div class="color-red2-dark">
+                                {{ $errors->first('username') }}
+                            </div>
+
+                        @endif
+                    </div>
+                    <div class="input-style has-icon input-style-1 input-required">
+                        <i class="input-icon fa fa-lock font-12"></i>
+                        <span>Password</span>
+                        
+                        <input id="password" name="password" type="password"
+                            class="{{ $errors->has('password') ? ' is-invalid' : '' }}" required
+                            autocomplete="{{ trans('global.login_password') }}" autofocus
+                            placeholder="{{ trans('global.login_password') }}" value="">
+                        @if ($errors->has('password'))
+                            <div class="color-red2-dark">
+                                {{ $errors->first('password') }}
+                            </div>  
+                        @endif
+                        
+                    </div>
+                    <div class="clear"></div>
+                    <button type="submit" style="width: -webkit-fill-available;"
+                        class="button  button-margins button-full button-m shadow-large button-round-small bg-twitter top-30 bottom-0">{{ trans('global.login') }}</button>
+                    <div class="divider top-30"></div>
+                </form>
+
                 <div class="clear"></div>
 
             </div>

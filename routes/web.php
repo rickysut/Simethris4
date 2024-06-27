@@ -567,6 +567,7 @@ Route::group(['prefix' => '2024', 'as' => '2024.', 'namespace' => 'Admin', 'midd
 
 Route::group(['prefix' => 'mobile', 'as' => 'mobile.', 'namespace' => 'Mobile'], function () {
 	Route::get('/login', 'LoginController@index')->name('login');
+	Route::post('/login', 'LoginController@login')->name('login');
 });	
 Route::group(['prefix' => 'mobile', 'as' => 'mobile.', 'namespace' => 'Mobile', 'middleware' => ['auth']], function () {
 	Route::get('/', 'HomeController@index')->name('home');
