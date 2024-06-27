@@ -1,5 +1,6 @@
 @extends('t2024.layouts.admin')
 
+
 @section('content')
 	@can('landing_access')
 		@php($unreadmsg = \App\Models\QaTopic::unreadCount())
@@ -38,11 +39,9 @@
 
 		<div class="row mb-5">
 			<div class="col text-center">
-				<h1 class="hidden-md-down">Selamat Datang di Simethris,</h1><br>
-				<span class="display-4 fw-700 hidden-md-down">{{ Auth::user()->data_user->company_name ?? Auth::user()->name }}</span>
-				<h2 class="display-4 hidden-sm-up">Hallo, <span class="fw-700">{{ Auth::user()->name }}</span></h2>
-				<h4 class="hidden-md-down">
-					<p class="text-muted">{!! $quote !!}</p>
+				<h2 class="display-4">Hallo, <span class="fw-700">{{ Auth::user()->name }} </span></h2>
+				<h4 class="">
+					<p class="text-muted">Selamat Datang di Mobile Version</p>
 				</h4>
 			</div>
 		</div>
@@ -76,7 +75,7 @@
 
 		@if (Auth::user()->roles[0]->title == 'Pejabat')
 			@if (!$profile || (!$profile->jabatan || !$profile->nip))
-				<div class="row mb-5">
+				<div class="row mb-5" hidden>
 					<div class="col-md">
 					<div class="alert alert-danger">
 						<div class="d-flex flex-start w-100">
@@ -103,7 +102,7 @@
 			@endif
 		@endif
 		<!-- Page Content -->
-		<div class="row">
+		<div class="row" hidden>
 			<div class="col-lg-6">
 				{{-- <div id="panel-1" class="panel">
 					<div class="panel-hdr">
@@ -508,6 +507,28 @@
 						</div>
 					</div>
 				@endif
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-12 text-center">
+				<span class="d-inline-flex flex-column justify-content-center m-2">
+					<a href="" class="btn btn-xxl  btn-outline-warning btn-icon waves-effect waves-themed">
+						<img src="{{ asset('logoicon.png') }}" alt="" style="width: 5rem; height: 5rem;">
+					</a>
+					<span>Verifikasi</span>
+				</span>
+				<span class="d-inline-flex flex-column justify-content-center m-2">
+					<a href="" class="btn btn-xxl  btn-outline-warning btn-icon waves-effect waves-themed">
+						<img src="{{ asset('favicon.png') }}" alt="" style="width: 5rem; height: 5rem;">
+					</a>
+					<span>Sample</span>
+				</span>
+				<span class="d-inline-flex flex-column justify-content-center m-2">
+					<a href="" class="btn btn-xxl  btn-outline-warning btn-icon waves-effect waves-themed">
+						<img src="{{ asset('favicon.png') }}" alt="" style="width: 5rem; height: 5rem;">
+					</a>
+					<span>Sample</span>
+				</span>
 			</div>
 		</div>
 		<!-- Page Content -->

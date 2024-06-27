@@ -4091,6 +4091,16 @@ html body a:hover {
 	line-height: 3rem;
 }
 
+.btn-icon.btn-xl {
+    width: calc(4rem + 2px);
+    line-height: 4rem;
+}
+
+.btn-icon.btn-xxl {
+    width: calc(6rem + 2px);
+    line-height: 6rem;
+}
+
 .btn-icon-light {
 	color: rgba(255, 255, 255, 0.7) !important;
 	border-color: transparent !important;

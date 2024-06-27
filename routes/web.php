@@ -24,7 +24,7 @@ Route::get('/home', function () {
 	if (Auth::user()->roles[0]->title == 'Spatial Administrator' || Auth::user()->roles[0]->title == 'Spatial Staff') {
 		return redirect()->route('2024.spatial.home')->with('status', session('status'));
 	}else{
-		return redirect()->route('admin.home')->with('status', session('status'));
+		return redirect()->route('2024.admin.home')->with('status', session('status'));
 	}
 });
 
@@ -461,7 +461,8 @@ Route::group(['prefix' => '2024', 'as' => '2024.', 'namespace' => 'Admin', 'midd
 
 		//route untuk verifikator
 		Route::group(['prefix' => 'verifikator', 'as' => 'verifikator.'], function () {
-			Route::get('/', 'HomeController@index')->name('home');
+			Route::get('/', 'HomeController@index')->name('home')->middleware('screen.redirect');
+			Route::get('/mobile', 'HomeController@indexMobile')->name('mobile');
 
 			Route::group(['prefix' => 'tanam', 'as' => 'tanam.'], function () {
 				Route::get('/', 'VerifTanamController@index')->name('home');
@@ -562,5 +563,3 @@ Route::group(['prefix' => '2024', 'as' => '2024.', 'namespace' => 'Admin', 'midd
 		});
 	});
 });
-
-

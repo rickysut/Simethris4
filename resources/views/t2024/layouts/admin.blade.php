@@ -69,7 +69,12 @@
 		<div class="page-wrapper">
 			<div class="page-inner">
 				<!-- begin sidebar -->
-				@include('t2024.partials.menu')
+				<div class="hidden-md-down">
+					@include('t2024.partials.menu')
+				</div>
+				{{-- <div class="hidden-sm-up">
+					@include('t2024.partials.menumobile')
+				</div> --}}
 				<!-- end sidebar -->
 				<div class="page-content-wrapper">
 					<!-- begin page header -->
