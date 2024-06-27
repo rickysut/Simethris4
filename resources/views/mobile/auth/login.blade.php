@@ -11,13 +11,13 @@
 
         <div class="page-content">
 
-            <div data-height="150" class="page-title-bg bg-20"><!-- image --></div>
-            <div data-height="150" class="page-title-bg dark-mode-tint"><!-- contrast for dark mode --></div>
-            <div data-height="150" class="page-title-bg opacity-90 bg-highlight"><!-- background color --></div>
+            {{-- <div data-height="150" class="page-title-bg bg-20"><!-- image --></div> --}}
+            {{-- 	<div data-height="150" class="page-title-bg dark-mode-tint"><!-- contrast for dark mode --></div> --}}
+            {{-- <div data-height="150" class="page-title-bg opacity-90 bg-highlight"><!-- background color --></div> --}}
 
             <div class="page-title-small color-white bottom-30">
-                <h1><i class="fa fa-arrow-left back-button"></i>Login </h1>
-                <a href="#" data-menu="menu-main" class="shadow-huge scale-box bg-fade-gray2-dark"></a>
+                
+                {{-- 	<a href="#" data-menu="menu-main" class="shadow-huge scale-box bg-fade-gray2-dark"></a> --}}
             </div>
 
             <div class="cover-wrapper cover-no-buttons">
@@ -25,7 +25,7 @@
                     <div class="caption-center">
 
                         <div class="left-50 right-50">
-                            <h1 class="color-white center-text uppercase ultrabold fa-4x top-40">LOGIN</h1>
+                            <h1 class="color-white center-text uppercase ultrabold fa-3x top-40">LOGIN</h1>
                             <p class="color-highlight center-text font-12 under-heading bottom-30 top-5">
                                 Let's get you in your account
                             </p>
@@ -50,14 +50,9 @@
                             </div>
                             <div class="clear"></div>
                             <a href="#"
-                                class="back-button button button-full button-m shadow-large button-round-small bg-highlight top-30 bottom-0">LOGIN</a>
+                                class="back-button button button-full button-m shadow-large button-round-small bg- top-30 bottom-0">LOGIN</a>
                             <div class="divider top-30"></div>
-                            <a href="#"
-                                class="back-button button button-icon button-full button-xs shadow-large button-round-small font-11 bg-facebook top-30 bottom-0"><i
-                                    class="fab fa-facebook-f"></i><span class="left-40">Sign in with Facebook</span></a>
-                            <a href="#"
-                                class="back-button button button-icon button-full button-xs shadow-large button-round-small font-11 bg-twitter top-10 bottom-0"><i
-                                    class="fab fa-twitter"></i><span class="left-40">Sign in with Twitter</span></a>
+                            
                         </div>
                     </div>
                     <div class="caption-overlay bg-black opacity-90"></div>
@@ -68,11 +63,11 @@
         </div>
 
         <!--Footer Menu-->
-        <div id="footer-menu" class="footer-menu-5-icons footer-menu-style-1">
+        {{-- <div id="footer-menu" class="footer-menu-5-icons footer-menu-style-1">
             <a href="components.html">
                 <i data-feather="heart" data-feather-line="1" data-feather-size="21" data-feather-color="red2-dark"
                     data-feather-bg="red2-fade-light"></i>
-                <span>Features</span>
+                <span>Featurehttps://simethris4.test/mobile/login#s</span>
             </a>
             <a href="media.html">
                 <i data-feather="image" data-feather-line="1" data-feather-size="21" data-feather-color="green1-dark"
@@ -110,10 +105,10 @@
         <!-- Color Highlights Menu-->
         <div id="menu-highlights" class="menu menu-box-bottom menu-box-detached round-medium" data-menu-height="480"
             data-menu-effect="menu-over" data-menu-load="menu-colors.html">
-        </div>
+        </div> --}}
 
 
 
-        <div class="menu-hider"></div>
+        {{-- <div class="menu-hider"></div> --}}
     </div>
 @endsection
