@@ -13,8 +13,6 @@ use App\Models\User;
 
 class HomeController extends Controller
 {
-	
-
 	public function index()
     {
         // $posts = Post::all();
@@ -39,13 +37,16 @@ class HomeController extends Controller
         // $profile = DataAdministrator::where('user_id', $me->id)->first() ?? new DataAdministrator();
         // dd(Auth::user()->roles[0]->title);
         if (Auth::user()->roles[0]->title == 'Verifikator') {
-            return view('mobile.verifikator.dashboard');
+			$user = Auth::user()->name;
+            return view('mobile.verifikator.dashboard', compact('user'));
         }
         else if (Auth::user()->roles[0]->title == 'User') {
-            return view('mobile.user.dashboard'); 
-        } 
+			$user = Auth::user();
+            return view('mobile.user.dashboard');
+        }
         else if (Auth::user()->roles[0]->title == 'Admin') {
-            return view('mobile.admin.dashboard'); 
-        }   
+			$user = Auth::user();
+            return view('mobile.admin.dashboard');
+        }
     }
 }

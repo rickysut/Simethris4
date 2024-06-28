@@ -563,13 +563,20 @@ Route::group(['prefix' => '2024', 'as' => '2024.', 'namespace' => 'Admin', 'midd
 			});
 		});
 	});
-});	
+});
 
 Route::group(['prefix' => 'mobile', 'as' => 'mobile.', 'namespace' => 'Mobile'], function () {
 	Route::get('/login', 'LoginController@index')->name('login');
 	Route::post('/login', 'LoginController@login')->name('login');
-});	
+});
 Route::group(['prefix' => 'mobile', 'as' => 'mobile.', 'namespace' => 'Mobile', 'middleware' => ['auth']], function () {
 	Route::post('/logout', 'LoginController@logout')->name('logout');
 	Route::get('/', 'HomeController@index')->name('home');
-});	
+
+	//verifikasi tanam
+	Route::group(['prefix' => 'verifikasi', 'as' => 'verifikasi.'], function () {
+		Route::group(['prefix' => 'tanam', 'as' => 'tanam.'], function () {
+			Route::get('/', 'VerifikasiTanamController@index');
+		});
+	});
+});

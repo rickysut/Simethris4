@@ -8,12 +8,12 @@
 <link href="https://fonts.googleapis.com/css?family=Poppins:200,200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i|Roboto:300,300i,400,400i,500,500i,700,700i,900,900i&display=swap" rel="stylesheet">
 <link rel="stylesheet" type="text/css" href="/mobile/css/style.css">
 <link rel="stylesheet" type="text/css" href="/mobile/css/framework.css">
-<link rel="stylesheet" type="text/css" href="/mobile/fonts/css/fontawesome-all.min.css">    
+<link rel="stylesheet" type="text/css" href="/mobile/fonts/css/fontawesome-all.min.css">
 <link rel="apple-touch-icon" sizes="180x180" href="/mobile/app/icons/icon-192x192.png">
 </head>
-    
-<body class="theme-light"  data-highlight="blue2">
-    @yield('content')        
+
+<body class="theme-light bg-white"  data-highlight="blue3">
+    @yield('content')
 
     <form id="logoutform" action="{{ route('mobile.logout') }}" method="POST" style="display: none;">
         {{ csrf_field() }}
