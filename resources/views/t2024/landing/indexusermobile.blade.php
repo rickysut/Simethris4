@@ -17,39 +17,7 @@
 
 @section('content')
 	@can('landing_access')
-		@php($unreadmsg = \App\Models\QaTopic::unreadCount())
-		@php($msgs = \App\Models\QaTopic::unreadMsg())
 
-		@if (Auth::user()->roles[0]->title == 'Admin' || Auth::user()->roles[0]->title == 'Pejabat' || Auth::user()->roles[0]->title == 'Verifikator')
-			{{-- tanam --}}
-			@php($cntAjuVerifTanam = \App\Models\AjuVerifTanam::newPengajuanCount())
-			@php($getAjuVerifTanam = \App\Models\AjuVerifTanam::getNewPengajuan())
-			{{-- produksi --}}
-			@php($cntAjuVerifProduksi = \App\Models\AjuVerifProduksi::newPengajuanCount())
-			@php($getAjuVerifProduksi = \App\Models\AjuVerifProduksi::getNewPengajuan())
-			{{-- skl --}}
-			@php($cntAjuVerifSkl = \App\Models\AjuVerifSkl::newPengajuanCount())
-			@php($getAjuVerifSkl = \App\Models\AjuVerifSkl::getNewPengajuan())
-			@php($cntpengajuan = $cntAjuVerifTanam + $cntAjuVerifProduksi + (Auth::user()->roles[0]->title == 'Admin' ? $cntAjuVerifSkl : 0))
-			{{-- rekomendasi --}}
-			@php($cntRecomendations = \App\Models\Skl::newPengajuanCount())
-			@php($getRecomendations = \App\Models\Skl::getNewPengajuan())
-
-		@else
-			@php($cntAjuVerifTanam = 0)
-			@php($cntAjuVerifTanam = null)
-			@php($cntAjuVerifProduksi = 0)
-			@php($getAjuVerifProduksi = null)
-			@php($cntAjuVerifSkl = 0)
-			@php($getAjuVerifSkl = null)
-			@php($cntRecomendations = 0)
-			@php($getRecomendations = null)
-		@endif
-
-		@if (Auth::user()->roles[0]->title == 'User' || Auth::user()->roles[0]->title == 'Pejabat' )
-			@php($getNewSkl = \App\Models\Skl::getNewSkl())
-			@php($cntgetNewSkl = \App\Models\SklReads::getNewSklCount())
-		@endif
 
 		<div class="row mb-5">
 			<div class="col text-center">
@@ -79,10 +47,6 @@
 					</a>
 					<span>Sample</span>
 				</span>
-			</div>
-			<div class="col-4 text-center">
-			</div>
-			<div class="col-4 text-center">
 			</div>
 		</div>
 		<!-- Page Content -->
