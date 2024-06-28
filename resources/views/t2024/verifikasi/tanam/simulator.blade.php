@@ -6,6 +6,10 @@
 {{-- @can('spatial_data_access') --}}
 
 	<div class="row">
+		<span class="text-danger" id="gpsstatus"></span>
+	</div>
+
+	<div class="row">
 		<div class="col-12">
 			<div class="panel" id="panel-peta">
 				<div class="panel-container show">
@@ -84,18 +88,18 @@
 						var thisLong = position.coords.longitude;
 						$('#latitude').val(thisLat);
 						$('#longitude').val(thisLong);
-						$('#gpstatus').text("GPS is active");
+						$('#gpstatus').html('GPS status <span class="text-success font-weight-bold">Aktif</span>');
 
 						initMap(thisLat, thisLong);
 					},
 					function(error) {
 						console.error("Error Code = " + error.code + " - " + error.message);
-						$('#gpstatus').text("GPS is inactive or permission denied");
+						$('#gpstatus').html('GPS status <span class="text-danger font-weight-bold">Tidak Aktif/Tidak Diijinkan</span>');
 					}
 				);
 			} else {
 				console.log("Geolocation is not supported by this browser.");
-				$('#gpstatus').text("Geolocation is not supported by this browser");
+				$('#gpstatus').html('Perangkat <span class="text-danger font-weight-bold">Tidak mendukung</span> Fitur ini.');
 			}
 		});
 
