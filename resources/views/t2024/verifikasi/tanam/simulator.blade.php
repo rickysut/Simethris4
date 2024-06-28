@@ -4,11 +4,35 @@
 @include('t2024.partials.subheader')
 @include('t2024.partials.sysalert')
 {{-- @can('spatial_data_access') --}}
-
+	<div class="modal fade" id="default-example-modal-sm-center" tabindex="-1" role="dialog" aria-hidden="true">
+		<div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Modal title</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true"><i class="fal fa-times"></i></span>
+					</button>
+				</div>
+				<div class="modal-body">
+					...
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+					<button type="button" class="btn btn-primary">Save changes</button>
+				</div>
+			</div>
+		</div>
+	</div>
 	<div class="row justify-content-center">
 		<span id="gpstatus"></span>
 	</div>
-
+	<div class="row">
+			<div id="myMap" style="height:600px; width: 100%;"></div>
+		<div class="panel">
+			<div class="panel-container">
+			</div>
+		</div>
+	</div>
 	<div class="row">
 		<div class="col-12">
 			<div class="panel" id="panel-peta">
@@ -18,7 +42,7 @@
 							@csrf --}}
 							<div class="row d-flex justify-content-between">
 								<div class="col-lg-6 mb-5">
-									<div id="myMap" style="height: 400px; width: 100%;"></div>
+
 								</div>
 								<div class="col-lg-6">
 									<div class="form-group row">
@@ -231,6 +255,47 @@
 		map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(controlDiv);
 	}
 
+	function showYourModal() {
+		var controlDiv = document.createElement('div');
+
+		var button = document.createElement('button');
+		button.style.backgroundColor = '#fff';
+		button.style.border = 'none';
+		button.style.outline = 'none';
+		button.style.width = '40px';
+		button.style.height = '40px';
+		button.style.borderRadius = '2px';
+		button.style.boxShadow = '0 2px 6px rgba(0,0,0,.3)';
+		button.style.cursor = 'pointer';
+		button.style.marginRight = '10px';
+		button.style.padding = '0';
+		button.title = 'Your Location';
+		controlDiv.appendChild(button);
+
+		var img = document.createElement('div');
+		img.style.margin = '10px';
+		img.style.width = '18px';
+		img.style.height = '18px';
+		img.style.backgroundImage = 'url(https://maps.gstatic.com/tactile/mylocation/mylocation-sprite-1x.png)';
+		img.style.backgroundSize = '180px 18px';
+		img.style.backgroundPosition = '0px 0px';
+		img.style.backgroundRepeat = 'no-repeat';
+		img.id = 'you_location_img';
+		button.appendChild(img);
+
+		google.maps.event.addListener(map, 'dragend', function() {
+			$('#you_location_img').css('background-position', '0px 0px');
+		});
+
+		button.addEventListener('click', function() {
+			// Tambahkan kode untuk membuka modal di sini
+			$('#default-example-modal-sm-center').modal('show'); // Contoh: menggunakan jQuery untuk membuka modal dengan ID 'myModal'
+		});
+
+		controlDiv.index = 2;
+		map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(controlDiv);
+	}
+
     var map;
     var marker;
     var circle;
@@ -295,6 +360,7 @@
     });
 
     addYourLocationButton(map, marker);
+    showYourModal();
 }
 
 	function clearMarkers() {

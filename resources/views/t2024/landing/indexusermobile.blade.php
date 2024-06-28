@@ -3,8 +3,8 @@
 @section('styles')
 <style>
 	.android-button {
-		padding: 20px;
-		margin: 3px;
+		padding: 10px;
+		margin: 10px;
 		font-size: 20px;
 		font-weight: bold;
 		text-align: center;
@@ -63,19 +63,19 @@
 			<div class="col-12 text-center">
 				<span class="d-inline-flex flex-column justify-content-center">
 					<a href="{{route('2024.verifikator.mobile.findmarker')}}" class="btn android-button btn-outline-warning">
-						<img src="{{ asset('logoicon.png') }}" alt="" style="width: 3rem; height: 3rem;">
+						<img src="{{ asset('logoicon.png') }}" alt="" style="width: 4rem; height: 4rem;">
 					</a>
 					<span>Verifikasi</span>
 				</span>
 				<span class="d-inline-flex flex-column justify-content-center ">
 					<a href="javascript:void(0)" class="android-button btn-default">
-						<img src="{{ asset('favicon.png') }}" alt="" style="width: 3rem; height: 3rem; filter: grayscale(100%)">
+						<img src="{{ asset('favicon.png') }}" alt="" style="width: 4rem; height: 4rem; filter: grayscale(100%)">
 					</a>
 					<span>Sample</span>
 				</span>
 				<span class="d-inline-flex flex-column justify-content-center">
 					<a href="javascript:void(0)" class="android-button btn-default">
-						<img src="{{ asset('favicon.png') }}" alt="" style="width: 3rem; height: 3rem; filter: grayscale(100%)">
+						<img src="{{ asset('favicon.png') }}" alt="" style="width: 4rem; height: 4rem; filter: grayscale(100%)">
 					</a>
 					<span>Sample</span>
 				</span>

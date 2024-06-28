@@ -66,12 +66,12 @@
 	</div> --}}
 	<div class="ml-auto d-flex">
 		<!-- activate app search icon (mobile) -->
-		<div class="hidden-sm-up">
+		{{-- <div class="hidden-sm-up">
 			<a href="#" class="header-icon" data-action="toggle" data-class="mobile-search-on"
 				data-focus="search-field" title="Search">
 				<i class="fal fa-search"></i>
 			</a>
-		</div>
+		</div> --}}
 		<!-- app settings -->
 		{{-- <div class="hidden-md-down">
 			<a href="#" class="header-icon" data-toggle="modal" title="Penyesuaian"
