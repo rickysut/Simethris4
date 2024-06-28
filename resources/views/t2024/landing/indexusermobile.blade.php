@@ -64,8 +64,8 @@
 			</div>
 			<div class="col-4 text-center">
 				<span class="d-inline-flex flex-column justify-content-center">
-					<a href="" class="btn btn-xxl  btn-outline-warning btn-icon waves-effect waves-themed">
-						<img src="{{ asset('favicon.png') }}" alt="" style="width: 5rem; height: 5rem;">
+					<a href="" class="btn btn-xl btn-outline-warning btn-icon waves-effect waves-themed">
+						<img src="{{ asset('favicon.png') }}" alt="" style="width: 3rem; height: 3rem;">
 					</a>
 					<span>Sample</span>
 				</span>
