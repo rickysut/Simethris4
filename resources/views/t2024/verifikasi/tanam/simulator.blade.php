@@ -8,17 +8,60 @@
 		<div class="modal-dialog modal-sm modal-dialog-centered" role="document">
 			<div class="modal-content">
 				<div class="modal-header">
-					<h5 class="modal-title">Modal title</h5>
+					<h5 class="modal-title">Pencarian Lokasi Tanam</h5>
 					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 						<span aria-hidden="true"><i class="fal fa-times"></i></span>
 					</button>
 				</div>
 				<div class="modal-body">
-					...
+					<div class="form-group row">
+						<label for="locus" class="col-sm-3 col-form-label">Jika saya di:</label>
+						<div class="col-sm-9">
+							<select class="form-control" name="locus" id="locus">
+								<option value="">--pilih lokasi</option>
+								@foreach ($myLocus as $locus)
+									<option value="{{ $locus['id'] }}">{{ $locus['name'] }}</option>
+								@endforeach
+							</select>
+						</div>
+					</div>
+					<div class="form-group row">
+						<label for="no_ijin" class="col-sm-3 col-form-label">Nomor RIPH</label>
+						<div class="col-sm-9">
+							<select class="form-control" name="no_ijin" id="no_ijin">
+								@foreach ($ijins as $ijin)
+									<option value="{{ $ijin->no_ijin }}">{{ $ijin->no_ijin }}</option>
+								@endforeach
+							</select>
+						</div>
+					</div>
+					<div class="form-group row">
+						<label for="radius" class="col-sm-3 col-form-label">Jarak (km)</label>
+						<div class="col-sm-9">
+							<input class="form-control" type="number" step="1" id="radius" name="radius" value="1">
+						</div>
+					</div>
+					<div class="form-group row">
+						<label for="latitude" class="col-sm-3 col-form-label">Latitude</label>
+						<div class="col-sm-9">
+							<input class="form-control" type="text" id="latitude" name="latitude">
+						</div>
+					</div>
+					<div class="form-group row">
+						<label for="longitude" class="col-sm-3 col-form-label">Longitude</label>
+						<div class="col-sm-9">
+							<input class="form-control" type="text" id="longitude" name="longitude">
+						</div>
+					</div>
+					<div class="d-flex justify-content-between mt-3">
+						<div></div>
+						<div>
+						</div>
+					</div>
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-					<button type="button" class="btn btn-primary">Save changes</button>
+					<button class="btn btn-primary" id="btnSubmit" data-dismiss="modal">Simulasikan</button>
 				</div>
 			</div>
 		</div>
@@ -45,43 +88,9 @@
 
 								</div>
 								<div class="col-lg-6">
-									<div class="form-group row">
-										<label for="no_ijin" class="col-sm-3 col-form-label">Nomor RIPH</label>
-										<div class="col-sm-9">
-											<select class="form-control" name="no_ijin" id="no_ijin">
-												@foreach ($ijins as $ijin)
-													<option value="{{ $ijin->no_ijin }}">{{ $ijin->no_ijin }}</option>
-												@endforeach
-											</select>
-										</div>
-									</div>
-									<div class="form-group row">
-										<label for="radius" class="col-sm-3 col-form-label">Jarak (km)</label>
-										<div class="col-sm-9">
-											<input class="form-control" type="number" step="1" id="radius" name="radius" value="1">
-										</div>
-									</div>
-									<div class="form-group row">
-										<label for="latitude" class="col-sm-3 col-form-label">Latitude</label>
-										<div class="col-sm-9">
-											<input class="form-control" type="text" id="latitude" name="latitude">
-										</div>
-									</div>
-									<div class="form-group row">
-										<label for="longitude" class="col-sm-3 col-form-label">Longitude</label>
-										<div class="col-sm-9">
-											<input class="form-control" type="text" id="longitude" name="longitude">
-										</div>
-									</div>
-									<div class="d-flex justify-content-between mt-3">
-										<div></div>
-										<div>
-											<button class="btn btn-primary" id="btnSubmit">Simulasikan</button>
-										</div>
-									</div>
+
 									<ul class="list-group" id="datalokasi">
 									</ul>
-
 								</div>
 							</div>
 						{{-- </form> --}}
@@ -101,40 +110,36 @@
 @parent
 <script>
 	$(document).ready(function() {
-		$(document).ready(function() {
-			if (navigator.geolocation) {
-				navigator.geolocation.getCurrentPosition(
-					function(position) {
-						console.log("Latitude: " + position.coords.latitude);
-						console.log("Longitude: " + position.coords.longitude);
+		if (navigator.geolocation) {
+			navigator.geolocation.getCurrentPosition(
+				function(position) {
+					console.log("Latitude: " + position.coords.latitude);
+					console.log("Longitude: " + position.coords.longitude);
 
-						var thisLat = position.coords.latitude;
-						var thisLong = position.coords.longitude;
-						$('#latitude').val(thisLat);
-						$('#longitude').val(thisLong);
-						$('#gpstatus').html('GPS status <span class="text-success font-weight-bold">Aktif</span>');
+					var thisLat = position.coords.latitude;
+					var thisLong = position.coords.longitude;
+					$('#latitude').val(thisLat);
+					$('#longitude').val(thisLong);
+					$('#gpstatus').html('GPS status <span class="text-success font-weight-bold">Aktif</span>');
 
-						initMap(thisLat, thisLong);
-					},
-					function(error) {
-						console.error("Error Code = " + error.code + " - " + error.message);
-						$('#gpstatus').html('GPS status <span class="text-danger font-weight-bold">Tidak Aktif/Tidak Diijinkan</span>');
-					}
-				);
-			} else {
-				console.log("Geolocation is not supported by this browser.");
-				$('#gpstatus').html('Perangkat <span class="text-danger font-weight-bold">Tidak mendukung</span> Fitur ini.');
-			}
-		});
+					initMap(thisLat, thisLong);
+				},
+				function(error) {
+					console.error("Error Code = " + error.code + " - " + error.message);
+					$('#gpstatus').html('GPS status <span class="text-danger font-weight-bold">Tidak Aktif/Tidak Diijinkan</span>');
+				}
+			);
+		} else {
+			console.log("Geolocation is not supported by this browser.");
+			$('#gpstatus').html('Perangkat <span class="text-danger font-weight-bold">Tidak mendukung</span> Fitur ini.');
+		}
 
 		$('#btnSubmit').on('click', function() {
-			// Retrieve selected value from dropdown
 			var selectedNoIjin = $('#no_ijin').val();
 			var radius = $('#radius').val();
 			var latitude = $('#latitude').val();
 			var longitude = $('#longitude').val();
 
-			// Prepare data to send
 			var requestData = {
 				noIjin: selectedNoIjin,
 				radius: radius,
@@ -142,55 +147,76 @@
 				longitude: longitude
 			};
 
-			 // Get CSRF token value
-			 var csrfToken = $('meta[name="csrf-token"]').attr('content');
-
-			// Add CSRF token to data
+			var csrfToken = $('meta[name="csrf-token"]').attr('content');
 			requestData._token = csrfToken;
 
-			// Make AJAX request
 			$.ajax({
 				url: "{{ route('2024.datafeeder.responseGetLocByRad') }}",
-				type: "POST", // Assuming you need to send data via POST method
+				type: "POST",
 				data: requestData,
 				success: function(response) {
 					console.log('Response:', response);
 					$('#datalokasi').empty();
 					var metadata = '<li class="list-group-item d-flex justify-content-between">' +
-                               '<span class="text-muted">Jarak (km)</span>' +
-                               '<span>' + response['Jarak (km)'] + '</span>' +
-                               '</li>' +
-                               '<li class="list-group-item d-flex justify-content-between">' +
-                               '<span class="text-muted">Device Location</span>' +
-                               '<span>' + response['Device Location'] + '</span>' +
-                               '</li>' +
-                               '<li class="list-group-item d-flex justify-content-between">' +
-                               '<span class="text-muted">Jumlah titik</span>' +
-                               '<span>' + response['Jumlah titik'] + '</span>' +
-                               '</li>';
+								'<span class="text-muted">Jarak (km)</span>' +
+								'<span>' + response['Jarak (km)'] + '</span>' +
+								'</li>' +
+								'<li class="list-group-item d-flex justify-content-between">' +
+								'<span class="text-muted">Device Location</span>' +
+								'<span>' + response['Device Location'] + '</span>' +
+								'</li>' +
+								'<li class="list-group-item d-flex justify-content-between">' +
+								'<span class="text-muted">Jumlah titik</span>' +
+								'<span>' + response['Jumlah titik'] + '</span>' +
+								'</li>';
 					$('#datalokasi').append(metadata);
 					clearMarkers();
 					$.each(response.data, function(index, location) {
 						var spatial = location.spatial;
 						var latLng = new google.maps.LatLng(parseFloat(spatial.latitude), parseFloat(spatial.longitude));
-                        var newMarker = new google.maps.Marker({
-                            position: latLng,
+						var newMarker = new google.maps.Marker({
+							position: latLng,
 							label: {
 								text: location.kode_spatial,
 								color: 'white',
 							},
-                            map: map,
-                        });
-                        markers.push(newMarker);
+							map: map,
+						});
+						markers.push(newMarker);
 					});
 					circle.setRadius(radius * 1000);
+					updateMap(latitude, longitude);
 				},
 				error: function(xhr, status, error) {
 					console.error('Error:', error);
 				}
 			});
 		});
+
+
 	});
+
+	var selectLocus = document.getElementById('locus');
+	var inputLatitude = document.getElementById('latitude');
+	var inputLongitude = document.getElementById('longitude');
+
+	selectLocus.addEventListener('change', function() {
+		var selectedId = this.value;
+
+		var selectedLocus = {!! json_encode($myLocus) !!}.find(function(locus) {
+			return locus.id == selectedId;
+		});
+
+		if (selectedLocus) {
+			inputLatitude.value = selectedLocus.latitude;
+			inputLongitude.value = selectedLocus.longitude;
+		} else {
+			inputLatitude.value = '';
+			inputLongitude.value = '';
+		}
+	});
+
+
 
 	function addYourLocationButton(map, marker) {
 		var controlDiv = document.createElement('div');
@@ -272,20 +298,15 @@
 		button.title = 'Your Location';
 		controlDiv.appendChild(button);
 
-		var img = document.createElement('div');
-		img.style.margin = '10px';
-		img.style.width = '18px';
-		img.style.height = '18px';
-		img.style.backgroundImage = 'url(https://maps.gstatic.com/tactile/mylocation/mylocation-sprite-1x.png)';
-		img.style.backgroundSize = '180px 18px';
-		img.style.backgroundPosition = '0px 0px';
-		img.style.backgroundRepeat = 'no-repeat';
-		img.id = 'you_location_img';
-		button.appendChild(img);
+		var icon = document.createElement('i');
+            icon.className = 'fas fa-search';
+            icon.style.fontSize = '18px';
+            icon.style.margin = '10px';
+            button.appendChild(icon);
 
-		google.maps.event.addListener(map, 'dragend', function() {
-			$('#you_location_img').css('background-position', '0px 0px');
-		});
+            google.maps.event.addListener(map, 'dragend', function() {
+                icon.style.color = '#000';
+            });
 
 		button.addEventListener('click', function() {
 			// Tambahkan kode untuk membuka modal di sini
@@ -297,71 +318,76 @@
 	}
 
     var map;
-    var marker;
-    var circle;
+	var marker;
+	var circle;
 	var markers = [];
 
-    function initMap(lat, lng) {
-    var centerLat = parseFloat($('#latitude').val()) || lat;
-    var centerLng = parseFloat($('#longitude').val()) || lng;
-    var radius = parseFloat($('#radius').val()) || 1;
+	var map;
+	var marker;
+	var circle;
+	var markers = [];
 
-    map = new google.maps.Map(document.getElementById('myMap'), {
-        mapTypeId: google.maps.MapTypeId.HYBRID,
-        center: { lat: centerLat, lng: centerLng },
-        zoom: 14,
-        mapTypeControl: false,
-        streetViewControl: false,
-        scaleControl: true,
-        rotateControl: false,
-        styles: [
-            {
-                featureType: 'all',
-                elementType: 'labels',
-                stylers: [{ visibility: 'off' }]
-            }
-        ]
-    });
+	function initMap(lat, lng) {
+		var centerLat = parseFloat($('#latitude').val()) || lat;
+		var centerLng = parseFloat($('#longitude').val()) || lng;
+		var radius = parseFloat($('#radius').val()) || 1;
 
-    var customIcon = {
-        url: '{{ asset("img/person.png") }}',
-        scaledSize: new google.maps.Size(50, 50)
-    };
+		map = new google.maps.Map(document.getElementById('myMap'), {
+			mapTypeId: google.maps.MapTypeId.HYBRID,
+			center: { lat: centerLat, lng: centerLng },
+			zoom: 14,
+			mapTypeControl: false,
+			streetViewControl: false,
+			scaleControl: true,
+			rotateControl: false,
+			styles: [
+				{
+					featureType: 'all',
+					elementType: 'labels',
+					stylers: [{ visibility: 'off' }]
+				}
+			]
+		});
 
-    marker = new google.maps.Marker({
-        position: { lat: centerLat, lng: centerLng },
-        map: map,
-        draggable: true,
-        icon: customIcon
-    });
+		var customIcon = {
+			url: '{{ asset("img/person.png") }}',
+			scaledSize: new google.maps.Size(50, 50)
+		};
 
-    circle = new google.maps.Circle({
-        strokeColor: '#ffc241',
-        strokeOpacity: 0.8,
-        strokeWeight: 1,
-        fillColor: '#ffc241',
-        fillOpacity: 0.2,
-        map: map,
-        center: { lat: centerLat, lng: centerLng },
-        radius: radius * 1000
-    });
+		marker = new google.maps.Marker({
+			position: { lat: centerLat, lng: centerLng },
+			map: map,
+			draggable: true,
+			icon: customIcon
+		});
 
-    google.maps.event.addListener(marker, 'dragend', function(event) {
-        var newLat = event.latLng.lat();
-        var newLng = event.latLng.lng();
-        $('#latitude').val(newLat);
-        $('#longitude').val(newLng);
-        circle.setCenter(new google.maps.LatLng(newLat, newLng));
-    });
+		circle = new google.maps.Circle({
+			strokeColor: '#ffc241',
+			strokeOpacity: 0.8,
+			strokeWeight: 1,
+			fillColor: '#ffc241',
+			fillOpacity: 0.2,
+			map: map,
+			center: { lat: centerLat, lng: centerLng },
+			radius: radius * 1000
+		});
 
-    $('#radius').on('change', function() {
-        var newRadius = parseFloat($(this).val());
-        circle.setRadius(newRadius * 1000);
-    });
+		google.maps.event.addListener(marker, 'dragend', function(event) {
+			var newLat = event.latLng.lat();
+			var newLng = event.latLng.lng();
+			$('#latitude').val(newLat);
+			$('#longitude').val(newLng);
+			circle.setCenter(new google.maps.LatLng(newLat, newLng));
+		});
 
-    addYourLocationButton(map, marker);
-    showYourModal();
-}
+		$('#radius').on('change', function() {
+			var newRadius = parseFloat($(this).val());
+			circle.setRadius(newRadius * 1000);
+		});
+
+		addYourLocationButton(map, marker);
+		showYourModal();
+	}
 
 	function clearMarkers() {
         for (var i = 0; i < markers.length; i++) {
@@ -369,6 +395,16 @@
         }
         markers = [];
     }
+
+	function updateMap(lat, lng) {
+		var newLatLng = new google.maps.LatLng(lat, lng);
+		map.setCenter(newLatLng);
+		map.setZoom(14);
+		marker.setPosition(newLatLng);
+		circle.setCenter(newLatLng);
+	}
+</script>
+<script>
 
 </script>
 

@@ -247,7 +247,28 @@ class VerifTanamController extends Controller
 
 		$ijins = PullRiph::select('no_ijin')->get();
 
+		$myLocus = [
+			[
+				'id' => 1,
+				'latitude' => -6.286147,
+				'longitude' => 106.838966,
+				'name' => 'Kantor Ditjen Hortikultura',
+			],
+			[
+				'id' => 2,
+				'latitude' => -6.66440,
+				'longitude' => 106.863234,
+				'name' => 'Lokasi Pengujian 1',
+			],
+			[
+				'id' => 3,
+				'latitude' => -7.34105,
+				'longitude' => 110.0749047922466,
+				'name' => 'Kebun Temanggung',
+			],
+		];
+
 		$mapkey = ForeignApi::find(1);
-		return view('t2024.verifikasi.tanam.simulator', compact('module_name', 'page_title', 'page_heading', 'heading_class', 'mapkey', 'ijins'));
+		return view('t2024.verifikasi.tanam.simulator', compact('module_name', 'page_title', 'page_heading', 'heading_class', 'mapkey', 'ijins', 'myLocus'));
 	}
 }

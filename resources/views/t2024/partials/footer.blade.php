@@ -28,7 +28,7 @@
 			<a href="javascript:void(0)" class="text-secondary press-scale-down">
 				<i class="ni ni-menu fa-3x"></i>
 			</a>
-			<a href="{{route('2024.verifikator.mobile')}}" class="text-secondary fw-700"><i class="fal fa-home-alt fa-3x"></i></a>
+			<a href="{{route('2024.verifikator.mobile')}}" class="{{ request()->is('2024.verifikator.mobile') ? 'active' : '' }} fw-700"><i class="{{ request()->is('2024.verifikator.mobile') ? 'fal fa-home-alt' : 'fa fa-home' }} fa-3x"></i></a>
 			<a href="javascript:void(0)" class="text-secondary fw-700" >
 				<i class="fal fa-chart-line fa-3x"></i>
 			</a>
