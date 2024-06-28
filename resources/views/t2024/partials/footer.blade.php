@@ -25,13 +25,13 @@
 	-->
 	<div class="col hidden-lg-up">
 		<div class="row d-flex justify-content-between align-items-center">
-				<a href="#" class="text-secondary press-scale-down" data-action="toggle" data-class="mobile-nav-on">
-					<i class="ni ni-menu fa-3x"></i>
-				</a>
-				<a href="" class="text-secondary fw-700"><i class="fal fa-home-alt fa-3x"></i></a>
-				<a href="#" class="text-secondary fw-700" data-action="toggle" data-class="mobile-nav-on">
-					<i class="fal fa-chart-line fa-3x"></i>
-				</a>
+			<a href="javascript:void(0)" class="text-secondary press-scale-down" data-action="toggle" data-class="mobile-nav-on">
+				<i class="ni ni-menu fa-3x"></i>
+			</a>
+			<a href="{{route('2024.verifikator.mobile')}}" class="text-secondary fw-700"><i class="fal fa-home-alt fa-3x"></i></a>
+			<a href="javascript:void(0)" class="text-secondary fw-700" data-action="toggle" data-class="mobile-nav-on">
+				<i class="fal fa-chart-line fa-3x"></i>
+			</a>
 		</div>
 	</div>
 </footer>
