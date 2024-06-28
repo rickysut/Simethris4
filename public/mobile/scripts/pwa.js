@@ -129,8 +129,8 @@ $(document).ready(function(){
             function versionCheck(){        
                 var dt = new Date();
                 var maniTimeVersion = dt.getHours() + ":" + dt.getMinutes() + ":" + dt.getSeconds();
-                var localVersionNumber = $('link[rel="manifest"]').data('pwa-version');
-                var onlineVersionJSON = "_manifest.json?ver=" + maniTimeVersion;
+                var localVersionNumber = $('link[rel="/mobile/manifest"]').data('pwa-version');
+                var onlineVersionJSON = "/mobile/_manifest.json?ver=" + maniTimeVersion;
                 var onlineVersionNumber = "Connection Offline. Waiting to Reconect";
                 $.getJSON(onlineVersionJSON, function(onlineData) {onlineVersionNumber = onlineData.version;}); 
                 setTimeout(function(){
