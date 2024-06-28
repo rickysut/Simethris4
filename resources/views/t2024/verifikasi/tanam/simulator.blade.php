@@ -73,25 +73,31 @@
 @parent
 <script>
 	$(document).ready(function() {
-		if (navigator.geolocation) {
-			navigator.geolocation.getCurrentPosition(
-				function(position) {
-					console.log("Latitude: " + position.coords.latitude);
-					console.log("Longitude: " + position.coords.longitude);
+		$(document).ready(function() {
+			if (navigator.geolocation) {
+				navigator.geolocation.getCurrentPosition(
+					function(position) {
+						console.log("Latitude: " + position.coords.latitude);
+						console.log("Longitude: " + position.coords.longitude);
 
-					var thisLat = position.coords.latitude;
-					var thisLong = position.coords.longitude;
-					$('#latitude').val(thisLat);
-					$('#longitude').val(thisLong);
-					initMap(thisLat, thisLong);
-				},
-				function(error) {
-					console.error("Error Code = " + error.code + " - " + error.message);
-				}
-			);
-		} else {
-			console.log("Geolocation is not supported by this browser.");
-		};
+						var thisLat = position.coords.latitude;
+						var thisLong = position.coords.longitude;
+						$('#latitude').val(thisLat);
+						$('#longitude').val(thisLong);
+						$('#gpstatus').text("GPS is active");
+
+						initMap(thisLat, thisLong);
+					},
+					function(error) {
+						console.error("Error Code = " + error.code + " - " + error.message);
+						$('#gpstatus').text("GPS is inactive or permission denied");
+					}
+				);
+			} else {
+				console.log("Geolocation is not supported by this browser.");
+				$('#gpstatus').text("Geolocation is not supported by this browser");
+			}
+		});
 
 		$('#btnSubmit').on('click', function() {
 			// Retrieve selected value from dropdown
