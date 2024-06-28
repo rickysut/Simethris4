@@ -2,31 +2,15 @@
 
 @section('styles')
 <style>
-	/* Gaya Dasar Tombol */
 	.android-button {
-		display: inline-block;
-		padding: 20px 40px; /* Sesuaikan ukuran sesuai kebutuhan */
+		padding: 20px;
+		margin: 2px;
 		font-size: 20px;
 		font-weight: bold;
 		text-align: center;
-		text-decoration: none;
 		border-radius: 10px;
 		cursor: pointer;
-		background-color: #4CAF50; /* Warna latar belakang */
-		color: white; /* Warna teks */
-		border: none;
 		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-	}
-
-	/* Efek Hover */
-	.android-button:hover {
-		background-color: #45a049;
-	}
-
-	/* Efek Klik */
-	.android-button:active {
-		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-		transform: translateY(2px);
 	}
 </style>
 @endsection
@@ -76,35 +60,29 @@
 			</div>
 		</div>
 		<div class="row">
-			<a href="javascript:void(0);" class="d-flex flex-row align-items-center">
-				<div class="icon-stack display-3 flex-shrink-0">
-					<i class="fal fa-circle icon-stack-3x opacity-100 color-primary-400"></i>
-					<i class="fas fa-graduation-cap icon-stack-1x opacity-100 color-primary-500"></i>
-				</div>
-			</a>
-			<div class="col-4 text-center">
+			<div class="col-12 text-center">
 				<span class="d-inline-flex flex-column justify-content-center">
-					<a href="{{route('2024.verifikator.mobile.findmarker')}}" class="btn-xxl  btn-outline-warning btn-icon waves-effect waves-themed">
+					<a href="{{route('2024.verifikator.mobile.findmarker')}}" class="android-button btn-warning">
 						<img src="{{ asset('logoicon.png') }}" alt="" style="width: 5rem; height: 5rem;">
 					</a>
 					<span>Verifikasi</span>
 				</span>
-			</div>
-			<div class="col-4 text-center">
 				<span class="d-inline-flex flex-column justify-content-center ">
-					<a href="" class="btn-xxl  btn-outline-warning btn-icon waves-effect waves-themed">
+					<a href="" class="android-button btn-warning">
 						<img src="{{ asset('favicon.png') }}" alt="" style="width: 5rem; height: 5rem;">
 					</a>
 					<span>Sample</span>
 				</span>
-			</div>
-			<div class="col-4 text-center">
 				<span class="d-inline-flex flex-column justify-content-center">
-					<a href="" class="btn-xl btn-outline-warning btn-icon waves-effect waves-themed">
+					<a href="" class="android-button btn-warning">
 						<img src="{{ asset('favicon.png') }}" alt="" style="width: 3rem; height: 3rem;">
 					</a>
 					<span>Sample</span>
 				</span>
+			</div>
+			<div class="col-4 text-center">
+			</div>
+			<div class="col-4 text-center">
 			</div>
 		</div>
 		<!-- Page Content -->
