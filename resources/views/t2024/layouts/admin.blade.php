@@ -8,12 +8,12 @@
 		<meta name="description" content="Page Title">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, user-scalable=no, minimal-ui">
-		<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
-
 		<!-- Call App Mode on ios devices -->
 		<meta name="apple-mobile-web-app-capable" content="yes" />
 		<!-- Remove Tap Highlight on Windows Phone IE -->
 		<meta name="msapplication-tap-highlight" content="no">
+		<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+
 		<!-- smartadmin base css -->
 		<link rel="stylesheet" href="{{ asset('css/app.css') }}" />
 		<link id="vendorsbundle" rel="stylesheet" media="screen, print" href="{{ asset('css/smartadmin/vendors.bundle.css') }}">
@@ -63,17 +63,17 @@
 		@yield('styles')
 	</head>
 
-	<body class="mod-bg-2 mod-nav-link mod-skin-light blur">  {{-- mod-skin-dark --}}
+	<body class="mod-bg-2 mod-nav-link blur">  {{-- mod-skin-dark --}}
 		<script src="{{ asset('js/smartadmin/pagesetting.js') }}"></script>
 		<!-- begin page wrapper -->
 		<div class="page-wrapper">
 			<div class="page-inner">
 				<!-- begin sidebar -->
-				@include('t2024.partials.menu')
+				@include('partials.menu')
 				<!-- end sidebar -->
 				<div class="page-content-wrapper">
 					<!-- begin page header -->
-					@include('t2024.partials.header')
+					@include('partials.header')
 					<!-- end page header -->
 					<!-- begin page content -->
 					<main id="js-page-content" role="main" class="page-content">
@@ -153,7 +153,6 @@
 		<script src="{{ asset('js/smartadmin/statistics/easypiechart/easypiechart.bundle.js') }}"></script>
 		<script src="{{ asset('js/smartadmin/statistics/sparkline/sparkline.bundle.js') }}"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.10/jquery.mask.js"></script>
-		<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 
 		<script src="{{ asset('js/toastr.js') }}"></script>
@@ -164,7 +163,6 @@
 		<script src="{{ asset('js/pdfmake/pdfmake.min.js') }}"></script>
 		<script src="{{ asset('js/pdfmake/vfs_fonts.js') }}"></script>
 		<script src="{{ asset('js/jszip/jszip.min.js') }}"></script>
-		<script src="{{ asset('js/datatable-global-setting.js') }}"></script>
 
 		<!-- search bar -->
 		<script type="text/javascript">

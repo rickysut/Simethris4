@@ -57,9 +57,9 @@
 	</div>
 	<!-- DOC: mobile button appears during mobile width -->
 	<div class="hidden-lg-up">
-		<a href="#" class="header-btn btn press-scale-down" data-action="toggle" data-class="mobile-nav-on">
-			<i class="ni ni-menu"></i>
-		</a>
+		<span class="h3" data-class="mobile-nav-on">
+			Simethris Mobile
+		</span>
 	</div>
 	{{-- <div class="search">
 		<select class="searchable-field form-control"></select>

@@ -7,10 +7,12 @@
         {{env('APP_NAME')}} | {{ $pagedata['controller'] ?? config('app.name', 'Application') }}
     </title>
     <meta name="description" content="Login">
+	<meta name="theme-color" content="#886ab5">
+
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, user-scalable=no, minimal-ui">
     <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
 
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, user-scalable=no, minimal-ui">
     <!-- Call App Mode on ios devices -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <!-- Remove Tap Highlight on Windows Phone IE -->
@@ -40,6 +42,8 @@
     <link rel="stylesheet" media="screen, print" href="{{ asset('css/smartadmin/fa-regular.css') }}">
     <link rel="stylesheet" media="screen, print" href="{{ asset('css/smartadmin/fa-solid.css') }}">
     <link rel="stylesheet" media="screen, print" href="{{ asset('css/smartadmin/fa-brands.css') }}">
+
+	<link rel="manifest" href="{{asset('manifest.json')}}">
 
     @yield('style')
 
@@ -105,7 +109,17 @@
     @include('partials.pagesettings')
     <script src="{{ asset('js/vendors.bundle.js') }}"></script>
     <script src="{{ asset('js/app.bundle.js') }}"></script>
-
+	<script src="{{asset('sw.js')}}"></script>
+	<script>
+		if ('serviceWorker' in navigator) {
+			navigator.serviceWorker.register('sw.js')
+				.then(function(registration) {
+					console.log('Service Worker registered with scope:', registration.scope);
+				}).catch(function(error) {
+					console.log('Service Worker registration failed:', error);
+				});
+		}
+	</script>
     {{-- <script>
         $(document).ready(function() {
             $(function() {
@@ -156,6 +170,7 @@
             // Perform ajax submit here...
         });
     </script>
+
     @yield('scripts')
 </body>
 

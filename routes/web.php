@@ -9,6 +9,7 @@ Route::get('/', function () {
 	return redirect()->route('login');
 });
 
+
 Route::get('/v2/register', function () {
 	return view('v2register');
 });
@@ -24,7 +25,7 @@ Route::get('/home', function () {
 	if (Auth::user()->roles[0]->title == 'Spatial Administrator' || Auth::user()->roles[0]->title == 'Spatial Staff') {
 		return redirect()->route('2024.spatial.home')->with('status', session('status'));
 	}else{
-		return redirect()->route('admin.home')->with('status', session('status'));
+		return redirect()->route('2024.admin.home')->with('status', session('status'));
 	}
 });
 
@@ -461,7 +462,12 @@ Route::group(['prefix' => '2024', 'as' => '2024.', 'namespace' => 'Admin', 'midd
 
 		//route untuk verifikator
 		Route::group(['prefix' => 'verifikator', 'as' => 'verifikator.'], function () {
-			Route::get('/', 'HomeController@index')->name('home');
+			Route::get('/', 'HomeController@index')->name('home')->middleware('screen.redirect');
+			Route::get('/mobile', 'HomeController@indexMobile')->name('mobile');
+
+			Route::group(['prefix' => 'mobile', 'as' => 'mobile.'], function () {
+				Route::get('/markers', 'VerifTanamController@findmarker')->name('findmarker');
+			});
 
 			Route::group(['prefix' => 'tanam', 'as' => 'tanam.'], function () {
 				Route::get('/', 'VerifTanamController@index')->name('home');
@@ -563,4 +569,20 @@ Route::group(['prefix' => '2024', 'as' => '2024.', 'namespace' => 'Admin', 'midd
 	});
 });
 
+Route::group(['prefix' => 'mobile', 'as' => 'mobile.', 'namespace' => 'Mobile'], function () {
+	Route::get('/login', 'LoginController@index')->name('login');
+	Route::post('/login', 'LoginController@login')->name('login');
+});
+Route::group(['prefix' => 'mobile', 'as' => 'mobile.', 'namespace' => 'Mobile', 'middleware' => ['auth']], function () {
+	Route::post('/logout', 'LoginController@logout')->name('logout');
+	Route::get('/', 'HomeController@index')->name('home');
 
+	//verifikasi tanam
+	Route::group(['prefix' => 'verifikasi', 'as' => 'verifikasi.'], function () {
+		Route::group(['prefix' => 'tanam', 'as' => 'tanam.'], function () {
+			Route::get('/', 'VerifikasiTanamController@index');
+			Route::get('/tanam/maps/{noIjin}', 'VerifikasiTanamController@verifikasiMap')->name('maps');
+			Route::get('/tanam/maps/{noIjin}/{spatial}', 'VerifikasiTanamController@verifikasilokasitanam')->name('lokasi');
+		});
+	});
+});

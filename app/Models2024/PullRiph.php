@@ -61,6 +61,11 @@ class PullRiph extends Model
 		'deleted_at',
 	];
 
+	public function getFormattedNoIjinAttribute()
+    {
+        return str_replace(['/', '.', ' '], '', $this->no_ijin);
+    }
+
 	public function user()
 	{
 		return $this->belongsTo(User::class, 'npwp_company', 'npwp');
@@ -95,6 +100,11 @@ class PullRiph extends Model
 	{
 		return $this->hasMany(AjuVerifTanam::class, 'no_ijin', 'no_ijin');
 	}
+
+	public function latestAjutanam()
+    {
+        return $this->hasOne(AjuVerifTanam::class, 'no_ijin', 'no_ijin')->latest();
+    }
 
 	public function ajuproduksi()
 	{

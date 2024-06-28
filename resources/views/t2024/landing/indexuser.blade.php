@@ -1,4 +1,5 @@
 @extends('t2024.layouts.admin')
+
 @section('content')
 	@can('landing_access')
 		@php($unreadmsg = \App\Models\QaTopic::unreadCount())
@@ -517,6 +518,7 @@
 
 	<script>
 		$(document).ready(function() {
+
 			function markAsRead(sklId) {
 				var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content'); // Ambil token CSRF
 
@@ -534,6 +536,32 @@
 					}
 				});
 			}
+
 		});
 	</script>
+	<script>
+		function setScreenSizeAndRedirect() {
+			var screenSize = (window.innerWidth <= 992) ? 'mobile' : 'desktop';
+			document.cookie = "screen_size=" + screenSize + "; path=/";
+
+			var userRole = "{{ Auth::user()->roles[0]->title }}";
+
+			if (userRole === 'Verifikator') {
+				if (screenSize === 'mobile' && window.location.pathname !== '/2024/verifikator/mobile') {
+					window.location.href = "/2024/verifikator/mobile";
+				} else if (screenSize === 'desktop' && window.location.pathname !== '/2024/verifikator') {
+					window.location.href = "/2024/verifikator";
+				}
+			}
+		}
+
+		document.addEventListener('DOMContentLoaded', function() {
+			setScreenSizeAndRedirect();
+		});
+
+		window.addEventListener('resize', function() {
+			setScreenSizeAndRedirect();
+		});
+	</script>
+
 @endsection
