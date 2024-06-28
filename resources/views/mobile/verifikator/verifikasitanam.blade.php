@@ -22,7 +22,7 @@
                 <h1><i class="fa fa-arrow-left back-button"></i>Verifikasi Tanam</h1>
                 <a href="{{route('mobile.home')}}" data-menu="menu-main" class="shadow-huge scale-box bg-fade-gray2-dark"  onclick="event.preventDefault(); document.getElementById('logoutform').submit();"></a>
             </div>
-            <div data-height="130" class="page-title-bg preload-image" data-src="images/pictures/20s.jpg"><!-- image --></div>
+            <div data-height="130" class="page-title-bg preload-image" data-src="/mobile/images/pictures/20s.jpg"><!-- image --></div>
             <div data-height="130" class="page-title-bg dark-mode-tint"><!-- contrast for dark mode --></div>
             <div data-height="130" class="page-title-bg opacity-90 bg-highlight bottom-30"><!-- background color --></div>
 

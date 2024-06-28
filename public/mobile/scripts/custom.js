@@ -1759,7 +1759,7 @@ $(function() {
     //Activate the PWA
     if(isPWA === true){
         if(!$('#manifest-pwa').length){
-            $('head').append('<link rel="manifest" id="manifest-pwa" href="_manifest.json" data-pwa-version="set_by_pwa.js">')
+            $('head').append('<link rel="/mobile/manifest" id="manifest-pwa" href="/mobile/_manifest.json" data-pwa-version="set_by_pwa.js">')
         }
         var loadJS = function(url, implementationCode, location){
             var scriptTag = document.createElement('script');
@@ -1769,7 +1769,7 @@ $(function() {
             location.appendChild(scriptTag);
         };
         function loadPWA(){}
-        loadJS('scripts/pwa.js', loadPWA, document.body);
+        loadJS('/mobile/scripts/pwa.js', loadPWA, document.body);
     }
 
     //To Remove AJAX Remove This Code
