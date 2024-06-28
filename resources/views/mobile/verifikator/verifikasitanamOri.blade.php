@@ -39,20 +39,23 @@
 			<div class="content content-boxed round-medium shadow-small">
 				<div class="content">
 					<p class="location-support top-20"></p>
-						<div class="input-style input-style-2 input-required">
-							<span>Pilih No. RIPH</span>
-							<em><i class="fa fa-angle-down"></i></em>
-							<select id="riphSelect">
-								<option value="default" disabled="" selected="">pilih no RIPH</option>
-								@foreach ($commitments as $commitment)
-									<option value="{{$commitment->formatted_no_ijin}}">{{$commitment->no_ijin}}</option>
-								@endforeach
-							</select>
-						</div>
-						<a href="#" id="getLocationButton" class="button button-full bg-highlight button-m button-round-small shadow-large">Dapatkan Lokasi</a>
+					<div class="input-style input-style-2 input-required">
+						<span>Pilih No. RIPH</span>
+						<em><i class="fa fa-angle-down"></i></em>
+						<select>
+							<option value="default" disabled="" selected="">pilih no RIPH</option>
+							@foreach ($commitments as $commitment)
+								<option value="{{$commitment->no_ijin}}">{{$commitment->no_ijin}}</option>
+							@endforeach
+						</select>
+					</div>
+					<a href="#" class="get-location button button-full bg-highlight button-m button-round-small shadow-large">Dapatkan Lokasi</a>
 					<p class="location-coordinates" hidden></p>
 
 					<div class="divider"></div>
+				</div>
+				<div class="responsive-iframe bottom-0 add-iframe">
+					<iframe class="location-map" src='https://maps.google.com/?ie=UTF8&amp;ll=47.595131,-122.330414&amp;spn=0.006186,0.016512&amp;t=h&amp;z=17&amp;output=embed'></iframe>
 				</div>
 			</div>
         </div>
@@ -63,24 +66,4 @@
 
         <div class="menu-hider"></div>
     </div>
-@endsection
-
-@section('scripts')
-<script>
-    $(document).ready(function() {
-        $('#riphSelect').change(function() {
-            var selectedValue = $(this).val();
-            if (selectedValue !== 'default') {
-                var routeUrl = '{{ route("mobile.verifikasi.tanam.maps", ":id") }}';
-                routeUrl = routeUrl.replace(':id', selectedValue);
-                $('#getLocationButton').attr('href', routeUrl);
-            } else {
-                $('#getLocationButton').attr('href', '#');
-            }
-
-			console.log(routeUrl);
-        });
-    });
-</script>
-
 @endsection

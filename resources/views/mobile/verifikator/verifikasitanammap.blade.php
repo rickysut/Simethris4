@@ -36,30 +36,46 @@
 				</div>
 			</div>
 
+			<div class="map-full left-15 right-15 round-small">
+				<iframe src="https://maps.google.com/?ie=UTF8&amp;ll=47.595131,-122.330414&amp;spn=0.006186,0.016512&amp;t=h&amp;z=17&amp;output=embed"></iframe>
+				<div data-height="cover-title" class="caption ">
+					<div class="caption-center">
+						<h1 class="center-text color-white ultrabold font-36">FULL MAPS</h1>
+						<p class="boxed-text-large under-heading color-white opacity-90 top-10">
+							Browse Google Maps in Full Screen.<br> Just tap the button to scroll through it.
+						</p>
+						<a href="#" class="show-map button button-m button-center-medium bg-highlight button-round-small">ACTIVATE MAP</a>
+					</div>
+					<div class="caption-overlay bg-black opacity-80"></div>
+				</div>
+				<a href="#" class="hide-map button button-m bg-red2-dark button-round-small">DISABLE MAP</a>
+			</div>
+
 			<div class="content content-boxed round-medium shadow-small">
 				<div class="content">
-					<p class="location-support top-20"></p>
-						<div class="input-style input-style-2 input-required">
-							<span>Pilih No. RIPH</span>
-							<em><i class="fa fa-angle-down"></i></em>
-							<select id="riphSelect">
-								<option value="default" disabled="" selected="">pilih no RIPH</option>
-								@foreach ($commitments as $commitment)
-									<option value="{{$commitment->formatted_no_ijin}}">{{$commitment->no_ijin}}</option>
-								@endforeach
-							</select>
-						</div>
-						<a href="#" id="getLocationButton" class="button button-full bg-highlight button-m button-round-small shadow-large">Dapatkan Lokasi</a>
-					<p class="location-coordinates" hidden></p>
-
+					<ul class="list-group">
+						<li class="list-group-items">
+							{{$user->name}}
+						</li>
+						<li class="list-group-items">
+							{{$noIjin}}
+						</li>
+						<li class="list-group-items">
+							{{$ijin}}
+						</li>
+					</ul>
+					<p>peta di atas muncul marker-marker yang telah di filter</p>
 					<div class="divider"></div>
+
+					{{-- sample buat marker on click --}}
+					<a href="{{route('mobile.verifikasi.tanam.lokasi', [$ijin, 'TMG_00001'])}}" class="button button-m bg-red2-dark button-round-small">Lihat Lokasi</a>
 				</div>
 			</div>
         </div>
 
         <!-- Footer Menu-->
         @include('mobile.partials.footer-menu')
-        @include('mobile.partials.menu-main-share-highlights')
+        {{-- @include('mobile.partials.menu-main-share-highlights') --}}
 
         <div class="menu-hider"></div>
     </div>
@@ -67,20 +83,8 @@
 
 @section('scripts')
 <script>
-    $(document).ready(function() {
-        $('#riphSelect').change(function() {
-            var selectedValue = $(this).val();
-            if (selectedValue !== 'default') {
-                var routeUrl = '{{ route("mobile.verifikasi.tanam.maps", ":id") }}';
-                routeUrl = routeUrl.replace(':id', selectedValue);
-                $('#getLocationButton').attr('href', routeUrl);
-            } else {
-                $('#getLocationButton').attr('href', '#');
-            }
-
-			console.log(routeUrl);
-        });
-    });
+//untuk mendapatkan semua lokasi dari nomor riph terkait dalam radius
+//gunakan route ini {{ route('2024.datafeeder.responseGetLocByRad') }}
 </script>
 
 @endsection

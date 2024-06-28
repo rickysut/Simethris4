@@ -465,6 +465,10 @@ Route::group(['prefix' => '2024', 'as' => '2024.', 'namespace' => 'Admin', 'midd
 			Route::get('/', 'HomeController@index')->name('home')->middleware('screen.redirect');
 			Route::get('/mobile', 'HomeController@indexMobile')->name('mobile');
 
+			Route::group(['prefix' => 'mobile', 'as' => 'mobile.'], function () {
+				Route::get('/markers', 'VerifTanamController@findmarker')->name('findmarker');
+			});
+
 			Route::group(['prefix' => 'tanam', 'as' => 'tanam.'], function () {
 				Route::get('/', 'VerifTanamController@index')->name('home');
 				Route::get('/check/{noIjin}/{tcode}', 'VerifTanamController@check')->name('check');
@@ -577,6 +581,8 @@ Route::group(['prefix' => 'mobile', 'as' => 'mobile.', 'namespace' => 'Mobile', 
 	Route::group(['prefix' => 'verifikasi', 'as' => 'verifikasi.'], function () {
 		Route::group(['prefix' => 'tanam', 'as' => 'tanam.'], function () {
 			Route::get('/', 'VerifikasiTanamController@index');
+			Route::get('/tanam/maps/{noIjin}', 'VerifikasiTanamController@verifikasiMap')->name('maps');
+			Route::get('/tanam/maps/{noIjin}/{spatial}', 'VerifikasiTanamController@verifikasilokasitanam')->name('lokasi');
 		});
 	});
 });

@@ -235,4 +235,19 @@ class VerifTanamController extends Controller
 
 		return view('t2024.verifikasi.tanam.result', compact('module_name', 'page_title', 'page_heading', 'heading_class', 'ijin', 'user', 'noIjin'));
 	}
+
+
+	//mobile
+	public function findmarker (Request $request)
+	{
+		$module_name = 'Verifikasi';
+		$page_title = 'Simulator Spatial';
+		$page_heading = 'Marker Finder Simulator';
+		$heading_class = 'fal fa-map-marked-alt';
+
+		$ijins = PullRiph::select('no_ijin')->get();
+
+		$mapkey = ForeignApi::find(1);
+		return view('t2024.verifikasi.tanam.simulator', compact('module_name', 'page_title', 'page_heading', 'heading_class', 'mapkey', 'ijins'));
+	}
 }

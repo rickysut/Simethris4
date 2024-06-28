@@ -61,6 +61,11 @@ class PullRiph extends Model
 		'deleted_at',
 	];
 
+	public function getFormattedNoIjinAttribute()
+    {
+        return str_replace(['/', '.', ' '], '', $this->no_ijin);
+    }
+
 	public function user()
 	{
 		return $this->belongsTo(User::class, 'npwp_company', 'npwp');
