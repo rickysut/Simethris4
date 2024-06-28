@@ -73,7 +73,7 @@
 			</a>
 		</div> --}}
 		<!-- app settings -->
-		<div class="hidden-md-down">
+		<div class="">
 			<a href="#" class="header-icon" data-toggle="modal" title="Penyesuaian"
 				data-target=".js-modal-settings">
 				<i class="fal fa-cog"></i>
