@@ -47,19 +47,19 @@
 		</div>
 		<div class="row">
 			<div class="col-12 text-center">
-				<span class="d-inline-flex flex-column justify-content-center m-2">
+				<span class="d-inline-flex flex-column justify-content-center">
 					<a href="{{route('2024.verifikator.mobile.findmarker')}}" class="btn btn-xxl  btn-outline-warning btn-icon waves-effect waves-themed">
 						<img src="{{ asset('logoicon.png') }}" alt="" style="width: 5rem; height: 5rem;">
 					</a>
 					<span>Verifikasi</span>
 				</span>
-				<span class="d-inline-flex flex-column justify-content-center m-2">
+				<span class="d-inline-flex flex-column justify-content-center ">
 					<a href="" class="btn btn-xxl  btn-outline-warning btn-icon waves-effect waves-themed">
 						<img src="{{ asset('favicon.png') }}" alt="" style="width: 5rem; height: 5rem;">
 					</a>
 					<span>Sample</span>
 				</span>
-				<span class="d-inline-flex flex-column justify-content-center m-2">
+				<span class="d-inline-flex flex-column justify-content-center">
 					<a href="" class="btn btn-xxl  btn-outline-warning btn-icon waves-effect waves-themed">
 						<img src="{{ asset('favicon.png') }}" alt="" style="width: 5rem; height: 5rem;">
 					</a>
