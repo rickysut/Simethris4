@@ -5,8 +5,8 @@
 @include('t2024.partials.sysalert')
 {{-- @can('spatial_data_access') --}}
 
-	<div class="row">
-		<span class="text-danger" id="gpsstatus"></span>
+	<div class="row justify-content-center">
+		<span id="gpstatus"></span>
 	</div>
 
 	<div class="row">
