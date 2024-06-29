@@ -63,17 +63,17 @@
 		@yield('styles')
 	</head>
 
-	<body class="mod-bg-2 mod-nav-link blur">  {{-- mod-skin-dark --}}
+	<body class="mod-bg-2 mod-nav-link header-function-fixed footer-function-fixed blur">  {{-- mod-skin-dark --}}
 		<script src="{{ asset('js/smartadmin/pagesetting.js') }}"></script>
 		<!-- begin page wrapper -->
 		<div class="page-wrapper">
 			<div class="page-inner">
 				<!-- begin sidebar -->
-				@include('partials.menu')
+				@include('t2024.partials.menu')
 				<!-- end sidebar -->
 				<div class="page-content-wrapper">
 					<!-- begin page header -->
-					@include('partials.header')
+					@include('t2024.partials.header')
 					<!-- end page header -->
 					<!-- begin page content -->
 					<main id="js-page-content" role="main" class="page-content">
@@ -108,7 +108,7 @@
 					<!-- end page content -->
 
 					<!-- begin page footer -->
-					{{-- @include('partials.footer') --}}
+					@include('t2024.partials.footer')
 					<!-- end page footer -->
 					<!-- begin shortcut -->
 					{{-- @include('partials.shortcut') --}}
@@ -121,7 +121,7 @@
 		</form>
 		<!-- end page wrapper -->
 		<!-- begin quick menu -->
-		{{-- @include('partials.quickmenu') --}}
+		@include('partials.quickmenu')
 		<!-- end quick menu -->
 		{{-- base app script --}}
 		<script src="{{ asset('js/app.js') }}"></script>
