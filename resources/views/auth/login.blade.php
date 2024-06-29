@@ -52,7 +52,7 @@
 					@csrf
 					
 					<div class="form-group">
-						<label class="form-label text-white" for="username">Username</label>
+						{{-- <label class="form-label text-white" for="username">Username</label> --}}
 						<div class="input-group" data-toggle="tooltip" title data-original-title="Your Username" data-title="Nama Pengguna (username)" data-intro="Type your username here" data-step="3">
 							<div class="input-group-prepend">
 								<div class="input-group-text">
@@ -70,7 +70,7 @@
 					</div>
 					
 					<div class="form-group">
-						<label class="form-label text-white" for="password">Password</label>
+						{{-- <label class="form-label text-white" for="password">Password</label> --}}
 						<div class="input-group bg-white shadow-inset-2" data-toggle="tooltip" title data-original-title="Your password" data-title="Password" data-intro="Type your password" data-step="4">
 							<div class="input-group-prepend">
 								<div class="input-group-text">
