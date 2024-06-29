@@ -271,4 +271,17 @@ class VerifTanamController extends Controller
 		$mapkey = ForeignApi::find(1);
 		return view('t2024.verifikasi.tanam.simulator', compact('module_name', 'page_title', 'page_heading', 'heading_class', 'mapkey', 'ijins', 'myLocus'));
 	}
+
+	public function veriflokasimobile (Request $request, $noIjin, $spatial)
+	{
+		$spatial = $spatial;
+		$module_name = 'Verifikasi';
+		$page_title = 'Simulator Spatial';
+		$page_heading = 'Verifikasi Lahan ' . $spatial;
+		$heading_class = 'fal fa-map-marker';
+
+
+		$mapkey = ForeignApi::find(1);
+		return view('t2024.verifikasi.tanam.veriflokasimobile', compact('module_name', 'page_title', 'page_heading', 'heading_class', 'mapkey'));
+	}
 }
