@@ -25,11 +25,11 @@
             </div>
         </div>
     </div>
-    <div class="col-sm-12 col-md-6 col-lg-5 col-xl-4 ml-auto">
-        <h1 class="text-white fw-300 mb-3">
+    <div class="col-sm-12 col-md-6 col-lg-5 col-xl-4 ml-auto hidden-sm-down">
+        <h1 class="text-white fw-300 mb-3 ">
             Login
         </h1>
-        <div class="card p-4 rounded-plus bg-faded">
+        <div class="card p-4 rounded-plus bg-faded  hidden-sm-down">
             <div class="d-sm-block d-md-none text-center mt-0 mb-1">
                 <img src="{{ asset('img/logo-icon.png') }}" alt="simethris" aria-roledescription="logo" style="width:150px; height:auto;">
             </div>
@@ -39,7 +39,68 @@
                 {{ $errors->first('roleaccess') }}
             @endif
         </div>
+		
     </div>
+	<div class="col-sm-12  ml-auto align hidden-md-up">
+		<div class="d-flex align-items-center justify-content-center mb-6 mt-6">	
+			<img src="{{ asset('img/logo-simet.png') }}" alt="simethris" aria-roledescription="logo" style="width: 80%; height: auto;">
+		</div>
+		<div class="mt-4">
+			<div class="card p-4 rounded-plus bg-faded">
+				
+				<form  id="js-login" novalidate="" method="POST" action="{{ route('mobile.login') }}">
+					@csrf
+					
+					<div class="form-group">
+						<label class="form-label" for="username">Username</label>
+						<div class="input-group" data-toggle="tooltip" title data-original-title="Your Username" data-title="Nama Pengguna (username)" data-intro="Type your username here" data-step="3">
+							<div class="input-group-prepend">
+								<div class="input-group-text">
+									<span class="fal fa-user"></span>
+								</div>
+							</div>
+
+							<input id="username" name="usernamemob" type="text" class="form-control form-control-lg {{ $errors->has('username') ? ' is-invalid' : '' }}" required autocomplete="{{ trans('global.login_username') }}" autofocus placeholder="{{ trans('global.login_username') }}" value="{{ old('username', null) }}" />
+							@if($errors->has('username'))
+							<div class="invalid-feedback">
+								{{ $errors->first('username') }}
+							</div>
+							@endif
+						</div>
+					</div>
+					
+					<div class="form-group">
+						<label class="form-label" for="password">Password</label>
+						<div class="input-group bg-white shadow-inset-2" data-toggle="tooltip" title data-original-title="Your password" data-title="Password" data-intro="Type your password" data-step="4">
+							<div class="input-group-prepend">
+								<div class="input-group-text">
+									<span class="fal fa-key"></span>
+								</div>
+							</div>
+							<input id="password" name="passwordmob" type="password" class="form-control form-control-lg border-right-0 bg-transparent pr-0 {{ $errors->has('password') ? ' is-invalid' : '' }}" required autocomplete="{{ trans('global.login_password') }}" autofocus placeholder="{{ trans('global.login_password') }}" value="" />
+							@if($errors->has('password'))
+							<div class="invalid-feedback">
+								{{ $errors->first('password') }}
+							</div>
+							@endif
+							<div class="input-group-append">
+								<span class="input-group-text bg-transparent border-left-0">
+									<i class="far fa-eye-slash text-muted" id="togglePasswordM"></i>
+								</span>
+							</div>
+						</div>
+					</div>
+					
+					<div class="row no-gutters">
+						<div class="col-lg-12 pl-lg-1 my-2" >
+							<button id="js-login-btn" type="submit" class="btn btn-block btn-info btn-lg">{{ trans('global.login') }}</button>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+		
+	</div>
 </div>
 <div class="modal fade" id="login1" tabindex="-1" role="dialog" style="display: none;" aria-modal="true">
 	<div class="modal-dialog modal-dialog-centered" role="document">
@@ -121,6 +182,7 @@
 
 <script>
 	$(document).ready(function () {
+		
 		@if ($errors->any())
 
 			$('#login1').modal('show');
@@ -130,9 +192,25 @@
 	})
 
 	const togglePassword = document.querySelector('#togglePassword');
+	const togglePasswordM = document.querySelector('#togglePasswordM');
 	const password = document.querySelector('#password');
 
 	togglePassword.addEventListener('click', function (e) {
+		// toggle the type attribute
+		const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+		password.setAttribute('type', type);
+		// toggle the eye slash icon\
+		if (this.classList.contains('fa-eye')){
+			this.classList.remove('fa-eye');
+			this.classList.add('fa-eye-slash');
+		} else {
+			this.classList.remove('fa-eye-slash');
+			this.classList.add('fa-eye');
+		}
+
+	});
+
+	togglePasswordM.addEventListener('click', function (e) {
 		// toggle the type attribute
 		const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
 		password.setAttribute('type', type);

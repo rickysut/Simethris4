@@ -193,7 +193,7 @@ class LoginController extends Controller
 		// ];
 		$request->validate([
 			$this->username() => 'required|string',
-			'password' => 'required|string',
+			'passwordmob' => 'required|string',
 		]);
 	}
 
@@ -205,8 +205,13 @@ class LoginController extends Controller
 	 */
 	protected function attemptLogin(Request $request)
 	{
+		$cred = [
+			'username' => $request->input($this->username()),
+            'password' => $request->input('passwordmob'),
+		];
+		
 		return $this->guard()->attempt(
-			$this->credentials($request),
+			$cred,
 			$request->boolean('remember')
 		);
 	}
@@ -220,7 +225,7 @@ class LoginController extends Controller
 	protected function credentials(Request $request)
 	{
 
-		return $request->only($this->username(), 'password');
+		return $request->only($this->username(), 'passwordmob');
 	}
 
 	/**
@@ -286,7 +291,7 @@ class LoginController extends Controller
 	 */
 	public function username()
 	{
-		return 'username';
+		return 'usernamemob';
 	}
 
 	/**
@@ -309,7 +314,7 @@ class LoginController extends Controller
 
 		return $request->wantsJson()
 			? new JsonResponse([], 204)
-			: redirect('/mobile');
+			: redirect('/');
 	}
 
 	/**
@@ -320,7 +325,7 @@ class LoginController extends Controller
 	 */
 	protected function loggedOut(Request $request)
 	{
-		return redirect('/mobile');
+		return redirect('/');
 	}
 
 	/**
