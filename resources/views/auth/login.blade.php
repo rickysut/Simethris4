@@ -48,7 +48,7 @@
 		<div class="mt-4">
 			<div class="card p-4 rounded-plus bg-faded">
 				
-				<form  id="js-login" novalidate="" method="POST" action="{{ route('mobile.login') }}">
+				<form  id="js-loginmob" novalidate="" method="POST" action="{{ route('mobile.login') }}">
 					@csrf
 					
 					<div class="form-group">
@@ -60,7 +60,7 @@
 								</div>
 							</div>
 
-							<input id="username" name="usernamemob" type="text" class="form-control form-control-lg {{ $errors->has('username') ? ' is-invalid' : '' }}" required autocomplete="{{ trans('global.login_username') }}" autofocus placeholder="{{ trans('global.login_username') }}" value="{{ old('username', null) }}" />
+							<input id="usernamemob" name="usernamemob" type="text" class="form-control form-control-lg {{ $errors->has('username') ? ' is-invalid' : '' }}" required autocomplete="{{ trans('global.login_username') }}" autofocus placeholder="{{ trans('global.login_username') }}" value="{{ old('username', null) }}" />
 							@if($errors->has('username'))
 							<div class="invalid-feedback">
 								{{ $errors->first('username') }}
@@ -77,7 +77,7 @@
 									<span class="fal fa-key"></span>
 								</div>
 							</div>
-							<input id="password" name="passwordmob" type="password" class="form-control form-control-lg border-right-0 bg-transparent pr-0 {{ $errors->has('password') ? ' is-invalid' : '' }}" required autocomplete="{{ trans('global.login_password') }}" autofocus placeholder="{{ trans('global.login_password') }}" value="" />
+							<input id="passwordmob" name="passwordmob" type="password" class="form-control form-control-lg border-right-0 bg-transparent pr-0 {{ $errors->has('password') ? ' is-invalid' : '' }}" required autocomplete="{{ trans('global.login_password') }}" autofocus placeholder="{{ trans('global.login_password') }}" value="" />
 							@if($errors->has('password'))
 							<div class="invalid-feedback">
 								{{ $errors->first('password') }}
@@ -93,7 +93,7 @@
 					
 					<div class="row no-gutters">
 						<div class="col-lg-12 pl-lg-1 my-2" >
-							<button id="js-login-btn" type="submit" class="btn btn-block btn-info btn-lg">{{ trans('global.login') }}</button>
+							<button id="js-login-btnm" type="submit" class="btn btn-block btn-info btn-lg">{{ trans('global.login') }}</button>
 						</div>
 					</div>
 				</form>
