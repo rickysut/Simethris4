@@ -158,17 +158,17 @@
 					console.log('Response:', response);
 					$('#datalokasi').empty();
 					var metadata = '<li class="list-group-item d-flex justify-content-between">' +
-								'<span class="text-muted">Jarak (km)</span>' +
-								'<span>' + response['Jarak (km)'] + '</span>' +
-								'</li>' +
-								'<li class="list-group-item d-flex justify-content-between">' +
-								'<span class="text-muted">Device Location</span>' +
-								'<span>' + response['Device Location'] + '</span>' +
-								'</li>' +
-								'<li class="list-group-item d-flex justify-content-between">' +
-								'<span class="text-muted">Jumlah titik</span>' +
-								'<span>' + response['Jumlah titik'] + '</span>' +
-								'</li>';
+						'<span class="text-muted">Jarak (km)</span>' +
+						'<span>' + response['Jarak (km)'] + '</span>' +
+						'</li>' +
+						'<li class="list-group-item d-flex justify-content-between">' +
+						'<span class="text-muted">Device Location</span>' +
+						'<span>' + response['Device Location'] + '</span>' +
+						'</li>' +
+						'<li class="list-group-item d-flex justify-content-between">' +
+						'<span class="text-muted">Jumlah titik</span>' +
+						'<span>' + response['Jumlah titik'] + '</span>' +
+						'</li>';
 					$('#datalokasi').append(metadata);
 					clearMarkers();
 					$.each(response.data, function(index, location) {
@@ -181,6 +181,13 @@
 								color: 'white',
 							},
 							map: map,
+						});
+						newMarker.addListener('click', function() {
+							var noIjin = selectedNoIjin.trim().replace(/[^a-zA-Z0-9]/g, '');
+							var spatial = location.kode_spatial;
+							window.location.href = "{{ route('2024.verifikator.mobile.veriflokasimobile', ['noIjin', 'spatial']) }}"
+								.replace('noIjin', noIjin)
+								.replace('spatial', spatial);
 						});
 						markers.push(newMarker);
 					});
@@ -399,7 +406,7 @@
 	function updateMap(lat, lng) {
 		var newLatLng = new google.maps.LatLng(lat, lng);
 		map.setCenter(newLatLng);
-		map.setZoom(14);
+		map.setZoom(19);
 		marker.setPosition(newLatLng);
 		circle.setCenter(newLatLng);
 	}

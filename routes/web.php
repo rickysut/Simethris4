@@ -467,6 +467,8 @@ Route::group(['prefix' => '2024', 'as' => '2024.', 'namespace' => 'Admin', 'midd
 
 			Route::group(['prefix' => 'mobile', 'as' => 'mobile.'], function () {
 				Route::get('/markers', 'VerifTanamController@findmarker')->name('findmarker');
+				Route::get('/markers/verifikasi/{noIjin}/{spatial}', 'VerifTanamController@veriflokasimobile')->name('veriflokasimobile');
+
 			});
 
 			Route::group(['prefix' => 'tanam', 'as' => 'tanam.'], function () {
