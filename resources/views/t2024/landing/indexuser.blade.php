@@ -589,7 +589,7 @@
 
 	<script>
 		$(document).ready(function() {
-
+			checkGeolocationPermission();
 			function markAsRead(sklId) {
 				var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content'); // Ambil token CSRF
 
@@ -609,6 +609,54 @@
 			}
 
 		});
+
+		function checkGeolocationPermission() {
+            if (!navigator.geolocation) {
+                console.log("Geolocation is not supported by this browser.");
+                $('#gpstatus').html('Perangkat <span class="text-danger font-weight-bold">Tidak mendukung</span> Fitur ini.');
+                return;
+            }
+
+            navigator.permissions.query({ name: 'geolocation' }).then(function(permissionStatus) {
+                if (permissionStatus.state === 'granted') {
+                    getCurrentPosition();
+                } else if (permissionStatus.state === 'prompt') {
+                    getCurrentPosition();
+                } else {
+                    $('#gpstatus').html('GPS status <span class="text-danger font-weight-bold">Tidak Diijinkan</span>. Mohon izinkan akses lokasi untuk menggunakan fitur ini.');
+                    // Optionally, you could provide a button or a link to open browser settings
+                }
+
+                permissionStatus.onchange = function() {
+                    if (permissionStatus.state === 'granted') {
+                        getCurrentPosition();
+                    } else {
+                        $('#gpstatus').html('GPS status <span class="text-danger font-weight-bold">Tidak Diijinkan</span>. Mohon izinkan akses lokasi untuk menggunakan fitur ini.');
+                    }
+                };
+            });
+        }
+
+		function getCurrentPosition() {
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    console.log("Latitude: " + position.coords.latitude);
+                    console.log("Longitude: " + position.coords.longitude);
+
+                    var thisLat = position.coords.latitude;
+                    var thisLong = position.coords.longitude;
+                    $('#latitude').val(thisLat);
+                    $('#longitude').val(thisLong);
+                    $('#gpstatus').html('GPS status <span class="text-success font-weight-bold">Aktif</span>');
+
+                    initMap(thisLat, thisLong);
+                },
+                function(error) {
+                    console.error("Error Code = " + error.code + " - " + error.message);
+                    $('#gpstatus').html('GPS status <span class="text-danger font-weight-bold">Tidak Aktif/Tidak Diijinkan</span>');
+                }
+            );
+        }
 	</script>
 	<script>
 		// function setScreenSizeAndRedirect() {
