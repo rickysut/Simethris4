@@ -44,7 +44,7 @@
     <link rel="stylesheet" media="screen, print" href="{{ asset('css/smartadmin/fa-brands.css') }}">
 
 	{{-- move manifest ke root --}}
-	<link rel="manifest" href="manifest.json">
+	<link rel="manifest" href="/manifest.json">
 
     @yield('style')
 

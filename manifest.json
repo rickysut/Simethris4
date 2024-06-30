@@ -1,6 +1,6 @@
 {
     "version": "1.0",
-	"lang" : "id",
+	"lang" : "en",
 	"name" : "Simethris Mobile",
 	"scope" : "https://simethris.hortikultura.pertanian.go.id/2024",
 	"display" : "fullscreen",

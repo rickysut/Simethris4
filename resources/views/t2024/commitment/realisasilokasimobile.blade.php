@@ -50,6 +50,18 @@
 											<span class="text-muted">Luas Lahan (m2)</span>
 											<span class="fw-bold" id="">{{ number_format($data->luas_lahan, 0, ',', '.') }}</span>
 										</li>
+										<li class="list-group-item d-flex justify-content-between align-item-start">
+											<div class="row">
+												<label for="mulai_tanam">Tanggal Awal Tanam<sup class="text-danger"> *</sup></label>
+												<div class="input-group">
+													<div class="input-group-prepend">
+														<span class="input-group-text"><i class="fal fa-calendar-day"></i></span>
+													</div>
+													<input type="date" value="" name="mulai_tanam" id="mulai_tanam" class="font-weight-bold form-control form-control bg-white">
+												</div>
+												<span class="help-block">Tanggal mulai penanaman.</span>
+											</div>
+										</li>
 									</ul>
 								</div>
 							</div>
