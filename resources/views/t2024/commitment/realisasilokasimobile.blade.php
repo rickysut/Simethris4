@@ -52,6 +52,7 @@
 										</li>
 									</ul>
 									<div class="row flex">
+										<input type="file" accept="image/*" capture="camera" id="cameraInput" style="display:none;">
 										<div class="col-12 mb-3">
 											<label for="mulai_tanam">Tanggal Awal Tanam</label>
 											<div class="input-group">
@@ -250,8 +251,40 @@
 			]
 		});
 
+		cameraBtn();
 		createMarker();
 		createPolygon();
+	}
+
+	function cameraBtn() {
+		var controlDiv = document.createElement('div');
+
+		var button = document.createElement('button');
+		button.style.backgroundColor = '#fff';
+		button.style.border = 'none';
+		button.style.outline = 'none';
+		button.style.width = '40px';
+		button.style.height = '40px';
+		button.style.borderRadius = '2px';
+		button.style.boxShadow = '0 2px 6px rgba(0,0,0,.3)';
+		button.style.cursor = 'pointer';
+		button.style.marginRight = '10px';
+		button.style.padding = '0';
+		button.title = 'Take a Photo';
+		controlDiv.appendChild(button);
+
+		var icon = document.createElement('i');
+		icon.className = 'fas fa-camera';
+		icon.style.fontSize = '18px';
+		icon.style.margin = '10px';
+		button.appendChild(icon);
+
+		button.addEventListener('click', function() {
+			document.getElementById('cameraInput').click();
+		});
+
+		controlDiv.index = 1;
+		myMap.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(controlDiv);
 	}
 
 	function createMarker() {
