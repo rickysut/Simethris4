@@ -43,7 +43,7 @@
     <link rel="stylesheet" media="screen, print" href="{{ asset('css/smartadmin/fa-solid.css') }}">
     <link rel="stylesheet" media="screen, print" href="{{ asset('css/smartadmin/fa-brands.css') }}">
 
-	<link rel="manifest" href="{{asset('manifest.json')}}">
+	<link rel="manifest" href="manifest.json">
 
     @yield('style')
 
