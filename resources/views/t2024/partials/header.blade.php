@@ -53,7 +53,6 @@
 			title="Hide Navigation">
 			<i class="ni ni-menu"></i>
 		</a>
-
 	</div>
 	<!-- DOC: mobile button appears during mobile width -->
 	<div class="hidden-lg-up">

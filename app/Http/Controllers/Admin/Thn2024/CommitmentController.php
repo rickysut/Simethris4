@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 use App\Models2024\AjuVerifProduksi;
 use App\Models2024\AjuVerifSkl;
 use App\Models2024\AjuVerifTanam;
+use App\Models2024\ForeignApi;
 use App\Models2024\Lokasi;
 use App\Models2024\MasterAnggota;
 use App\Models2024\MasterSpatial;
@@ -151,6 +152,64 @@ class CommitmentController extends Controller
 			$disabled = true; // input di-disable
 		}
 		return view('t2024.commitment.realisasi', compact('module_name', 'page_title', 'page_heading', 'heading_class', 'commitment', 'noIjin','penangkars', 'docs', 'npwp', 'varietass', 'disabled', 'poktans', 'ijin'));
+	}
+
+	public function findmarker (Request $request)
+	{
+		$module_name = 'Verifikasi';
+		$page_title = 'Simulator Spatial';
+		$page_heading = 'Marker Finder Simulator';
+		$heading_class = 'fal fa-map-marked-alt';
+
+		$ijins = PullRiph::select('no_ijin')->get();
+
+		$myLocus = [
+			[
+				'id' => 1,
+				'latitude' => -6.286147,
+				'longitude' => 106.838966,
+				'name' => 'Lokasi Pengujian 1',
+			],
+			[
+				'id' => 2,
+				'latitude' => -6.66440,
+				'longitude' => 106.863234,
+				'name' => 'Lokasi Pengujian 2',
+			],
+			[
+				'id' => 3,
+				'latitude' => -7.34105,
+				'longitude' => 110.0749047922466,
+				'name' => 'Kebun Temanggung',
+			],
+		];
+
+		$mapkey = ForeignApi::find(1);
+		return view('t2024.commitment.simulator', compact('module_name', 'page_title', 'page_heading', 'heading_class', 'mapkey', 'ijins', 'myLocus'));
+	}
+
+	public function realisasimobile (Request $request, $noIjin, $spatial)
+	{
+		$spatial = $spatial;
+		$module_name = 'Verifikasi';
+		$page_title = 'Simulator Spatial';
+		$page_heading = 'Verifikasi Lahan ' . $spatial;
+		$heading_class = 'fal fa-map-marker';
+
+		$noIjin = substr($noIjin, 0, 4) . '/' .
+			substr($noIjin, 4, 2) . '.' .
+			substr($noIjin, 6, 3) . '/' .
+			substr($noIjin, 9, 1) . '/' .
+			substr($noIjin, 10, 2) . '/' .
+			substr($noIjin, 12, 4);
+
+		$data = Lokasi::where('no_ijin', $noIjin)
+		->where('kode_spatial', $spatial)
+		->with(['masteranggota', 'pks', 'spatial', 'fototanam', 'fotoproduksi'])
+		->first();
+
+		$mapkey = ForeignApi::find(1);
+		return view('t2024.commitment.realisasilokasimobile', compact('module_name', 'page_title', 'page_heading', 'heading_class', 'mapkey', 'data'));
 	}
 
 	public function updatePks(Request $request, $id)
