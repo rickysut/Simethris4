@@ -468,7 +468,6 @@ Route::group(['prefix' => '2024', 'as' => '2024.', 'namespace' => 'Admin', 'midd
 			Route::group(['prefix' => 'mobile', 'as' => 'mobile.'], function () {
 				Route::get('/markers', 'VerifTanamController@findmarker')->name('findmarker');
 				Route::get('/markers/verifikasi/{noIjin}/{spatial}', 'VerifTanamController@veriflokasimobile')->name('veriflokasimobile');
-
 			});
 
 			Route::group(['prefix' => 'tanam', 'as' => 'tanam.'], function () {
@@ -487,13 +486,17 @@ Route::group(['prefix' => '2024', 'as' => '2024.', 'namespace' => 'Admin', 'midd
 		Route::group(['prefix' => 'user', 'as' => 'user.'], function () {
 			Route::get('/', 'HomeController@index')->name('home');
 
+			Route::group(['prefix' => 'mobile', 'as' => 'mobile.'], function () {
+				Route::get('/markers', 'CommitmentController@findmarker')->name('findmarker');
+				Route::get('/markers/realisasi/{noIjin}/{spatial}', 'CommitmentController@realisasimobile')->name('realisasi');
+			});
+
 			//pullriph
 			Route::group(['prefix' => 'pull', 'as' => 'pull.'], function () {
 				Route::get('/', 'PullRiphController@index')->name('index');
 				Route::get('/getriph', 'PullRiphController@pull')->name('getriph');
 				Route::post('/store', 'PullRiphController@store')->name('store');
 			});
-
 
 			//commitment
 			Route::group(['prefix' => 'commitment', 'as' => 'commitment.'], function () {
@@ -571,6 +574,14 @@ Route::group(['prefix' => '2024', 'as' => '2024.', 'namespace' => 'Admin', 'midd
 	});
 });
 
+
+
+
+
+
+
+
+//hold dulu bagian ini ke bawah
 Route::group(['prefix' => 'mobile', 'as' => 'mobile.', 'namespace' => 'Mobile'], function () {
 	Route::get('/login', 'LoginController@index')->name('login');
 	Route::post('/login', 'LoginController@login')->name('login');

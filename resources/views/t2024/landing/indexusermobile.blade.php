@@ -23,7 +23,7 @@
 			<div class="col text-center">
 				<h2 class="display-4">Hallo, <span class="fw-700">{{ Auth::user()->name }} </span></h2>
 				<h4 class="">
-					<p class="text-muted">Selamat Datang di Mobile Version</p>
+					<p class="text-muted">Selamat Datang di Simethris Mobile</p>
 				</h4>
 			</div>
 		</div>
@@ -79,28 +79,28 @@
 		});
 	</script>
 	<script>
-		function setScreenSizeAndRedirect() {
-			var screenSize = (window.innerWidth <= 992) ? 'mobile' : 'desktop';
-			document.cookie = "screen_size=" + screenSize + "; path=/";
+		// function setScreenSizeAndRedirect() {
+		// 	var screenSize = (window.innerWidth <= 992) ? 'mobile' : 'desktop';
+		// 	document.cookie = "screen_size=" + screenSize + "; path=/";
 
-			var userRole = "{{ Auth::user()->roles[0]->title }}";
+		// 	var userRole = "{{ Auth::user()->roles[0]->title }}";
 
-			if (userRole === 'Verifikator') {
-				if (screenSize === 'mobile' && window.location.pathname !== '/2024/verifikator/mobile') {
-					window.location.href = "/2024/verifikator/mobile";
-				} else if (screenSize === 'desktop' && window.location.pathname !== '/2024/verifikator') {
-					window.location.href = "/2024/verifikator";
-				}
-			}
-		}
+		// 	if (userRole === 'Verifikator') {
+		// 		if (screenSize === 'mobile' && window.location.pathname !== '/2024/verifikator/mobile') {
+		// 			window.location.href = "/2024/verifikator/mobile";
+		// 		} else if (screenSize === 'desktop' && window.location.pathname !== '/2024/verifikator') {
+		// 			window.location.href = "/2024/verifikator";
+		// 		}
+		// 	}
+		// }
 
-		document.addEventListener('DOMContentLoaded', function() {
-			setScreenSizeAndRedirect();
-		});
+		// document.addEventListener('DOMContentLoaded', function() {
+		// 	setScreenSizeAndRedirect();
+		// });
 
-		window.addEventListener('resize', function() {
-			setScreenSizeAndRedirect();
-		});
+		// window.addEventListener('resize', function() {
+		// 	setScreenSizeAndRedirect();
+		// });
 	</script>
 
 @endsection

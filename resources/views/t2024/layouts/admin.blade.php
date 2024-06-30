@@ -18,6 +18,7 @@
 		<link rel="stylesheet" href="{{ asset('css/app.css') }}" />
 		<link id="vendorsbundle" rel="stylesheet" media="screen, print" href="{{ asset('css/smartadmin/vendors.bundle.css') }}">
 		<link id="appbundle" rel="stylesheet" media="screen, print" href="{{ asset('css/smartadmin/app.bundle.css') }}">
+		{{-- <link id="customtheme" rel="stylesheet" media="screen, print" href="{{ asset('css/smartadmin/custom.css') }}"> --}}
 		<link id="mytheme" rel="stylesheet" media="screen, print" href="#">
 		<link id="myskin" rel="stylesheet" media="screen, print" href="{{ asset('css/smartadmin/skins/skin-master.css') }}">
 		<!-- Place favicon.ico in the root directory -->
