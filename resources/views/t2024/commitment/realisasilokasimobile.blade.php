@@ -37,7 +37,7 @@
 							</div>
 							<div id="data-realisasi" class="collapse show" data-parent="#data-laporan" style="">
 								<div class="card-body">
-									<ul class="list-group">
+									<ul class="list-group mb-3">
 										<li class="list-group-item d-flex justify-content-between align-item-start">
 											<span class="text-muted">Nama Petani</span>
 											<span class="fw-bold" id="">{{$data->spatial->nama_petani}}</span>
@@ -50,19 +50,90 @@
 											<span class="text-muted">Luas Lahan (m2)</span>
 											<span class="fw-bold" id="">{{ number_format($data->luas_lahan, 0, ',', '.') }}</span>
 										</li>
-										<li class="list-group-item d-flex justify-content-between align-item-start">
-											<div class="row">
-												<label for="mulai_tanam">Tanggal Awal Tanam<sup class="text-danger"> *</sup></label>
-												<div class="input-group">
-													<div class="input-group-prepend">
-														<span class="input-group-text"><i class="fal fa-calendar-day"></i></span>
-													</div>
-													<input type="date" value="" name="mulai_tanam" id="mulai_tanam" class="font-weight-bold form-control form-control bg-white">
-												</div>
-												<span class="help-block">Tanggal mulai penanaman.</span>
-											</div>
-										</li>
 									</ul>
+									<div class="row flex">
+										<div class="col-12 mb-3">
+											<label for="mulai_tanam">Tanggal Awal Tanam</label>
+											<div class="input-group">
+												<div class="input-group-prepend">
+													<span class="input-group-text"><i class="fal fa-calendar-day"></i></span>
+												</div>
+												<input type="date" value="" name="mulai_tanam" id="mulai_tanam" class="font-weight-bold form-control form-control-lg bg-white">
+											</div>
+											<span class="help-block">Tanggal mulai penanaman.</span>
+										</div>
+										<div class="col-12 mb-3">
+											<label for="akhir_tanam">Tanggal Akhir Tanam</label>
+											<div class="input-group">
+												<div class="input-group-prepend">
+													<span class="input-group-text"><i class="fal fa-calendar-day"></i></span>
+												</div>
+												<input type="date" value="" name="akhir_tanam" id="akhir_tanam" class="font-weight-bold form-control form-control-lg  bg-white">
+											</div>
+											<span class="help-block">Tanggal akhir penanaman.</span>
+										</div>
+										<div class="col-12 mb-3">
+											<label for="luas_tanam">Luas Tanam (m2)</label>
+											<div class="input-group">
+												<div class="input-group-prepend">
+													<span class="input-group-text"><i class="fal fa-ruler"></i></span>
+												</div>
+												<input type="number" value="" name="luas_tanam" id="luas_tanam" class="font-weight-bold form-control form-control-lg bg-white">
+											</div>
+											<span class="help-block">Luas lahan yang ditanami.</span>
+										</div>
+										<div class="col-12 mb-3">
+											<label for="mulai_tanam">Tanggal Awal Produksi</label>
+											<div class="input-group">
+												<div class="input-group-prepend">
+													<span class="input-group-text"><i class="fal fa-calendar-day"></i></span>
+												</div>
+												<input type="date" value="" name="mulai_panen" id="mulai_panen" class="font-weight-bold form-control form-control-lg bg-white">
+											</div>
+											<span class="help-block">Tanggal dimulainya pemanenan.</span>
+										</div>
+										<div class="col-12 mb-3">
+											<label for="akhir_tanam">Tanggal Akhir Produksi</label>
+											<div class="input-group">
+												<div class="input-group-prepend">
+													<span class="input-group-text"><i class="fal fa-calendar-day"></i></span>
+												</div>
+												<input type="date" value="" name="akhir_panen" id="akhir_panen" class="font-weight-bold form-control form-control-lg bg-white">
+											</div>
+											<span class="help-block">Tanggal akhir dilaksanakannya pemanenan.</span>
+										</div>
+										<div class="col-12 mb-3">
+											<label for="volume">Volume Produksi (ton)</label>
+											<div class="input-group">
+												<div class="input-group-prepend">
+													<span class="input-group-text"><i class="fal fa-balance-scale"></i></span>
+												</div>
+
+												<input type="number" step="1" value="" name="volume" id="volume" class="font-weight-bold form-control form-control-lg bg-white">
+											</div>
+											<span class="help-block">Total produksi yang diperoleh.</span>
+										</div>
+										<div class="col-12 mb-3">
+											<label for="volume">Untuk Benih (ton)</label>
+											<div class="input-group">
+												<div class="input-group-prepend">
+													<span class="input-group-text"><i class="fal fa-seedling"></i></span>
+												</div>
+												<input type="number" value="" name="vol_benih" id="vol_benih" class="font-weight-bold form-control form-control-lg bg-white" disabled="">
+											</div>
+											<span class="help-block">Total produksi yang disimpan sebagai benih.</span>
+										</div>
+										<div class="col-12 mb-3">
+											<label for="volume">Untuk Dijual (ton)</label>
+											<div class="input-group">
+												<div class="input-group-prepend">
+													<span class="input-group-text"><i class="fal fa-truck-loading"></i></span>
+												</div>
+												<input type="number" value="" name="vol_jual" id="vol_jual" class="font-weight-bold form-control form-control-lg bg-white">
+											</div>
+											<span class="help-block">Total produksi yang dilepas ke konsumsi.</span>
+										</div>
+									</div>
 								</div>
 							</div>
 						</div>
@@ -86,6 +157,47 @@
 @parent
 <script>
 	$(document).ready(function() {
+		$('#vol_benih').prop('disabled', true);
+    	// $('#vol_jual').prop('readonly', true);
+
+		function updateVolJual() {
+			var volume = parseFloat($('#volume').val());
+			var volBenih = parseFloat($('#vol_benih').val()) || 0; // Treat null as 0
+
+			if (!isNaN(volume) && volume >= 0 && volBenih >= 0 && volBenih <= volume) {
+				$('#vol_jual').val(volume - volBenih);
+			} else {
+				$('#vol_jual').val('');
+			}
+		}
+
+		// Reset vol_benih and vol_jual on change of volume
+		$('#volume').on('input', function() {
+			var volume = parseFloat($(this).val());
+			if (isNaN(volume) || volume < 0) {
+				$(this).val('').attr('placeholder', 'Masukkan nilai volume yang valid.');
+				$('#vol_benih').val('').prop('disabled', true);
+				$('#vol_jual').val('').prop('readonly', true);
+			} else {
+				$(this).attr('placeholder', '');
+				$('#vol_benih').prop('disabled', false);
+				$('#vol_jual').prop('readonly', false);
+				updateVolJual();
+			}
+		});
+
+		// Reset vol_jual if vol_benih is changed
+		$('#vol_benih').on('input', function() {
+			var volBenih = parseFloat($(this).val());
+			var volume = parseFloat($('#volume').val());
+			if (isNaN(volBenih) || volBenih < 0 || volBenih > volume) {
+				$(this).val('').attr('placeholder', 'Masukkan nilai vol benih yang valid.');
+			} else {
+				$(this).attr('placeholder', '');
+				updateVolJual();
+			}
+		});
+
 		if (navigator.geolocation) {
 			navigator.geolocation.getCurrentPosition(
 				function(position) {
