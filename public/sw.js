@@ -1,17 +1,57 @@
-importScripts('https://storage.googleapis.com/workbox-cdn/releases/4.3.0/workbox-sw.js');
+const preLoad = function () {
+    return caches.open("offline").then(function (cache) {
+        // caching index and important routes
+        return cache.addAll(filesToCache);
+    });
+};
 
-//Workbox Config
-workbox.setConfig({
-    debug: false //set to true if you want to see SW in action.
+self.addEventListener("install", function (event) {
+    event.waitUntil(preLoad());
 });
 
-//Caching Everything Inside the Folder of our Item
-workbox.routing.registerRoute(
-    new RegExp('.*'),
-    new workbox.strategies.NetworkFirst()
-);
+const filesToCache = [
+    '/',
+    '/offline.html'
+];
 
-//console.log('Sticky Service Worker Running');
+const checkResponse = function (request) {
+    return new Promise(function (fulfill, reject) {
+        fetch(request).then(function (response) {
+            if (response.status !== 404) {
+                fulfill(response);
+            } else {
+                reject();
+            }
+        }, reject);
+    });
+};
 
-//Learn more about Service Workers and Configurations
-//https://developers.google.com/web/tools/workbox/
+const addToCache = function (request) {
+    return caches.open("offline").then(function (cache) {
+        return fetch(request).then(function (response) {
+            return cache.put(request, response);
+        });
+    });
+};
+
+const returnFromCache = function (request) {
+    return caches.open("offline").then(function (cache) {
+        return cache.match(request).then(function (matching) {
+            if (!matching || matching.status === 404) {
+                return cache.match("offline.html");
+            } else {
+                return matching;
+            }
+        });
+    });
+};
+
+self.addEventListener("fetch", function (event) {
+    event.respondWith(checkResponse(event.request).catch(function () {
+        return returnFromCache(event.request);
+    }));
+    if(!event.request.url.startsWith('http')){
+        event.waitUntil(addToCache(event.request));
+    }
+});
+
