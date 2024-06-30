@@ -1,5 +1,18 @@
 @extends('t2024.layouts.admin')
-
+@section('styles')
+<style>
+	.android-button {
+		padding: 10px;
+		margin: 10px;
+		font-size: 20px;
+		font-weight: bold;
+		text-align: center;
+		border-radius: 10px;
+		cursor: pointer;
+		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+	}
+</style>
+@endsection
 @section('content')
 	@can('landing_access')
 		@php($unreadmsg = \App\Models\QaTopic::unreadCount())
@@ -36,7 +49,7 @@
 			@php($cntgetNewSkl = \App\Models\SklReads::getNewSklCount())
 		@endif
 
-		<div class="row mb-5">
+		<div class="row mb-5 hidden-md-down">
 			<div class="col text-center">
 				<h1 class="hidden-md-down">Selamat Datang di Simethris,</h1><br>
 				<span class="display-4 fw-700 hidden-md-down">{{ Auth::user()->data_user->company_name ?? Auth::user()->name }}</span>
@@ -102,8 +115,8 @@
 				</div>
 			@endif
 		@endif
-		<!-- Page Content -->
-		<div class="row">
+		<!-- Page Content Daftar Pesan baru dan Pengajuan -->
+		<div class="row hidden-md-down">
 			<div class="col-lg-6">
 				{{-- <div id="panel-1" class="panel">
 					<div class="panel-hdr">
@@ -510,7 +523,65 @@
 				@endif
 			</div>
 		</div>
-		<!-- Page Content -->
+		<!-- Page Content Khusus Mobile-->
+		<div class="hidden-sm-up">
+			<div class="row mb-5">
+				<div class="col text-center">
+					<h2 class="display-4">Hallo, <span class="fw-700">{{ Auth::user()->name }} </span></h2>
+					<h4 class="">
+						<p class="text-muted">Selamat Datang di Simethris Mobile</p>
+					</h4>
+				</div>
+			</div>
+			@can('verificator_task_access')
+				<div class="row">
+					<div class="col-12 text-center">
+						<span class="d-inline-flex flex-column justify-content-center">
+							<a href="{{route('2024.verifikator.mobile.findmarker')}}" class="btn android-button btn-outline-warning">
+								<img src="{{ asset('logoicon.png') }}" alt="" style="width: 4rem; height: 4rem;">
+							</a>
+							<span>Verifikasi</span>
+						</span>
+						<span class="d-inline-flex flex-column justify-content-center ">
+							<a href="javascript:void(0)" class="android-button btn-default">
+								<img src="{{ asset('favicon.png') }}" alt="" style="width: 4rem; height: 4rem; filter: grayscale(100%)">
+							</a>
+							<span>Sample</span>
+						</span>
+						<span class="d-inline-flex flex-column justify-content-center">
+							<a href="javascript:void(0)" class="android-button btn-default">
+								<img src="{{ asset('favicon.png') }}" alt="" style="width: 4rem; height: 4rem; filter: grayscale(100%)">
+							</a>
+							<span>Sample</span>
+						</span>
+					</div>
+				</div>
+			@endcan
+			@can('user_task_access')
+				<div class="row">
+					<div class="col-12 text-center">
+						<span class="d-inline-flex flex-column justify-content-center">
+							<a href="{{route('2024.user.mobile.findmarker')}}" class="btn android-button btn-outline-warning">
+								<img src="{{ asset('logoicon.png') }}" alt="" style="width: 4rem; height: 4rem;">
+							</a>
+							<span>Realisasi Tanam</span>
+						</span>
+						<span class="d-inline-flex flex-column justify-content-center ">
+							<a href="javascript:void(0)" class="android-button btn-default">
+								<img src="{{ asset('favicon.png') }}" alt="" style="width: 4rem; height: 4rem; filter: grayscale(100%)">
+							</a>
+							<span>Sample</span>
+						</span>
+						<span class="d-inline-flex flex-column justify-content-center">
+							<a href="javascript:void(0)" class="android-button btn-default">
+								<img src="{{ asset('favicon.png') }}" alt="" style="width: 4rem; height: 4rem; filter: grayscale(100%)">
+							</a>
+							<span>Sample</span>
+						</span>
+					</div>
+				</div>
+			@endcan
+		</div>
 	@endcan
 @endsection
 @section('scripts')
@@ -540,28 +611,28 @@
 		});
 	</script>
 	<script>
-		function setScreenSizeAndRedirect() {
-			var screenSize = (window.innerWidth <= 992) ? 'mobile' : 'desktop';
-			document.cookie = "screen_size=" + screenSize + "; path=/";
+		// function setScreenSizeAndRedirect() {
+		// 	var screenSize = (window.innerWidth <= 992) ? 'mobile' : 'desktop';
+		// 	document.cookie = "screen_size=" + screenSize + "; path=/";
 
-			var userRole = "{{ Auth::user()->roles[0]->title }}";
+		// 	var userRole = "{{ Auth::user()->roles[0]->title }}";
 
-			if (userRole === 'Verifikator') {
-				if (screenSize === 'mobile' && window.location.pathname !== '/2024/verifikator/mobile') {
-					window.location.href = "/2024/verifikator/mobile";
-				} else if (screenSize === 'desktop' && window.location.pathname !== '/2024/verifikator') {
-					window.location.href = "/2024/verifikator";
-				}
-			}
-		}
+		// 	if (userRole === 'Verifikator') {
+		// 		if (screenSize === 'mobile' && window.location.pathname !== '/2024/verifikator/mobile') {
+		// 			window.location.href = "/2024/verifikator/mobile";
+		// 		} else if (screenSize === 'desktop' && window.location.pathname !== '/2024/verifikator') {
+		// 			window.location.href = "/2024/verifikator";
+		// 		}
+		// 	}
+		// }
 
-		document.addEventListener('DOMContentLoaded', function() {
-			setScreenSizeAndRedirect();
-		});
+		// document.addEventListener('DOMContentLoaded', function() {
+		// 	setScreenSizeAndRedirect();
+		// });
 
-		window.addEventListener('resize', function() {
-			setScreenSizeAndRedirect();
-		});
+		// window.addEventListener('resize', function() {
+		// 	setScreenSizeAndRedirect();
+		// });
 	</script>
 
 @endsection
