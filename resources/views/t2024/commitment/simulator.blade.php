@@ -126,7 +126,7 @@
 				},
 				function(error) {
 					console.error("Error Code = " + error.code + " - " + error.message);
-					$('#gpstatus').html('GPS status <span class="text-danger font-weight-bold">Tidak Aktif/Tidak Diijinkan</span>');
+					$('#gpstatus').html('GPS status <span class="text-warning font-weight-bold">Tidak Aktif/Tidak Diijinkan</span>');
 				}
 			);
 		} else {
