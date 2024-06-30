@@ -4,7 +4,7 @@
 "name" : "Simethris",
 "scope" : "https://simethris.hortikultura.pertanian.go.id/mobile",
 "display" : "fullscreen",
-"short_name" : "Simethris 4Alpha",
+"short_name" : "Simethris Mobile",
 "description" : "Aplikasi Verifikasi dan Pelaporan Wajib Tanam",
 "orientation" : "portrait",
 "background_color": "#000000",
