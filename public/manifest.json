@@ -1,8 +1,8 @@
 {
     "version": "1.0",
 	"lang" : "id",
-	"name" : "Simethris Mobile",
-	"scope" : "https://simethris.hortikultura.pertanian.go.id/mobile",
+	"name" : "SimethrisMobile",
+	"scope" : "https://simethris.hortikultura.pertanian.go.id/2024",
 	"display" : "fullscreen",
 	"short_name" : "Simethris",
 	"description" : "Aplikasi Verifikasi dan Pelaporan Wajib Tanam",
