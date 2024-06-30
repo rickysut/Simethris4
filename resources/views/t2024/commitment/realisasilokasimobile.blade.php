@@ -90,13 +90,14 @@
 				},
 				function(error) {
 					console.error("Error Code = " + error.code + " - " + error.message);
-					$('#gpstatus').html('GPS status <span class="text-warning font-weight-bold">Tidak Aktif/Tidak Diijinkan</span>');
+					$('#gpstatus').html('GPS status <span class="text-danger font-weight-bold">Tidak Aktif/Tidak Diijinkan</span>');
 				}
 			);
 		} else {
 			console.log("Geolocation is not supported by this browser.");
 			$('#gpstatus').html('Perangkat <span class="text-danger font-weight-bold">Tidak mendukung</span> Fitur ini.');
 		}
+
 		var lat = parseFloat('{{$data->spatial->latitude}}');
 		var lng = parseFloat('{{$data->spatial->longitude}}');
 		var poly = JSON.parse('{{$data->spatial->polygon}}'.replace(/&quot;/g,'"'));
