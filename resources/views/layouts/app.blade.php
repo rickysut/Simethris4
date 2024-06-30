@@ -58,7 +58,7 @@
     <div class="page-wrapper">
         <div class="page-inner bg-brand-gradient">
             <div class="page-content-wrapper bg-transparent m-0">
-                <div class="height-10 w-100 shadow-lg px-4 bg-brand-gradient">
+                <div class="height-10 w-100 shadow-lg px-4 bg-brand-gradient hidden-sm-down">
                     <div class="d-flex align-items-center container p-0">
                         <div class="page-logo width-mobile-auto m-0 align-items-center justify-content-center p-0 bg-transparent bg-img-none shadow-0 height-9 border-0">
                             <img src="{{ asset('img/favicon.png') }}" alt="simethris" aria-roledescription="logo">
@@ -66,13 +66,8 @@
                                 <img src="{{ asset('img/logo-icon.png') }}" alt="simethris" aria-roledescription="logo" style="width:150px; height:auto;">
                             </span>
                             <span class="page-logo-text mr-1 d-sm-block d-md-none">Simethris MobileApp</span>
-                        </div>
-                        {{-- <div class="page-logo width-mobile-auto m-0 align-items-center justify-content-center p-0 bg-transparent bg-img-none shadow-0 height-9 border-0">
-                            <a href="javascript:void(0)" class="page-logo-link press-scale-down d-flex align-items-center">
-                                <img src="img/logo-simet.png" alt="SmartCompany WebApp" aria-roledescription="logo">
-                                <span class="page-logo-text mr-1">SmartCompany WebApp</span>
-                            </a>
-                        </div> --}}
+                        </div> 
+                        
                         <div class="ml-auto">
                             <ol class="nav">
                                 @guest
