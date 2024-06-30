@@ -208,8 +208,6 @@ class CommitmentController extends Controller
 		->with(['masteranggota', 'pks', 'spatial', 'fototanam', 'fotoproduksi'])
 		->first();
 
-		dd($data);
-
 		$mapkey = ForeignApi::find(1);
 		return view('t2024.commitment.realisasilokasimobile', compact('module_name', 'page_title', 'page_heading', 'heading_class', 'mapkey', 'data'));
 	}
