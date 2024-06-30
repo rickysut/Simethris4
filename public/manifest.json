@@ -1,15 +1,11 @@
 {
-    "version": "1.0",
-	"lang" : "en",
-	"name" : "Simethris",
-	"scope" : "https://simethris.hortikultura.pertanian.go.id/mobile",
-	"display" : "fullscreen",
-	"short_name" : "Simethris",
-	"description" : "",
-	"orientation" : "portrait",
-	"background_color": "#000000",
-	"theme_color": "#000000",
-	"generated" : "true",
+    "name": "Simethris 4@",
+    "short_name": "simethris4aalpha",
+    "start_url": "/index.php",
+    "background_color": "#6777ef",
+    "description": "Aplikasi Verifikasi dan Pelaporan Wajib Tanam",
+    "display": "fullscreen",
+    "theme_color": "#886ab5",
     "icons": [
         {
             "src": "logoicon.png",
