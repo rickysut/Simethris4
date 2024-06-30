@@ -531,6 +531,7 @@
 					<h4 class="">
 						<p class="text-muted">Selamat Datang di Simethris Mobile</p>
 					</h4>
+					<p class="gpstatus"></p>
 				</div>
 			</div>
 			@can('verificator_task_access')
