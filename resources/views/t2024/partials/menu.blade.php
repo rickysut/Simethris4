@@ -254,9 +254,39 @@
 
 			{{-- verificator task --}}
 			@can('verificator_task_access')
-				<li class="nav-title" data-i18n="nav.administation">PENGAJUAN VERIFIKASI</li>
+				<li class="nav-title" data-i18n="nav.administation">VERIFIKASI</li>
 				@can('online_access')
-					<li class="c-sidebar-nav-item {{ request()->is('verification/tanam*') ? 'active' : '' }}">
+					<li class="c-sidebar-nav-item {{ request()->is('2024/admin/pengajuan*') ? 'active' : '' }}">
+						<a href="{{ route('2024.admin.pengajuan.') }}"
+							data-filter-tags="verifikasi tanam">
+							<i class="fal fa-download c-sidebar-nav-icon"></i>
+							<span class="nav-link-text">
+								Pengajuan
+							</span>
+							@php
+								$pengajuan = new \App\Models2024\AjuVerifTanam();
+								$unverified = $pengajuan->NewRequest();
+								$proceed = $pengajuan->proceedVerif();
+							@endphp
+							<span class="">
+								{{-- untuk 2024 --}}
+								@if ($unverified > 0 || $proceed > 0)
+									<span class="dl-ref {{ $unverified > 0 ? 'bg-danger-500' : 'bg-warning-500' }} hidden-nav-function-minify hidden-nav-function-top">
+										{{ $unverified }}/{{ $proceed }}
+									</span>
+								@endif
+								{{-- @if ($unverified > 0)
+									<span class="dl-ref bg-danger-500 hidden-nav-function-minify hidden-nav-function-top">{{ $unverified }}</span>
+								@endif
+								@if ($proceed > 0)
+									<span class="dl-ref bg-warning-500 hidden-nav-function-minify hidden-nav-function-top">{{ $proceed }}</span>
+								@endif --}}
+							</span>
+						</a>
+					</li>
+				@endcan
+				@can('permission_access')
+					<li class="c-sidebar-nav-item {{ request()->is('admin/pengajuan*') ? 'active' : '' }}">
 						<a href="{{ route('2024.verifikator.tanam.home') }}"
 							data-filter-tags="verifikasi tanam">
 							<i class="fal fa-seedling c-sidebar-nav-icon"></i>

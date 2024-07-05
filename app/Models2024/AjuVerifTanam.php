@@ -91,4 +91,9 @@ class AjuVerifTanam extends Model
 	{
 		return $this->belongsTo(User::class, 'check_by', 'id');
 	}
+
+	public function assignments()
+	{
+		return $this->hasMany(AssignmentTanam::class, 'pengajuan_id');
+	}
 }

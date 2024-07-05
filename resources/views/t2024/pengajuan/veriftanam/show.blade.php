@@ -62,12 +62,6 @@
 									<td></td>
 								</tr>
 								<tr>
-									<td class="text-muted">Luas Wajib Tanam</td>
-									<td>:</td>
-									<td class="fw-500" id="wajibTanam"></td>
-									<td></td>
-								</tr>
-								<tr>
 									<td class="text-muted">Realisasi Tanam</td>
 									<td>:</td>
 									<td class="fw-500" id="realisasiTanam">
@@ -289,12 +283,15 @@
 					$('#periode').text(data.periode);
 
 					//Ringkasan Realisasi dan Kewajiban
-					$('#wajibTanam').text(data.wajibTanam + ' ha');
+					var wajibTanam = data.wajibTanam * 10000;
+					var realisasi = data.realisasiTanam;
+					var wajibTanamFormatted = wajibTanam.toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+					var realisasiFormatted = realisasi.toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
 
-					var luasTanam = data.realisasiTanam + ' / ' + data.wajibTanam + ' ha';
-					if (data.realisasiTanam == '0' || data.realisasiTanam == null || data.realisasiTanam == undefined){
+					var luasTanam = realisasiFormatted + ' / ' + wajibTanamFormatted + ' m2';
+					if (realisasiFormatted == '0' || realisasiFormatted == null || realisasiFormatted == undefined){
 						$('#realisasiTanam').html('<span class="text-danger">' + luasTanam + '</span>');
-					}else if (data.wajibTanam > data.realisasiTanam){
+					}else if (wajibTanamFormatted > realisasiFormatted){
 						$('#realisasiTanam').html('<span class="text-warning">' + luasTanam + '</span>');
 					}else{
 						$('#realisasiTanam').html('<span class="text-success">' + luasTanam + '</span>');
@@ -353,26 +350,56 @@
 						$('#avtNote p').text('Tidak ada catatan.');
 					}
 
-					if (data.avtStatus == '1') {
-                    	$('#avtStatus').html('<span class="text-primary">Verifikasi sudah diajukan. </span> <i class="fas fa-check text-primary ml-1"></i>');
-					} else if (data.avtStatus == '2' || data.avtStatus == '3') {
-						$('#avtStatus').html('<span class="text-warning">Dalam proses pemeriksaan/verifikasi oleh Petugas. </span> <i class="fas fa-clock text-warning ml-1"></i>');
-					} else if (data.avtStatus == '4') {
-						$('#avtStatus').html('<span class="text-success">Pemeriksaan/Verifikasi telah Selesai. </span> <i class="fas fa-check ml-1"></i>');
-					} else if (data.avtStatus == '5') {
-						$('#avtStatus').html('<span class="text-danger">Laporan Realisasi harus diperbaiki (lihat catatan verifikasi). </span> <i class="fas fa-exclamation-circle ml-1"></i>');
-					} else {
-						$('#avtStatus').text('Belum/Tidak ada pengajuan.');
+					let statusMessage = '';
+					let iconClass = '';
+					let iconColorClass = '';
+
+					switch(data.avtStatus) {
+						case '0':
+							statusMessage = 'Verifikasi sudah diajukan.';
+							iconClass = 'fas fa-check';
+							iconColorClass = 'text-primary';
+							break;
+						case '1':
+							statusMessage = 'Penetapan Verifikator.';
+							iconClass = 'fas fa-check';
+							iconColorClass = 'text-primary';
+							break;
+						case '2':
+						case '3':
+						case '4':
+						case '5':
+							statusMessage = 'Dalam proses pemeriksaan/verifikasi oleh Petugas.';
+							iconClass = 'fas fa-clock';
+							iconColorClass = 'text-warning';
+							break;
+						case '6':
+							statusMessage = 'Pemeriksaan/Verifikasi telah Selesai.';
+							iconClass = 'fas fa-check';
+							iconColorClass = 'text-success';
+							break;
+						case '7':
+							statusMessage = 'Laporan Realisasi harus diperbaiki (lihat catatan verifikasi).';
+							iconClass = 'fas fa-exclamation-circle';
+							iconColorClass = 'text-danger';
+							break;
+						default:
+							statusMessage = 'Belum/Tidak ada pengajuan.';
+							$('#avtStatus').text(statusMessage);
+							return;
 					}
 
+					$('#avtStatus').html(`<span class="${iconColorClass}">${statusMessage} </span> <i class="${iconClass} ${iconColorClass} ml-1"></i>`);
+
+
 					$('#btnSubmit').text('Ajukan');
-					var avpStatus = data.avpStatus;
+					var avtStatus = data.avtStatus;
 					var realisasiProduksi = data.realisasiProduksi;
 					var countPoktan = data.countPoktan;
 					var countPks = data.countPks;
-					if (avpStatus === null && realisasiProduksi >= data.wajibProduksi) {
+					if (avtStatus === null && realisasiProduksi >= data.wajibProduksi) {
 						$('#btnSubmit').removeClass('d-none');
-					} else if (avpStatus === '5' && realisasiProduksi >= data.wajibProduksi) {
+					} else if (avtStatus == '7' && realisasiProduksi >= data.wajibProduksi) {
 						$('#btnSubmit').removeClass('d-none');
 						$('#btnSubmit').text('Ajukan Ulang');
 					} else {

@@ -453,6 +453,14 @@ Route::group(['prefix' => '2024', 'as' => '2024.', 'namespace' => 'Admin', 'midd
 		//route untuk adminisrator
 		Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
 			Route::get('/', 'HomeController@index')->name('home');
+
+			//halaman pengajuan verifikasi dari importir
+			Route::group(['prefix' => 'pengajuan', 'as' => 'pengajuan.'], function () {
+				Route::get('/', 'VerifTanamController@indexpengajuan');
+				Route::get('/penugasan/{noIjin}/{tcode}', 'VerifTanamController@assignment')->name('assignment');
+				Route::post('/storeAssignment/{noIjin}/{tcode}', 'VerifTanamController@storeAssignment')->name('storeAssignment');
+				Route::delete('/delete/{tcode}/assignment', 'VerifTanamController@deleteAssignment')->name('deleteAssignment');
+			});
 		});
 
 		//route untuk pejabat
