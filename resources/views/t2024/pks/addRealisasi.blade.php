@@ -749,23 +749,6 @@
 		var namaPetani = $('#nama_petani');
 		var ktpPetani = $('#ktp_petani');
 
-		spatialSelect.change(function() {
-			var selectedSpatialKode = spatialSelect.val();
-			var realKode = selectedSpatialKode.replace(/-/g, '');
-
-			$.get('/2024/datafeeder/getSpatialByKode/' + realKode, function(data) {
-				latitudeInput.val(data.latitude);
-				longitudeInput.val(data.longitude);
-				polygonInput.val(data.polygon);
-				luasLahanInput.val(data.luas_lahan);
-				namaPetani.text(data.nama_petani);
-				ktpPetani.val(data.ktp_petani);
-
-				clearMarkers();
-				createMarker();
-				createPolygon();
-			});
-		});
 
 		$('#distStored').prop('disabled', true);
     	// $('#vol_jual').prop('readonly', true);
@@ -886,9 +869,4 @@
 		responsive: true,
 	});
 </script>
-
-
-
-{{-- aktifkan untuk pembatasan max input luas lahan
-	 --}}
 @endsection
