@@ -523,6 +523,7 @@ Route::group(['prefix' => '2024', 'as' => '2024.', 'namespace' => 'Admin', 'midd
 				});
 				Route::get('daftarlokasi/{noIjin}/{poktanId}', 'PksController@daftarLokasi')->name('daftarLokasi');
 				Route::get('addrealisasi/{noIjin}/{spatial}', 'PksController@addrealisasi')->name('addrealisasi');
+				Route::post('storefoto/{noIjin}/{spatial}', 'PksController@storeFoto')->name('storefoto');
 				Route::post('storerealisasi/{noIjin}/{spatial}', 'PksController@storerealisasi')->name('storerealisasi');
 
 				// Route::get('{id}/penangkar', 'PenangkarRiphController@mitra')->name('penangkar');
