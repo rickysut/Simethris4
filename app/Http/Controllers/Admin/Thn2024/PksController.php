@@ -174,6 +174,7 @@ class PksController extends Controller
 
 		$mapkey = ForeignApi::find(1);
 		$npwpCompany = Auth::user()->data_user->npwp_company;
+		$npwp = preg_replace('/[^0-9]/', '', $npwpCompany);
 		$lokasi = Lokasi::where('no_ijin', $noIjin)->where('kode_spatial', $spatial)->first();
 		// dd($spatial);
 		$pks = Pks::where('poktan_id', $lokasi->poktan_id)->where('no_ijin', $noIjin)->first();
@@ -188,13 +189,106 @@ class PksController extends Controller
 
 		$data = [
 			'npwpCompany' => $npwpCompany,
+			'npwp' => $npwp,
+			'noIjin' => $noIjin,
+			'lokasi' => $lokasi,
+			'pks' => $pks,
+			'spatial' => $spatial,
 			'lokasi' => $lokasi,
 			'pks' => $pks,
 			'spatial' => $spatial,
 			'anggota' => $spatial->anggota,
+			'ijin' => $ijin,
 		];
 		// dd($data);
-		return view('t2024.pks.addRealisasi', compact('module_name', 'page_title', 'page_heading', 'heading_class', 'data', 'mapkey', 'kabupatens', 'ijin'));
+		return view('t2024.pks.addRealisasi', compact('module_name', 'page_title', 'page_heading', 'heading_class', 'data', 'mapkey', 'kabupatens', 'ijin', 'lokasi'));
+	}
+
+	public function storeFoto(Request $request, $noIjin, $spatial)
+	{
+		// Format $noIjin
+		$noIjinFormatted = substr($noIjin, 0, 4) . '/' .
+			substr($noIjin, 4, 2) . '.' .
+			substr($noIjin, 6, 3) . '/' .
+			substr($noIjin, 9, 1) . '/' .
+			substr($noIjin, 10, 2) . '/' .
+			substr($noIjin, 12, 4);
+
+		// Cari lokasi berdasarkan no_ijin dan kode_spatial
+		$lokasi = Lokasi::where('no_ijin', $noIjinFormatted)
+			->where('kode_spatial', $spatial)
+			->first();
+
+		if (!$lokasi) {
+			return redirect()->back()->with('error', 'Lokasi tidak ditemukan');
+		}
+
+		// Ambil periode dari pullriph
+		$periode = $lokasi->pullriph->periodetahun;
+
+		// Ambil NPWP perusahaan dari lokasi
+		$npwpCompany = $lokasi->npwp;
+
+		// Menghilangkan karakter yang tidak diperlukan dari NPWP
+		$npwp = preg_replace('/[^0-9]/', '', $npwpCompany);
+
+		// Daftar field foto yang mungkin diunggah
+		$fields = [
+			'tanamFoto',
+			'lahanfoto',
+			'benihFoto',
+			'mulsaFoto',
+			'pupuk1Foto',
+			'pupuk2Foto',
+			'pupuk3Foto',
+			'optFoto',
+			'prodFoto',
+			'distFoto'
+		];
+
+		// Validasi file yang diunggah sesuai dengan field yang ada
+		$validationRules = [];
+		foreach ($fields as $field) {
+			if ($request->hasFile($field)) {
+				$validationRules[$field] = 'file|mimes:jpeg,jpg,png|max:2048';
+			}
+		}
+
+		$request->validate($validationRules);
+
+		DB::beginTransaction();
+		try {
+			// Proses menyimpan setiap file foto yang diunggah
+			foreach ($fields as $field) {
+				if ($request->hasFile($field)) {
+					$file = $request->file($field);
+					$extension = $file->getClientOriginalExtension();
+					$filename = $field . '_' . time() . '_' . $noIjin . '_' . $spatial . '.' . $extension;
+
+					// Simpan file ke storage
+					$path = $file->storeAs('uploads/' . $npwp . '/' . $periode, $filename, 'public');
+
+					// Update field pada model lokasi
+					$lokasi->{$field} = $path;
+				}
+			}
+
+			// Simpan perubahan pada model lokasi
+			$lokasi->save();
+
+			// Commit transaksi
+			DB::commit();
+			$this->storerealisasi($request, $noIjin, $spatial);
+
+			// Berhasil menyimpan
+			return redirect()->back()->with('success', 'Berkas berhasil diunggah.');
+		} catch (\Exception $e) {
+			// Rollback jika terjadi kesalahan
+			DB::rollBack();
+
+			// Gagal menyimpan
+			return redirect()->back()->with('error', 'Terjadi kesalahan saat mengunggah berkas: ' . $e->getMessage());
+		}
 	}
 
 	public function storerealisasi(Request $request, $noIjin, $spatial)
@@ -209,51 +303,149 @@ class PksController extends Controller
 			substr($noIjin, 10, 2) . '/' .
 			substr($noIjin, 12, 4);
 
-		// Find the Lokasi record
-		$lokasi = Lokasi::where('no_ijin', $noIjin)
-			->where('kode_spatial', $spatial)
-			->first();
-
-		// Check if the Lokasi record exists and if the user is authorized
-		// if (!$lokasi || Auth::user()->data_user->npwo_company !== $lokasi->npwp) {
-		// 	abort(403, 'Anda tidak memiliki ijin untuk menjalankan ini.');
-		// }
-
 		// Start a database transaction
 		DB::beginTransaction();
 
+		// dd($request->all());
+
 		try {
-			// Update or create the Lokasi record
-			Lokasi::updateOrCreate(
+			$lokasi = Lokasi::updateOrCreate(
 				[
 					'no_ijin' => $noIjin,
 					'kode_spatial' => $spatial,
 				],
-				[
-					'tgl_tanam' => $request->input('mulai_tanam'),
-					// 'tgl_akhir_tanam' => $request->input('akhir_tanam'),
-					// 'luas_tanam' => $request->input('luas_tanam'),
-					// 'tgl_panen' => $request->input('mulai_panen'),
-					// 'tgl_akhir_panen' => $request->input('akhir_panen'),
-					// 'volume' => $request->input('volume'),
-					// 'vol_benih' => $request->input('vol_benih'),
-					// 'vol_jual' => $request->input('vol_jual'),
-				]
+				array_filter([
+					'tgl_tanam' => $request->input('tanamDate'),
+					'luas_tanam' => $request->input('tanamLuas'),
+					'tanamComment' => $request->input('tanamComment'),
+
+					'lahandate' => $request->input('lahandate'),
+					'lahancomment' => $request->input('lahancomment'),
+
+					'benihDate' => $request->input('benihDate'),
+					'benihComment' => $request->input('benihComment'),
+
+					'mulsaDate' => $request->input('mulsaDate'),
+					'mulsaComment' => $request->input('mulsaComment'),
+
+					'pupuk1Date' => $request->input('pupuk1Date'),
+					'pupuk1Comment' => $request->input('pupuk1Comment'),
+
+					'pupuk2Date' => $request->input('pupuk2Date'),
+					'pupuk2Comment' => $request->input('pupuk2Comment'),
+
+					'pupuk3Date' => $request->input('pupuk3Date'),
+					'pupuk3Comment' => $request->input('pupuk3Comment'),
+
+					'optDate' => $request->input('optDate'),
+					'optComment' => $request->input('optComment'),
+
+					'tgl_panen' => $request->input('prodDate'),
+					'volume' => $request->input('prodVol'),
+					'vol_benih' => $request->input('distStored'),
+					'vol_jual' => $request->input('distSale'),
+					'distComment' => $request->input('distComment'),
+					'prodComment' => $request->input('prodComment'),
+				])
 			);
 
 			// Commit the transaction
 			DB::commit();
 
-			// Return a success response
-			return redirect()->back()->with('success', 'Data berhasil disimpan.');
+			// Return a success response as JSON
+			return response()->json(['success' => true, 'message' => 'Data berhasil disimpan.']);
 		} catch (\Exception $e) {
 			// Rollback the transaction if an error occurs
 			DB::rollBack();
 
-			// Return an error response
-			return redirect()->back()->with('error', $e->getMessage());
+			// Return an error response as JSON
+			return response()->json(['success' => false, 'message' => 'Gagal menyimpan data.', 'error' => $e->getMessage()]);
 		}
 	}
+
+
+	// public function storerealisasi(Request $request, $noIjin, $spatial)
+	// {
+	// 	$ijin = $noIjin;
+
+	// 	// Format the $noIjin string
+	// 	$noIjin = substr($noIjin, 0, 4) . '/' .
+	// 		substr($noIjin, 4, 2) . '.' .
+	// 		substr($noIjin, 6, 3) . '/' .
+	// 		substr($noIjin, 9, 1) . '/' .
+	// 		substr($noIjin, 10, 2) . '/' .
+	// 		substr($noIjin, 12, 4);
+
+	// 	// Find the Lokasi record
+	// 	$lokasi = Lokasi::where('no_ijin', $noIjin)
+	// 		->where('kode_spatial', $spatial)
+	// 		->first();
+
+	// 	// Check if the Lokasi record exists and if the user is authorized
+	// 	// if (!$lokasi || Auth::user()->data_user->npwo_company !== $lokasi->npwp) {
+	// 	// 	abort(403, 'Anda tidak memiliki ijin untuk menjalankan ini.');
+	// 	// }
+
+	// 	// Start a database transaction
+	// 	DB::beginTransaction();
+
+	// 	try {
+	// 		// Update or create the Lokasi record
+	// 		Lokasi::updateOrCreate(
+	// 			[
+	// 				'no_ijin' => $noIjin,
+	// 				'kode_spatial' => $spatial,
+	// 			],
+	// 			[
+	// 				'tgl_tanam' => $request->input('tanamDate'),
+	// 				'luas_tanam' => $request->input('tanamLuas'),
+	// 				'tanamComment' => $request->input('tanamComment'),
+
+	// 				'lahandate' => $request->input('lahandate'),
+	// 				'lahancomment' => $request->input('lahancomment'),
+
+	// 				'benihDate' => $request->input('benihDate'),
+	// 				'benihComment' => $request->input('benihComment'),
+
+	// 				'mulsaDate' => $request->input('mulsaDate'),
+	// 				'mulsaComment' => $request->input('mulsaComment'),
+
+	// 				'pupuk1Date' => $request->input('pupuk1Date'),
+	// 				'pupuk1Comment' => $request->input('pupuk1Comment'),
+
+	// 				'pupuk2Date' => $request->input('pupuk2Date'),
+	// 				'pupuk2Comment' => $request->input('pupuk2Comment'),
+
+	// 				'pupuk3Date' => $request->input('pupuk3Date'),
+	// 				'pupuk3Comment' => $request->input('pupuk3Comment'),
+
+	// 				'optDate' => $request->input('optDate'),
+	// 				'optComment' => $request->input('optComment'),
+
+	// 				'benihDate' => $request->input('benihDate'),
+	// 				'benihComment' => $request->input('benihComment'),
+
+	// 				'tgl_panen' => $request->input('prodDate'),
+	// 				'volume' => $request->input('prodVol'),
+	// 				'vol_benih' => $request->input('distStored'),
+	// 				'vol_jual' => $request->input('distSale'),
+	// 				'distComment' => $request->input('distComment'),
+	// 			]
+	// 		);
+
+	// 		// Commit the transaction
+	// 		DB::commit();
+
+	// 		// Return a success response
+	// 		return redirect()->back()->with('success', 'Data berhasil disimpan.');
+	// 	} catch (\Exception $e) {
+	// 		// Rollback the transaction if an error occurs
+	// 		DB::rollBack();
+
+	// 		// Return an error response
+	// 		return redirect()->back()->with('error', $e->getMessage());
+	// 	}
+	// }
 
 	public function logbook($noIjin, $spatial)
 	{
