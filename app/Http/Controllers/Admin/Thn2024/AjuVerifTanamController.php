@@ -56,7 +56,7 @@ class AjuVerifTanamController extends Controller
 				'npwp' => $npwp,
 				'commitment_id' => $commitment->id,
 				'no_ijin' => $noIjin,
-				'status' => 1,
+				'status' => 0,
 			]
 		);
 

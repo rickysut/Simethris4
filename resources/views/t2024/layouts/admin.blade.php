@@ -50,6 +50,7 @@
 
 		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
+
 		<!-- coreui -->
 		<link href="{{ asset('css/ajax/all.css') }}" rel="stylesheet" />
 		{{-- <link href="{{ asset('css/datatables/dataTables.bootstrap4.min.css') }}" rel="stylesheet" />
@@ -59,6 +60,7 @@
 		<link href="{{ asset('css/toastr.css') }}" rel="stylesheet" />
 
 		<script src="https://maps.googleapis.com/maps/api/js?key={{ isset($mapkey) ? $mapkey->key : 'Default Key' }}&libraries=drawing,geometry&callback=initMap" async defer></script>
+		<link rel="stylesheet" media="screen, print" href="{{ asset('css/smartadmin/notifications/sweetalert2/sweetalert2.bundle.css') }}">
 
 		<meta name="csrf-token" content="{{ csrf_token() }}">
 		@yield('styles')
@@ -154,6 +156,7 @@
 		<script src="{{ asset('js/smartadmin/statistics/easypiechart/easypiechart.bundle.js') }}"></script>
 		<script src="{{ asset('js/smartadmin/statistics/sparkline/sparkline.bundle.js') }}"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.10/jquery.mask.js"></script>
+		<script src="{{ asset('js/smartadmin/notifications/sweetalert2/sweetalert2.bundle.js') }}"></script>
 
 
 		<script src="{{ asset('js/toastr.js') }}"></script>

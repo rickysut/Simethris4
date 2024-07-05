@@ -1,5 +1,12 @@
 @extends('t2024.layouts.admin')
 @section('styles')
+
+<style>
+	.middle-align tbody td {
+		vertical-align: middle;
+	}
+</style>
+
 <link rel="stylesheet" media="screen, print" href="{{ asset('css/miscellaneous/lightgallery/lightgallery.bundle.css') }}">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
@@ -15,13 +22,14 @@
 	@php
 		$npwp = str_replace(['.', '-'], '', $data['npwpCompany']);
 	@endphp
-	<div class="row">
-		<div class="col-12">
-			<div class="panel" id="panel-data">
+	<div class="row d-flex align-items-start">
+		<div class="col-md-4">
+			<div class="panel" id="panel-1">
 				<div class="panel-hdr">
 					<h2>
-						Data Tanam <span class="fw-300">
-							<i>Lokasi</i>
+						<span class="text-muted fw-300">Data Lokasi </span>
+						<span class="fw-600">
+							{{$data['spatial']->kode_spatial}}</i>
 						</span>
 					</h2>
 					<div class="panel-toolbar">
@@ -29,301 +37,704 @@
 					</div>
 				</div>
 
-				<form action="{{ route('2024.user.commitment.storerealisasi', ['noIjin' => $ijin, 'spatial' => $data['spatial']->kode_spatial]) }}" method="POST" enctype="multipart/form-data">
-					@csrf
-					<div class="panel-container show">
-						<div class="panel-content">
-							<div class="row d-flex flex-row justify-content-between">
-								<div class="col-md-4 mb-5">
-									<div class="mb-5" id="myMap" style="height: 400px; width: 100%;"></div>
-								</div>
-								<div class="col-md-8">
-									<input type="hidden" name="form_action" value="form1">
-									<input type="hidden" name="npwp_company" value="{{$data['pks']->npwp}}">
-									<input type="hidden" name="no_ijin" value="{{$data['pks']->no_ijin}}">
-									<input type="hidden" name="poktan_id" value="{{$data['pks']->poktan_id}}">
-									<input type="hidden" name="pks_id" value="{{$data['pks']->id}}">
-									<input type="hidden" name="anggota_id" value="{{$data['spatial']->kode_spatial}}">
-									<input type="hidden" name="lokasi_id" value="{{$data['lokasi']->id}}">
-									<div class="row" hidden>
-										<div class="col-12 mb-5">
-											<div class="form-group">
-												<label class="form-label" for="kabupaten_id">
-													Pilih Kabupaten
-												</label>
-												<select class="select2-kabupaten form-control" id="kabupaten_id">
-													<option value="" hidden></option>
-												</select>
-											</div>
-										</div>
-										<div class="col-md-6 mb-5">
-											<div class="form-group">
-												<label class="form-label" for="kecamatan_id">
-													Pilih Kecamatan
-												</label>
-												<select class="select2-kecamatan form-control" id="kecamatan_id">
-													<option value="" hidden></option>
-												</select>
-											</div>
-										</div>
-										<div class="col-md-6">
-											<div class="form-group">
-												<label class="form-label" for="spatial_data">
-													Pilih Lokasi Lahan
-												</label>
-												<select class="select2-spatial form-control" id="spatial_data">
-													<option value="" hidden></option>
-												</select>
-											</div>
-										</div>
-									</div>
-									<div class="row">
-										<div class="col-12">
-											<h5 class="font-weight-bold">
-												Data Lokasi
-											</h5>
-										</div>
-										<div class="form-group col-md-6">
-											<label>Pemilik/Pengelola</label>
-											<div class="input-group">
-												<div class="input-group-prepend">
-													<span class="input-group-text"><i class="fal fa-user"></i></span>
-												</div>
-												<input type="text" value="{{$data['spatial']->nama_petani}}"
-													name="nama_petani" id="nama_petani"
-													class="font-weight-bold form-control form-control-sm" readonly />
-											</div>
-											<span class="help-block">Nama Petani Pemilik/Pengelola Lokasi sesuai Database Simethris.</span>
-										</div>
-										<div class="form-group col-md-6 ">
-											<label>NIK Pemilik/Pengelola</label>
-											<div class="input-group">
-												<div class="input-group-prepend">
-													<span class="input-group-text"><i class="fal fa-address-card"></i></span>
-												</div>
-												<input type="text" value="{{$data['spatial']->ktp_petani}}"
-													name="nik_petani" id="nik_petani"
-													class="font-weight-bold form-control form-control-sm" readonly />
-											</div>
-											<span class="help-block">NIK Petani Pemilik/Pengelola Lokasi sesuai Database Simethris.</span>
-										</div>
-										<div class="form-group col-md-6 ">
-											<label>Kode Lokasi</label>
-											<div class="input-group">
-												<div class="input-group-prepend">
-													<span class="input-group-text"><i class="fal fa-map-signs"></i></span>
-												</div>
-												<input type="text" value="{{$data['spatial']->kode_spatial}}"
-													name="kode_lokasi" id="kode_lokasi"
-													class="font-weight-bold form-control form-control-sm" readonly />
-											</div>
-											<span class="help-block">Kode Spatial untuk lokasi ini menurut Database Simethris.</span>
-										</div>
-										<div class="form-group col-md-6 ">
-											<label>Luas Area (m2)<sup class="text-info"> *</sup></label>
-											<div class="input-group">
-												<div class="input-group-prepend">
-													<span class="input-group-text"><i class="fal fa-ruler-combined"></i></span>
-												</div>
-												<input type="text" value="{{$data['spatial']->luas_lahan}}"
-													name="luas_lahan" id="luas_lahan" pla readonly
-													class="font-weight-bold form-control form-control-sm" />
-											</div>
-											<span class="help-block">Luas bidang diukur menurut Database.</span>
-										</div>
-										<div class="form-group col-md-6 ">
-											<label>Latitude <sup class="text-info"> *</sup></label>
-											<div class="input-group">
-												<div class="input-group-prepend">
-													<span class="input-group-text"><i class="fal fa-map-marker"></i></span>
-												</div>
-												<input type="text" value="{{$data['spatial']->latitude}}"
-													name="latitude" id="latitude" readonly
-													class="font-weight-bold form-control form-control-sm" />
-											</div>
-											<span class="help-block">Koordinat Lintang lokasi</span>
-										</div>
-										<div class="form-group col-md-6">
-											<label>Longitude <sup class="text-info"> *</sup></label>
-											<div class="input-group">
-												<div class="input-group-prepend">
-													<span class="input-group-text"><i class="fal fa-map-marker-alt"></i></span>
-												</div>
-												<input type="text" value="{{$data['spatial']->longitude}}"
-													name="longitude" id="longitude" readonly
-													class="font-weight-bold form-control form-control-sm" />
-											</div>
-											<span class="help-block">Koordinat Bujur lokasi</span>
-										</div>
-										<div class="form-group col-md-6 ">
-											<label>Polygon<sup class="text-info"> *</sup></label>
-											<div class="input-group">
-												<div class="input-group-prepend">
-													<span class="input-group-text"><i class="fal fa-draw-polygon"></i></span>
-												</div>
-												<input type="text" value="{{$data['spatial']->polygon}}"
-												name="polygon" id="polygon" readonly
-												class="font-weight-bold form-control form-control-sm" />
-											</div>
-											<span class="help-block">Kurva bidang lahan yang ditanami.</span>
-										</div>
-										<div class="form-group col-md-6 ">
-											<label>Altitude (mdpl) </label>
-											<div class="input-group">
-												<div class="input-group-prepend">
-													<span class="input-group-text"><i class="fal fa-ruler-vertical"></i></span>
-												</div>
-												<input type="text" value="{{$data['spatial']->altitude}}"
-													name="altitude" id="altitude"
-													class="font-weight-bold form-control form-control-sm" readonly/>
-											</div>
-											<span class="help-block">Ketinggian lokasi lahan (rerata ketinggain dpl)</span>
-										</div>
-									</div>
-									<hr>
-									<div class="row">
-										<div class="col-12">
-											<h5 class="font-weight-bold">Realisasi Tanam</h5>
-										</div>
-										<div class="form-group col-md-6">
-											<label>Pengelola</label>
-											<div class="input-group">
-												<div class="input-group-prepend">
-													<span class="input-group-text"><i class="fal fa-user"></i></span>
-												</div>
-												<input type="text" value="{{$data['lokasi']->nama_petani}}"
-													name="nama_petani_riph" id="nama_petani_riph"
-													class="font-weight-bold form-control form-control-sm" readonly />
-											</div>
-											<span class="help-block">Nama Petani Pengelola Lokasi sesuai Data Rencana Tanam RIPH.</span>
-										</div>
-										<div class="form-group col-md-6 ">
-											<label>NIK Pengelola</label>
-											<div class="input-group">
-												<div class="input-group-prepend">
-													<span class="input-group-text"><i class="fal fa-address-card"></i></span>
-												</div>
-												<input type="text" value="{{$data['lokasi']->ktp_petani}}"
-													name="nik_petani_riph" id="nik_petani_riph"
-													class="font-weight-bold form-control form-control-sm" readonly />
-											</div>
-											<span class="help-block">NIK Petani Pengelola Lokasi sesuai Data Rencana Tanam RIPH.</span>
-										</div>
-										<div class="form-group col-md-4">
-											<label for="mulai_tanam">Tanggal Awal Tanam<sup class="text-danger"> *</sup></label>
-											<div class="input-group">
-												<div class="input-group-prepend">
-													<span class="input-group-text"><i class="fal fa-calendar-day"></i></span>
-												</div>
-												<input type="date" value="{{$data['lokasi']->tgl_tanam}}" name="mulai_tanam" id="mulai_tanam" class="font-weight-bold form-control form-control-sm bg-white" />
-											</div>
-											<span class="help-block">Tanggal mulai penanaman.</span>
-										</div>
-										<div class="form-group col-md-4">
-											<label for="akhir_tanam">Tanggal Akhir Tanam<sup class="text-danger"> *</sup></label>
-											<div class="input-group">
-												<div class="input-group-prepend">
-													<span class="input-group-text"><i class="fal fa-calendar-day"></i></span>
-												</div>
-												<input type="date" value="{{$data['lokasi']->tgl_akhir_tanam}}" name="akhir_tanam" id="akhir_tanam" class="font-weight-bold form-control form-control-sm bg-white" />
-											</div>
-											<span class="help-block">Tanggal akhir penanaman.</span>
-										</div>
-										<div class="form-group col-md-4">
-											<label for="luas_tanam">Luas Tanam (m2)<sup class="text-danger"> *</sup></label>
-											<div class="input-group">
-												<div class="input-group-prepend">
-													<span class="input-group-text"><i class="fal fa-ruller"></i></span>
-												</div>
-												<input type="number" value="{{$data['lokasi']->luas_tanam}}" name="luas_tanam" id="luas_tanam" class="font-weight-bold form-control form-control-sm bg-white" />
-											</div>
-											<span class="help-block">Luas lahan yang ditanami.</span>
-										</div>
-									</div>
-									<hr>
-									<div class="row">
-										<div class="col-12">
-											<h5 class="font-weight-bold">Realisasi Produksi</h5>
-										</div>
-										<div class="form-group col-md-4">
-											<label for="mulai_tanam">Tanggal Awal Produksi<sup class="text-danger"> *</sup></label>
-											<div class="input-group">
-												<div class="input-group-prepend">
-													<span class="input-group-text"><i class="fal fa-calendar-day"></i></span>
-												</div>
-												<input type="date" value="{{$data['lokasi']->tgl_panen}}" name="mulai_panen" id="mulai_panen" class="font-weight-bold form-control form-control-sm bg-white" />
-											</div>
-											<span class="help-block">Tanggal dimulainya pemanenan.</span>
-										</div>
-										<div class="form-group col-md-4">
-											<label for="akhir_tanam">Tanggal Akhir Produksi<sup class="text-danger"> *</sup></label>
-											<div class="input-group">
-												<div class="input-group-prepend">
-													<span class="input-group-text"><i class="fal fa-calendar-day"></i></span>
-												</div>
-												<input type="date" value="{{$data['lokasi']->tgl_akhir_panen}}" name="akhir_panen" id="akhir_panen" class="font-weight-bold form-control form-control-sm bg-white" />
-											</div>
-											<span class="help-block">Tanggal akhir dilaksanakannya pemanenan.</span>
-										</div>
-										<div class="form-group col-md-4">
-											<label for="volume">Volume Produksi (ton)<sup class="text-danger"> *</sup></label>
-											<div class="input-group">
-												<div class="input-group-prepend">
-													<span class="input-group-text"><i class="fal fa-balance-scale"></i></span>
-												</div>
-												{{-- tambahkan ini
-												max="{{ $anggota->luas_lahan - $anggota->datarealisasi->sum('luas_lahan') }}"
-												untuk pembatasan dan aktifkan script --}}
-												<input type="number" step="1" value="{{$data['lokasi']->volume}}" name="volume" id="volume" class="font-weight-bold form-control form-control-sm bg-white" />
-											</div>
-											<span class="help-block">Total produksi yang diperoleh.</span>
-										</div>
-									</div>
-									<hr>
-									<div class="row">
-										<div class="col-12">
-											<h5 class="font-weight-bold">Penyaluran Hasil Produksi</h5>
-										</div>
-										<div class="form-group col-md-4">
-											<label for="volume">Untuk Benih (ton)</label>
-											<div class="input-group">
-												<div class="input-group-prepend">
-													<span class="input-group-text"><i class="fal fa-seedling"></i></span>
-												</div>
-												<input type="number" value="{{$data['lokasi']->vol_benih}}" name="vol_benih" id="vol_benih" class="font-weight-bold form-control form-control-sm bg-white" />
-											</div>
-											<span class="help-block">Total produksi yang disimpan sebagai benih.</span>
-										</div>
-										<div class="form-group col-md-4">
-											<label for="volume">Untuk Dijual (ton)</label>
-											<div class="input-group">
-												<div class="input-group-prepend">
-													<span class="input-group-text"><i class="fal fa-truck-loading"></i></span>
-												</div>
-												<input type="number" value="{{$data['lokasi']->vol_jual}}" name="vol_jual" id="vol_jual" class="font-weight-bold form-control form-control-sm bg-white" />
-											</div>
-											<span class="help-block">Total produksi yang dilepas ke konsumsi.</span>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
 
-					<div class="card-footer">
-						<div class="d-flex justify-content-between align-items-center">
-							<div class="d-none d-md-block">
-								<span class="small mr-3"><span class="text-info mr-1"> *</span>: Autogenerate by System</span>
-								<span class="small"><span class="text-danger mr-1"> *</span>: Wajib diisi</span>
+				<div class="panel-container collapse">
+					<div id="myMap" cl style="height: 370px; width: 100%;"></div>
+					<div class="panel-content">
+						<ul class="list-group">
+							<li class="list-group-item d-flex align-items-start justify-content-between">
+								<span class="text-muted">Pemilik/Pengelola</span>
+								<span class="fw-500">{{$data['lokasi']->nama_petani}}</span>
+							</li>
+							<li class="list-group-item d-flex align-items-start justify-content-between">
+								<span class="text-muted">NIK Pemilik/Pengelola</span>
+								<span class="fw-500">{{$data['lokasi']->ktp_petani}}</span>
+							</li>
+							<li class="list-group-item d-flex align-items-start justify-content-between">
+								<span class="text-muted">Luas Lahan (m2)</span>
+								<span class="fw-500">{{$data['spatial']->luas_lahan}}</span>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-8">
+			<div class="panel" id="panel-2">
+				<div class="panel-hdr">
+					<h2>Log Kegiatan</h2>
+					<div class="panel-toolbar">
+						@include('t2024.partials.globaltoolbar')
+					</div>
+				</div>
+				<div class="panel-container show">
+					<div class="panel-content">
+						<input type="hidden" name="form_action" value="form1">
+						<input type="hidden" name="npwp_company" value="{{$data['pks']->npwp}}">
+						<input type="hidden" name="no_ijin" value="{{$data['pks']->no_ijin}}">
+						<input type="hidden" name="poktan_id" value="{{$data['pks']->poktan_id}}">
+						<input type="hidden" name="pks_id" value="{{$data['pks']->id}}">
+						<input type="hidden" name="anggota_id" value="{{$data['spatial']->kode_spatial}}">
+						<input type="hidden" name="lokasi_id" value="{{$data['lokasi']->id}}">
+						<input type="hidden" value="{{$data['spatial']->latitude}}" name="latitude" id="latitude" readonly>
+						<input type="hidden" value="{{$data['spatial']->longitude}}" name="longitude" id="longitude" readonly/>
+						<input type="hidden" value="{{$data['spatial']->polygon}}" name="polygon" id="polygon" readonly>
+						<div class="accordion accordion-hover accordion-outline" id="logKeg">
+							<div class="card">
+								<div class="card-header">
+									<a href="javascript:void(0);" class="card-title collapsed" data-toggle="collapse" data-target="#logKeg-lahan" aria-expanded="false">
+										<i class="fal fa-shovel width-2 fs-xl"></i>
+										Pengolahan Lahan
+										<span class="ml-auto">
+											<span class="collapsed-reveal">
+												<i class="fal fa-chevron-up fs-xl"></i>
+											</span>
+											<span class="collapsed-hidden">
+												<i class="fal fa-chevron-down fs-xl"></i>
+											</span>
+										</span>
+									</a>
+								</div>
+								<div id="logKeg-lahan" class="collapse" data-parent="#logKeg" style="">
+									<form action="" enctype="multipart/form-data" method="post">
+										@csrf
+										@method('PUT')
+										<div class="card-body">
+											<div class="row d-flex">
+												<div class="col-md-4 mb-3">
+													<div class="card" style="width: 100%; padding-top: 100%; position: relative; overflow: hidden;">
+														<div class="card-image" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+															background-image: url('{{ Auth::user()->data_user->avatar ? asset('storage/' . Auth::user()->data_user->avatar) : asset('img/posts_img/default-post-image-light.svg') }}');
+															background-size: cover; background-repeat: no-repeat; background-position: center;">
+														</div>
+													</div>
+												</div>
+												<div class="col-md-8">
+													<div class="fom-group mb-3">
+														<button class="btn btn-block d-md-none d-block btn-primary" id="camlahan">
+															<i class="fal fa-camera mr-1"></i> Foto Kegiatan
+														</button>
+													</div>
+													<div class="form-group">
+														<label class="form-label" for="lahandate">Tanggal</label>
+														<input class="form-control" id="lahandate" type="date" name="lahandate" value="2023-07-23">
+													</div>
+													<div class="form-group">
+														<label class="form-label" for="lahancomment">Keterangan</label>
+														<textarea class="form-control" id="lahancomment" name="lahancomment" rows="2"></textarea>
+													</div>
+													<div class="form-group d-none d-lg-block">
+														<label class="form-label" for="lahanfoto">Bukti Kegiatan</label>
+														<div class="input-group">
+															<div class="custom-file">
+																<input type="file" class="custom-file-input" id="lahanfoto" name="lahanfoto" aria-describedby="lahanfoto">
+																<label class="custom-file-label" for="lahanfoto">input foto kegiatan</label>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="card-footer d-flex justify-content-between">
+											<div></div>
+											<div class="ml-auto">
+												<button class="btn btn-warning waves-effect waves-themed" type="button" id="saveLahan">Simpan Persiapan Lahan</button>
+											</div>
+										</div>
+									</form>
+								</div>
 							</div>
-							<div class="justify-content-end ml-auto">
-								<button class="btn btn-sm btn-primary" role="button" type="submit">
-									<i class="fa fa-save mr-1"></i>Simpan
-								</button>
+							<div class="card">
+								<div class="card-header">
+									<a href="javascript:void(0);" class="card-title collapsed" data-toggle="collapse" data-target="#logKeg-benih" aria-expanded="false">
+										<i class="fal fa-seedling width-2 fs-xl"></i>
+										Persiapan Benih
+										<span class="ml-auto">
+											<span class="collapsed-reveal">
+												<i class="fal fa-chevron-up fs-xl"></i>
+											</span>
+											<span class="collapsed-hidden">
+												<i class="fal fa-chevron-down fs-xl"></i>
+											</span>
+										</span>
+									</a>
+								</div>
+								<div id="logKeg-benih" class="collapse" data-parent="#logKeg" style="">
+									<form action="" enctype="multipart/form-data" method="post">
+										@csrf
+										@method('PUT')
+										<div class="card-body">
+											<div class="row d-flex">
+												<div class="col-md-4 mb-3">
+													<div class="card" style="width: 100%; padding-top: 100%; position: relative; overflow: hidden;">
+														<div class="card-image" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+															background-image: url('{{ Auth::user()->data_user->avatar ? asset('storage/' . Auth::user()->data_user->avatar) : asset('img/posts_img/default-post-image-light.svg') }}');
+															background-size: cover; background-repeat: no-repeat; background-position: center;">
+														</div>
+													</div>
+												</div>
+												<div class="col-md-8">
+													<div class="fom-group mb-3">
+														<button class="btn btn-block d-md-none d-block btn-primary"  id="camBenih">
+															<i class="fal fa-camera mr-1"></i> Foto Kegiatan
+														</button>
+													</div>
+													<div class="form-group">
+														<label class="form-label" for="benihDate">Tanggal</label>
+														<input class="form-control" id="benihDate" type="date" name="benihDate" value="2023-07-23">
+													</div>
+													<div class="form-group">
+														<label class="form-label" for="benihComment">Keterangan</label>
+														<textarea class="form-control" id="benihComment" id="benihComment" rows="2"></textarea>
+													</div>
+													<div class="form-group d-none d-lg-block">
+														<label class="form-label" for="benihFoto">Bukti Kegiatan</label>
+														<div class="input-group">
+															<div class="custom-file">
+																<input type="file" class="custom-file-input" id="benihFoto" name="benihFoto" aria-describedby="benihFoto">
+																<label class="custom-file-label" for="benihFoto">input foto kegiatan</label>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="card-footer d-flex justify-content-between">
+											<div></div>
+											<div class="ml-auto">
+												<button class="btn btn-warning waves-effect waves-themed" type="button" id="saveBenih">Simpan Kegiatan Benih</button>
+											</div>
+										</div>
+									</form>
+								</div>
+							</div>
+							<div class="card">
+								<div class="card-header">
+									<a href="javascript:void(0);" class="card-title collapsed" data-toggle="collapse" data-target="#logKeg-mulsa" aria-expanded="false">
+										<i class="fal fa-blanket width-2 fs-xl"></i>
+										Pemasangan Mulsa
+										<span class="ml-auto">
+											<span class="collapsed-reveal">
+												<i class="fal fa-chevron-up fs-xl"></i>
+											</span>
+											<span class="collapsed-hidden">
+												<i class="fal fa-chevron-down fs-xl"></i>
+											</span>
+										</span>
+									</a>
+								</div>
+								<div id="logKeg-mulsa" class="collapse" data-parent="#logKeg" style="">
+									<form action="" enctype="multipart/form-data" method="post">
+										@csrf
+										@method('PUT')
+										<div class="card-body">
+											<div class="row d-flex">
+												<div class="col-md-4 mb-3">
+													<div class="card" style="width: 100%; padding-top: 100%; position: relative; overflow: hidden;">
+														<div class="card-image" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+															background-image: url('{{ Auth::user()->data_user->avatar ? asset('storage/' . Auth::user()->data_user->avatar) : asset('img/posts_img/default-post-image-light.svg') }}');
+															background-size: cover; background-repeat: no-repeat; background-position: center;">
+														</div>
+													</div>
+												</div>
+												<div class="col-md-8">
+													<div class="fom-group mb-3">
+														<button class="btn btn-block d-md-none d-block btn-primary" id="mulsaCam">
+															<i class="fal fa-camera mr-1"></i> Foto Kegiatan
+														</button>
+													</div>
+													<div class="form-group">
+														<label class="form-label" for="mulsaDate">Tanggal</label>
+														<input class="form-control" id="mulsaDate" type="date" name="mulsaDate" value="2023-07-23">
+													</div>
+													<div class="form-group">
+														<label class="form-label" for="mulsaComment">Keterangan</label>
+														<textarea class="form-control" id="mulsaComment" rows="2"></textarea>
+													</div>
+													<div class="form-group d-none d-lg-block">
+														<label class="form-label" for="mulsaFoto">Bukti Kegiatan</label>
+														<div class="input-group">
+															<div class="custom-file">
+																<input type="file" class="custom-file-input" id="mulsaFoto" name="mulsaFoto" aria-describedby="mulsaFoto">
+																<label class="custom-file-label" for="mulsaFoto">input foto kegiatan</label>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="card-footer d-flex justify-content-between">
+											<div></div>
+											<div class="ml-auto">
+												<button class="btn btn-warning waves-effect waves-themed" type="button" id="saveMulsa">Simpan Kegiatan Mulsa</button>
+											</div>
+										</div>
+									</form>
+								</div>
+							</div>
+							<div class="card">
+								<div class="card-header">
+									<a href="javascript:void(0);" class="card-title collapsed" data-toggle="collapse" data-target="#logKeg-tanam" aria-expanded="false">
+										<i class="fal fa-hand-holding-seedling width-2 fs-xl"></i>
+										Penanaman
+										<span class="ml-auto">
+											<span class="collapsed-reveal">
+												<i class="fal fa-chevron-up fs-xl"></i>
+											</span>
+											<span class="collapsed-hidden">
+												<i class="fal fa-chevron-down fs-xl"></i>
+											</span>
+										</span>
+									</a>
+								</div>
+								<div id="logKeg-tanam" class="collapse" data-parent="#logKeg" style="">
+									<form action="{{ route('2024.user.commitment.storerealisasi', ['noIjin' => $ijin, 'spatial' => $data['spatial']->kode_spatial]) }}" enctype="multipart/form-data" method="post">
+										@csrf
+										{{-- @method('PUT') --}}
+										<div class="card-body">
+											<div class="row d-flex">
+												<div class="col-md-4 mb-3">
+													<div class="card" style="width: 100%; padding-top: 100%; position: relative; overflow: hidden;">
+														<div class="card-image" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+															background-image: url('{{ Auth::user()->data_user->avatar ? asset('storage/' . Auth::user()->data_user->avatar) : asset('img/posts_img/default-post-image-light.svg') }}');
+															background-size: cover; background-repeat: no-repeat; background-position: center;">
+														</div>
+													</div>
+												</div>
+												<div class="col-md-8">
+													<div class="fom-group mb-3">
+														<button class="btn btn-block d-md-none d-block btn-primary" id="tanamCam">
+															<i class="fal fa-camera mr-1"></i> Foto Kegiatan
+														</button>
+													</div>
+													<div class="form-group">
+														<label class="form-label" for="tanamDate">Tanggal</label>
+														<input class="form-control" id="tanamDate" type="date" name="tanamDate" value="2023-07-23">
+													</div>
+													<div class="form-group">
+														<label class="form-label" for="tanamLuas">Luas Tanam (m)</label>
+														<input class="form-control" id="tanamLuas" type="number" name="tanamLuas" value="">
+													</div>
+													<div class="form-group">
+														<label class="form-label" for="tanamComment">Keterangan</label>
+														<textarea class="form-control" id="tanamComment" rows="2"></textarea>
+													</div>
+													<div class="form-group d-none d-lg-block">
+														<label class="form-label" for="tanamFoto">Bukti Kegiatan</label>
+														<div class="input-group">
+															<div class="custom-file">
+																<input type="file" class="custom-file-input" id="tanamFoto" name="tanamFoto" aria-describedby="tanamFoto">
+																<label class="custom-file-label" for="tanamFoto">input foto kegiatan</label>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="card-footer d-flex justify-content-between">
+											<div></div>
+											<div class="ml-auto">
+												<button class="btn btn-warning waves-effect waves-themed" type="submit" id="saveTanam">Simpan Kegiatan Tanam</button>
+											</div>
+										</div>
+									</form>
+								</div>
+							</div>
+							<div class="card">
+								<div class="card-header">
+									<a href="javascript:void(0);" class="card-title collapsed" data-toggle="collapse" data-target="#logKeg-pupuk-1" aria-expanded="false">
+										<i class="fal fa-vial width-2 fs-xl"></i>
+										Pemupukan Pertama
+										<span class="ml-auto">
+											<span class="collapsed-reveal">
+												<i class="fal fa-chevron-up fs-xl"></i>
+											</span>
+											<span class="collapsed-hidden">
+												<i class="fal fa-chevron-down fs-xl"></i>
+											</span>
+										</span>
+									</a>
+								</div>
+								<div id="logKeg-pupuk-1" class="collapse" data-parent="#logKeg" style="">
+									<form action="" enctype="multipart/form-data" method="post">
+										@csrf
+										@method('PUT')
+										<div class="card-body">
+											<div class="row d-flex">
+												<div class="col-md-4 mb-3">
+													<div class="card" style="width: 100%; padding-top: 100%; position: relative; overflow: hidden;">
+														<div class="card-image" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+															background-image: url('{{ Auth::user()->data_user->avatar ? asset('storage/' . Auth::user()->data_user->avatar) : asset('img/posts_img/default-post-image-light.svg') }}');
+															background-size: cover; background-repeat: no-repeat; background-position: center;">
+														</div>
+													</div>
+												</div>
+												<div class="col-md-8">
+													<div class="fom-group mb-3">
+														<button class="btn btn-block d-md-none d-block btn-primary" id="pupuk1Cam">
+															<i class="fal fa-camera mr-1"></i> Foto Kegiatan
+														</button>
+													</div>
+													<div class="form-group">
+														<label class="form-label" for="pupuk1Date">Tanggal</label>
+														<input class="form-control" id="pupuk1Date" type="date" name="pupuk1Date" value="2023-07-23">
+													</div>
+													<div class="form-group">
+														<label class="form-label" for="pupuk1Comment">Keterangan</label>
+														<textarea class="form-control" id="pupuk1Comment" name="pupuk1Comment" rows="2"></textarea>
+													</div>
+													<div class="form-group d-none d-lg-block">
+														<label class="form-label" for="pupuk1Foto">Bukti Kegiatan</label>
+														<div class="input-group">
+															<div class="custom-file">
+																<input type="file" class="custom-file-input" id="pupuk1Foto" name="pupuk1Foto" aria-describedby="inputGroupFileAddon04">
+																<label class="custom-file-label" for="pupuk1Foto">input foto kegiatan</label>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="card-footer d-flex justify-content-between">
+											<div></div>
+											<div class="ml-auto">
+												<button class="btn btn-warning waves-effect waves-themed" type="button" id="savePupuk1">Simpan Pemupukan 1</button>
+											</div>
+										</div>
+									</form>
+								</div>
+							</div>
+							<div class="card">
+								<div class="card-header">
+									<a href="javascript:void(0);" class="card-title collapsed" data-toggle="collapse" data-target="#logKeg-pupuk-2" aria-expanded="false">
+										<i class="fal fa-vials width-2 fs-xl"></i>
+										Pemupukan Kedua
+										<span class="ml-auto">
+											<span class="collapsed-reveal">
+												<i class="fal fa-chevron-up fs-xl"></i>
+											</span>
+											<span class="collapsed-hidden">
+												<i class="fal fa-chevron-down fs-xl"></i>
+											</span>
+										</span>
+									</a>
+								</div>
+								<div id="logKeg-pupuk-2" class="collapse" data-parent="#logKeg" style="">
+									<form action="" enctype="multipart/form-data" method="post">
+										@csrf
+										@method('PUT')
+										<div class="card-body">
+											<div class="row d-flex">
+												<div class="col-md-4 mb-3">
+													<div class="card" style="width: 100%; padding-top: 100%; position: relative; overflow: hidden;">
+														<div class="card-image" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+															background-image: url('{{ Auth::user()->data_user->avatar ? asset('storage/' . Auth::user()->data_user->avatar) : asset('img/posts_img/default-post-image-light.svg') }}');
+															background-size: cover; background-repeat: no-repeat; background-position: center;">
+														</div>
+													</div>
+												</div>
+												<div class="col-md-8">
+													<div class="fom-group mb-3">
+														<button class="btn btn-block d-md-none d-block btn-primary" id="pupuk2Cam">
+															<i class="fal fa-camera mr-1"></i> Foto Kegiatan
+														</button>
+													</div>
+													<div class="form-group">
+														<label class="form-label" for="pupuk2Date">Tanggal</label>
+														<input class="form-control" id="pupuk2Date" type="date" name="pupuk2Date" value="2023-07-23">
+													</div>
+													<div class="form-group">
+														<label class="form-label" for="pupuk2Comment">Keterangan</label>
+														<textarea class="form-control" id="pupuk2Comment" name="pupuk2Comment" rows="2"></textarea>
+													</div>
+													<div class="form-group d-none d-lg-block">
+														<label class="form-label" for="pupuk2Foto">Bukti Kegiatan</label>
+														<div class="input-group">
+															<div class="custom-file">
+																<input type="file" class="custom-file-input" id="pupuk2Foto" name="pupuk2Foto" aria-describedby="pupuk2Foto">
+																<label class="custom-file-label" for="pupuk2Foto">input foto kegiatan</label>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="card-footer d-flex justify-content-between">
+											<div></div>
+											<div class="ml-auto">
+												<button class="btn btn-warning waves-effect waves-themed" type="button" id="savePupuk2">Simpan Pemupukan 2</button>
+											</div>
+										</div>
+									</form>
+								</div>
+							</div>
+							<div class="card">
+								<div class="card-header">
+									<a href="javascript:void(0);" class="card-title collapsed" data-toggle="collapse" data-target="#logKeg-pupuk-3" aria-expanded="false">
+										<i class="fal fa-fill-drip width-2 fs-xl"></i>
+										Pemupukan Ketiga
+										<span class="ml-auto">
+											<span class="collapsed-reveal">
+												<i class="fal fa-chevron-up fs-xl"></i>
+											</span>
+											<span class="collapsed-hidden">
+												<i class="fal fa-chevron-down fs-xl"></i>
+											</span>
+										</span>
+									</a>
+								</div>
+								<div id="logKeg-pupuk-3" class="collapse" data-parent="#logKeg" style="">
+									<form action="" enctype="multipart/form-data" method="post">
+										@csrf
+										@method('PUT')
+										<div class="card-body">
+											<div class="row d-flex">
+												<div class="col-md-4 mb-3">
+													<div class="card" style="width: 100%; padding-top: 100%; position: relative; overflow: hidden;">
+														<div class="card-image" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+															background-image: url('{{ Auth::user()->data_user->avatar ? asset('storage/' . Auth::user()->data_user->avatar) : asset('img/posts_img/default-post-image-light.svg') }}');
+															background-size: cover; background-repeat: no-repeat; background-position: center;">
+														</div>
+													</div>
+												</div>
+												<div class="col-md-8">
+													<div class="fom-group mb-3">
+														<button class="btn btn-block d-md-none d-block btn-primary" id="pupuk3Cam">
+															<i class="fal fa-camera mr-1"></i> Foto Kegiatan
+														</button>
+													</div>
+													<div class="form-group">
+														<label class="form-label" for="pupuk3Date">Tanggal</label>
+														<input class="form-control" id="pupuk3Date" type="date" name="pupuk3Date" value="2023-07-23">
+													</div>
+													<div class="form-group">
+														<label class="form-label" for="pupuk3Comment">Keterangan</label>
+														<textarea class="form-control" id="pupuk3Comment" name="pupuk3Comment" rows="2"></textarea>
+													</div>
+													<div class="form-group d-none d-lg-block">
+														<label class="form-label" for="pupuk3Foto">Bukti Kegiatan</label>
+														<div class="input-group">
+															<div class="custom-file">
+																<input type="file" class="custom-file-input" id="pupuk3Foto" name="pupuk3Foto" aria-describedby="pupuk3Foto">
+																<label class="custom-file-label" for="pupuk3Foto">input foto kegiatan</label>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="card-footer d-flex justify-content-between">
+											<div></div>
+											<div class="ml-auto">
+												<button class="btn btn-warning waves-effect waves-themed" type="button" id="savePupuk3">Simpan Pemupukan 3</button>
+											</div>
+										</div>
+									</form>
+								</div>
+							</div>
+							<div class="card">
+								<div class="card-header">
+									<a href="javascript:void(0);" class="card-title collapsed" data-toggle="collapse" data-target="#logKeg-OPT" aria-expanded="false">
+										<i class="fal fa-shield-virus width-2 fs-xl"></i>
+										Pengendalian OPT
+										<span class="ml-auto">
+											<span class="collapsed-reveal">
+												<i class="fal fa-chevron-up fs-xl"></i>
+											</span>
+											<span class="collapsed-hidden">
+												<i class="fal fa-chevron-down fs-xl"></i>
+											</span>
+										</span>
+									</a>
+								</div>
+								<div id="logKeg-OPT" class="collapse" data-parent="#logKeg" style="">
+									<form action="" enctype="multipart/form-data" method="post">
+										@csrf
+										@method('PUT')
+										<div class="card-body">
+											<div class="row d-flex">
+												<div class="col-md-4 mb-3">
+													<div class="card" style="width: 100%; padding-top: 100%; position: relative; overflow: hidden;">
+														<div class="card-image" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+															background-image: url('{{ Auth::user()->data_user->avatar ? asset('storage/' . Auth::user()->data_user->avatar) : asset('img/posts_img/default-post-image-light.svg') }}');
+															background-size: cover; background-repeat: no-repeat; background-position: center;">
+														</div>
+													</div>
+												</div>
+												<div class="col-md-8">
+													<div class="fom-group mb-3">
+														<button class="btn btn-block d-md-none d-block btn-primary" id="optCam">
+															<i class="fal fa-camera mr-1"></i> Foto Kegiatan
+														</button>
+													</div>
+													<div class="form-group">
+														<label class="form-label" for="optDate">Tanggal</label>
+														<input class="form-control" id="optDate" type="date" name="optDate" value="2023-07-23">
+													</div>
+													<div class="form-group">
+														<label class="form-label" for="optComment">Keterangan</label>
+														<textarea class="form-control" id="optDate" name="optDate" rows="2"></textarea>
+													</div>
+													<div class="form-group d-none d-lg-block">
+														<label class="form-label" for="optFoto">Bukti Kegiatan</label>
+														<div class="input-group">
+															<div class="custom-file">
+																<input type="file" class="custom-file-input" id="optFoto" name="optFoto" aria-describedby="optFoto">
+																<label class="custom-file-label" for="optFoto">input foto kegiatan</label>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="card-footer d-flex justify-content-between">
+											<div></div>
+											<div class="ml-auto">
+												<button class="btn btn-warning waves-effect waves-themed" type="button" id="saveOPT">Simpan Pengendalian OPT</button>
+											</div>
+										</div>
+									</form>
+								</div>
+							</div>
+							<div class="card">
+								<div class="card-header">
+									<a href="javascript:void(0);" class="card-title collapsed" data-toggle="collapse" data-target="#logKeg-produksi" aria-expanded="false">
+										<i class="fal fa-dolly width-2 fs-xl"></i>
+										Produksi/Panen
+										<span class="ml-auto">
+											<span class="collapsed-reveal">
+												<i class="fal fa-chevron-up fs-xl"></i>
+											</span>
+											<span class="collapsed-hidden">
+												<i class="fal fa-chevron-down fs-xl"></i>
+											</span>
+										</span>
+									</a>
+								</div>
+								<div id="logKeg-produksi" class="collapse" data-parent="#logKeg" style="">
+									<form action="" enctype="multipart/form-data" method="post">
+										@csrf
+										@method('PUT')
+										<div class="card-body">
+											<div class="row d-flex">
+												<div class="col-md-4 mb-3">
+													<div class="card" style="width: 100%; padding-top: 100%; position: relative; overflow: hidden;">
+														<div class="card-image" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+															background-image: url('{{ Auth::user()->data_user->avatar ? asset('storage/' . Auth::user()->data_user->avatar) : asset('img/posts_img/default-post-image-light.svg') }}');
+															background-size: cover; background-repeat: no-repeat; background-position: center;">
+														</div>
+													</div>
+												</div>
+												<div class="col-md-8">
+													<div class="fom-group mb-3">
+														<button class="btn btn-block d-md-none d-block btn-primary" id="prodCam">
+															<i class="fal fa-camera mr-1"></i> Foto Kegiatan
+														</button>
+													</div>
+													<div class="form-group">
+														<label class="form-label" for="prodDate">Tanggal</label>
+														<input class="form-control" id="prodDate" type="date" name="prodDate" value="">
+													</div>
+													<div class="form-group">
+														<label class="form-label" for="prodVol">Tanggal</label>
+														<input class="form-control" id="prodVol" type="number" name="prodVol" value="">
+													</div>
+													<div class="form-group">
+														<label class="form-label" for="prodComment">Keterangan</label>
+														<textarea class="form-control" id="prodComment" name="prodComment" rows="2"></textarea>
+													</div>
+													<div class="form-group d-none d-lg-block">
+														<label class="form-label" for="prodFoto">Bukti Kegiatan</label>
+														<div class="input-group">
+															<div class="custom-file">
+																<input type="file" class="custom-file-input" id="prodFoto" name="prodFoto" aria-describedby="prodFoto">
+																<label class="custom-file-label" for="prodFoto">Choose file</label>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="card-footer d-flex justify-content-between">
+											<div></div>
+											<div class="ml-auto">
+												<button class="btn btn-warning waves-effect waves-themed" type="button" id="saveProd">Simpan Data Produksi</button>
+											</div>
+										</div>
+									</form>
+								</div>
+							</div>
+							<div class="card">
+								<div class="card-header">
+									<a href="javascript:void(0);" class="card-title collapsed" data-toggle="collapse" data-target="#logKeg-distribusi" aria-expanded="false">
+										<i class="fal fa-truck-container width-2 fs-xl"></i>
+										Distribusi Hasil
+										<span class="ml-auto">
+											<span class="collapsed-reveal">
+												<i class="fal fa-chevron-up fs-xl"></i>
+											</span>
+											<span class="collapsed-hidden">
+												<i class="fal fa-chevron-down fs-xl"></i>
+											</span>
+										</span>
+									</a>
+								</div>
+								<div id="logKeg-distribusi" class="collapse" data-parent="#logKeg" style="">
+									<form action="" enctype="multipart/form-data" method="post">
+										@csrf
+										@method('PUT')
+										<div class="card-body">
+											<div class="row d-flex">
+												<div class="col-md-4 mb-3">
+													<div class="card" style="width: 100%; padding-top: 100%; position: relative; overflow: hidden;">
+														<div class="card-image" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+															background-image: url('{{ Auth::user()->data_user->avatar ? asset('storage/' . Auth::user()->data_user->avatar) : asset('img/posts_img/default-post-image-light.svg') }}');
+															background-size: cover; background-repeat: no-repeat; background-position: center;">
+														</div>
+													</div>
+												</div>
+												<div class="col-md-8">
+													<div class="fom-group mb-3">
+														<button class="btn btn-block d-md-none d-block btn-primary" id="distCam">
+															<i class="fal fa-camera mr-1"></i> Foto Kegiatan
+														</button>
+													</div>
+													<div class="form-group">
+														<label class="form-label" for="distStored">Untuk Benih</label>
+														<input class="form-control" id="distStored" type="number" name="distStored" value="">
+													</div>
+													<div class="form-group">
+														<label class="form-label" for="distSale">Dijual Kembali</label>
+														<input class="form-control" id="distSale" type="number" name="distSale" value="">
+													</div>
+													<div class="form-group">
+														<label class="form-label" for="distComment">Keterangan</label>
+														<textarea class="form-control" id="distComment" name="distComment" rows="2"></textarea>
+													</div>
+													<div class="form-group d-none d-lg-block">
+														<label class="form-label" for="distFoto">Bukti Kegiatan</label>
+														<div class="input-group">
+															<div class="custom-file">
+																<input type="file" class="custom-file-input" id="distFoto" name="distFoto" aria-describedby="distFoto">
+																<label class="custom-file-label" for="distFoto">Choose file</label>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="card-footer d-flex justify-content-between">
+											<div></div>
+											<div class="ml-auto">
+												<button class="btn btn-warning waves-effect waves-themed" type="button" id="saveDist">Simpan Distribusi Produksi</button>
+											</div>
+										</div>
+									</form>
+								</div>
 							</div>
 						</div>
 					</div>
-				</form>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -436,8 +847,6 @@
 			});
 		});
 
-
-
 		$('#vol_benih').prop('disabled', true);
     	// $('#vol_jual').prop('readonly', true);
 
@@ -548,6 +957,10 @@
 
 	window.addEventListener('load', function() {
 		initMap();
+	});
+
+	$('#tblLogbook').dataTable({
+		responsive: true,
 	});
 </script>
 {{-- aktifkan untuk pembatasan max input luas lahan

@@ -157,15 +157,15 @@
 						render: function(data, type, row) {
 							if (data) {
 								if(data){
-									return `<a href="{{route('2024.user.commitment.addrealisasi', ['noIjin' => ':ijin', 'spatial' => ':spatial'])}}" title="Isi/ubah data realisasi tanam" class="btn btn-primary btn-icon btn-xs text-white" >
+									return `<a href="{{route('2024.user.commitment.addrealisasi', ['noIjin' => ':ijin', 'spatial' => ':spatial'])}}" title="Isi/ubah data realisasi" class="btn btn-outline-primary btn-icon btn-xs" >
 											<i class="fa fa-edit"></i>
 										</a>
-										<a href="" title="ubah data tanam" class="btn btn-info btn-icon btn-xs text-white" >
-											<i class="fa fa-images"></i>
+										<a href="" title="Logbook Kegiatan" class="btn btn-outline-info btn-icon btn-xs" >
+											<i class="fal fa-book"></i>
 										</a>
 										`.replace(':ijin', ijin).replace(':spatial', data);
 								}else{
-									return `<a href="" title="isi data tanam" class="btn btn-warning btn-icon btn-xs text-white" >
+									return `<a href="" title="isi data tanam" class="btn btn-outline-warning btn-icon btn-xs" >
 										<i class="fa fa-map"></i>
 									</a>`;
 								}

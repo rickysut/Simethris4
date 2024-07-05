@@ -38,19 +38,55 @@ class Lokasi extends Model
 		'polygon',
 		'luas_kira',
 		'tgl_tanam',
-		'tgl_akhir_tanam',
 		'luas_tanam',
 		'tanam_doc',
 		'tanam_pict',
 		'tgl_panen',
-		'tgl_akhir_panen',
 		'volume',
 		'vol_benih',
 		'vol_jual',
-		'panen_doc',
-		'panen_pict',
 		'status',
-		'varietas', //unused
+		'tanamComment',
+            'tanamFoto',
+
+            'lahandate',
+            'lahancomment',
+            'lahanfoto',
+
+            'benihDate',
+            'benihComment',
+            'benihFoto',
+
+            'mulsaDate',
+            'mulsaComment',
+            'mulsaFoto',
+
+            'pupuk1Date',
+            'pupuk1Comment',
+            'pupuk1Foto',
+
+            'pupuk2Date',
+            'pupuk2Comment',
+            'pupuk2Foto',
+
+            'pupuk3Date',
+            'pupuk3Comment',
+            'pupuk3Foto',
+
+            'optDate',
+            'optComment',
+            'optFoto',
+
+            'prodComment',
+            'prodFoto',
+
+            'distComment',
+            'distFoto',
+		// 'tgl_akhir_panen',
+		// 'tgl_akhir_tanam',
+		// 'panen_doc',
+		// 'panen_pict',
+		// 'varietas',
 	];
 
 	public function masteranggota()
@@ -76,6 +112,11 @@ class Lokasi extends Model
 	public function spatial()
 	{
 		return $this->belongsTo(MasterSpatial::class, 'kode_spatial', 'kode_spatial');
+	}
+
+	public function logbook()
+	{
+		return $this->hasMany(LogbookKegiatan::class);
 	}
 
 	public function fototanam()

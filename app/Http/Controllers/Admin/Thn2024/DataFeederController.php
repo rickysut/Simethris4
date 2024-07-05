@@ -1264,6 +1264,9 @@ class DataFeederController extends Controller
 
 		// Build the query
 		$query = AjuVerifTanam::select('id', 'tcode', 'npwp', 'no_ijin', 'check_by', 'verif_at', 'status', 'note', 'created_at')
+			->when($user->roles[0]->title !== 'Administrator', function ($query) {
+				$query->where('status', 0);
+			})
 			->where(function ($query) use ($user) {
 				$query->where('check_by', null)
 					->orWhere('check_by', $user->id);
@@ -1272,9 +1275,10 @@ class DataFeederController extends Controller
 				'verifikator:id,name',
 				'datauser:id,npwp_company,company_name',
 				'commitment:id,no_ijin,periodetahun',
+				'assignments:id,tcode,pengajuan_id,user_id',
+            	'assignments.user:id,name'
 			]);
 
-		// Apply additional filters for periode and status
 		if ($periodeFilter) {
 			$query->whereHas('commitment', function ($query) use ($periodeFilter) {
 				$query->where('periodetahun', $periodeFilter);
@@ -1285,10 +1289,8 @@ class DataFeederController extends Controller
 			$query->where('status', $statusFilter);
 		}
 
-		// Get the data
 		$data = $query->get();
 
-		// Map the data
 		$data = $data->map(function ($item) {
 			return [
 				'id' => $item->id,
@@ -1302,10 +1304,20 @@ class DataFeederController extends Controller
 				'verif_at' => $item->verif_at,
 				'status' => $item->status,
 				'ijin' => str_replace(['/', '.', '-'], '', $item->no_ijin),
+				'assignments' => $item->assignments->map(function ($assignment) {
+					return [
+						'id' => $assignment->id,
+						'user_id' => $assignment->user_id,
+						'user_name' => $assignment->user ? $assignment->user->name : null,
+						'tcode' => $assignment ? $assignment->tcode : null,
+						'no_sk' => $assignment->no_sk,
+						'tgl_sk' => $assignment->tgl_sk,
+						'file' => $assignment->file,
+					];
+				}),
 			];
 		});
 
-		// Filtering
 		if ($searchValue) {
 			$data = $data->filter(function ($item) use ($searchValue) {
 				return strpos(strtolower($item['periode']), strtolower($searchValue)) !== false ||
@@ -1316,7 +1328,6 @@ class DataFeederController extends Controller
 			})->values();
 		}
 
-		// Sorting
 		if (!empty($order)) {
 			$orderColumn = $order[0]['column'];
 			$orderDirection = $order[0]['dir'];
@@ -1330,7 +1341,6 @@ class DataFeederController extends Controller
 		$totalRecords = $data->count();
 		$filteredRecords = $data->count();
 
-		// Pagination
 		$verifList = $data->slice($start, $length)->values();
 
 		return response()->json([

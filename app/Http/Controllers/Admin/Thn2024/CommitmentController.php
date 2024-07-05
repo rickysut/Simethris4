@@ -45,53 +45,7 @@ class CommitmentController extends Controller
 		$page_heading = 'Daftar Komitmen';
 		$heading_class = 'fal fa-ballot-check';
 
-		$npwp_company = Auth::user()->data_user->npwp_company;
-		$commitments = PullRiph::select('id', 'no_ijin', 'periodetahun', 'tgl_ijin', 'volume_riph', 'luas_wajib_tanam', 'volume_produksi')
-			->where('npwp', $npwp_company)
-			->with('skl')
-			->get();
-		// dd($commitments);
-		$pksCount = 0; // Initialize with a default value
-		$pksFileCount = 0; // Initialize with a default value
-
-		if ($commitments) {
-			foreach ($commitments as $commitment) {
-				$sumLuas = $commitment->lokasi->sum('luas_tanam');
-				$sumVolume = $commitment->lokasi->sum('volume');
-				$minThresholdTanam = $commitment->luas_wajib_tanam;
-				$minThresholdProd = $commitment->volume_produksi;
-
-				$commitment->sumLuas = $sumLuas;
-				$commitment->sumVolume = $sumVolume;
-				$commitment->minThresholdTanam = $minThresholdTanam;
-				$commitment->minThresholdProd = $minThresholdProd;
-				$thesePks = Pks::select('id', 'no_ijin','berkas_pks')->where('no_ijin', $commitment->no_ijin)->get();
-				$pksCount = $thesePks->count();
-				$pksFileCount = $thesePks
-					->whereNotNull('berkas_pks')
-					->count();
-				$userDocs = UserDocs::where('no_ijin', $commitment->no_ijin)
-					->first();
-
-				$ajuTanam = AjuVerifTanam::where('no_ijin', $commitment->no_ijin)->select('status')
-					->first();
-
-				$ajuProduksi = AjuVerifProduksi::where('no_ijin', $commitment->no_ijin)->select('status')
-					->first();
-
-				$ajuSkl = AjuVerifSkl::where('no_ijin', $commitment->no_ijin)->select('status')
-					->first();
-
-				$noIjin = str_replace(['.', '-', '/'], '', $commitment->no_ijin);
-				$commitment->noIjin = $noIjin;
-				// Add userDocs to the commitment
-				$commitment->userDocs = $userDocs;
-				$commitment->ajuTanam = $ajuTanam;
-				$commitment->ajuProduksi = $ajuProduksi;
-				$commitment->ajuSkl = $ajuSkl;
-			}
-		}
-		return view('t2024.commitment.index', compact('module_name', 'page_title', 'page_heading', 'heading_class', 'npwp_company', 'commitments', 'pksCount', 'pksFileCount'));
+		return view('t2024.commitment.index', compact('module_name', 'page_title', 'page_heading', 'heading_class'));
 	}
 
 	public function show($noIjin)

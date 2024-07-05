@@ -231,13 +231,13 @@ class PksController extends Controller
 				],
 				[
 					'tgl_tanam' => $request->input('mulai_tanam'),
-					'tgl_akhir_tanam' => $request->input('akhir_tanam'),
-					'luas_tanam' => $request->input('luas_tanam'),
-					'tgl_panen' => $request->input('mulai_panen'),
-					'tgl_akhir_panen' => $request->input('akhir_panen'),
-					'volume' => $request->input('volume'),
-					'vol_benih' => $request->input('vol_benih'),
-					'vol_jual' => $request->input('vol_jual'),
+					// 'tgl_akhir_tanam' => $request->input('akhir_tanam'),
+					// 'luas_tanam' => $request->input('luas_tanam'),
+					// 'tgl_panen' => $request->input('mulai_panen'),
+					// 'tgl_akhir_panen' => $request->input('akhir_panen'),
+					// 'volume' => $request->input('volume'),
+					// 'vol_benih' => $request->input('vol_benih'),
+					// 'vol_jual' => $request->input('vol_jual'),
 				]
 			);
 
@@ -255,7 +255,25 @@ class PksController extends Controller
 		}
 	}
 
+	public function logbook($noIjin, $spatial)
+	{
+		$ijin = $noIjin;
 
+		// Format the $noIjin string
+		$noIjin = substr($noIjin, 0, 4) . '/' .
+			substr($noIjin, 4, 2) . '.' .
+			substr($noIjin, 6, 3) . '/' .
+			substr($noIjin, 9, 1) . '/' .
+			substr($noIjin, 10, 2) . '/' .
+			substr($noIjin, 12, 4);
+
+		// Find the Lokasi record
+		$lokasi = Lokasi::where('no_ijin', $noIjin)
+			->where('kode_spatial', $spatial)
+			->first();
+
+		dd($ijin, $noIjin, $spatial, $lokasi);
+	}
 
 
 	public function index(Request $request)
