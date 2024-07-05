@@ -95,7 +95,7 @@
 										</span>
 									</a>
 								</div>
-								<div id="logKeg-lahan" class="collapse" data-parent="#logKeg" style="">
+								<div id="logKeg-lahan" class="collapse" data-parent="#logKeg" >
 									<div class="card-body">
 										<div class="row d-flex">
 											<div class="col-md-4 mb-3">
@@ -147,7 +147,7 @@
 										</span>
 									</a>
 								</div>
-								<div id="logKeg-benih" class="collapse" data-parent="#logKeg" style="">
+								<div id="logKeg-benih" class="collapse" data-parent="#logKeg" >
 									<div class="card-body">
 										<div class="row d-flex">
 											<div class="col-md-4 mb-3">
@@ -199,7 +199,7 @@
 										</span>
 									</a>
 								</div>
-								<div id="logKeg-mulsa" class="collapse" data-parent="#logKeg" style="">
+								<div id="logKeg-mulsa" class="collapse" data-parent="#logKeg" >
 									<div class="card-body">
 										<div class="row d-flex">
 											<div class="col-md-4 mb-3">
@@ -251,7 +251,7 @@
 										</span>
 									</a>
 								</div>
-								<div id="logKeg-tanam" class="collapse" data-parent="#logKeg" style="">
+								<div id="logKeg-tanam" class="collapse" data-parent="#logKeg" >
 									<div class="card-body">
 										<div class="row d-flex">
 											<div class="col-md-4 mb-3">
@@ -303,7 +303,7 @@
 										</span>
 									</a>
 								</div>
-								<div id="logKeg-pupuk-1" class="collapse" data-parent="#logKeg" style="">
+								<div id="logKeg-pupuk-1" class="collapse" data-parent="#logKeg" >
 									<div class="card-body">
 										<div class="row d-flex">
 											<div class="col-md-4 mb-3">
@@ -355,7 +355,7 @@
 										</span>
 									</a>
 								</div>
-								<div id="logKeg-pupuk-2" class="collapse" data-parent="#logKeg" style="">
+								<div id="logKeg-pupuk-2" class="collapse" data-parent="#logKeg" >
 									<div class="card-body">
 										<div class="row d-flex">
 											<div class="col-md-4 mb-3">
@@ -407,7 +407,7 @@
 										</span>
 									</a>
 								</div>
-								<div id="logKeg-pupuk-3" class="collapse" data-parent="#logKeg" style="">
+								<div id="logKeg-pupuk-3" class="collapse" data-parent="#logKeg" >
 									<div class="card-body">
 										<div class="row d-flex">
 											<div class="col-md-4 mb-3">
@@ -459,7 +459,7 @@
 										</span>
 									</a>
 								</div>
-								<div id="logKeg-pupuk-3" class="collapse" data-parent="#logKeg" style="">
+								<div id="logKeg-pupuk-3" class="collapse" data-parent="#logKeg" >
 									<div class="card-body">
 										<div class="row d-flex">
 											<div class="col-md-4 mb-3">
@@ -511,7 +511,7 @@
 										</span>
 									</a>
 								</div>
-								<div id="logKeg-produksi" class="collapse" data-parent="#logKeg" style="">
+								<div id="logKeg-produksi" class="collapse" data-parent="#logKeg" >
 									<div class="card-body">
 										<div class="row d-flex">
 											<div class="col-md-4 mb-3">
@@ -563,7 +563,7 @@
 										</span>
 									</a>
 								</div>
-								<div id="logKeg-distribusi" class="collapse" data-parent="#logKeg" style="">
+								<div id="logKeg-distribusi" class="collapse" data-parent="#logKeg" >
 									<div class="card-body">
 										<div class="row d-flex">
 											<div class="col-md-4 mb-3">

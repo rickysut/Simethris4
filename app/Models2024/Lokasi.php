@@ -82,6 +82,7 @@ class Lokasi extends Model
 
 		'distComment',
 		'distFoto',
+
 		// 'tgl_akhir_panen',
 		// 'tgl_akhir_tanam',
 		// 'panen_doc',

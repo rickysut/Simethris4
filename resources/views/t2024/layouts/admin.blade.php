@@ -12,7 +12,7 @@
 		<meta name="apple-mobile-web-app-capable" content="yes" />
 		<!-- Remove Tap Highlight on Windows Phone IE -->
 		<meta name="msapplication-tap-highlight" content="no">
-		<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+		{{-- <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests"> --}}
 
 		<!-- smartadmin base css -->
 		<link rel="stylesheet" href="{{ asset('css/app.css') }}" />

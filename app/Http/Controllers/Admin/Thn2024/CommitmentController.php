@@ -150,6 +150,8 @@ class CommitmentController extends Controller
 		$page_heading = 'Verifikasi Lahan ' . $spatial;
 		$heading_class = 'fal fa-map-marker';
 
+		$ijin = $noIjin;
+
 		$noIjin = substr($noIjin, 0, 4) . '/' .
 			substr($noIjin, 4, 2) . '.' .
 			substr($noIjin, 6, 3) . '/' .
@@ -157,13 +159,33 @@ class CommitmentController extends Controller
 			substr($noIjin, 10, 2) . '/' .
 			substr($noIjin, 12, 4);
 
-		$data = Lokasi::where('no_ijin', $noIjin)
-		->where('kode_spatial', $spatial)
-		->with(['masteranggota', 'pks', 'spatial', 'fototanam', 'fotoproduksi'])
-		->first();
+		// dd($spatial);
 
 		$mapkey = ForeignApi::find(1);
-		return view('t2024.commitment.realisasilokasimobile', compact('module_name', 'page_title', 'page_heading', 'heading_class', 'mapkey', 'data'));
+		$npwpCompany = Auth::user()->data_user->npwp_company;
+		$npwp = preg_replace('/[^0-9]/', '', $npwpCompany);
+		$lokasi = Lokasi::where('no_ijin', $noIjin)->where('kode_spatial', $spatial)->first();
+		// dd($spatial);
+		$pks = Pks::where('poktan_id', $lokasi->poktan_id)->where('no_ijin', $noIjin)->first();
+		$spatial = MasterSpatial::select('id', 'kode_spatial', 'nama_petani', 'latitude', 'longitude', 'polygon', 'altitude', 'luas_lahan', 'kabupaten_id', 'ktp_petani')->where('kode_spatial', $spatial)
+			->first();
+
+		$data = [
+			'npwpCompany' => $npwpCompany,
+			'npwp' => $npwp,
+			'noIjin' => $noIjin,
+			'lokasi' => $lokasi,
+			'pks' => $pks,
+			'spatial' => $spatial,
+			'lokasi' => $lokasi,
+			'pks' => $pks,
+			'spatial' => $spatial,
+			'anggota' => $spatial->anggota,
+			'ijin' => $ijin,
+		];
+
+		$mapkey = ForeignApi::find(1);
+		return view('t2024.commitment.realisasilokasimobile', compact('module_name', 'page_title', 'page_heading', 'heading_class', 'data', 'mapkey', 'ijin', 'lokasi'));
 	}
 
 	public function updatePks(Request $request, $id)
