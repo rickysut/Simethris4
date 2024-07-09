@@ -45,13 +45,6 @@
 									<ul class="list-group" id="exportedData" hidden>
 									</ul>
 									<div id="myForm" hidden>
-
-										<div class="form-group row">
-											<label for="komoditas" class="col-sm-3 col-form-label">Komoditas</label>
-											<div class="col-sm-9">
-												<input class="form-control" type="text" id="komoditas" name="komoditas" value="" readonly>
-											</div>
-										</div>
 										<div class="form-group row">
 											<label for="kode_spatial" class="col-sm-3 col-form-label">Kode Spatial</label>
 											<div class="col-sm-9">
@@ -86,12 +79,6 @@
 											<label for="luas_lahan" class="col-sm-3 col-form-label">Luas Lahan (m2)</label>
 											<div class="col-sm-9">
 												<input class="form-control" type="text" id="luas_lahan" name="luas_lahan" value="" readonly>
-											</div>
-										</div>
-										<div class="form-group row">
-											<label for="nama_lahan" class="col-sm-3 col-form-label">Nama Lahan</label>
-											<div class="col-sm-9">
-												<input class="form-control" type="text" id="nama_lahan" name="nama_lahan" value="" readonly>
 											</div>
 										</div>
 										<div class="form-group row">
@@ -132,24 +119,6 @@
 											<div class="col-sm-9">
 												<input class="form-control" type="text" id="kelurahan_nama" name="kelurahan_nama" value="" readonly>
 												<input class="form-control" type="hidden" id="kelurahan_id" name="kelurahan_id" value="">
-											</div>
-										</div>
-										<div class="form-group row">
-											<label for="nama_petugas" class="col-sm-3 col-form-label">Petugas Pemetaan</label>
-											<div class="col-sm-9">
-												<input class="form-control" type="text" id="nama_petugas" name="nama_petugas" value="" readonly>
-											</div>
-										</div>
-										<div class="form-group row">
-											<label for="tgl_peta" class="col-sm-3 col-form-label">Tanggal Pemetaan</label>
-											<div class="col-sm-9">
-												<input class="form-control" type="text" id="tgl_peta" name="tgl_peta" value="" readonly>
-											</div>
-										</div>
-										<div class="form-group row">
-											<label for="tgl_tanam" class="col-sm-3 col-form-label">Jadwal Tanam</label>
-											<div class="col-sm-9">
-												<input class="form-control" type="text" id="tgl_tanam" name="tgl_tanam" value="" readonly>
 											</div>
 										</div>
 										<div class="d-flex justify-content-between mt-3">
@@ -316,18 +285,14 @@
 		const placemarks = kmlXml.getElementsByTagName("Placemark");
 		for (let i = 0; i < placemarks.length; i++) {
 			const placemark = placemarks[i];
-			const id_lahan = placemark.querySelector("SimpleData[name='ID_Lahan']").textContent;
-			const komoditas = placemark.querySelector("SimpleData[name='Komoditas']").textContent;
+			const id_lahan = placemark.querySelector("SimpleData[name='ID_LAHAN']").textContent;
 			const nikPetani = placemark.querySelector("SimpleData[name='NIK']").textContent;
-			const petani = placemark.querySelector("SimpleData[name='Petani']").textContent;
-			const luas = placemark.querySelector("SimpleData[name='Luas_Lahan']").textContent;
-			const x = parseFloat(placemark.querySelector("SimpleData[name='Latitude']").textContent);
-			const y = parseFloat(placemark.querySelector("SimpleData[name='Longitude']").textContent);
-			const altitude = parseFloat(placemark.querySelector("SimpleData[name='Altitude']").textContent);
-			const desa_id = placemark.querySelector("SimpleData[name='ID_Desa']").textContent;
-			const petugas = placemark.querySelector("SimpleData[name='Petugas']").textContent;
-			const tgl_peta = placemark.querySelector("SimpleData[name='Tgl_Pemeta']").textContent;
-			const tgl_tanam = placemark.querySelector("SimpleData[name='Tgl_Tanam']").textContent;
+			const petani = placemark.querySelector("SimpleData[name='PETANI']").textContent;
+			const luas = placemark.querySelector("SimpleData[name='LUAS_LAHAN']").textContent;
+			const x = parseFloat(placemark.querySelector("SimpleData[name='LATITUDE']").textContent);
+			const y = parseFloat(placemark.querySelector("SimpleData[name='LONGITUDE']").textContent);
+			const altitude = parseFloat(placemark.querySelector("SimpleData[name='ALTITUDE']").textContent);
+			const desa_id = placemark.querySelector("SimpleData[name='ID_DESA']").textContent;
 
 			const kecamatan_id = desa_id.substring(0, 7);
 			const kabupaten_id = desa_id.substring(0, 4);
@@ -341,7 +306,6 @@
 			const routeProv = `{{ route('wilayah.getProvById', ':id') }}`.replace(':id', provinsi_id);
 
 			document.getElementById("kode_spatial").value = id_lahan;
-			document.getElementById("komoditas").value = komoditas;
 			document.getElementById("kdLokasiTitle").textContent = id_lahan;
 			document.getElementById("ktp_petani").value = nikPetani;
 			document.getElementById("nama_petani").value = petani;
@@ -351,10 +315,6 @@
 			document.getElementById("kecamatan_id").value = kecamatan_id;
 			document.getElementById("kabupaten_id").value = kabupaten_id;
 			document.getElementById("provinsi_id").value = provinsi_id;
-
-			document.getElementById("nama_petugas").value = petugas;
-			document.getElementById("tgl_peta").value = tgl_peta;
-			document.getElementById("tgl_tanam").value = tgl_tanam;
 			document.getElementById("altitude").value = altitude;
 
 			Promise.all([
@@ -387,10 +347,6 @@
 						<span id='id_lahan'> ${id_lahan} </span>
 					</li>
 					<li class='list-group-item d-flex justify-content-between'>
-						<span>Komoditas</span>
-						<span id='komoditas'> ${komoditas} </span>
-					</li>
-					<li class='list-group-item d-flex justify-content-between'>
 						<span>Nama Petani (NIK)</span>
 						<span id='nikpetani' class='${namaPetaniClass}'> ${nikPetani} </span>
 					</li>
@@ -405,18 +361,6 @@
 					<li class='list-group-item d-flex justify-content-between'>
 						<span>Altitude (mdpl)</span>
 						<span id='altitude'> ${altitude} </span>
-					</li>
-					<li class='list-group-item d-flex justify-content-between'>
-						<span>Petugas Pemetaan</span>
-						<span id='petugas' > ${petugas} </span>
-					</li>
-					<li class='list-group-item d-flex justify-content-between'>
-						<span>Tanggal Tanam</span>
-						<span id='tgl_tanam' > ${tgl_tanam} </span>
-					</li>
-					<li class='list-group-item d-flex justify-content-between'>
-						<span>Tanggal Pemetaan</span>
-						<span id='tglPeta' > ${tgl_peta} </span>
 					</li>
 					<li class='list-group-item d-flex justify-content-between'>
 						<span>Provinsi</span>
