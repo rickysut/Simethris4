@@ -82,6 +82,12 @@
 											</div>
 										</div>
 										<div class="form-group row">
+											<label for="poktan_name" class="col-sm-3 col-form-label">Kelompok Tani</label>
+											<div class="col-sm-9">
+												<input class="form-control" type="text" id="poktan_name" name="poktan_name" value="" readonly>
+											</div>
+										</div>
+										<div class="form-group row">
 											<label for="ktp_petani" class="col-sm-3 col-form-label">NIK Petani</label>
 											<div class="col-sm-9">
 												<input class="form-control" type="text" id="ktp_petani" name="ktp_petani" value="" readonly>
@@ -293,6 +299,7 @@
 			const y = parseFloat(placemark.querySelector("SimpleData[name='LONGITUDE']").textContent);
 			const altitude = parseFloat(placemark.querySelector("SimpleData[name='ALTITUDE']").textContent);
 			const desa_id = placemark.querySelector("SimpleData[name='ID_DESA']").textContent;
+			const poktanName = placemark.querySelector("SimpleData[name='POKTAN']").textContent;
 
 			const kecamatan_id = desa_id.substring(0, 7);
 			const kabupaten_id = desa_id.substring(0, 4);
@@ -310,6 +317,7 @@
 			document.getElementById("ktp_petani").value = nikPetani;
 			document.getElementById("nama_petani").value = petani;
 			document.getElementById("luas_lahan").value = luas;
+			document.getElementById("poktan_name").value = poktanName;
 
 			document.getElementById("kelurahan_id").value = desa_id;
 			document.getElementById("kecamatan_id").value = kecamatan_id;
@@ -345,6 +353,10 @@
 					<li class='list-group-item d-flex justify-content-between'>
 						<span>Kode Lokasi</span>
 						<span id='id_lahan'> ${id_lahan} </span>
+					</li>
+					<li class='list-group-item d-flex justify-content-between'>
+						<span>Kelompok Tani</span>
+						<span id='poktanName' class=''> ${poktanName} </span>
 					</li>
 					<li class='list-group-item d-flex justify-content-between'>
 						<span>Nama Petani (NIK)</span>

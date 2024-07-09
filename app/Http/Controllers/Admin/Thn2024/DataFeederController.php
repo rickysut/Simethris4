@@ -693,6 +693,7 @@ class DataFeederController extends Controller
 		$query = $data->map(function ($item) {
 			return [
 				'id' => $item->id,
+				'kode_poktan' => $item->kode_poktan,
 				'nama_kelompok' => $item->nama_kelompok,
 				'nama_pimpinan' => $item->nama_pimpinan,
 				'hp_pimpinan' => $item->hp_pimpinan,

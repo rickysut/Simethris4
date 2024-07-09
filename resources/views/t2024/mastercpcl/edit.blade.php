@@ -36,10 +36,10 @@
 									<div class="help-block" id="help-hp"></div>
 								</div>
 								<div class="col-md-6">
-									<label class="form-label" for="poktan_id">Kelompok Tani <span class="text-danger">*</span></label>
-									<select id="poktan_id" name="poktan_id" class="form-control w-100 @error('poktan_id') is-invalid @enderror" required>
+									<label class="form-label" for="kode_poktan">Kelompok Tani <span class="text-danger">*</span></label>
+									<select id="kode_poktan" name="kode_poktan" class="form-control w-100 @error('kode_poktan') is-invalid @enderror" required>
 										<option value="" hidden></option>
-										<option value="{{$cpcl->poktan_id}}" selected>{{$cpcl->masterpoktan ?$cpcl->masterpoktan->nama_kelompok : ''}}</option>
+										<option value="{{$cpcl->kode_poktan}}" selected>{{$cpcl->masterpoktan ?$cpcl->masterpoktan->nama_kelompok : ''}}</option>
 										<option value=""></option>
 									</select>
 									<span class="help-block" id="help-poktan"></span>
@@ -103,7 +103,7 @@
 @parent
 <script>
 	$(document).ready(function() {
-		var poktanSelect = $('#poktan_id');
+		var poktanSelect = $('#kode_poktan');
 		var provinsiSelect = $('#provinsi_id');
 		var kabupatenSelect = $('#kabupaten_id');
 		var kecamatanSelect = $('#kecamatan_id');
@@ -112,7 +112,7 @@
 		$("#provinsi_id").select2({
 			placeholder: "-- pilih provinsi"
 		});
-		$("#poktan_id").select2({
+		$("#kode_poktan").select2({
 			placeholder: "-- pilih poktan"
 		});
 		$("#kabupaten_id").select2({
@@ -126,20 +126,22 @@
 		});
 
 		$.get('{{ route("2024.datafeeder.getAllPoktan") }}', function(response) {
-			console.log(response); // Log response to ensure it is being retrieved
+			console.log('responses: ', response); // Log response to ensure it is being retrieved
 
 			if (response.data && response.data.length > 0) {
 				$.each(response.data, function(index, poktan) {
 					var option = $('<option>', {
-						value: poktan.id,
+						value: poktan.kode_poktan,
 						text: poktan.nama_kelompok
 					});
 
 					// Check if this option should be selected based on old input or current value
-					var selected = ('{{ old("poktan_id") }}' == poktan.id || '{{ $poktan_id ?? "" }}' == poktan.id) ? 'selected' : '';
+					if ('{{ old("kode_poktan") }}' == poktan.kode_poktan || '{{ $cpcl->kode_poktan ?? "" }}' == poktan.kode_poktan) {
+						option.prop('selected', true);
+					}
 
 					// Append the option to the select element
-					poktanSelect.append(option.prop('selected', selected));
+					poktanSelect.append(option);
 				});
 			} else {
 				console.log('No data returned or data is empty');
