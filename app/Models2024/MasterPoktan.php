@@ -26,6 +26,7 @@ class MasterPoktan extends Model
 
 	protected $fillable = [
 		'id',
+		'kode_poktan',
 		'kode_register',
 		'alamat',
 		'provinsi_id',
@@ -45,7 +46,7 @@ class MasterPoktan extends Model
 
 	public function anggota()
 	{
-		return $this->hasMany(MasterAnggota::class, 'poktan_id');
+		return $this->hasMany(MasterAnggota::class, 'kode_poktan');
 	}
 
 	public function provinsi()

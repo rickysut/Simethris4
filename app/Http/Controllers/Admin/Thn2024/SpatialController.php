@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin\Thn2024;
 use App\Http\Controllers\Controller;
 use App\Models2024\ForeignApi;
 use App\Models2024\MasterAnggota;
+use App\Models2024\MasterPoktan;
 use App\Models2024\MasterSpatial;
 use App\Models2024\PullRiph;
 use Illuminate\Http\Request;
@@ -64,6 +65,36 @@ class SpatialController extends Controller
 				throw new \Exception('File not found');
 			}
 
+			$poktanKode = 'poktan_' . time();
+
+			MasterPoktan:: updateOrCreate(
+				[
+					'kelurahan_id' => $request->input('kelurahan_id'),
+					'nama_kelompok' => $request->input('poktan_name'),
+				],
+				[
+					'kode_poktan' => $poktanKode,
+					'provinsi_id' => $request->input('provinsi_id'),
+					'kabupaten_id' => $request->input('kabupaten_id'),
+					'kecamatan_id' => $request->input('kecamatan_id'),
+					'kelurahan_id' => $request->input('kelurahan_id'),
+				],
+			);
+
+			MasterAnggota::updateOrCreate(
+				[
+					'ktp_petani' => $request->input('ktp_petani'),
+				],
+				[
+					'kode_poktan' => $poktanKode,
+					'nama_petani' => $request->input('nama_petani'),
+					'provinsi_id' => $request->input('provinsi_id'),
+					'kabupaten_id' => $request->input('kabupaten_id'),
+					'kecamatan_id' => $request->input('kecamatan_id'),
+					'kelurahan_id' => $request->input('kelurahan_id'),
+				],
+			);
+
 			MasterSpatial::updateOrCreate(
 				['kode_spatial' => $request->input('kode_spatial')],
 				[
@@ -85,19 +116,6 @@ class SpatialController extends Controller
 					// 'tgl_tanam' => $request->input('tgl_tanam'),
 					'kml_url' => $filePath,
 				]
-			);
-
-			MasterAnggota::updateOrCreate(
-				[
-					'ktp_petani' => $request->input('ktp_petani'),
-				],
-				[
-					'nama_petani' => $request->input('nama_petani'),
-					'provinsi_id' => $request->input('provinsi_id'),
-					'kabupaten_id' => $request->input('kabupaten_id'),
-					'kecamatan_id' => $request->input('kecamatan_id'),
-					'kelurahan_id' => $request->input('kelurahan_id'),
-				],
 			);
 
 			DB::commit();

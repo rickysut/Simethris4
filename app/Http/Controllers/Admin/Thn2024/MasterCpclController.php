@@ -67,7 +67,7 @@ class MasterCpclController extends Controller
 		$heading_class = 'fal fa-address-card';
 
 		$cpcl = MasterAnggota::where('ktp_petani', $nik)->first();
-		dd($cpcl);
+		// dd($cpcl);
 
 		return view('t2024.mastercpcl.edit', compact('module_name', 'page_title', 'page_heading', 'heading_class', 'cpcl'));
     }

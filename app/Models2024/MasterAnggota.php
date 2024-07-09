@@ -30,6 +30,7 @@ class MasterAnggota extends Model
 
 	protected $fillable = [
 		'id',
+		'kode_poktan',
 		'poktan_id',
 		'nama_petani',
 		'ktp_petani',
@@ -43,7 +44,7 @@ class MasterAnggota extends Model
 
 	public function masterpoktan()
 	{
-		return $this->belongsTo(MasterPoktan::class, 'poktan_id');
+		return $this->belongsTo(MasterPoktan::class, 'kode_poktan');
 	}
 
 	public function lokasi()
