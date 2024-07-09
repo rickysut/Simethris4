@@ -99,7 +99,7 @@
 				{data: 'kode_spatial'},
 				{data: 'ktp_petani',
 					render: function (data, type, row) {
-						return row.nama_petani;
+						return row.nama_anggota;
 					}
 				},
 				{
