@@ -584,15 +584,18 @@ class DataFeederController extends Controller
 	{
 		$draw = $request->input('draw', 1);
 		$start = $request->input('start', 0);
-		$length = $request->input('length', 10);
+		$length = $request->input('length', 100);
 		$searchValue = $request->input('search.value', '');
 
-		$data = MasterSpatial::select('id', 'kode_spatial', 'luas_lahan', 'ktp_petani', 'nama_petani', 'provinsi_id', 'kabupaten_id', 'kml_url', 'status')
-			->with([
+		// $spatials = MasterSpatial::where('ktp_petani', '3324016204770001')->with('anggota')->get();
+		// dd($spatials);
+
+		$data = MasterSpatial::with([
 				// 'anggota:id,poktan_id,nama_petani,ktp_petani',
 				'provinsi:provinsi_id,nama',
 				'kabupaten:kabupaten_id,nama_kab',
 				'jadwal:kode_spatial,awal_masa,akhir_masa',
+				'anggota:ktp_petani,nama_petani',
 			])->get();
 
 		$query = $data->map(function ($item) {
@@ -602,6 +605,7 @@ class DataFeederController extends Controller
 				'luas_lahan' => $item->luas_lahan,
 				'ktp_petani' => $item->ktp_petani,
 				'nama_petani' => $item->nama_petani,
+				'nama_anggota' => $item->anggota ? $item->anggota->nama_petani : null,
 				'kml_url' => $item->kml_url,
 				'provinsi_id' => $item->provinsi_id,
 				'nama_provinsi' => $item->provinsi ? $item->provinsi->nama : null,
@@ -619,7 +623,7 @@ class DataFeederController extends Controller
 			$query = $query->filter(function ($item) use ($searchValue) {
 				return strpos(strtolower($item['kode_spatial']), strtolower($searchValue)) !== false ||
 					strpos(strtolower($item['ktp_petani']), strtolower($searchValue)) !== false ||
-					strpos(strtolower($item['nama_petani']), strtolower($searchValue)) !== false ||
+					strpos(strtolower($item['nama_anggota']), strtolower($searchValue)) !== false ||
 					strpos(strtolower($item['nama_provinsi']), strtolower($searchValue)) !== false ||
 					strpos(strtolower($item['nama_kabupaten']), strtolower($searchValue)) !== false ||
 					strpos(strtolower($item['nama_kecamatan']), strtolower($searchValue)) !== false ||
@@ -641,8 +645,8 @@ class DataFeederController extends Controller
 				case 'ktp_petani':
 					$query = $query->sortByDesc('ktp_petani');
 					break;
-				case 'nama_petani':
-					$query = $query->sortByDesc('nama_petani');
+				case 'nama_anggota':
+					$query = $query->sortByDesc('nama_anggota');
 					break;
 				case 'nama_provinsi':
 					$query = $query->sortByDesc('nama_provinsi');
