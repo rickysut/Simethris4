@@ -441,6 +441,7 @@ Route::group(['prefix' => '2024', 'as' => '2024.', 'namespace' => 'Admin', 'midd
 			Route::get('/getVerifSklHistory/{noIjin}', 'DataFeederController@getVerifSklHistory')->name('getVerifSklHistory');
 			Route::get('/getRequestVerifTanam', 'DataFeederController@getRequestVerifTanam')->name('getRequestVerifTanam');
 			Route::get('/getVerifTanamByIjin/{noIjin}', 'DataFeederController@getVerifTanamByIjin')->name('getVerifTanamByIjin');
+			Route::get('/getspatial', 'DataFeederController@getspatial')->name('getspatial');
 			Route::post('/responseGetLocByRad', 'DataFeederController@responseGetLocByRad')->name('responseGetLocByRad');
 
 			Route::get('/getLocDataByIjinBySpatial/{noIjin}/{spatial}', 'DataFeederController@getLocDataByIjinBySpatial')->name('getLocDataByIjinBySpatial');

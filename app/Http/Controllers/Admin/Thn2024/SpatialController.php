@@ -182,4 +182,29 @@ class SpatialController extends Controller
 		$mapkey = ForeignApi::find(1);
 		return view('t2024.spatial.simulator', compact('module_name', 'page_title', 'page_heading', 'heading_class', 'mapkey', 'ijins'));
 	}
+
+	public function getspatial(Request $request)
+	{
+		//soap call dengan email dan passwoord
+		//cek role
+		//abort jika fail,, return response dengan json
+		$validated = $request->validate([
+            'status' => 'required|integer'
+        ]);
+
+
+
+		$status = 1; // status: All = findAll; status = 1 where status = 1; status = 2 where status = 2;
+
+		if ($status == 'All') {
+			$spatials = MasterSpatial::select('kode_spatial', 'ktp_petani', 'nama_petani', 'poktan_id', 'provinsi_id', 'kabupaten_id', 'kecamatan_id', 'kelurahan_id', 'luas_lahan', 'status')
+				->get();
+		} else {
+			$spatials = MasterSpatial::select('kode_spatial', 'ktp_petani', 'nama_petani', 'poktan_id', 'provinsi_id', 'kabupaten_id', 'kecamatan_id', 'kelurahan_id', 'luas_lahan', 'status')
+				->where('status', $status)
+				->get();
+		}
+
+		return response()->json($spatials);
+	}
 }

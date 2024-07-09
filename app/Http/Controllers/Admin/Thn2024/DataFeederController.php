@@ -1276,7 +1276,7 @@ class DataFeederController extends Controller
 				'datauser:id,npwp_company,company_name',
 				'commitment:id,no_ijin,periodetahun',
 				'assignments:id,tcode,pengajuan_id,user_id',
-            	'assignments.user:id,name'
+				'assignments.user:id,name'
 			]);
 
 		if ($periodeFilter) {
@@ -1564,5 +1564,73 @@ class DataFeederController extends Controller
 
 		// Return response in JSON format
 		return response()->json($data);
+	}
+
+
+	//get spatial by status
+	public function getspatial(Request $request)
+	{
+		$status = $request->input('status', 1);
+		//kita uji di sini untuk provinsi_id = "33";
+		$provinsi = $request->input('provinsi_id', "All");
+
+		// Inisialisasi query dasar
+		$query = MasterSpatial::select(
+			'kode_spatial',
+			'ktp_petani',
+			'nama_petani',
+			'poktan_id',
+			'provinsi_id',
+			'kabupaten_id',
+			'kecamatan_id',
+			'kelurahan_id',
+			'luas_lahan',
+			'status'
+		);
+
+		// Filter berdasarkan status jika status bukan 'All'
+		if ($status != 'All') {
+			$query->where('status', $status);
+		}
+
+		// Filter berdasarkan wilayah jika disediakan
+		if ($provinsi != 'All') {
+			$query->where('provinsi_id', $provinsi);
+		}
+		if ($request->has('kabupaten_id')) {
+			$query->where('kabupaten_id', $request->input('kabupaten_id'));
+		}
+		if ($request->has('kecamatan_id')) {
+			$query->where('kecamatan_id', $request->input('kecamatan_id'));
+		}
+		if ($request->has('kelurahan_id')) {
+			$query->where('kelurahan_id', $request->input('kelurahan_id'));
+		}
+
+		// Eksekusi query untuk mendapatkan hasil
+		$spatials = $query->get();
+
+		// Modifikasi struktur data
+		$spatials = $spatials->map(function ($spatial) {
+			return [
+				'kode_spatial' => $spatial->kode_spatial,
+				'luas_lahan' => $spatial->luas_lahan,
+				'ktp_petani' => $spatial->ktp_petani,
+				'nama_petani' => $spatial->nama_petani,
+				'poktan_id' => $spatial->poktan_id,
+				'status' => $spatial->status,
+				'wilayah' => [
+					'provinsi_id' => $spatial->provinsi_id,
+					'kabupaten_id' => $spatial->kabupaten_id,
+					'kecamatan_id' => $spatial->kecamatan_id,
+					'kelurahan_id' => $spatial->kelurahan_id,
+				]
+			];
+		});
+
+		// Kembalikan hasil dalam bentuk JSON
+		return response()->json([
+			'spatials' => $spatials,
+		]);
 	}
 }

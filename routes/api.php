@@ -6,6 +6,8 @@ use App\Http\Controllers\Api\GetWilayahController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\SKLController;
 
+// use Illuminate\Support\Facades\Route;
+
 
 //getToken
 Route::post('getToken', 'Api\\AuthController@getToken');
@@ -14,6 +16,9 @@ Route::group(['as' => 'api.', 'namespace' => 'Api', 'middleware' => ['auth:sanct
 
 	//getCompletedSKL
 	Route::get('getSKL/{no_ijin}', 'SKLController@getSKL');
+
+	//getspatial
+	Route::get('getspatial', 'SpatialController@getspatial');
 
 	//dashboard
 	Route::get('getApiDashboardDatabyYear/{periodetahun}', 'DashboardDataController@monitoringDataByYear');
