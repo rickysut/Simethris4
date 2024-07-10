@@ -111,6 +111,7 @@ class SpatialController extends Controller
 					'kabupaten_id' => $request->input('kabupaten_id'),
 					'kecamatan_id' => $request->input('kecamatan_id'),
 					'kelurahan_id' => $request->input('kelurahan_id'),
+					'status' => 1,
 					// 'nama_petugas' => $request->input('nama_petugas'),
 					// 'tgl_peta' => $request->input('tgl_peta'),
 					// 'tgl_tanam' => $request->input('tgl_tanam'),

@@ -45,14 +45,9 @@ class SpatialController extends Controller
 	 */
 	public function getspatial(Request $request)
 	{
-		//soap call dengan email dan passwoord
-		//cek role
-		//abort jika fail,, return response dengan json
 		$validated = $request->validate([
             'status' => 'required|integer'
         ]);
-
-
 
 		$status = 1; // status: All = findAll; status = 1 where status = 1; status = 2 where status = 2;
 

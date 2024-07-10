@@ -596,7 +596,8 @@ class DataFeederController extends Controller
 				'kabupaten:kabupaten_id,nama_kab',
 				'jadwal:kode_spatial,awal_masa,akhir_masa',
 				'anggota:ktp_petani,nama_petani',
-			])->get();
+			])
+			->get();
 
 		$query = $data->map(function ($item) {
 			return [
@@ -1575,7 +1576,7 @@ class DataFeederController extends Controller
 	//get spatial by status
 	public function getspatial(Request $request)
 	{
-		$status = $request->input('status', 1);
+		$status = 1;
 		//kita uji di sini untuk provinsi_id = "33";
 		$provinsi = $request->input('provinsi_id', "All");
 
@@ -1600,7 +1601,7 @@ class DataFeederController extends Controller
 
 		// Filter berdasarkan wilayah jika disediakan
 		if ($provinsi != 'All') {
-			$query->where('provinsi_id', $provinsi);
+			$query->where('provinsi_id', $request->input('provinsi_id'));
 		}
 		if ($request->has('kabupaten_id')) {
 			$query->where('kabupaten_id', $request->input('kabupaten_id'));
