@@ -87,7 +87,7 @@ class CommitmentController extends Controller
 			->where('no_ijin',$noIjin)->first();
 
 		$poktans = Pks::where('no_ijin', $noIjin)
-			->groupBy('poktan_id')
+			->groupBy('kode_poktan')
 			->get();
 
 		$docs = UserDocs::where('no_ijin', $commitment->no_ijin)->first();

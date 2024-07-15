@@ -591,12 +591,12 @@ class DataFeederController extends Controller
 		// dd($spatials);
 
 		$data = MasterSpatial::with([
-				// 'anggota:id,poktan_id,nama_petani,ktp_petani',
-				'provinsi:provinsi_id,nama',
-				'kabupaten:kabupaten_id,nama_kab',
-				'jadwal:kode_spatial,awal_masa,akhir_masa',
-				'anggota:ktp_petani,nama_petani',
-			])
+			// 'anggota:id,poktan_id,nama_petani,ktp_petani',
+			'provinsi:provinsi_id,nama',
+			'kabupaten:kabupaten_id,nama_kab',
+			'jadwal:kode_spatial,awal_masa,akhir_masa',
+			'anggota:ktp_petani,nama_petani',
+		])
 			->get();
 
 		$query = $data->map(function ($item) {
@@ -1576,16 +1576,28 @@ class DataFeederController extends Controller
 	//get spatial by status
 	public function getspatial(Request $request)
 	{
-		$status = 1;
-		//kita uji di sini untuk provinsi_id = "33";
-		$provinsi = $request->input('provinsi_id', "All");
+		$informasi = 'Daftar Kode Spatial Wajib Tanam';
+		$app = 'Simethris 4 Alpha';
+		$Uses = '?s=status&p=provinsi_id&b=kabupaten_id&c=kecamatan_id&l=kelurahan_id';
 
-		// Inisialisasi query dasar
+		$validated = $request->validate([
+			's' => 'nullable|integer',
+			'p' => 'nullable|integer',
+			'b' => 'nullable|integer',
+			'c' => 'nullable|integer',
+			'l' => 'nullable|integer',
+		]);
+
+		$s = $validated['s'] ?? null;
+		$p = $validated['p'] ?? null;
+		$b = $validated['b'] ?? null;
+		$c = $validated['c'] ?? null;
+		$l = $validated['l'] ?? null;
+
 		$query = MasterSpatial::select(
 			'kode_spatial',
 			'ktp_petani',
 			'nama_petani',
-			'poktan_id',
 			'provinsi_id',
 			'kabupaten_id',
 			'kecamatan_id',
@@ -1594,36 +1606,32 @@ class DataFeederController extends Controller
 			'status'
 		);
 
-		// Filter berdasarkan status jika status bukan 'All'
-		if ($status != 'All') {
-			$query->where('status', $status);
+		if (!is_null($s)) {
+			$query->where('status', $s);
+		}
+		if (!is_null($p)) {
+			$query->where('provinsi_id', $p);
+		}
+		if (!is_null($b)) {
+			$query->where('kabupaten_id', $b);
+		}
+		if (!is_null($c)) {
+			$query->where('kecamatan_id', $c);
+		}
+		if (!is_null($l)) {
+			$query->where('kelurahan_id', $l);
 		}
 
-		// Filter berdasarkan wilayah jika disediakan
-		if ($provinsi != 'All') {
-			$query->where('provinsi_id', $request->input('provinsi_id'));
-		}
-		if ($request->has('kabupaten_id')) {
-			$query->where('kabupaten_id', $request->input('kabupaten_id'));
-		}
-		if ($request->has('kecamatan_id')) {
-			$query->where('kecamatan_id', $request->input('kecamatan_id'));
-		}
-		if ($request->has('kelurahan_id')) {
-			$query->where('kelurahan_id', $request->input('kelurahan_id'));
-		}
-
-		// Eksekusi query untuk mendapatkan hasil
 		$spatials = $query->get();
 
-		// Modifikasi struktur data
-		$spatials = $spatials->map(function ($spatial) {
+		$formattedSpatials = $spatials->map(function ($spatial) {
 			return [
 				'kode_spatial' => $spatial->kode_spatial,
 				'luas_lahan' => $spatial->luas_lahan,
 				'ktp_petani' => $spatial->ktp_petani,
-				'nama_petani' => $spatial->nama_petani,
-				'poktan_id' => $spatial->poktan_id,
+				'nama_petani' => $spatial->anggota->nama_petani,
+				'kode_poktan' => $spatial->anggota->masterpoktan->kode_poktan ?? null,
+				'nama_kelompok' => $spatial->anggota->masterpoktan->nama_kelompok ?? null,
 				'status' => $spatial->status,
 				'wilayah' => [
 					'provinsi_id' => $spatial->provinsi_id,
@@ -1633,10 +1641,11 @@ class DataFeederController extends Controller
 				]
 			];
 		});
-
-		// Kembalikan hasil dalam bentuk JSON
 		return response()->json([
-			'spatials' => $spatials,
+			'Informasi' => $informasi,
+			'Applikasi' => $app,
+			'Penggunaan'=> $Uses,
+			'data_spatial' => $formattedSpatials,
 		]);
 	}
 }

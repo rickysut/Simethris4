@@ -27,10 +27,9 @@ class Pks extends Model
 	];
 
 	protected $fillable = [
-		'tcode',
+		'kode_poktan',
 		'npwp',
 		'no_ijin',
-		'poktan_id',
 		'nama_poktan',
 		'no_perjanjian',
 		'tgl_perjanjian_start',
@@ -50,18 +49,18 @@ class Pks extends Model
 
 	public function lokasi()
 	{
-		return $this->hasMany(Lokasi::class, ['poktan_id', 'no_ijin'], ['poktan_id', 'no_ijin']);
+		return $this->hasMany(Lokasi::class, ['kode_poktan', 'no_ijin'], ['kode_poktan', 'no_ijin']);
 	}
 
 
 	public function masterpoktan()
 	{
-		return $this->belongsTo(MasterPoktan::class, 'poktan_id');
+		return $this->belongsTo(MasterPoktan::class, 'kode_poktan');
 	}
 
 	public function anggota()
 	{
-		return $this->hasMany(MasterAnggota::class, 'poktan_id', 'poktan_id');
+		return $this->hasMany(MasterAnggota::class, 'kode_poktan', 'kode_poktan');
 	}
 
 	public function commitment()

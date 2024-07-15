@@ -26,6 +26,7 @@ class MasterSpatial extends Model
 	public $fillable = [
 		'komoditas',
 		'kode_spatial',
+		'kode_poktan',
 		'ktp_petani',
 		'nama_petani',
 		'latitude',
@@ -34,18 +35,19 @@ class MasterSpatial extends Model
 		'altitude',
 		'imagery',
 		'luas_lahan',
-		'nama_lahan',
 		'catatan',
 		'provinsi_id',
 		'kabupaten_id',
 		'kecamatan_id',
 		'kelurahan_id',
 		'kml_url',
-		'nama_petugas',
-		'tgl_peta',
-		'tgl_tanam',
 		'status',
 	];
+
+	public function masterpoktan()
+	{
+		return $this->belongsTo(MasterPoktan::class, 'kode_poktan', 'kode_poktan');
+	}
 
 	public function anggota()
 	{

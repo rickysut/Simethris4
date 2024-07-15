@@ -22,30 +22,16 @@ class Lokasi extends Model
 	];
 
 	protected $fillable = [
-		'kode_spatial',
 		'npwp',
 		'no_ijin',
-		'poktan_id',
-		'anggota_id',
+		'kode_poktan',
+		'kode_spatial',
 		'ktp_petani',
-		'nama_petani',
-		'nama_lokasi',
 		'luas_lahan',
 		'periode_tanam',
-		'latitude',
-		'longitude',
-		'altitude',
-		'polygon',
-		'luas_kira',
+
 		'tgl_tanam',
 		'luas_tanam',
-		'tanam_doc',
-		'tanam_pict',
-		'tgl_panen',
-		'volume',
-		'vol_benih',
-		'vol_jual',
-		'status',
 		'tanamComment',
 		'tanamFoto',
 
@@ -77,11 +63,17 @@ class Lokasi extends Model
 		'optComment',
 		'optFoto',
 
+		'tgl_panen',
+		'volume',
+		'vol_benih',
+		'vol_jual',
 		'prodComment',
 		'prodFoto',
 
 		'distComment',
 		'distFoto',
+
+		'status',
 
 		// 'tgl_akhir_panen',
 		// 'tgl_akhir_tanam',
@@ -102,7 +94,7 @@ class Lokasi extends Model
 
 	public function pks()
 	{
-		return $this->belongsTo(Pks::class, ['poktan_id', 'no_ijin'], ['poktan_id', 'no_ijin']);
+		return $this->belongsTo(Pks::class, ['kode_poktan', 'no_ijin'], ['kode_poktan', 'no_ijin']);
 	}
 
 	public function datarealisasi()

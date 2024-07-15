@@ -65,15 +65,18 @@ class SpatialController extends Controller
 				throw new \Exception('File not found');
 			}
 
-			$poktanKode = 'poktan_' . time();
+			$kelurahanId = $request->input('kelurahan_id');
+			$namaKelompok = $request->input('poktan_name');
+			$hashedKodePoktan = md5($kelurahanId . $namaKelompok); // Hash kelurahan_id and nama_kelompok
+			$kodePoktan = 'poktan_' . $hashedKodePoktan;
 
-			MasterPoktan:: updateOrCreate(
+			$masterPoktan = MasterPoktan::updateOrCreate(
 				[
 					'kelurahan_id' => $request->input('kelurahan_id'),
 					'nama_kelompok' => $request->input('poktan_name'),
 				],
 				[
-					'kode_poktan' => $poktanKode,
+					'kode_poktan' => $kodePoktan,
 					'provinsi_id' => $request->input('provinsi_id'),
 					'kabupaten_id' => $request->input('kabupaten_id'),
 					'kecamatan_id' => $request->input('kecamatan_id'),
@@ -86,7 +89,7 @@ class SpatialController extends Controller
 					'ktp_petani' => $request->input('ktp_petani'),
 				],
 				[
-					'kode_poktan' => $poktanKode,
+					'kode_poktan' => $masterPoktan->kode_poktan,
 					'nama_petani' => $request->input('nama_petani'),
 					'provinsi_id' => $request->input('provinsi_id'),
 					'kabupaten_id' => $request->input('kabupaten_id'),
@@ -98,7 +101,11 @@ class SpatialController extends Controller
 			MasterSpatial::updateOrCreate(
 				['kode_spatial' => $request->input('kode_spatial')],
 				[
-					// 'komoditas' => $request->input('komoditas'),
+					'kode_poktan' => $masterPoktan->kode_poktan,
+                    'ktp_petani' => $request->input('ktp_petani'),
+                    'nama_petani' => $request->input('nama_petani'),
+                    'latitude' => $request->input('latitude'),
+                    'longitude' => $request->input('longitude'),
 					'ktp_petani' => $request->input('ktp_petani'),
 					'nama_petani' => $request->input('nama_petani'),
 					'latitude' => $request->input('latitude'),
@@ -112,10 +119,11 @@ class SpatialController extends Controller
 					'kecamatan_id' => $request->input('kecamatan_id'),
 					'kelurahan_id' => $request->input('kelurahan_id'),
 					'status' => 1,
+					'kml_url' => $filePath,
+					// 'komoditas' => $request->input('komoditas'),
 					// 'nama_petugas' => $request->input('nama_petugas'),
 					// 'tgl_peta' => $request->input('tgl_peta'),
 					// 'tgl_tanam' => $request->input('tgl_tanam'),
-					'kml_url' => $filePath,
 				]
 			);
 
