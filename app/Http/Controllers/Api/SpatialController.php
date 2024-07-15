@@ -13,8 +13,8 @@ class SpatialController extends Controller
 {
 	/**
 	 * @OA\Get(
-	 *      path="/getSKL/{no_ijin}",
-	 *      operationId="getSKL",
+	 *      path="/getspatial/{no_ijin}",
+	 *      operationId="getspatial",
 	 *      tags={"SKL"},
 	 *      summary="Get list of completed skl",
 	 *      description="Returns list of skl",
