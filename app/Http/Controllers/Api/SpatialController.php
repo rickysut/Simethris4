@@ -155,7 +155,7 @@ class SpatialController extends Controller
 		]);
 	}
 
-	public function batchUpdateStatus(Request $request)
+	public function batchUpdateStatusLokasi(Request $request)
     {
         // Validasi input
         $validated = $request->validate([
@@ -188,4 +188,22 @@ class SpatialController extends Controller
             return response()->json(['success' => false, 'message' => 'Failed to update spatial data.', 'error' => $e->getMessage()], 500);
         }
     }
+
+	public function updateStatusLokasi(Request $request, $kodeSpatial)
+	{
+		$validated = $request->validate([
+			'status' => 'required|integer',
+		]);
+
+		$spatial = MasterSpatial::where('kode_spatial', $kodeSpatial)->first();
+
+		if ($spatial) {
+			$spatial->status = $validated['status'];
+			$spatial->save();
+
+			return response()->json(['success' => true]);
+		} else {
+			return response()->json(['success' => false, 'message' => 'Spatial data not found.'], 404);
+		}
+	}
 }

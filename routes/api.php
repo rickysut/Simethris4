@@ -19,7 +19,8 @@ Route::group(['as' => 'api.', 'namespace' => 'Api', 'middleware' => ['auth:sanct
 
 	//getspatial
 	Route::get('getspatial', 'SpatialController@getspatial');
-	Route::post('batchUpdateStatus', 'SpatialController@batchUpdateStatus');
+	Route::post('batchUpdateStatusLokasi', 'SpatialController@batchUpdateStatusLokasi');
+	Route::post('updateStatusLokasi/{kodeSpatial}', 'SpatialController@updateStatusLokasi');
 
 
 	//dashboard
