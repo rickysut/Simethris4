@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models2024\MasterSpatial;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 
@@ -153,4 +154,38 @@ class SpatialController extends Controller
 			'data_spatial' => $formattedSpatials,
 		]);
 	}
+
+	public function batchUpdateStatus(Request $request)
+    {
+        // Validasi input
+        $validated = $request->validate([
+            'status' => 'required|integer',
+            'kode_spatial' => 'required|array',
+            'kode_spatial.*' => 'required|string', // atau sesuaikan dengan tipe data kode_spatial Anda
+        ]);
+
+        $status = $validated['status'];
+        $kodeSpatialList = $validated['kode_spatial'];
+
+        DB::beginTransaction();
+
+        try {
+            foreach ($kodeSpatialList as $kodeSpatial) {
+                // Lakukan update status untuk setiap kode_spatial
+                $spatial = MasterSpatial::where('kode_spatial', $kodeSpatial)->first();
+
+                if ($spatial) {
+                    $spatial->status = $status;
+                    $spatial->save();
+                }
+            }
+
+            DB::commit();
+
+            return response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json(['success' => false, 'message' => 'Failed to update spatial data.', 'error' => $e->getMessage()], 500);
+        }
+    }
 }

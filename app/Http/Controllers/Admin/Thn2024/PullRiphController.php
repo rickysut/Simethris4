@@ -283,7 +283,7 @@ class PullRiphController extends Controller
 					return redirect()->back()->with('error', 'Failed to save. Location data is incomplete.');
 				}
 
-				$existingLokasiRecords = Lokasi::where('npwp', $stnpwp)->where('no_ijin', $noijin)->pluck('kode_spatial')->toArray();
+				$existingLokasiRecords = Lokasi::withTrashed()->where('npwp', $stnpwp)->where('no_ijin', $noijin)->pluck('kode_spatial')->toArray();
 				$newLokasiRecords = [];
 
 				if (is_array($dtjson->riph->wajib_tanam->lokasi)) {
@@ -327,7 +327,7 @@ class PullRiphController extends Controller
 
 				foreach ($pksToAdd as $kode_poktan) {
 					$nama_poktan = $poktanGroups[$kode_poktan]->first()->masterpoktan->nama_kelompok ?? '';
-					Pks::updateOrCreate(
+					Pks::withTrashed()->updateOrCreate(
 						[
 							'npwp' => $stnpwp,
 							'no_ijin' => $noijin,
@@ -335,6 +335,7 @@ class PullRiphController extends Controller
 						],
 						[
 							'nama_poktan' => $nama_poktan,
+							'deleted_at' => null
 						]
 					);
 				}
@@ -351,6 +352,7 @@ class PullRiphController extends Controller
 							'kode_poktan' => $masterSpatial->kode_poktan ?? '',
 							'ktp_petani' => $masterSpatial->ktp_petani ?? '',
 							'luas_lahan' => $masterSpatial->luas_lahan ?? '',
+							'deleted_at' => null,
 						]
 					);
 				}

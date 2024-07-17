@@ -44,11 +44,11 @@
 						<ul class="list-group">
 							<li class="list-group-item d-flex align-items-start justify-content-between">
 								<span class="text-muted">Pemilik/Pengelola</span>
-								<span class="fw-500">{{$data['lokasi']->nama_petani}}</span>
+								<span class="fw-500">{{$data['spatial']->nama_petani}}</span>
 							</li>
 							<li class="list-group-item d-flex align-items-start justify-content-between">
 								<span class="text-muted">NIK Pemilik/Pengelola</span>
-								<span class="fw-500">{{$data['lokasi']->ktp_petani}}</span>
+								<span class="fw-500">{{$data['spatial']->ktp_petani}}</span>
 							</li>
 							<li class="list-group-item d-flex align-items-start justify-content-between">
 								<span class="text-muted">Luas Lahan (m2)</span>

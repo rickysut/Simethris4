@@ -1,0 +1,363 @@
+@extends('t2024.layouts.admin')
+@section('content')
+{{-- @include('t2024.partials.breadcrumb') --}}
+@include('t2024.partials.subheader')
+@include('t2024.partials.sysalert')
+@can('spatial_data_access')
+	<div class="row">
+		<div class="col">
+			<div class="panel" id="panel-1">
+				<div class="panel-hdr">
+					<h2>
+						Daftar <span class="fw-300"><i>Wilayah</i></span>
+					</h2>
+				</div>
+				<div class="panel-container show">
+					<div class="panel-content">
+						<div class="row justify-content-between">
+							<div class="form-group col-lg-4">
+								<label class="form-label" for="provinsi_id">
+									Provinsi
+								</label>
+								<select class="select2 form-control w-100" id="provinsi_id" name="provinsi_id">
+									<option value=""></option>
+								</select>
+							</div>
+							<div class="form-group col-lg-4">
+								<label class="form-label" for="kabupaten_id">
+									Kabupaten
+								</label>
+								<select class="select2 form-control w-100" id="kabupaten_id" name="kabupaten_id">
+									<option value=""></option>
+								</select>
+							</div>
+							<div class="form-group col-lg-4">
+								<label class="form-label" for="kecamatan_id">
+									Kecamatan
+								</label>
+								<select class="select2 form-control w-100" id="kecamatan_id" name="kecamatan_id">
+									<option value=""></option>
+								</select>
+							</div>
+						</div>
+					</div>
+					<div class="panel-content" id="panelProv">
+						<!-- datatable start -->
+						<table id="tblWilayah" class="table table-bordered table-hover table-sm table-striped w-100">
+							<thead class="thead-themed">
+								<th style="width:15%">Kode Wilayah</th>
+								<th>Nama Wilayah</th>
+								<th>Tindakan</th>
+							</thead>
+							<tbody>
+
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+@endcan
+
+@endsection
+
+<!-- start script for this page -->
+@section('scripts')
+@parent
+
+<script>
+	$(document).ready(function() {
+		var provinsiSelect = $('#provinsi_id');
+		var kabupatenSelect = $('#kabupaten_id');
+		var kecamatanSelect = $('#kecamatan_id');
+
+		var urlProvinsi = "{{ route('wilayah.getAllProvinsi') }}";
+		var urlKabupaten = function(provinsiId) { return "{{ route('wilayah.getKabupatenByProvinsi', '') }}/" + provinsiId; };
+		var urlKecamatan = function(kabupatenId) { return "{{ route('wilayah.getKecamatanByKabupaten', '') }}/" + kabupatenId; };
+		var urlDesa = function(kecamatanId) { return "{{ route('wilayah.getDesaByKecamatan', '') }}/" + kecamatanId; };
+
+		var urlUpdateProv = "{{ route('2024.spatial.updateProvinsiFromBPS', '') }}";
+		var urlUpdateKab = function(provinsiId) { return "{{ route('2024.spatial.updateKabupatenFromBPS', '') }}/" + provinsiId; };
+		var urlUpdateKec = function(kabupatenId) { return "{{ route('2024.spatial.updateKecamatanFromBPS', '') }}/" + kabupatenId; };
+		var urlUpdateDesa = function(kecamatanId) { return "{{ route('2024.spatial.updateDesaFromBPS', '') }}/" + kecamatanId; };
+
+		var status = 'need update';
+
+		// Inisialisasi Select2
+		$("#provinsi_id, #kabupaten_id, #kecamatan_id").select2({
+			placeholder: "-- pilih --"
+		});
+
+		// Fungsi untuk mengosongkan dan menambahkan placeholder ke Select2
+		function resetSelect2(selectElement, placeholderText) {
+			selectElement.empty();
+			selectElement.append($('<option>', { value: '', text: placeholderText }));
+		}
+
+		// Fungsi untuk mengisi data dropdown
+		function populateDropdown(url, selectElement, placeholderText, idField, nameField) {
+			$.ajax({
+				url: url,
+				type: "GET",
+				dataType: 'json',
+				success: function(response) {
+					resetSelect2(selectElement, placeholderText);
+					$.each(response.data, function(index, item) {
+						selectElement.append(new Option(item[nameField], item[idField]));
+					});
+				},
+				error: function(xhr, status, error) {
+					console.error('Gagal mengambil data:', status, error);
+				}
+			});
+		}
+
+		// Mengisi dropdown provinsi
+		populateDropdown(urlProvinsi, provinsiSelect, '-- pilih provinsi', 'provinsi_id', 'nama');
+
+		// inisiasi table
+		var tblWilayah = $('#tblWilayah').DataTable({
+			responsive: true,
+			lengthChange: false,
+			paging: false,
+			ordering: true,
+			dom:
+				"<'row mb-3'<'col-sm-12 col-md-6 d-flex align-items-center justify-content-start'f><'col-sm-12 col-md-6 d-flex align-items-center justify-content-end'lB>>" +
+				"<'row'<'col-sm-12'tr>>" +
+				"<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+			ajax: {
+				url: urlProvinsi,
+				type: "GET",
+				dataSrc: "data"
+			},
+			columns: [
+				{data: 'provinsi_id', title: 'Kode BPS'},
+				{data: 'nama', title: 'Nama BPS (PROVINSI)'},
+				{
+					data: 'provinsi_id',
+					width: '20%',
+					title: 'Tindakan',
+					render: function (data, type, row) {
+						return `<button type="button" class="btn btn-default btn-xs btnUpdate" data-id="${data}" data-level="provinsi">Selaraskan data Kabupaten</button>`;
+					}
+				}
+			],
+			buttons: [
+				{
+					extend: 'pdfHtml5',
+					text: '<i class="fa fa-file-pdf"></i>',
+					title: 'Daftar Wilayah',
+					titleAttr: 'Generate PDF',
+					className: 'btn-outline-danger btn-sm btn-icon mr-1',
+					exportOptions: {
+						columns: [0, 1]
+					}
+				},
+				{
+					extend: 'excelHtml5',
+					text: '<i class="fa fa-file-excel"></i>',
+					title: 'Daftar Wilayah',
+					titleAttr: 'Generate Excel',
+					className: 'btn-outline-success btn-sm btn-icon mr-1',
+					exportOptions: {
+						columns: [0, 1]
+					}
+				},
+				{
+					extend: 'print',
+					text: '<i class="fa fa-print"></i>',
+					title: 'Daftar Wilayah',
+					titleAttr: 'Print Table',
+					className: 'btn-outline-primary btn-sm btn-icon mr-2',
+					exportOptions: {
+						columns: [0, 1]
+					}
+				},
+				{
+					text: '<i class="fa fa-undo"></i> Update Provinsi',
+					title: 'Synchronize Provinsi dengan Data BPS',
+					titleAttr: 'Synchronize Provinsi dengan Data BPS',
+					className: 'btn-warning btn-sm btnUpdateProv',
+				},
+			]
+		});
+
+		// pembaruan table
+		function updateTable(url, idField, nameField, level) {
+			tblWilayah.clear().destroy();
+			tblWilayah = $('#tblWilayah').DataTable({
+				responsive: true,
+				lengthChange: false,
+				paging: false,
+				ordering: true,
+				dom:
+					"<'row mb-3'<'col-sm-12 col-md-6 d-flex align-items-center justify-content-start'f><'col-sm-12 col-md-6 d-flex align-items-center justify-content-end'lB>>" +
+					"<'row'<'col-sm-12'tr>>" +
+					"<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+				ajax: {
+					url: url,
+					type: "GET",
+					dataSrc: "data"
+				},
+				columns: [
+					{ data: idField, title: idField.replace('_', ' ').toUpperCase(), width: '15%' },
+					{ data: nameField, title: 'NAMA BPS (' + idField.split('_')[0].toUpperCase() +')'},
+					{
+						data: idField,
+						title: 'Tindakan',
+						width: '20%',
+						render: function (data, type, row) {
+							let nextLevel;
+							switch(level) {
+								case 'provinsi':
+									nextLevel = 'kabupaten';
+									break;
+								case 'kabupaten':
+									nextLevel = 'kecamatan';
+									break;
+								case 'kecamatan':
+									nextLevel = 'kelurahan';
+									break;
+								case 'kelurahan':
+									nextLevel = '';
+									break;
+							}
+							if (nextLevel) {
+								return `<button type="button" class="btn btn-default btn-xs btnUpdate" data-id="${data}" data-level="${nextLevel}">Selaraskan data ${nextLevel}</button>`;
+							} else {
+								return '';
+							}
+						}
+					}
+				],
+				buttons: [
+					{
+						extend: 'pdfHtml5',
+						text: '<i class="fa fa-file-pdf"></i>',
+						title: 'Daftar Wilayah',
+						titleAttr: 'Generate PDF',
+						className: 'btn-outline-danger btn-sm btn-icon mr-1',
+						exportOptions: {
+							columns: [0, 1]
+						}
+					},
+					{
+						extend: 'excelHtml5',
+						text: '<i class="fa fa-file-excel"></i>',
+						title: 'Daftar Wilayah',
+						titleAttr: 'Generate Excel',
+						className: 'btn-outline-success btn-sm btn-icon mr-1',
+						exportOptions: {
+							columns: [0, 1]
+						}
+					},
+					{
+						text: '<i class="fa fa-undo"></i>',
+						title: 'Reset',
+						titleAttr: 'Reset',
+						className: 'btn-outline-info btn-sm btn-icon mr-1',
+						action: function (e, dt, button, config) {
+							location.reload();
+						}
+					}
+				]
+			});
+		}
+
+		provinsiSelect.change(function() {
+			var provinsiId = provinsiSelect.val();
+			updateTable(urlKabupaten(provinsiId), 'kabupaten_id', 'nama_kab', 'kabupaten');
+			resetSelect2(kabupatenSelect, '-- pilih kabupaten');
+			resetSelect2(kecamatanSelect, '-- pilih kecamatan');
+
+			if (provinsiId) {
+				populateDropdown(urlKabupaten(provinsiId), kabupatenSelect, '-- pilih kabupaten', 'kabupaten_id', 'nama_kab');
+			}
+		});
+
+		kabupatenSelect.change(function() {
+			var kabupatenId = kabupatenSelect.val();
+			console.log('id kabupaten: ', kabupatenId);
+			updateTable(urlKecamatan(kabupatenId), 'kecamatan_id', 'nama_kecamatan', 'kecamatan');
+			resetSelect2(kecamatanSelect, '-- pilih kecamatan');
+
+			if (kabupatenId) {
+				populateDropdown(urlKecamatan(kabupatenId), kecamatanSelect, '-- pilih kecamatan', 'kecamatan_id', 'nama_kecamatan');
+			}
+		});
+
+		kecamatanSelect.change(function() {
+			var kecamatanId = kecamatanSelect.val();
+			updateTable(urlDesa(kecamatanId), 'kelurahan_id', 'nama_desa', 'desa');
+		});
+
+		$('#tblWilayah').on('click', '.btnUpdate', function() {
+			var dataId = $(this).data('id');
+			var level = $(this).data('level');
+			var updateUrl;
+			switch (level) {
+				case 'provinsi':
+					updateUrl = urlUpdateKab(dataId);
+					break;
+				case 'kabupaten':
+					updateUrl = urlUpdateKec(dataId);
+					break;
+				case 'kecamatan':
+					updateUrl = urlUpdateDesa(dataId);
+					break;
+				default:
+					break;
+			}
+
+			if (updateUrl) {
+				$.ajax({
+					url: updateUrl,
+					type: "GET",
+					dataType: 'json',
+					success: function(response) {
+						Swal.fire({
+							icon: 'success',
+							title: 'Sukses!',
+							text: 'Data wilayah berhasil diselaraskan!'
+						});
+						$('#tblWilayah').DataTable().ajax.reload();
+					},
+					error: function(xhr, status, error) {
+						console.error('Gagal memperbarui data:', status, error);
+						Swal.fire({
+							icon: 'error',
+							title: 'Gagal!',
+							text: 'Terjadi kesalahan saat memperbarui data.'
+						});
+					}
+				});
+			}
+		});
+
+		$('.btnUpdateProv').on('click', function(){
+			$.ajax({
+				url: urlUpdateProv,
+				type: "GET",
+				dataType: 'json',
+				success: function(response) {
+					Swal.fire({
+						icon: 'success',
+						title: 'Sukses!',
+						text: 'Data wilayah berhasil diselaraskan!'
+					});
+					$('#tblWilayah').DataTable().ajax.reload();
+				},
+				error: function(xhr, status, error) {
+					console.error('Gagal memperbarui data:', status, error);
+					Swal.fire({
+						icon: 'error',
+						title: 'Gagal!',
+						text: 'Terjadi kesalahan saat memperbarui data.'
+					});
+				}
+			});
+		});
+	});
+</script>
+@endsection

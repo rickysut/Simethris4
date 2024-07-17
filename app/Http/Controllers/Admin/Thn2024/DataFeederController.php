@@ -14,8 +14,10 @@ use App\Models2024\MasterSpatial;
 use App\Models2024\Pks;
 use App\Models2024\PullRiph;
 use App\Models\AjuVerifSkl as ModelsAjuVerifSkl;
-use App\Models\MasterDesa;
+use App\Models\MasterProvinsi;
+use App\Models\MasterKabupaten;
 use App\Models\MasterKecamatan;
+use App\Models\MasterDesa;
 use App\Models\UserDocs;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -159,13 +161,13 @@ class DataFeederController extends Controller
 		]);
 	}
 
-	public function getPksById($tcode)
+	public function getPksById($id)
 	{
-		$pks = Pks::select('id', 'tcode', 'npwp', 'no_ijin', 'no_perjanjian', 'tgl_perjanjian_start', 'tgl_perjanjian_end', 'varietas_tanam', 'periode_tanam', 'berkas_pks')
+		$pks = Pks::select('id', 'kode_poktan', 'npwp', 'no_ijin', 'no_perjanjian', 'tgl_perjanjian_start', 'tgl_perjanjian_end', 'varietas_tanam', 'periode_tanam', 'berkas_pks')
 			->with(['varietas' => function ($query) {
 				$query->select('id', 'nama_varietas');
 			}])
-			->where('tcode', $tcode)->first();
+			->where('id', $id)->first();
 
 		$commitment = PullRiph::where('no_ijin', $pks->no_ijin)->first();
 		$npwp = str_replace(['.', '-'], '', $commitment->npwp);
@@ -196,11 +198,11 @@ class DataFeederController extends Controller
 		$columns = $request->input('columns', []);
 
 		// Base query
-		$query = Lokasi::select('id', 'kode_spatial', 'poktan_id', 'no_ijin', 'tgl_tanam', 'tgl_akhir_tanam', 'tgl_panen', 'tgl_akhir_panen')
+		$query = Lokasi::select('id', 'kode_spatial', 'kode_poktan', 'no_ijin', 'tgl_tanam', 'tgl_akhir_tanam', 'tgl_panen', 'tgl_akhir_panen')
 			->where('no_ijin', $noIjin)
 			->with([
 				'pks' => function ($query) {
-					$query->select('id', 'no_ijin', 'poktan_id', 'tgl_perjanjian_start', 'tgl_perjanjian_end');
+					$query->select('id', 'no_ijin', 'kode_poktan', 'tgl_perjanjian_start', 'tgl_perjanjian_end');
 				},
 				'pullriph' => function ($query) {
 					$query->select('id', 'no_ijin', 'tgl_ijin', 'tgl_akhir');
@@ -271,12 +273,12 @@ class DataFeederController extends Controller
 
 		$commitment = PullRiph::where('no_ijin', $noIjin)->first();
 		$query = Pks::query()
-			->select('id', 'tcode', 'no_ijin', 'poktan_id', 'nama_poktan', 'no_perjanjian', 'tgl_perjanjian_start', 'tgl_perjanjian_end', 'varietas_tanam', 'periode_tanam', 'berkas_pks', 'status', 'note')
+			->select('id', 'kode_poktan', 'no_ijin', 'nama_poktan', 'no_perjanjian', 'tgl_perjanjian_start', 'tgl_perjanjian_end', 'varietas_tanam', 'periode_tanam', 'berkas_pks', 'status', 'note')
 			->where('no_ijin', $commitment->no_ijin)
 			->withCount('lokasi')
 			->with(['lokasi' => function ($query) {
-				$query->selectRaw('poktan_id, no_ijin, sum(luas_lahan) as total_luas_lahan')
-					->groupBy('poktan_id', 'no_ijin');
+				$query->selectRaw('kode_poktan, no_ijin, sum(luas_lahan) as total_luas_lahan')
+					->groupBy('kode_poktan', 'no_ijin');
 			}]);
 
 		// Paginasi sesuai permintaan DataTables
@@ -313,9 +315,9 @@ class DataFeederController extends Controller
 		// Format the noIjin parameter
 		$noIjin = $this->formatNoIjin($noIjin);
 
-		$dataRealisasi = Lokasi::select('no_ijin', 'poktan_id', 'luas_tanam', 'volume')
+		$dataRealisasi = Lokasi::select('no_ijin', 'kode_poktan', 'luas_tanam', 'volume')
 			->where('no_ijin', $noIjin)
-			->where('poktan_id', $poktanId)
+			->where('kode_poktan', $poktanId)
 			->get();
 
 		$realisasiLuasTanam = $dataRealisasi->sum('luas_tanam');
@@ -330,7 +332,7 @@ class DataFeederController extends Controller
 
 		// Base query
 		$query = Lokasi::where('no_ijin', $noIjin)
-			->where('poktan_id', $poktanId)
+			->where('kode_poktan', $poktanId)
 			->with('spatial');
 
 		// Calculate total records
@@ -339,8 +341,7 @@ class DataFeederController extends Controller
 		// Apply search filter if any
 		if (!empty($searchValue)) {
 			$query = $query->where(function ($q) use ($searchValue) {
-				$q->where('nama_petani', 'like', "%{$searchValue}%")
-					->orWhere('ktp_petani', 'like', "%{$searchValue}%")
+				$q->where('ktp_petani', 'like', "%{$searchValue}%")
 					->orWhere('kode_spatial', 'like', "%{$searchValue}%");
 			});
 		}
@@ -355,9 +356,8 @@ class DataFeederController extends Controller
 			$orderColumn = $columns[$orderColumnIndex]['data'];
 
 			switch ($orderColumn) {
-				case 'nama_kelompok':
 				case 'ktp_petani':
-				case 'nama_petani':
+				case 'spatial_petani':
 				case 'kode_spatial':
 				case 'spatial_ktp':
 					$query = $query->orderBy($orderColumn, $orderDirection);
@@ -375,7 +375,6 @@ class DataFeederController extends Controller
 			$spatial = $item->spatial;
 			return [
 				'id' => $item->id,
-				'nama_kelompok' => $item->nama_poktan,
 				'kode_spatial' => $item->kode_spatial,
 				'ktp_petani' => $item->ktp_petani,
 				'nama_petani' => $item->nama_petani,
@@ -591,7 +590,7 @@ class DataFeederController extends Controller
 		// dd($spatials);
 
 		$data = MasterSpatial::with([
-			// 'anggota:id,poktan_id,nama_petani,ktp_petani',
+			// 'anggota:id,kode_poktan,nama_petani,ktp_petani',
 			'provinsi:provinsi_id,nama',
 			'kabupaten:kabupaten_id,nama_kab',
 			'jadwal:kode_spatial,awal_masa,akhir_masa',
@@ -970,7 +969,7 @@ class DataFeederController extends Controller
 			'realisasiTanam' => $commitment->lokasi->sum('luas_tanam'),
 			'realisasiProduksi' => $commitment->lokasi->sum('volume'),
 			'countAnggota' => $commitment->lokasi->groupBy('ktp_petani')->count(),
-			'countPoktan' => $commitment->lokasi->groupBy('poktan_id')->count(),
+			'countPoktan' => $commitment->lokasi->groupBy('kode_poktan')->count(),
 			'countPks' => $pks->where('berkas_pks', '!=', null)->count(),
 			'countSpatial' => $lokasis->count(),
 			'countTanam' => $lokasis->where('luas_tanam', '!=', null)->count(),
@@ -1380,7 +1379,7 @@ class DataFeederController extends Controller
 				'sumLuas' => $query->commitment->lokasi->sum('luas_lahan'),
 				'sumLuasTanam' => $query->commitment->lokasi->sum('luas_tanam'),
 				'countPks' => $query->commitment->pks->where('berkas_pks', '!=', null)->count(),
-				'countPoktan' => $query->commitment->lokasi->groupBy('poktan_id')->count(),
+				'countPoktan' => $query->commitment->lokasi->groupBy('kode_poktan')->count(),
 				'countSpatial' => $query->commitment->lokasi->count(),
 				'countTanam' => $query->commitment->lokasi->where('luas_tanam', '!=', null)->count(),
 				'countAnggota' => $query->commitment->lokasi->groupBy('ktp_petani')->count(),

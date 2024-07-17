@@ -99,7 +99,7 @@
 		$(document).ready(function() {
 			var noIjin = '{{$commitment->no_ijin}}';
 			var formattedNoIjin = noIjin.replace(/[\/.]/g, '');
-			var poktanId = '{{$pks->poktan_id}}';
+			var poktanId = '{{$pks->kode_poktan}}';
 			var ijin = '{{$ijin}}';
 
 			$('#tblLokasi').dataTable(
@@ -144,7 +144,7 @@
 						data: 'ktp_petani',
 						name: 'nama_petani',
 						render: function (data, type, row) {
-							return row.nama_petani + ' / ' + data;
+							return row.spatial_petani + ' / ' + data;
 						}
 					},
 					{ data: 'luas_tanam'},

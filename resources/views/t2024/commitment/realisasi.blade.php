@@ -354,7 +354,7 @@
 				<div class="modal-header">
 					<span class="modal-title">
 						<h4 class="fw-500">Edit Data PKS</h4>
-						<span>Data Perjanjian Kerjasama dengan Mitra Kelompok Tani <span id="tcode"></span></span>
+						<span>Data Perjanjian Kerjasama dengan Mitra Kelompok Tani <span id=""></span></span>
 					</span>
 					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 						<span aria-hidden="true">&times;</span>
@@ -614,14 +614,14 @@
 					data: 'statusData',
 					render: function (data, type, row) {
 						if (data == 'Filled') {
-							return `<button type="button" class="btn btn-icon btn-xs btn-success" onclick="openModal(` + row.tcode + `)" data-toggle="tooltip" data-original-title="Data sudah lengkap">
+							return `<button type="button" class="btn btn-icon btn-xs btn-success" onclick="openModal(` + row.id + `)" data-toggle="tooltip" data-original-title="Data sudah lengkap">
 										<i class="fal fa-cassette-tape"></i>
 									</button>
-									<a href="` + daftarLokasiRoute.replace(':noIjin', formattedNoIjin).replace(':poktanId', row.poktan_id) + `" class="btn btn-icon btn-xs btn-primary" data-toggle="tooltip" data-original-title="Lengkapi data realisasi Komitmen Wajib Tanam-produksi">
+									<a href="` + daftarLokasiRoute.replace(':noIjin', formattedNoIjin).replace(':poktanId', row.kode_poktan) + `" class="btn btn-icon btn-xs btn-primary" data-toggle="tooltip" data-original-title="Lengkapi data realisasi Komitmen Wajib Tanam-produksi">
 										<i class="fal fa-seedling"></i>
 									</a>`;
 						} else {
-							return `<button type="button" class="btn btn-icon btn-xs btn-danger" onclick="openModal(` + row.tcode + `)">
+							return `<button type="button" class="btn btn-icon btn-xs btn-danger" onclick="openModal(` + row.id + `)">
 										<i class="fal fa-cassette-tape"></i>
 									</button>`;
 						}
@@ -719,7 +719,7 @@
 				success: function(data) {
 					console.log(data.no_perjanjian);
 					$('#no_perjanjian').val(data.no_perjanjian || '');
-					$('#tcode').text(data.tcode || '');
+					// $('#tcode').text(data.tcode || '');
 					$('#tgl_perjanjian_start').val(data.tgl_perjanjian_start || '');
 					$('#tgl_perjanjian_end').val(data.tgl_perjanjian_end || '');
 					$('#periode_tanam').val(data.periode_tanam || '');

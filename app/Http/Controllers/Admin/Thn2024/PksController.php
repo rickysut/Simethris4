@@ -128,18 +128,18 @@ class PksController extends Controller
 			substr($noIjin, 10, 2) . '/' .
 			substr($noIjin, 12, 4);
 
-		$pks = Pks::select('id', 'no_ijin', 'poktan_id', 'no_perjanjian', 'nama_poktan')
+		$pks = Pks::select('id', 'no_ijin', 'kode_poktan', 'no_perjanjian', 'nama_poktan')
 			->where('no_ijin', $noIjin)
-			->where('poktan_id', $poktanId)
+			->where('kode_poktan', $poktanId)
 			->first();
 
 		$commitment = PullRiph::where('npwp', $npwpCompany)
 			->where('no_ijin', $noIjin)
 			->first();
 
-		$dataRealisasi = Lokasi::select('id', 'no_ijin', 'poktan_id', 'luas_tanam', 'volume')
+		$dataRealisasi = Lokasi::select('id', 'no_ijin', 'kode_poktan', 'luas_tanam', 'volume')
 			->where('no_ijin', $noIjin)
-			->where('poktan_id', $poktanId)
+			->where('kode_poktan', $poktanId)
 			->get();
 
 		$sumLuas = $dataRealisasi->sum('luas_tanam');
@@ -177,7 +177,7 @@ class PksController extends Controller
 		$npwp = preg_replace('/[^0-9]/', '', $npwpCompany);
 		$lokasi = Lokasi::where('no_ijin', $noIjin)->where('kode_spatial', $spatial)->first();
 		// dd($spatial);
-		$pks = Pks::where('poktan_id', $lokasi->poktan_id)->where('no_ijin', $noIjin)->first();
+		$pks = Pks::where('kode_poktan', $lokasi->kode_poktan)->where('no_ijin', $noIjin)->first();
 		$spatial = MasterSpatial::select('id', 'kode_spatial', 'nama_petani', 'latitude', 'longitude', 'polygon', 'altitude', 'luas_lahan', 'kabupaten_id', 'ktp_petani')->where('kode_spatial', $spatial)
 			->first();
 

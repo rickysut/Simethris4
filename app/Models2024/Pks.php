@@ -45,6 +45,7 @@ class Pks extends Model
 		'status',
 		'note',
 		'berkas_pks',
+		'deleted_at',
 	];
 
 	public function lokasi()

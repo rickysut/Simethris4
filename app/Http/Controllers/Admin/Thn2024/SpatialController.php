@@ -102,10 +102,10 @@ class SpatialController extends Controller
 				['kode_spatial' => $request->input('kode_spatial')],
 				[
 					'kode_poktan' => $masterPoktan->kode_poktan,
-                    'ktp_petani' => $request->input('ktp_petani'),
-                    'nama_petani' => $request->input('nama_petani'),
-                    'latitude' => $request->input('latitude'),
-                    'longitude' => $request->input('longitude'),
+					'ktp_petani' => $request->input('ktp_petani'),
+					'nama_petani' => $request->input('nama_petani'),
+					'latitude' => $request->input('latitude'),
+					'longitude' => $request->input('longitude'),
 					'ktp_petani' => $request->input('ktp_petani'),
 					'nama_petani' => $request->input('nama_petani'),
 					'latitude' => $request->input('latitude'),
@@ -201,7 +201,42 @@ class SpatialController extends Controller
 		}
 	}
 
-	public function simulatorJarak (Request $request)
+	public function batchUpdateStatus(Request $request)
+    {
+        // Validasi input
+        $validated = $request->validate([
+            'status' => 'required|integer',
+            'kode_spatial' => 'required|array',
+            'kode_spatial.*' => 'required|string', // atau sesuaikan dengan tipe data kode_spatial Anda
+        ]);
+
+        $status = $validated['status'];
+        $kodeSpatialList = $validated['kode_spatial'];
+
+        DB::beginTransaction();
+
+        try {
+            foreach ($kodeSpatialList as $kodeSpatial) {
+                // Lakukan update status untuk setiap kode_spatial
+                $spatial = MasterSpatial::where('kode_spatial', $kodeSpatial)->first();
+
+                if ($spatial) {
+                    $spatial->status = $status;
+                    $spatial->save();
+                }
+            }
+
+            DB::commit();
+
+            return response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json(['success' => false, 'message' => 'Failed to update spatial data.', 'error' => $e->getMessage()], 500);
+        }
+    }
+
+
+	public function simulatorJarak(Request $request)
 	{
 		$module_name = 'Spatial';
 		$page_title = 'Simulator Spatial';
@@ -220,8 +255,8 @@ class SpatialController extends Controller
 		//cek role
 		//abort jika fail,, return response dengan json
 		$validated = $request->validate([
-            'status' => 'required|integer'
-        ]);
+			'status' => 'required|integer'
+		]);
 
 
 

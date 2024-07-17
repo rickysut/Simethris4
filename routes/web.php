@@ -560,6 +560,14 @@ Route::group(['prefix' => '2024', 'as' => '2024.', 'namespace' => 'Admin', 'midd
 			Route::get('/{id}/show', 'SpatialController@show')->name('edit');
 			Route::post('/updatesingle', 'SpatialController@updatesingle')->name('updatesingle');
 			Route::post('/updateStatus/{kodeSpatial}', 'SpatialController@updateStatus')->name('updateStatus');
+			Route::post('/batchUpdateStatus', 'SpatialController@batchUpdateStatus')->name('batchUpdateStatus');
+
+			Route::get('/master-wilayah', 'MasterWilayahController@index')->name('wilayah');
+			Route::get('/master-wilayah/updateFromBPS', 'MasterWilayahController@updateFromBPS')->name('updateFromBPS');
+			Route::get('/master-wilayah/updateProvinsiFromBPS', 'MasterWilayahController@updateProvinsiFromBPS')->name('updateProvinsiFromBPS');
+			Route::get('/master-wilayah/updateKabupatenFromBPS/{provinsiId}', 'MasterWilayahController@updateKabupatenFromBPS')->name('updateKabupatenFromBPS');
+			Route::get('/master-wilayah/updateKecamatanFromBPS/{kabupatenId}', 'MasterWilayahController@updateKecamatanFromBPS')->name('updateKecamatanFromBPS');
+			Route::get('/master-wilayah/updateDesaFromBPS/{kecamatanId}', 'MasterWilayahController@updateDesaFromBPS')->name('updateDesaFromBPS');
 
 			Route::get('/simulator', 'SpatialController@simulatorJarak')->name('simulatorJarak');
 		});

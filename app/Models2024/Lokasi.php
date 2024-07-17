@@ -74,6 +74,7 @@ class Lokasi extends Model
 		'distFoto',
 
 		'status',
+		'deleted_at',
 
 		// 'tgl_akhir_panen',
 		// 'tgl_akhir_tanam',

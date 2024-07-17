@@ -194,7 +194,7 @@ class CommitmentController extends Controller
 
 		try {
 			$npwp_company = Auth::user()->data_user->npwp_company;
-			$pks = Pks::where('tcode', $id)->first();
+			$pks = Pks::where('id', $id)->first();
 			$commitment = PullRiph::where('no_ijin', $pks->no_ijin)->first();
 			$noIjin = str_replace(['/', '.'], '', $commitment->no_ijin);
 
@@ -210,7 +210,7 @@ class CommitmentController extends Controller
 				$request->validate([
 					'berkas_pks' => 'mimes:pdf|max:2048',
 				]);
-				$filename = 'pks_' . $filenpwp . '_' . $noIjin . '_' . $pks->poktan_id . '_' . time() . '.' . $file->extension();
+				$filename = 'pks_' . $filenpwp . '_' . $noIjin . '_' . time() . '.' . $file->extension();
 				$path = 'uploads/' . $filenpwp . '/' . $commitment->periodetahun;
 				$file->storeAs($path, $filename, 'public');
 				if (Storage::disk('public')->exists($path . '/' . $filename)) {

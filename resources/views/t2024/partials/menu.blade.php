@@ -705,6 +705,14 @@
 					</a>
 				</li> --}}
 			@endcan
+			<li class="nav-title" data-i18n="nav.administation">DATA WILAYAH</li>
+			<li class="c-sidebar-nav-item {{ request()->is('2024/spatial/wilayah*') ? 'active' : '' }}">
+				<a href="{{route('2024.spatial.wilayah')}}" title="Coming soon!"
+				data-filter-tags="data wilayah provinsi kabupaten kecamatan desa kelurahan">
+					<i class="fal fa-globe-asia"></i>
+					<span class="nav-link-text">Daftar Wilayah</span>
+				</a>
+			</li>
 
 			{{-- support --}}
 			<li class="nav-title" data-i18n="nav.administation">DUKUNGAN</li>
