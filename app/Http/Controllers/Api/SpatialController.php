@@ -80,7 +80,7 @@ class SpatialController extends Controller
 	 *      )
 	 * )
 	 */
-	public function getspatial(Request $request)
+	public function getLokasiTanam(Request $request)
 	{
 		$informasi = 'Daftar Kode Spatial Wajib Tanam';
 		$app = 'Simethris 4 Alpha';
