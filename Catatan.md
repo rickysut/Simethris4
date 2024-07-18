@@ -52,3 +52,13 @@ aspek-aspek:
 1. sumber daya (manusia, biaya) dan perangkat dalam pengumpulan data;
 2. perubahan kepemilikian dan atau pengusaaan lahan;
 3. aspek perubahan metode penyediaan data kelompok tani dan anggota kelompok tani yang sebelumnya dari aplikasi SIAPRIPH, kini dari sistem bank data spasial yang baru
+
+Status pengajuan verifikasi:
+0. Verifikasi sudah diajukan;
+1. Pendelegasian Petugas Verifikator;
+2. Pemeriksaan berkas Administrasi;
+3. Pemeriksaan berkas PKS;
+4. Pemeriksaan kesesuaian Tanggal tanam;
+5. Verifikasi Lapangan (pembuktian);
+6. Pemeriksaan selesai (status sesuai);
+7. Pemeriksaan selesai (status tidak sesuai);

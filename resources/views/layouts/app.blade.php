@@ -55,7 +55,7 @@
 </head>
 
 <body class="">
-    <div class="page-wrapper">
+    <div class="page-wrapper auth">
         <div class="page-inner bg-brand-gradient">
             <div class="page-content-wrapper bg-transparent m-0">
                 <div class="height-10 w-100 shadow-lg px-4 bg-brand-gradient hidden-sm-down">
@@ -66,8 +66,8 @@
                                 <img src="{{ asset('img/logo-icon.png') }}" alt="simethris" aria-roledescription="logo" style="width:150px; height:auto;">
                             </span>
                             <span class="page-logo-text mr-1 d-sm-block d-md-none">Simethris MobileApp</span>
-                        </div> 
-                        
+                        </div>
+
                         <div class="ml-auto">
                             <ol class="nav">
                                 @guest
@@ -89,7 +89,7 @@
                     </div>
                 </div>
 
-                <div class="flex-1 my-bg" style="background: url(img/pattern-1.svg) no-repeat center bottom fixed; background-size: cover;">
+                <div class="flex-1" style="background: url(img/simet-gunung-1.jpg) no-repeat center top fixed; background-size: cover;">
                     <div class="container py-4 py-lg-5 my-lg-5 px-4 px-sm-0">
                         @yield('content')
                     </div>

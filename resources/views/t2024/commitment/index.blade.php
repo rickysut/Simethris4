@@ -18,12 +18,12 @@ td {
 				<div class="panel-content">
 					<table id="datatable" class="table table-bordered table-hover table-striped table-sm w-100">
 						<thead class="thead-themed">
-							<th>No. RIPH</th>
+							<th width="20%">No. RIPH</th>
 							{{-- <th>Tahun</th>
 							<th>Tgl. Terbit</th>
 							<th>Vol. RIPH</th>
 							<th>Kewajiban</th> --}}
-							<th>Data</th>
+							<th width="15%">Laporan Realisasi</th>
 							<th>Tanam</th>
 							<th>Prod</th>
 							<th>SKL</th>
@@ -65,10 +65,10 @@ td {
 			},
 
 			columnDefs:[
-				// {
-				// 	targets: [5, 6, 7, 8],
-				// 	className: "text-center"
-				// },
+				{
+					targets: [1],
+					className: "text-center"
+				},
 				// {
 				// 	targets: [4,5,6,7,8],
 				// 	orderable: false
@@ -130,9 +130,9 @@ td {
 						var url = "{{ route('2024.user.commitment.realisasi', ':noIjin') }}".replace(':noIjin', noIjin);
 						return `
 							<a href="`+ url +`"
-								class="btn btn-icon btn-xs btn-primary" data-toggle="tooltip"
+								class="btn btn-xs btn-warning" data-toggle="tooltip"
 								title data-original-title="Isi Laporan Realisasi Tanam dan Produksi">
-								<i class="fal fa-edit"></i>
+								<i class="fal fa-edit"></i> Lengkapi Realisasi
 							</a>
 						`;
 					}
@@ -404,7 +404,6 @@ td {
 					${progressContent}`;
 			}
 		}
-
 	});
 </script>
 @endsection
