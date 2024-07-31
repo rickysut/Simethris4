@@ -55,7 +55,7 @@ return [
     |
     */
 
-	'url' => env('APP_URL', 'http://lasimethris.test'),
+	'url' => env('APP_URL', 'http://simethris4.test'),
 
 	'asset_url' => env('ASSET_URL', null),
 

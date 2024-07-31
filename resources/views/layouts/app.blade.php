@@ -45,6 +45,8 @@
 
 	<link rel="manifest" href="{{asset('manifest.json')}}">
 
+	<link rel="stylesheet" media="screen, print" href="{{ asset('css/smartadmin/notifications/sweetalert2/sweetalert2.bundle.css') }}">
+
     @yield('style')
 
     <!-- CSRF Token -->
@@ -52,6 +54,7 @@
 
     <!-- Scripts -->
     <link rel="stylesheet" href="{{ asset('css/app.css') }}" />
+	{{-- <script src="https://www.google.com/recaptcha/api.js"></script> --}}
 </head>
 
 <body class="">
@@ -89,7 +92,7 @@
                     </div>
                 </div>
 
-                <div class="flex-1" style="background: url(img/simet-gunung-1.jpg) no-repeat center top fixed; background-size: cover;">
+                <div class="flex-1" style="background: url(img/simet-bawang-pagi.webp) no-repeat center top fixed; background-size: cover;">
                     <div class="container py-4 py-lg-5 my-lg-5 px-4 px-sm-0">
                         @yield('content')
                     </div>
@@ -102,8 +105,10 @@
         </div>
     </div>
     @include('partials.pagesettings')
+	@stack('scripts')
     <script src="{{ asset('js/vendors.bundle.js') }}"></script>
     <script src="{{ asset('js/app.bundle.js') }}"></script>
+	<script src="{{ asset('js/smartadmin/notifications/sweetalert2/sweetalert2.bundle.js') }}"></script>
 	<script src="{{asset('sw.js')}}"></script>
 	<script>
 		if ('serviceWorker' in navigator) {

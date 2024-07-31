@@ -3,11 +3,11 @@
 namespace App\Models2024;
 
 use App\Models\DataUser;
+use App\Models2024\UserFile;
 // use App\Models\PenangkarRiph;
 use App\Models\User;
 use App\Models\UserDocs;
 use App\Traits\Auditable;
-use Dflydev\DotAccessData\Data;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -80,10 +80,9 @@ class PullRiph extends Model
 	{
 		return $this->hasOne(UserDocs::class, 'no_ijin', 'no_ijin');
 	}
-
-	public function penangkar_riph()
+	public function userfiles()
 	{
-		return $this->hasMany(PenangkarRiph::class, 'no_ijin', 'no_ijin');
+		return $this->hasMany(UserFile::class, 'no_ijin', 'no_ijin');
 	}
 
 	public function pks()

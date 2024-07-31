@@ -256,37 +256,37 @@
 			@can('verificator_task_access')
 				<li class="nav-title" data-i18n="nav.administation">VERIFIKASI</li>
 				@can('online_access')
-					<li class="c-sidebar-nav-item {{ request()->is('2024/admin/pengajuan*') ? 'active' : '' }}">
-						<a href="{{ route('2024.admin.pengajuan.') }}"
-							data-filter-tags="verifikasi tanam">
-							<i class="fal fa-download c-sidebar-nav-icon"></i>
-							<span class="nav-link-text">
-								Pengajuan
-							</span>
-							@php
-								$pengajuan = new \App\Models2024\AjuVerifTanam();
-								$unverified = $pengajuan->NewRequest();
-								$proceed = $pengajuan->proceedVerif();
-							@endphp
-							<span class="">
-								{{-- untuk 2024 --}}
-								@if ($unverified > 0 || $proceed > 0)
-									<span class="dl-ref {{ $unverified > 0 ? 'bg-danger-500' : 'bg-warning-500' }} hidden-nav-function-minify hidden-nav-function-top">
-										{{ $unverified }}/{{ $proceed }}
-									</span>
-								@endif
-								{{-- @if ($unverified > 0)
-									<span class="dl-ref bg-danger-500 hidden-nav-function-minify hidden-nav-function-top">{{ $unverified }}</span>
-								@endif
-								@if ($proceed > 0)
-									<span class="dl-ref bg-warning-500 hidden-nav-function-minify hidden-nav-function-top">{{ $proceed }}</span>
-								@endif --}}
-							</span>
-						</a>
-					</li>
-				@endcan
-				@can('permission_access')
-					<li class="c-sidebar-nav-item {{ request()->is('admin/pengajuan*') ? 'active' : '' }}">
+					@can('administrator_access')
+						<li class="c-sidebar-nav-item {{ request()->is('2024/admin/pengajuan*') ? 'active' : '' }}">
+							<a href="{{ route('2024.admin.pengajuan.') }}"
+								data-filter-tags="verifikasi tanam">
+								<i class="fal fa-download c-sidebar-nav-icon"></i>
+								<span class="nav-link-text">
+									Pengajuan
+								</span>
+								@php
+									$pengajuan = new \App\Models2024\AjuVerifTanam();
+									$unverified = $pengajuan->NewRequest();
+									$proceed = $pengajuan->proceedVerif();
+								@endphp
+								<span class="">
+									{{-- untuk 2024 --}}
+									@if ($unverified > 0 || $proceed > 0)
+										<span class="dl-ref {{ $unverified > 0 ? 'bg-danger-500' : 'bg-warning-500' }} hidden-nav-function-minify hidden-nav-function-top">
+											{{ $unverified }}/{{ $proceed }}
+										</span>
+									@endif
+									{{-- @if ($unverified > 0)
+										<span class="dl-ref bg-danger-500 hidden-nav-function-minify hidden-nav-function-top">{{ $unverified }}</span>
+									@endif
+									@if ($proceed > 0)
+										<span class="dl-ref bg-warning-500 hidden-nav-function-minify hidden-nav-function-top">{{ $proceed }}</span>
+									@endif --}}
+								</span>
+							</a>
+						</li>
+					@endcan
+					<li class="c-sidebar-nav-item {{ request()->is('2024/verifikator/tanam*') ? 'active' : '' }}">
 						<a href="{{ route('2024.verifikator.tanam.home') }}"
 							data-filter-tags="verifikasi tanam">
 							<i class="fal fa-seedling c-sidebar-nav-icon"></i>
@@ -433,6 +433,14 @@
 			{{-- pengelolaan berkas permohonan_access --}}
 			@can('permohonan_access')
 				<li class="nav-title">Pengelolaan Berkas</li>
+				<li class="c-sidebar-nav-item {{ request()->is('admin/template')
+					|| request()->is('admin/template/*') ? 'active' : '' }}">
+					<a href="{{ route('admin.template.index') }}" title="Master Template"
+						data-filter-tags="daftar berkas file template">
+						<i class="fa-fw fal fa-cabinet-filing c-sidebar-nav-icon"></i>
+						<span class="nav-link-text">Berkas Saya</span>
+					</a>
+				</li>
 				@can('template_access')
 					<li class="c-sidebar-nav-item {{ request()->is('admin/template')
 						|| request()->is('admin/template/*') ? 'active' : '' }}">
@@ -665,7 +673,7 @@
 			@endif
 
 
-			@can('cpcl_data_access')
+			@can('spatial_data_access')
 				<li class="nav-title" data-i18n="nav.administation">DATA CPCL</li>
 				<li class="c-sidebar-nav-item {{ request()->is('2024/cpcl/poktan*') ? 'active' : '' }}">
 					<a href="{{route('2024.cpcl.poktan.index')}}" title="Coming soon!"
@@ -704,15 +712,15 @@
 						<span class="nav-link-text">Peta Lokasi Baru</span>
 					</a>
 				</li> --}}
+				<li class="nav-title" data-i18n="nav.administation">DATA WILAYAH</li>
+				<li class="c-sidebar-nav-item {{ request()->is('2024/spatial/wilayah*') ? 'active' : '' }}">
+					<a href="{{route('2024.spatial.wilayah')}}" title="Coming soon!"
+					data-filter-tags="data wilayah provinsi kabupaten kecamatan desa kelurahan">
+						<i class="fal fa-globe-asia"></i>
+						<span class="nav-link-text">Daftar Wilayah</span>
+					</a>
+				</li>
 			@endcan
-			<li class="nav-title" data-i18n="nav.administation">DATA WILAYAH</li>
-			<li class="c-sidebar-nav-item {{ request()->is('2024/spatial/wilayah*') ? 'active' : '' }}">
-				<a href="{{route('2024.spatial.wilayah')}}" title="Coming soon!"
-				data-filter-tags="data wilayah provinsi kabupaten kecamatan desa kelurahan">
-					<i class="fal fa-globe-asia"></i>
-					<span class="nav-link-text">Daftar Wilayah</span>
-				</a>
-			</li>
 
 			{{-- support --}}
 			<li class="nav-title" data-i18n="nav.administation">DUKUNGAN</li>

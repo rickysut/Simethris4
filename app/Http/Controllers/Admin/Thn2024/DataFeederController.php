@@ -7,6 +7,7 @@ use App\Models2024\AjuVerifProduksi;
 use App\Models2024\AjuVerifSkl;
 use App\Models2024\AjuVerifTanam;
 use App\Models2024\DataRealisasi;
+use App\Models2024\FileManagement;
 use App\Models2024\Lokasi;
 use App\Models2024\MasterAnggota;
 use App\Models2024\MasterPoktan;
@@ -198,7 +199,7 @@ class DataFeederController extends Controller
 		$columns = $request->input('columns', []);
 
 		// Base query
-		$query = Lokasi::select('id', 'kode_spatial', 'kode_poktan', 'no_ijin', 'tgl_tanam', 'tgl_akhir_tanam', 'tgl_panen', 'tgl_akhir_panen')
+		$query = Lokasi::select('id', 'kode_spatial', 'kode_poktan', 'no_ijin', 'tgl_tanam', 'tgl_panen')
 			->where('no_ijin', $noIjin)
 			->with([
 				'pks' => function ($query) {
@@ -315,7 +316,7 @@ class DataFeederController extends Controller
 		// Format the noIjin parameter
 		$noIjin = $this->formatNoIjin($noIjin);
 
-		$dataRealisasi = Lokasi::select('no_ijin', 'kode_poktan', 'luas_tanam', 'volume')
+		$dataRealisasi = Lokasi::select('origin','no_ijin', 'tcode','kode_poktan', 'luas_tanam', 'volume')
 			->where('no_ijin', $noIjin)
 			->where('kode_poktan', $poktanId)
 			->get();
@@ -375,7 +376,9 @@ class DataFeederController extends Controller
 			$spatial = $item->spatial;
 			return [
 				'id' => $item->id,
+				'origin' => $item->origin,
 				'kode_spatial' => $item->kode_spatial,
+				'tcode' => $item->tcode,
 				'ktp_petani' => $item->ktp_petani,
 				'nama_petani' => $item->nama_petani,
 				'spatial_petani' => $spatial ? $spatial->nama_petani : null,
@@ -403,6 +406,24 @@ class DataFeederController extends Controller
 		// Format the noIjin parameter
 		$noIjin = $this->formatNoIjin($noIjin);
 
+		// Memeriksa apakah ada minimal satu record dengan status yang tidak null
+		$hasNonNullStatus = Lokasi::where('no_ijin', $noIjin)
+			->whereNotNull('status')
+			->exists();
+
+		if (!$hasNonNullStatus) {
+			// Jika tidak ada record dengan status yang tidak null, kembalikan data kosong
+			return response()->json([
+				'draw' => $request->input('draw', 1),
+				'recordsTotal' => 0,
+				'recordsFiltered' => 0,
+				'totalRealisasiLuas' => 0,
+				'totalRealisasiProduksi' => 0,
+				'data' => [],
+			]);
+		}
+
+		// Jika ada minimal satu record dengan status yang tidak null, ambil semua data
 		$dataRealisasi = Lokasi::select('no_ijin', 'luas_tanam', 'volume')
 			->where('no_ijin', $noIjin)
 			->get();
@@ -461,15 +482,14 @@ class DataFeederController extends Controller
 		// Map data to the required format
 		$data = $lokasis->map(function ($item) {
 			$spatial = $item->spatial;
-			$masterAnggota = $item->masteranggota ? $item->masteranggota->first() : null;
-			$nama_kelompok = $masterAnggota ? ($masterAnggota->masterpoktan ? $masterAnggota->masterpoktan->nama_kelompok : null) : null;
 			return [
 				'id' => $item->id,
-				'nama_kelompok' => $item->nama_poktan,
+				'tcode' => $item->tcode,
+				'nama_kelompok' => $item->masteranggota->masterpoktan->nama_kelompok,
+				'kode_poktan' => $item->kode_poktan,
 				'kode_spatial' => $item->kode_spatial,
 				'ktp_petani' => $item->ktp_petani,
-				'nama_petani' => $item->nama_petani,
-				'nama_kelompok' => $nama_kelompok,
+				'nama_petani' => $item->masteranggota->nama_petani,
 				'spatial_petani' => $spatial ? $spatial->nama_petani : null,
 				'spatial_ktp' => $spatial ? $spatial->ktp_petani : null,
 				'luas_lahan' => $item->luas_lahan,
@@ -491,6 +511,7 @@ class DataFeederController extends Controller
 			'data' => $data,
 		]);
 	}
+
 
 	public function getLokasiByIjinNik($noIjin, $nik)
 	{
@@ -586,17 +607,19 @@ class DataFeederController extends Controller
 		$length = $request->input('length', 100);
 		$searchValue = $request->input('search.value', '');
 
-		// $spatials = MasterSpatial::where('ktp_petani', '3324016204770001')->with('anggota')->get();
-		// dd($spatials);
-
 		$data = MasterSpatial::with([
-			// 'anggota:id,kode_poktan,nama_petani,ktp_petani',
 			'provinsi:provinsi_id,nama',
 			'kabupaten:kabupaten_id,nama_kab',
 			'jadwal:kode_spatial,awal_masa,akhir_masa',
 			'anggota:ktp_petani,nama_petani',
-		])
-			->get();
+		])->get();
+
+		$totalLuas = $data->sum('luas_lahan');
+		$totalLahan = $data->count();
+		$totalLuasAktif = $data->where('status', 0)->sum('luas_lahan');
+		$totalLahanAktif = $data->where('status', 0)->count();
+		$totalLuasNonAktif = $totalLuas - $totalLuasAktif;
+		$totalLahanNonAktif = $totalLahan - $totalLahanAktif;
 
 		$query = $data->map(function ($item) {
 			return [
@@ -636,45 +659,28 @@ class DataFeederController extends Controller
 			$orderDirection = $request->input('order')[0]['dir'];
 			$columnName = $request->input('columns')[$orderColumn]['data'];
 
-
-			// Gunakan switch case atau if else untuk menentukan kolom pengurutan
-			switch ($columnName) {
-				case 'kode_spatial':
-					$query = $query->sortBy('kode_spatial');
-					break;
-				case 'ktp_petani':
-					$query = $query->sortByDesc('ktp_petani');
-					break;
-				case 'nama_anggota':
-					$query = $query->sortByDesc('nama_anggota');
-					break;
-				case 'nama_provinsi':
-					$query = $query->sortByDesc('nama_provinsi');
-					break;
-				case 'nama_kabupaten':
-					$query = $query->sortByDesc('nama_kabupaten');
-					break;
-				case 'nama_kecamatan':
-					$query = $query->sortByDesc('nama_kecamatan');
-					break;
-				case 'nama_desa':
-					$query = $query->sortByDesc('nama_desa');
-					break;
-			}
+			$query = $query->sortBy($columnName, SORT_REGULAR, $orderDirection == 'desc');
 		}
 
 		$totalRecords = $data->count();
 		$filteredRecords = $query->count();
 
-		$spatials = $query->slice($start)->take($length)->values();
+		$spatials = $query->slice($start, $length)->values();
 
 		return response()->json([
+			'totalLuas' => $totalLuas,
+			'totalLahan' => $totalLahan,
+			'totalLahanAktif' => $totalLahanAktif,
+			'totalLuasAktif' => $totalLuasAktif,
+			'totalLuasNonAktif' => $totalLuasNonAktif,
+			'totalLahanNonAktif' => $totalLahanNonAktif,
 			'draw' => $draw,
 			'recordsTotal' => $totalRecords,
 			'recordsFiltered' => $filteredRecords,
 			'data' => $spatials,
 		]);
 	}
+
 
 	public function getAllPoktan(Request $request)
 	{
@@ -927,7 +933,6 @@ class DataFeederController extends Controller
 	public function getDataPengajuan($noIjin)
 	{
 		$noIjin = $this->formatNoIjin($noIjin);
-
 
 		$commitment = PullRiph::where('no_ijin', $noIjin)->first();
 		$verifTanam = AjuVerifTanam::where('no_ijin', $noIjin)->latest()->first() ?? new AjuVerifTanam();
@@ -1257,7 +1262,6 @@ class DataFeederController extends Controller
 	public function getRequestVerifTanam(Request $request)
 	{
 		$user = Auth::user();
-		// Get the request inputs
 		$draw = $request->input('draw', 1);
 		$start = $request->input('start', 0);
 		$length = $request->input('length', 10);
@@ -1270,11 +1274,21 @@ class DataFeederController extends Controller
 		// Build the query
 		$query = AjuVerifTanam::select('id', 'tcode', 'npwp', 'no_ijin', 'check_by', 'verif_at', 'status', 'note', 'created_at')
 			->when($user->roles[0]->title !== 'Administrator', function ($query) {
-				$query->where('status', 0);
+				$query->whereBetween('status', [0, 7]);
 			})
+			// ->where(function ($query) use ($user) {
+			// 	$query->where('check_by', null)
+			// 		->orWhere('check_by', $user->id);
+			// })
 			->where(function ($query) use ($user) {
-				$query->where('check_by', null)
-					->orWhere('check_by', $user->id);
+				$query->whereHas('assignments', function ($query) use ($user) {
+					$query->where('user_id', $user->id);
+				})
+					->orWhere(function ($query) use ($user) {
+						if ($user->id == 1) {
+							$query->where('id', '>', 0); // or any condition that always returns true
+						}
+					});
 			})
 			->with([
 				'verifikator:id,name',
@@ -1290,8 +1304,25 @@ class DataFeederController extends Controller
 			});
 		}
 
-		if ($statusFilter) {
-			$query->where('status', $statusFilter);
+		if ($statusFilter !== null) {
+			switch ($statusFilter) {
+				case 1:
+					$query->where('status', '>', 0);
+					break;
+				case 2:
+					$query->whereBetween('status', [1, 5]);
+					break;
+				case 3:
+					$query->where('status', '>', 5);
+					break;
+				default:
+					// Apply default filter for status between 0 and 5 if no filter is selected
+					$query->whereBetween('status', [1, 5]);
+					break;
+			}
+		} else {
+			// Apply default filter for status between 0 and 5 if no filter is selected
+			$query->whereBetween('status', [1, 5]);
 		}
 
 		$data = $query->get();
@@ -1301,7 +1332,7 @@ class DataFeederController extends Controller
 				'id' => $item->id,
 				'tcode' => $item->tcode,
 				'check_by' => $item->check_by,
-				'verifikator' => $item->verifikator ? $item->verifikator->name : null,
+				// 'verifikator' => $item->verifikator ? $item->verifikator->name : null,
 				'periode' => $item->commitment ? $item->commitment->periodetahun : null,
 				'perusahaan' => $item->datauser ? $item->datauser->company_name : null,
 				'no_ijin' => $item->no_ijin,
@@ -1643,8 +1674,86 @@ class DataFeederController extends Controller
 		return response()->json([
 			'Informasi' => $informasi,
 			'Applikasi' => $app,
-			'Penggunaan'=> $Uses,
+			'Penggunaan' => $Uses,
 			'data_spatial' => $formattedSpatials,
+		]);
+	}
+
+	public function filemanagement(Request $request)
+	{
+		$draw = $request->input('draw', 1);
+		$start = $request->input('start', 0);
+		$length = $request->input('length', 10);
+		$searchValue = $request->input('search.value', '');
+		$order = $request->input('order', []);
+		$columns = $request->input('columns', []);
+		$npwp = Auth::user()->data_user->npwp_company;
+		$commitments = PullRiph::select('no_ijin')
+			->where('npwp', $npwp)
+			->pluck('no_ijin');
+
+		// Base query
+		$query = FileManagement::select('no_ijin', 'berkas', 'tanggal', 'source')
+			->whereIn('no_ijin', $commitments);
+
+		// Apply search filter
+		if (!empty($searchValue)) {
+			$query = $query->where(function ($q) use ($searchValue) {
+				$q->where('no_ijin', 'like', "%{$searchValue}%")
+					->orWhere('berkas', 'like', "%{$searchValue}%")
+					->orWhere('source', 'like', "%{$searchValue}%")
+					->orWhereDate('tanggal', '=', $searchValue); // Assuming searchValue is a date for exact match
+			});
+		}
+
+		// Calculate total records
+		$totalRecords = $query->count();
+
+		// Apply ordering
+		if (!empty($order)) {
+			$orderColumnIndex = $order[0]['column'];
+			$orderDirection = $order[0]['dir'];
+			$orderColumn = $columns[$orderColumnIndex]['data'];
+			switch ($orderColumn) {
+				case 'no_ijin':
+					$query = $query->orderBy('no_ijin', $orderDirection);
+					break;
+				case 'berkas':
+					$query = $query->orderBy('berkas', $orderDirection);
+					break;
+				case 'tanggal':
+					$query = $query->orderBy('tanggal', $orderDirection);
+					break;
+				case 'tanggal':
+					$query = $query->orderBy('source', $orderDirection);
+					break;
+				default:
+					$query = $query->orderBy('tanggal', 'desc');
+					break;
+			}
+		}
+
+		// Apply pagination
+		$data = $query->skip($start)->take($length)->get();
+
+		// Calculate filtered records
+		$filteredRecords = $data->count();
+
+		// Format data for view
+		$data = $data->map(function ($item) {
+			return [
+				'no_ijin' => $item->no_ijin,
+				'berkas' => $item->berkas,
+				'tanggal' => \Carbon\Carbon::parse($item->tanggal)->format('d F, Y'), // Format tanggal sesuai kebutuhan
+				'source' => $item->source,
+			];
+		});
+
+		return response()->json([
+			'draw' => $draw,
+			'recordsTotal' => $totalRecords,
+			'recordsFiltered' => $filteredRecords,
+			'data' => $data,
 		]);
 	}
 }

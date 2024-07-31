@@ -1,9 +1,65 @@
 @extends('t2024.layouts.admin')
+@section('styles')
+<style>
+	.display-5{
+		font-size: 1.8rem;
+		font-weight: 300;
+		line-height: 1.25;
+	}
+</style>
+@endsection
 @section('content')
 {{-- @include('t2024.partials.breadcrumb') --}}
 @include('t2024.partials.subheader')
 @include('t2024.partials.sysalert')
 @can('spatial_data_access')
+	<section class="mb-3">
+		<div class="row">
+			<div class="col-12">
+				<div class="card-deck">
+					<div class="card bg-info-300 overflow-hidden position-relative mb-g">
+						<div class="card-body text-right">
+							<div>
+								<label class="fs-sm mb-0">Total Lahan Wajib Tanam</label>
+								<h4 class="display-5 font-weight-bold mb-0" ><span id="totalLuas"></span> ha</h4>
+							</div>
+							<div>
+								<h4 class="display-5 font-weight-bold mb-0"><span id="totalLahan"></span> titik</h4>
+							</div>
+							<p class="m-0 l-h-n"></p>
+						</div>
+						<i class="fal fa-globe-asia position-absolute pos-left pos-bottom opacity-15 mb-n1 mr-n1" style="font-size:6rem"></i>
+					</div>
+					<div class="card bg-success-300 overflow-hidden position-relative mb-g">
+						<div class="card-body text-right">
+							<div>
+								<label class="fs-sm mb-0">Lahan Tersedia</label>
+								<h4 class="display-5 font-weight-bold mb-0"><span id="totalLuasAktif"></span> ha</h4>
+							</div>
+							<div>
+								<h4 class="display-5 font-weight-bold mb-0"><span id="totalLahanAktif"></span> titik</h4>
+							</div>
+							<p class="m-0 l-h-n"></p>
+						</div>
+						<i class="fal fa-lock-open-alt position-absolute pos-left pos-bottom opacity-15 mb-n1 mr-n1" style="font-size:6rem"></i>
+					</div>
+					<div class="card bg-warning-300 overflow-hidden position-relative mb-g">
+						<div class="card-body text-right">
+							<div>
+								<label class="fs-sm mb-0" aria-label="Luas Lahan" aria-describedby="#deskripsilabel">Lahan Bermitra</label>
+								<h4 class="display-5 font-weight-bold mb-0"><span id="totalLuasNonAktif"></span> ha</h4>
+							</div>
+							<div>
+								<h4 class="display-5 font-weight-bold mb-0"><span id="totalLahanNonAktif"></span> titik</h4>
+							</div>
+							<p class="m-0 l-h-n"></p>
+						</div>
+						<i class="fal fa-map-marker-check position-absolute pos-left pos-bottom opacity-15 mb-n1 mr-n1" style="font-size:6rem"></i>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
 	<div class="row">
 		<div class="col">
 			<div class="panel" id="panel-1">
@@ -89,7 +145,37 @@
 			ajax: {
 				url: "{{ route('2024.datafeeder.getAllSpatials')}}",
 				type: "GET",
-				dataSrc: "data"
+				dataSrc: function(json) {
+					// Update the totalLuas element with the total land area
+					var totalLuas = parseFloat(json.totalLuas) / 10000;
+					var totalLuasAktif = parseFloat(json.totalLuasAktif) / 10000;
+					var totalLuasNonAktif = parseFloat(json.totalLuasNonAktif) / 10000;
+					$('#totalLuas').text(totalLuas.toLocaleString('id-ID', {
+						minimumFractionDigits: 4,
+						maximumFractionDigits: 4
+					}));
+					$('#totalLahan').text(json.totalLahan.toLocaleString('id-ID', {
+						minimumFractionDigits: 0,
+						maximumFractionDigits: 0
+					}));
+					$('#totalLuasAktif').text(totalLuasAktif.toLocaleString('id-ID', {
+						minimumFractionDigits: 4,
+						maximumFractionDigits: 4
+					}));
+					$('#totalLahanAktif').text(json.totalLahanAktif.toLocaleString('id-ID', {
+						minimumFractionDigits: 0,
+						maximumFractionDigits: 0
+					}));
+					$('#totalLuasNonAktif').text(totalLuasNonAktif.toLocaleString('id-ID', {
+						minimumFractionDigits: 4,
+						maximumFractionDigits: 4
+					}));
+					$('#totalLahanNonAktif').text(json.totalLahanNonAktif.toLocaleString('id-ID', {
+						minimumFractionDigits: 0,
+						maximumFractionDigits: 0
+					}));
+					return json.data;
+				}
 			},
 			"columnDefs": [
 				{ "targets": [2,3], "className": "text-right" },
@@ -129,17 +215,17 @@
 					}
 				},
 				{
-					data: 'kode_spatial',
+					data: 'status',
 					render: function(data, type, row) {
-						var kode = data.replace(/[^a-zA-Z0-9]/g, '');
+						var kdSpatial = row.kode_spatial;
+						var kode = kdSpatial.replace(/[^a-zA-Z0-9]/g, '');
 						var url = "{{ route('2024.spatial.edit', ':kode') }}";
 						var kmlFile = row.kml_url;
 						var kmlPath = `{{ asset('storage') }}/${kmlFile}`;
 						url = url.replace(':kode', kode);
-						var status = row.status;
 
 						// Determine the checked state based on the status
-						var checked = status == 1 ? 'checked' : '';
+						var checked = data == 1 ? 'checked' : '';
 
 						var actionBtn = `
 							<div class="justify-content-center fs-sm d-flex align-items-center">
@@ -150,8 +236,8 @@
 									<i class="fal fa-download"></i>
 								</a>
 								<div class="custom-control custom-switch ml-1">
-									<input type="checkbox" class="custom-control-input form-control-sm status-switch" id="customSwitch_${kode}" ${checked} data-kode="${data}">
-									<label class="custom-control-label" for="customSwitch_${kode}"></label>
+									<input type="checkbox" class="custom-control-input form-control-sm status-switch" id="customSwitch_${kode}" ${checked} data-kode="${kdSpatial}">
+									<label class="custom-control-label" for="customSwitch_${kode}"><span class="sr-only">Open - Close</span></label>
 								</div>
 							</div>
 						`;
@@ -188,7 +274,8 @@
 	$(document).on('change', '.status-switch', function() {
 		var kode = $(this).data('kode');
 		var status = $(this).is(':checked') ? 1 : 0;
-
+		console.log('kode: ', kode);
+		console.log('status: ', status);
 		$.ajax({
 			url: "{{ route('2024.spatial.updateStatus', ':kode') }}".replace(':kode', kode),
 			method: 'POST',
@@ -199,7 +286,7 @@
 			success: function(response) {
 				if(response.success) {
 					$('#tblSpatial').DataTable().ajax.reload();
-					var action = status ? 'diaktifkan' : 'dinonaktifkan';
+					var action = status ? 'Bermitra' : 'Tersedia';
 					var message = `Lokasi ${kode} ${action}`;
 					Swal.fire({
 						icon: 'success',
@@ -217,7 +304,6 @@
 			}
 		});
 	});
-
 
 </script>
 @endsection

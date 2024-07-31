@@ -24,6 +24,7 @@ class MasterSpatial extends Model
 	];
 
 	public $fillable = [
+		'origin',
 		'komoditas',
 		'kode_spatial',
 		'kode_poktan',

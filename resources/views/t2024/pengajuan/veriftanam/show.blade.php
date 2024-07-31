@@ -229,7 +229,7 @@
 					{{-- pengajuan tanam --}}
 					<form action="{{route('2024.user.commitment.formavt.submitPengajuan', $ijin)}}" method="post">
 						@csrf
-						<button type="submit" class="btn btn-xs btn-warning d-none" data-toggle="tooltip" title data-original-title="Ajukan Verifikasi Tanam" id="btnSubmit">
+						<button type="submit" class="btn btn-xs btn-warning d-block" data-toggle="tooltip" title data-original-title="Ajukan Verifikasi Tanam" id="btnSubmit">
 							<i class="fal fa-upload mr-1"></i>
 							Ajukan
 						</button>

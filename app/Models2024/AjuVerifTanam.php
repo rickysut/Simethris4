@@ -17,7 +17,6 @@ class AjuVerifTanam extends Model
 	protected $fillable = [
 		'tcode',
 		'npwp',
-		'commitment_id',
 		'no_ijin',
 		'status',
 		'note',

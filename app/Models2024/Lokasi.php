@@ -2,8 +2,6 @@
 
 namespace App\Models2024;
 
-use App\Models2024\FotoProduksi;
-use App\Models2024\FotoTanam;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -22,6 +20,8 @@ class Lokasi extends Model
 	];
 
 	protected $fillable = [
+		'origin',
+		'tcode',
 		'npwp',
 		'no_ijin',
 		'kode_poktan',
@@ -40,22 +40,36 @@ class Lokasi extends Model
 		'lahanfoto',
 
 		'benihDate',
+		'benihSize',
 		'benihComment',
 		'benihFoto',
 
 		'mulsaDate',
+		'mulsaSize',
 		'mulsaComment',
 		'mulsaFoto',
 
 		'pupuk1Date',
+		'organik1',
+		'npk1',
+		'dolomit1',
+		'za1',
 		'pupuk1Comment',
 		'pupuk1Foto',
 
 		'pupuk2Date',
+		'organik2',
+		'npk2',
+		'dolomit2',
+		'za2',
 		'pupuk2Comment',
 		'pupuk2Foto',
 
 		'pupuk3Date',
+		'organik3',
+		'npk3',
+		'dolomit3',
+		'za3',
 		'pupuk3Comment',
 		'pupuk3Foto',
 
@@ -74,6 +88,16 @@ class Lokasi extends Model
 		'distFoto',
 
 		'status',
+		'tanamStatus',
+		'lahanStatus',
+		'benihStatus',
+		'mulsaStatus',
+		'pupuk1Status',
+		'pupuk2Status',
+		'pupuk3Status',
+		'optStatus',
+		'prodStatus',
+		'distStatus',
 		'deleted_at',
 
 		// 'tgl_akhir_panen',
@@ -82,6 +106,20 @@ class Lokasi extends Model
 		// 'panen_pict',
 		// 'varietas',
 	];
+
+	//otomatisasi tcode di table lokasi
+	protected static function booted()
+    {
+        static::creating(function ($lokasi) {
+            // Set tcode saat record dibuat
+            $lokasi->tcode = $lokasi->kode_spatial . '_' . time();
+        });
+
+        static::updating(function ($lokasi) {
+            // Hanya update kolom yang diizinkan saat record diupdate
+            $lokasi->tcode = $lokasi->getOriginal('tcode');
+        });
+    }
 
 	public function masteranggota()
 	{
@@ -98,11 +136,6 @@ class Lokasi extends Model
 		return $this->belongsTo(Pks::class, ['kode_poktan', 'no_ijin'], ['kode_poktan', 'no_ijin']);
 	}
 
-	public function datarealisasi()
-	{
-		return $this->hasOne(DataRealisasi::class, 'lokasi_id');
-	}
-
 	public function spatial()
 	{
 		return $this->belongsTo(MasterSpatial::class, 'kode_spatial', 'kode_spatial');
@@ -111,14 +144,5 @@ class Lokasi extends Model
 	public function logbook()
 	{
 		return $this->hasMany(LogbookKegiatan::class);
-	}
-
-	public function fototanam()
-	{
-		return $this->hasMany(FotoTanam::class);
-	}
-	public function fotoproduksi()
-	{
-		return $this->hasMany(FotoProduksi::class);
 	}
 }

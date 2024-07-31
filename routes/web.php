@@ -447,8 +447,10 @@ Route::group(['prefix' => '2024', 'as' => '2024.', 'namespace' => 'Admin', 'midd
 			Route::get('/getLocDataByIjinBySpatial/{noIjin}/{spatial}', 'DataFeederController@getLocDataByIjinBySpatial')->name('getLocDataByIjinBySpatial');
 			Route::post('/postLocDataByIjinBySpatial', 'DataFeederController@postLocDataByIjinBySpatial')->name('postLocDataByIjinBySpatial');
 
+			Route::get('/postLocDataByIjinBySpatial', 'DataFeederController@postLocDataByIjinBySpatial')->name('postLocDataByIjinBySpatial');
+
 			//ini jangan dijalankan lagi
-			Route::get('/updateOrCreateDesa', 'DataFeederController@updateOrCreateDesa')->name('updateOrCreateDesa');
+			Route::get('/filemanagement', 'DataFeederController@filemanagement')->name('filemanagement');
 		});
 
 		//route untuk adminisrator
@@ -481,13 +483,21 @@ Route::group(['prefix' => '2024', 'as' => '2024.', 'namespace' => 'Admin', 'midd
 
 			Route::group(['prefix' => 'tanam', 'as' => 'tanam.'], function () {
 				Route::get('/', 'VerifTanamController@index')->name('home');
-				Route::get('/check/{noIjin}/{tcode}', 'VerifTanamController@check')->name('check');
+				Route::get('/check/berkas/{noIjin}/{tcode}', 'VerifTanamController@check')->name('check');
+				Route::get('/check/pks/{noIjin}/{tcode}', 'VerifTanamController@checkpks')->name('checkpks');
+				Route::get('/check/timeline/{noIjin}/{tcode}', 'VerifTanamController@checktimeline')->name('checktimeline');
+				Route::get('/check/lokasi/{noIjin}/{tcode}', 'VerifTanamController@checkdaftarlokasi')->name('checkdaftarlokasi');
+				Route::get('/check/final/{noIjin}/{tcode}', 'VerifTanamController@checkfinal')->name('checkfinal');
 				Route::post('/saveCheckBerkas/{noIjin}', 'VerifTanamController@saveCheckBerkas')->name('saveCheckBerkas');
-				Route::post('/verifPksStore/{tcode}', 'VerifTanamController@verifPksStore')->name('verifPksStore');
+				Route::post('/verifPksStore/{noIjin}/{kodePoktan}', 'VerifTanamController@verifPksStore')->name('verifPksStore');
 				Route::post('/markStatus/{noIjin}/{tcode}/{status}', 'VerifTanamController@markStatus')->name('markStatus');
-				Route::post('/storelokasicheck/{noIjin}/{spatial}', 'VerifTanamController@storelokasicheck')->name('storelokasicheck');
-				Route::post('/check/{noIjin}/store', 'VerifTanamController@store')->name('store');
-				Route::get('/result/{noIjin}', 'VerifTanamController@check')->name('result');
+				Route::post('/storelokasicheck/{noIjin}/{tcode}', 'VerifTanamController@storelokasicheck')->name('storelokasicheck');
+				Route::get('/check/{noIjin}/{verifikasi}/{tcode}', 'VerifTanamController@verifLokasiByIjinBySpatial')->name('verifLokasiByIjinBySpatial');
+				Route::post('/storePhaseCheck/{noIjin}/{spatial}', 'VerifTanamController@storePhaseCheck')->name('storePhaseCheck');
+				Route::post('/storeFinalCheck/{noIjin}/{tcode}', 'VerifTanamController@storeFinalCheck')->name('storeFinalCheck');
+				Route::get('/result/{noIjin}/{tcode}', 'VerifTanamController@result')->name('result');
+				Route::get('/generateReport/{noIjin}/{tcode}', 'VerifTanamController@generateReport')->name('generateReport');
+				// Route::post('/check/{noIjin}/store', 'VerifTanamController@store')->name('store');
 			});
 		});
 
@@ -503,6 +513,7 @@ Route::group(['prefix' => '2024', 'as' => '2024.', 'namespace' => 'Admin', 'midd
 			//pullriph
 			Route::group(['prefix' => 'pull', 'as' => 'pull.'], function () {
 				Route::get('/', 'PullRiphController@index')->name('index');
+				Route::get('/checkYear', 'PullRiphController@checkYear')->name('checkYear');
 				Route::get('/getriph', 'PullRiphController@pull')->name('getriph');
 				Route::post('/store', 'PullRiphController@store')->name('store');
 			});
@@ -526,6 +537,7 @@ Route::group(['prefix' => '2024', 'as' => '2024.', 'namespace' => 'Admin', 'midd
 				Route::get('addrealisasi/{noIjin}/{spatial}', 'PksController@addrealisasi')->name('addrealisasi');
 				Route::post('storefoto/{noIjin}/{spatial}', 'PksController@storeFoto')->name('storefoto');
 				Route::post('storerealisasi/{noIjin}/{spatial}', 'PksController@storerealisasi')->name('storerealisasi');
+				Route::delete('deleteOriginLocalRealisasi/{spatial}', 'PksController@deleteOriginLocalRealisasi')->name('deleteOriginLocalRealisasi');
 
 				// Route::get('{id}/penangkar', 'PenangkarRiphController@mitra')->name('penangkar');
 				// Route::post('{id}/penangkar/store', 'PenangkarRiphController@store')->name('penangkar.store');
@@ -548,6 +560,11 @@ Route::group(['prefix' => '2024', 'as' => '2024.', 'namespace' => 'Admin', 'midd
 			});
 
 			//pks
+
+
+			//berkas file management
+			Route::group(['prefix' => 'files', 'as' => 'files.'], function () {
+			});
 
 		});
 

@@ -13,85 +13,26 @@ use Illuminate\Support\Str;
 class SpatialController extends Controller
 {
 	/**
-	 * @OA\Get(
-	 *      path="/getspatial/{no_ijin}",
-	 *      operationId="getspatial",
-	 *      tags={"Spatial"},
-	 *      summary="Get list of Spatial Data",
-	 *      description="Returns list of Kode Spatial",
-	 *      security={{"simethrisToken": {}}},
-	 *      @OA\Parameter(
-	 *          name="s",
-	 *          description="Cari berdasarkan status lokasi. 0 = Unavailable; 1= Available",
-	 *          required=false,
-	 *          in="path",
-	 *          @OA\Schema(
-	 *              type="string"
-	 *          )
-	 *      ),
-	 *      @OA\Parameter(
-	 *          name="p",
-	 *          description="Cari berdasarkan Kode Provinsi (provinsi_id).",
-	 *          required=false,
-	 *          in="path",
-	 *          @OA\Schema(
-	 *              type="string"
-	 *          )
-	 *      ),
-	 *      @OA\Parameter(
-	 *          name="b",
-	 *          description="Cari berdasarkan Kode Kabupaten (kabupaten_id).",
-	 *          required=false,
-	 *          in="path",
-	 *          @OA\Schema(
-	 *              type="string"
-	 *          )
-	 *      ),
-	 *      @OA\Parameter(
-	 *          name="c",
-	 *          description="Cari berdasarkan Kode Kecamatan (kecamatan_id).",
-	 *          required=false,
-	 *          in="path",
-	 *          @OA\Schema(
-	 *              type="string"
-	 *          )
-	 *      ),
-	 *      @OA\Parameter(
-	 *          name="l",
-	 *          description="Cari berdasarkan Kode kelurahan (kelurahan_id).",
-	 *          required=false,
-	 *          in="path",
-	 *          @OA\Schema(
-	 *              type="string"
-	 *          )
-	 *      ),
-	 *      @OA\Response(
-	 *          response=200,
-	 *          description="Successful operation",
-	 *          @OA\JsonContent()
-	 *       ),
-	 *      @OA\Response(
-	 *          response=401,
-	 *          description="Unauthenticated"
-	 *      ),
-	 *      @OA\Response(
-	 *          response=403,
-	 *          description="Forbidden"
-	 *      )
-	 * )
+	 * Get Lokasi Tanam
 	 */
 	public function getLokasiTanam(Request $request)
 	{
-		$informasi = 'Daftar Kode Spatial Wajib Tanam';
-		$app = 'Simethris 4 Alpha';
-		$Uses = '?s=status&p=provinsi_id&b=kabupaten_id&c=kecamatan_id&l=kelurahan_id';
+		// About information
+		$about = [
+			'Daftar Kode Spatial Wajib Tanam Simethris 4beta',
+			'Parameter: ?s=status&p=provinsi_id&b=kabupaten_id&c=kecamatan_id&l=kelurahan_id&k=kode_poktan',
+			'status dimaksud adalah status lahan.',
+			'wilayah dimaksud adalah Wilayah di mana lahan tersebut berada.'
+		];
 
+		// Validate request parameters
 		$validated = $request->validate([
 			's' => 'nullable|integer',
 			'p' => 'nullable|integer',
 			'b' => 'nullable|integer',
 			'c' => 'nullable|integer',
 			'l' => 'nullable|integer',
+			'k' => 'nullable|string',
 		]);
 
 		$s = $validated['s'] ?? null;
@@ -99,7 +40,9 @@ class SpatialController extends Controller
 		$b = $validated['b'] ?? null;
 		$c = $validated['c'] ?? null;
 		$l = $validated['l'] ?? null;
+		$k = $validated['k'] ?? null;
 
+		// Build the query
 		$query = MasterSpatial::select(
 			'kode_spatial',
 			'ktp_petani',
@@ -127,18 +70,23 @@ class SpatialController extends Controller
 		if (!is_null($l)) {
 			$query->where('kelurahan_id', $l);
 		}
+		if (!is_null($k)) {
+			$query->where('kode_poktan', $k); // Updated to filter by 'kode_poktan'
+		}
 
-		$spatials = $query->get();
+		// Paginate the results with a maximum of 100 records per page
+		$spatials = $query->paginate(min($request->input('per_page', 10), 10));
 
-		$formattedSpatials = $spatials->map(function ($spatial) {
+		// Format the data
+		$formattedSpatials = $spatials->getCollection()->map(function ($spatial) {
 			return [
 				'kode_spatial' => $spatial->kode_spatial,
 				'luas_lahan' => $spatial->luas_lahan,
+				'status' => $spatial->status,
 				'ktp_petani' => $spatial->ktp_petani,
 				'nama_petani' => $spatial->anggota->nama_petani,
 				'kode_poktan' => $spatial->anggota->masterpoktan->kode_poktan ?? null,
 				'nama_kelompok' => $spatial->anggota->masterpoktan->nama_kelompok ?? null,
-				'status' => $spatial->status,
 				'wilayah' => [
 					'provinsi_id' => $spatial->provinsi_id,
 					'kabupaten_id' => $spatial->kabupaten_id,
@@ -147,48 +95,63 @@ class SpatialController extends Controller
 				]
 			];
 		});
+
+		// Return the paginated data along with the "about" information
 		return response()->json([
-			'Informasi' => $informasi,
-			'Applikasi' => $app,
-			'Penggunaan'=> $Uses,
+			'Tentang' => $about,
 			'data_spatial' => $formattedSpatials,
+			'pagination' => [
+				'total' => $spatials->total(),
+				'per_page' => $spatials->perPage(),
+				'current_page' => $spatials->currentPage(),
+				'last_page' => $spatials->lastPage(),
+				'next_page_url' => $spatials->nextPageUrl(),
+				'prev_page_url' => $spatials->previousPageUrl(),
+			]
 		]);
 	}
 
+
+	/**
+	 * Batch Update Status Lokasi Tanam
+	 */
 	public function batchUpdateStatusLokasi(Request $request)
-    {
-        // Validasi input
-        $validated = $request->validate([
-            'status' => 'required|integer',
-            'kode_spatial' => 'required|array',
-            'kode_spatial.*' => 'required|string', // atau sesuaikan dengan tipe data kode_spatial Anda
-        ]);
+	{
+		// Validasi input
+		$validated = $request->validate([
+			'status' => 'required|integer',
+			'kode_spatial' => 'required|array',
+			'kode_spatial.*' => 'required|string', // atau sesuaikan dengan tipe data kode_spatial Anda
+		]);
 
-        $status = $validated['status'];
-        $kodeSpatialList = $validated['kode_spatial'];
+		$status = $validated['status'];
+		$kodeSpatialList = $validated['kode_spatial'];
 
-        DB::beginTransaction();
+		DB::beginTransaction();
 
-        try {
-            foreach ($kodeSpatialList as $kodeSpatial) {
-                // Lakukan update status untuk setiap kode_spatial
-                $spatial = MasterSpatial::where('kode_spatial', $kodeSpatial)->first();
+		try {
+			foreach ($kodeSpatialList as $kodeSpatial) {
+				// Lakukan update status untuk setiap kode_spatial
+				$spatial = MasterSpatial::where('kode_spatial', $kodeSpatial)->first();
 
-                if ($spatial) {
-                    $spatial->status = $status;
-                    $spatial->save();
-                }
-            }
+				if ($spatial) {
+					$spatial->status = $status;
+					$spatial->save();
+				}
+			}
 
-            DB::commit();
+			DB::commit();
 
-            return response()->json(['success' => true]);
-        } catch (\Exception $e) {
-            DB::rollback();
-            return response()->json(['success' => false, 'message' => 'Failed to update spatial data.', 'error' => $e->getMessage()], 500);
-        }
-    }
+			return response()->json(['success' => true]);
+		} catch (\Exception $e) {
+			DB::rollback();
+			return response()->json(['success' => false, 'message' => 'Failed to update spatial data.', 'error' => $e->getMessage()], 500);
+		}
+	}
 
+	/**
+	 * Update Status Lokasi Tanam
+	 */
 	public function updateStatusLokasi(Request $request, $kodeSpatial)
 	{
 		$validated = $request->validate([

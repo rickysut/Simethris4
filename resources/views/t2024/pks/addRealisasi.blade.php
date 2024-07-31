@@ -96,7 +96,7 @@
 									</a>
 								</div>
 								<div id="logKeg-lahan" class="collapse" data-parent="#logKeg" style="">
-									<form action="{{ route('2024.user.commitment.storefoto', ['noIjin' => $ijin, 'spatial' => $data['spatial']->kode_spatial]) }}" enctype="multipart/form-data" method="post">
+									<form action="{{ route('2024.user.commitment.storefoto', ['noIjin' => $ijin, 'spatial' => $data['lokasi']->tcode]) }}" enctype="multipart/form-data" method="post">
 										@csrf
 										<div class="card-body">
 											<div class="row d-flex">
@@ -160,7 +160,7 @@
 									</a>
 								</div>
 								<div id="logKeg-benih" class="collapse" data-parent="#logKeg" style="">
-									<form action="{{ route('2024.user.commitment.storefoto', ['noIjin' => $ijin, 'spatial' => $data['spatial']->kode_spatial]) }}" enctype="multipart/form-data" method="post">
+									<form action="{{ route('2024.user.commitment.storefoto', ['noIjin' => $ijin, 'spatial' => $data['lokasi']->tcode]) }}" enctype="multipart/form-data" method="post">
 										@csrf
 										<div class="card-body">
 											<div class="row d-flex">
@@ -181,6 +181,10 @@
 													<div class="form-group">
 														<label class="form-label" for="benihDate">Tanggal</label>
 														<input class="form-control" id="benihDate" type="date" name="benihDate" value="{{$data['lokasi']->benihDate}}">
+													</div>
+													<div class="form-group">
+														<label class="form-label" for="benihSize">Volume (kg)</label>
+														<input class="form-control" id="benihSize" type="number" step="0,1" name="benihSize" value="{{$data['lokasi']->benihsize}}">
 													</div>
 													<div class="form-group">
 														<label class="form-label" for="benihComment">Keterangan</label>
@@ -223,7 +227,7 @@
 									</a>
 								</div>
 								<div id="logKeg-mulsa" class="collapse" data-parent="#logKeg" style="">
-									<form action="{{ route('2024.user.commitment.storefoto', ['noIjin' => $ijin, 'spatial' => $data['spatial']->kode_spatial]) }}" enctype="multipart/form-data" method="post">
+									<form action="{{ route('2024.user.commitment.storefoto', ['noIjin' => $ijin, 'spatial' => $data['lokasi']->tcode]) }}" enctype="multipart/form-data" method="post">
 										@csrf
 										<div class="card-body">
 											<div class="row d-flex">
@@ -244,6 +248,10 @@
 													<div class="form-group">
 														<label class="form-label" for="mulsaDate">Tanggal</label>
 														<input class="form-control" id="mulsaDate" type="date" name="mulsaDate" value="{{$data['lokasi']->mulsaDate}}">
+													</div>
+													<div class="form-group">
+														<label class="form-label" for="mulsaSize">Jumlah (Roll)</label>
+														<input class="form-control" id="mulsaSize" type="number" name="mulsaSize" value="{{$data['lokasi']->mulsaSize}}">
 													</div>
 													<div class="form-group">
 														<label class="form-label" for="mulsaComment">Keterangan</label>
@@ -286,7 +294,7 @@
 									</a>
 								</div>
 								<div id="logKeg-tanam" class="collapse" data-parent="#logKeg" style="">
-									<form action="{{ route('2024.user.commitment.storefoto', ['noIjin' => $ijin, 'spatial' => $data['spatial']->kode_spatial]) }}" enctype="multipart/form-data" method="post">
+									<form action="{{ route('2024.user.commitment.storefoto', ['noIjin' => $ijin, 'spatial' => $data['lokasi']->tcode]) }}" enctype="multipart/form-data" method="post">
 										@csrf
 										<div class="card-body">
 											<div class="row d-flex">
@@ -353,7 +361,7 @@
 									</a>
 								</div>
 								<div id="logKeg-pupuk-1" class="collapse" data-parent="#logKeg" style="">
-									<form action="{{ route('2024.user.commitment.storefoto', ['noIjin' => $ijin, 'spatial' => $data['spatial']->kode_spatial]) }}" enctype="multipart/form-data" method="post">
+									<form action="{{ route('2024.user.commitment.storefoto', ['noIjin' => $ijin, 'spatial' => $data['lokasi']->tcode]) }}" enctype="multipart/form-data" method="post">
 										@csrf
 										<div class="card-body">
 											<div class="row d-flex">
@@ -374,6 +382,22 @@
 													<div class="form-group">
 														<label class="form-label" for="pupuk1Date">Tanggal</label>
 														<input class="form-control" id="pupuk1Date" type="date" name="pupuk1Date" value="{{$data['lokasi']->pupuk1Date}}">
+													</div>
+													<div class="form-group">
+														<label class="form-label" for="organik1">Pupuk Organik (kg)</label>
+														<input class="form-control" id="organik1" type="number" step="0,1" name="organik1" value="{{$data['lokasi']->organik1}}">
+													</div>
+													<div class="form-group">
+														<label class="form-label" for="npk1">NPK (kg)</label>
+														<input class="form-control" id="npk1" type="number" step="0,1" name="npk1" value="{{$data['lokasi']->npk1}}">
+													</div>
+													<div class="form-group">
+														<label class="form-label" for="dolomit1">Dolomit (kg)</label>
+														<input class="form-control" id="dolomit1" type="number" step="0,1" name="dolomit1" value="{{$data['lokasi']->dolomit1}}">
+													</div>
+													<div class="form-group">
+														<label class="form-label" for="za1">ZA (kg)</label>
+														<input class="form-control" id="za1" type="number" step="0,1" name="za1" value="{{$data['lokasi']->za1}}">
 													</div>
 													<div class="form-group">
 														<label class="form-label" for="pupuk1Comment">Keterangan</label>
@@ -416,7 +440,7 @@
 									</a>
 								</div>
 								<div id="logKeg-pupuk-2" class="collapse" data-parent="#logKeg" style="">
-									<form action="{{ route('2024.user.commitment.storefoto', ['noIjin' => $ijin, 'spatial' => $data['spatial']->kode_spatial]) }}" enctype="multipart/form-data" method="post">
+									<form action="{{ route('2024.user.commitment.storefoto', ['noIjin' => $ijin, 'spatial' => $data['lokasi']->tcode]) }}" enctype="multipart/form-data" method="post">
 										@csrf
 										<div class="card-body">
 											<div class="row d-flex">
@@ -437,6 +461,22 @@
 													<div class="form-group">
 														<label class="form-label" for="pupuk2Date">Tanggal</label>
 														<input class="form-control" id="pupuk2Date" type="date" name="pupuk2Date" value="{{$data['lokasi']->pupuk2Date}}">
+													</div>
+													<div class="form-group">
+														<label class="form-label" for="organik2">Pupuk Organik (kg)</label>
+														<input class="form-control" id="organik2" type="number" step="0,1" name="organik2" value="{{$data['lokasi']->organik2}}">
+													</div>
+													<div class="form-group">
+														<label class="form-label" for="npk2">NPK (kg)</label>
+														<input class="form-control" id="npk2" type="number" step="0,1" name="npk2" value="{{$data['lokasi']->npk2}}">
+													</div>
+													<div class="form-group">
+														<label class="form-label" for="dolomit2">Dolomit (kg)</label>
+														<input class="form-control" id="dolomit2" type="number" step="0.02" name="dolomit2" value="{{$data['lokasi']->dolomit2}}">
+													</div>
+													<div class="form-group">
+														<label class="form-label" for="za2">ZA (kg)</label>
+														<input class="form-control" id="za2" type="number" step="0,1" name="za2" value="{{$data['lokasi']->za2}}">
 													</div>
 													<div class="form-group">
 														<label class="form-label" for="pupuk2Comment">Keterangan</label>
@@ -479,7 +519,7 @@
 									</a>
 								</div>
 								<div id="logKeg-pupuk-3" class="collapse" data-parent="#logKeg" style="">
-									<form action="{{ route('2024.user.commitment.storefoto', ['noIjin' => $ijin, 'spatial' => $data['spatial']->kode_spatial]) }}" enctype="multipart/form-data" method="post">
+									<form action="{{ route('2024.user.commitment.storefoto', ['noIjin' => $ijin, 'spatial' => $data['lokasi']->tcode]) }}" enctype="multipart/form-data" method="post">
 										@csrf
 										<div class="card-body">
 											<div class="row d-flex">
@@ -500,6 +540,22 @@
 													<div class="form-group">
 														<label class="form-label" for="pupuk3Date">Tanggal</label>
 														<input class="form-control" id="pupuk3Date" type="date" name="pupuk3Date" value="{{$data['lokasi']->pupuk3Date}}">
+													</div>
+													<div class="form-group">
+														<label class="form-label" for="organik3">Pupuk Organik (kg)</label>
+														<input class="form-control" id="organik3" type="number" step="0,1" name="organik3" value="{{$data['lokasi']->organik3}}">
+													</div>
+													<div class="form-group">
+														<label class="form-label" for="npk3">NPK (kg)</label>
+														<input class="form-control" id="npk3" type="number" step="0,1" name="npk3" value="{{$data['lokasi']->npk3}}">
+													</div>
+													<div class="form-group">
+														<label class="form-label" for="dolomit3">Dolomit (kg)</label>
+														<input class="form-control" id="dolomit3" type="number" step="0.02" name="dolomit3" value="{{$data['lokasi']->dolomit3}}">
+													</div>
+													<div class="form-group">
+														<label class="form-label" for="za3">ZA (kg)</label>
+														<input class="form-control" id="za3" type="number" step="0,1" name="za3" value="{{$data['lokasi']->za3}}">
 													</div>
 													<div class="form-group">
 														<label class="form-label" for="pupuk3Comment">Keterangan</label>
@@ -542,7 +598,7 @@
 									</a>
 								</div>
 								<div id="logKeg-OPT" class="collapse" data-parent="#logKeg" style="">
-									<form action="{{ route('2024.user.commitment.storefoto', ['noIjin' => $ijin, 'spatial' => $data['spatial']->kode_spatial]) }}" enctype="multipart/form-data" method="post">
+									<form action="{{ route('2024.user.commitment.storefoto', ['noIjin' => $ijin, 'spatial' => $data['lokasi']->tcode]) }}" enctype="multipart/form-data" method="post">
 										@csrf
 										<div class="card-body">
 											<div class="row d-flex">
@@ -605,7 +661,7 @@
 									</a>
 								</div>
 								<div id="logKeg-produksi" class="collapse" data-parent="#logKeg" style="">
-									<form action="{{ route('2024.user.commitment.storefoto', ['noIjin' => $ijin, 'spatial' => $data['spatial']->kode_spatial]) }}" enctype="multipart/form-data" method="post">
+									<form action="{{ route('2024.user.commitment.storefoto', ['noIjin' => $ijin, 'spatial' => $data['lokasi']->tcode]) }}" enctype="multipart/form-data" method="post">
 										@csrf
 										<div class="card-body">
 											<div class="row d-flex">
@@ -672,7 +728,7 @@
 									</a>
 								</div>
 								<div id="logKeg-distribusi" class="collapse" data-parent="#logKeg" style="">
-									<form action="{{ route('2024.user.commitment.storefoto', ['noIjin' => $ijin, 'spatial' => $data['spatial']->kode_spatial]) }}" enctype="multipart/form-data" method="post">
+									<form action="{{ route('2024.user.commitment.storefoto', ['noIjin' => $ijin, 'spatial' => $data['lokasi']->tcode]) }}" enctype="multipart/form-data" method="post">
 										@csrf
 										<div class="card-body">
 											<div class="row d-flex">

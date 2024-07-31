@@ -88,6 +88,14 @@
 									<span class="font-weight-bold" id="jml_titik" name="jml_titik">{{$jmlLokasi}}</span>
 								</div>
 							</div>
+							<div class="form-group col-12">
+								<label class="text-muted" for="jml_titik">Wilayah Kabupaten</label>
+								<div class="input-group">
+									<span class="font-weight-bold" id="jml_titik" name="jml_titik">
+										{{ implode(', ', $kabupaten->pluck('nama_kab')->toArray()) }}
+									</span>
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>

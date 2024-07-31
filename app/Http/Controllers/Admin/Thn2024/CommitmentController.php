@@ -216,7 +216,7 @@ class CommitmentController extends Controller
 				if (Storage::disk('public')->exists($path . '/' . $filename)) {
 					$pks->berkas_pks = $filename;
 				} else {
-					return redirect()->back()->with('error', "Gagal mengunggah berkas. Error: " . $e->getMessage());
+					return redirect()->back()->with('error', "Gagal mengunggah berkas.");
 				}
 			}
 

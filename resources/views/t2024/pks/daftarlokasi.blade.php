@@ -15,7 +15,7 @@
 						Data <span class="fw-300"><i>Informasi</i></span>
 					</h2>
 					<div class="panel-toolbar">
-						<a href="{{route('2024.user.commitment.realisasi', $commitment->id)}}" class="btn btn-info btn-xs">
+						<a href="{{route('2024.user.commitment.realisasi', $ijin)}}" class="btn btn-info btn-xs">
 							<i class="fal fa-undo mr-1"></i>Kembali
 						</a>
 					</div>
@@ -137,7 +137,12 @@
 					{
 						data: 'kode_spatial',
 						render: function (data, type, row) {
-							return data;
+							var origin = row.origin;
+							if (row.origin === 'local'){
+								return data + `<sup class="badge badge-xs badge-danger ml-2">Tambahan</sup> `
+							}else{
+								return data;
+							}
 						}
 					},
 					{
@@ -153,27 +158,31 @@
 					{ data: 'volume_panen'},
 					{ data: 'tgl_panen' },
 					{
-						data: 'kode_spatial',
+						data: 'tcode',
 						render: function(data, type, row) {
-							if (data) {
-								if(data){
-									return `<a href="{{route('2024.user.commitment.addrealisasi', ['noIjin' => ':ijin', 'spatial' => ':spatial'])}}" title="Isi/ubah data realisasi" class="btn btn-outline-primary btn-icon btn-xs" >
-											<i class="fa fa-edit"></i>
-										</a>
-										<a href="" title="Logbook Kegiatan" class="btn btn-outline-info btn-icon btn-xs" >
-											<i class="fal fa-book"></i>
-										</a>
-										`.replace(':ijin', ijin).replace(':spatial', data);
-								}else{
-									return `<a href="" title="isi data tanam" class="btn btn-outline-warning btn-icon btn-xs" >
-										<i class="fa fa-map"></i>
-									</a>`;
-								}
-							} else {
-								return ``;
+							// Base edit button
+							let buttons = `
+								<a href="{{ route('2024.user.commitment.addrealisasi', ['noIjin' => ':ijin', 'spatial' => ':spatial']) }}" title="Isi/ubah data realisasi" class="btn btn-outline-primary btn-icon btn-xs">
+									<i class="fa fa-edit"></i>
+								</a>
+							`.replace(':ijin', ijin).replace(':spatial', data);
+
+							// Add delete button if origin is 'local'
+							if (row.origin === 'local') {
+								buttons += `
+									<form action="{{ route('2024.user.commitment.deleteOriginLocalRealisasi', ['spatial' => ':spatial']) }}" method="POST" style="display:inline;">
+										@csrf
+										@method('DELETE')
+										<button title="hapus data" class="btn btn-danger btn-icon btn-xs" type="button" onclick="confirmDelete(this)">
+											<i class="fal fa-trash"></i>
+										</button>
+									</form>
+								`.replace(':spatial', data);
 							}
+							return buttons;
 						}
-					},
+					}
+
 				],
 				columnDefs: [
 					{
@@ -214,6 +223,15 @@
 				]
 			});
 		});
+		function confirmDelete(button) {
+			// Show confirmation dialog
+			if (confirm('Apakah Anda yakin ingin menghapus data ini?')) {
+				// Find the form related to this button
+				let form = button.closest('form');
+				// Submit the form
+				form.submit();
+			}
+		}
 	</script>
 @endsection
 

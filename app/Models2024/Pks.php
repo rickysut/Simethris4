@@ -44,6 +44,8 @@ class Pks extends Model
 		'kelurahan_id',
 		'status',
 		'note',
+		'verif_by',
+		'verif_at',
 		'berkas_pks',
 		'deleted_at',
 	];

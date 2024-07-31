@@ -15,8 +15,8 @@ return new class extends Migration
 	{
 		Schema::create('t2024_avtanams', function (Blueprint $table) {
 			$table->bigIncrements('id');
+			$table->string('tcode')->nullable();
 			$table->string('npwp');
-			$table->unsignedBigInteger('commitment_id');
 			$table->string('no_ijin');
 			$table->string('status')->nullable(); //
 			$table->text('note')->nullable();

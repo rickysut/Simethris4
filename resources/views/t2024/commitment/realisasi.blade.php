@@ -546,8 +546,7 @@
 @parent
 
 <script>
-	$(document).ready(function()
-	{
+	$(document).ready(function() {
 		$("#selectPoktan").select2({
 			placeholder: "-- pilih poktan"
 		});
@@ -827,30 +826,27 @@
 				}
 			}
 		}
-	});
 
-	//validasi ukuran berkas
-	$(document).ready(function() {
 		$('.size-validation').on('change', function() {
-        var file = this.files[0];
-        if (file) {
-            var fileSize = file.size / 1024 / 1024; // in MB
-            if (fileSize > 2) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Ukuran Berkas',
-                    text: 'Ukuran yang diijinkan tidak melebihi 2MB',
-                });
-                // Clear the input field
-                $(this).val('');
-                // Reset the label
-                $(this).next('.custom-file-label').text('Pilih berkas...');
-            } else {
-                // Update the label with the file name
-                $(this).next('.custom-file-label').text(file.name);
-            }
-        }
-    });
+			var file = this.files[0];
+			if (file) {
+				var fileSize = file.size / 1024 / 1024; // in MB
+				if (fileSize > 2) {
+					Swal.fire({
+						icon: 'error',
+						title: 'Ukuran Berkas',
+						text: 'Ukuran yang diijinkan tidak melebihi 2MB',
+					});
+					// Clear the input field
+					$(this).val('');
+					// Reset the label
+					$(this).next('.custom-file-label').text('Pilih berkas...');
+				} else {
+					// Update the label with the file name
+					$(this).next('.custom-file-label').text(file.name);
+				}
+			}
+		});
 	});
 </script>
 @endsection

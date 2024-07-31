@@ -38,10 +38,14 @@ class PullRiphController extends Controller
 		$npwp_company = (Auth::user()::find(Auth::user()->id)->data_user->npwp_company ?? null);
 		$noIjins = PullRiph::where('npwp', $npwp_company)->select('no_ijin')->get();
 		// Cari ajutanam yang memiliki nomor ijin dari $noIjins
-		$ajutanam = AjuVerifTanam::whereIn('no_ijin', $noIjins)->get();
+		$ajutanam = AjuVerifTanam::whereIn('no_ijin', $noIjins)
+			->whereNotIn('status', [0, 7])
+			->get();
 
 		// Cari ajuproduksi dengan nomor ijin dari $noIjins
-		$ajuproduksi = AjuVerifProduksi::whereIn('no_ijin', $noIjins)->get();
+		$ajuproduksi = AjuVerifProduksi::whereIn('no_ijin', $noIjins)
+			->whereNotIn('status', [0, 7])
+			->get();
 
 		// Cari skl dengan nomor ijin dari $noIjins
 		$ajuskl = AjuVerifSkl::whereIn('no_ijin', $noIjins)->get();
@@ -49,6 +53,18 @@ class PullRiphController extends Controller
 		// Cari completed dengan nomor ijin dari $noIjins
 		$completed = Completed::whereIn('no_ijin', $noIjins)->get();
 		return view('t2024.pullriph.index', compact('module_name', 'page_title', 'page_heading', 'heading_class', 'npwp_company', 'noIjins', 'ajutanam', 'ajuproduksi', 'ajuskl', 'completed'));
+	}
+
+	public function checkYear(Request $request)
+	{
+		$nomor = $request->input('nomor');
+		$year = substr($nomor, -4);
+
+		if (is_numeric($year) && (int)$year < 2023) {
+			return response()->json(['success' => false, 'message' => 'Periode RIPH Anda tidak dapat digunakan pada simethris versi ini']);
+		}
+
+		return response()->json(['success' => true]);
 	}
 
 	public function pull(Request $request)
@@ -82,7 +98,6 @@ class PullRiphController extends Controller
 
 		return $res;
 	}
-
 
 	//ini yang asli
 	// public function store(Request $request)
@@ -301,11 +316,11 @@ class PullRiphController extends Controller
 				$recordsToAdd = array_diff($newLokasiRecords, $existingLokasiRecords);
 
 				if (!empty($recordsToDelete)) {
-					Lokasi::where('npwp', $stnpwp)->where('no_ijin', $noijin)->whereIn('kode_spatial', $recordsToDelete)->delete();
+					Lokasi::where('origin', 'foreign')->where('npwp', $stnpwp)->where('no_ijin', $noijin)->whereIn('kode_spatial', $recordsToDelete)->delete();
 				}
 
 				if (!empty($recordsToReactivate)) {
-					Lokasi::withTrashed()->where('npwp', $stnpwp)->where('no_ijin', $noijin)->whereIn('kode_spatial', $recordsToReactivate)->restore();
+					Lokasi::withTrashed()->where('origin', 'foreign')->where('npwp', $stnpwp)->where('no_ijin', $noijin)->whereIn('kode_spatial', $recordsToReactivate)->restore();
 				}
 
 				$masterSpatials = MasterSpatial::whereIn('kode_spatial', $newLokasiRecords)->get();
@@ -342,11 +357,18 @@ class PullRiphController extends Controller
 
 				foreach ($newLokasiRecords as $kodeSpatial) {
 					$masterSpatial = $masterSpatials->where('kode_spatial', $kodeSpatial)->first();
+					// \Log::info('Updating or creating:', [
+					// 	'origin' => 1,
+					// 	'npwp' => $stnpwp,
+					// 	'no_ijin' => $noijin,
+					// 	'kode_spatial' => $kodeSpatial,
+					// ]);
 					Lokasi::updateOrCreate(
 						[
 							'npwp' => $stnpwp,
 							'no_ijin' => $noijin,
 							'kode_spatial' => $kodeSpatial,
+							'origin' => 'foreign',
 						],
 						[
 							'kode_poktan' => $masterSpatial->kode_poktan ?? '',
@@ -368,5 +390,4 @@ class PullRiphController extends Controller
 
 		return redirect()->route('2024.user.commitment.index')->with('success', 'Data saved successfully and can be viewed in the list below.');
 	}
-
 }

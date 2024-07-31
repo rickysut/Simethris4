@@ -118,7 +118,7 @@ class SpatialController extends Controller
 					'kabupaten_id' => $request->input('kabupaten_id'),
 					'kecamatan_id' => $request->input('kecamatan_id'),
 					'kelurahan_id' => $request->input('kelurahan_id'),
-					'status' => 1,
+					'status' => 0,
 					'kml_url' => $filePath,
 					// 'komoditas' => $request->input('komoditas'),
 					// 'nama_petugas' => $request->input('nama_petugas'),
@@ -190,7 +190,7 @@ class SpatialController extends Controller
 		]);
 
 		$spatial = MasterSpatial::where('kode_spatial', $kodeSpatial)->first();
-
+		// dd($kodeSpatial);
 		if ($spatial) {
 			$spatial->status = $validated['status'];
 			$spatial->save();

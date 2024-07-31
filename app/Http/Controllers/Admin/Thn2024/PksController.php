@@ -137,7 +137,7 @@ class PksController extends Controller
 			->where('no_ijin', $noIjin)
 			->first();
 
-		$dataRealisasi = Lokasi::select('id', 'no_ijin', 'kode_poktan', 'luas_tanam', 'volume')
+		$dataRealisasi = Lokasi::select('id', 'tcode','no_ijin', 'kode_poktan', 'luas_tanam', 'volume')
 			->where('no_ijin', $noIjin)
 			->where('kode_poktan', $poktanId)
 			->get();
@@ -175,10 +175,9 @@ class PksController extends Controller
 		$mapkey = ForeignApi::find(1);
 		$npwpCompany = Auth::user()->data_user->npwp_company;
 		$npwp = preg_replace('/[^0-9]/', '', $npwpCompany);
-		$lokasi = Lokasi::where('no_ijin', $noIjin)->where('kode_spatial', $spatial)->first();
-		// dd($spatial);
+		$lokasi = Lokasi::where('no_ijin', $noIjin)->where('tcode', $spatial)->first();
 		$pks = Pks::where('kode_poktan', $lokasi->kode_poktan)->where('no_ijin', $noIjin)->first();
-		$spatial = MasterSpatial::select('id', 'kode_spatial', 'nama_petani', 'latitude', 'longitude', 'polygon', 'altitude', 'luas_lahan', 'kabupaten_id', 'ktp_petani')->where('kode_spatial', $spatial)
+		$spatial = MasterSpatial::select('id', 'kode_spatial', 'nama_petani', 'latitude', 'longitude', 'polygon', 'altitude', 'luas_lahan', 'kabupaten_id', 'ktp_petani')->where('kode_spatial', $lokasi->kode_spatial)
 			->first();
 
 		$kabupatens = MasterKabupaten::select('kabupaten_id', 'nama_kab')->get();
@@ -201,6 +200,7 @@ class PksController extends Controller
 			'ijin' => $ijin,
 		];
 		// dd($data);
+		// return response()->json($data);
 		return view('t2024.pks.addRealisasi', compact('module_name', 'page_title', 'page_heading', 'heading_class', 'data', 'mapkey', 'kabupatens', 'ijin', 'lokasi'));
 	}
 
@@ -216,7 +216,7 @@ class PksController extends Controller
 
 		// Cari lokasi berdasarkan no_ijin dan kode_spatial
 		$lokasi = Lokasi::where('no_ijin', $noIjinFormatted)
-			->where('kode_spatial', $spatial)
+			->where('tcode', $spatial)
 			->first();
 
 		if (!$lokasi) {
@@ -312,7 +312,7 @@ class PksController extends Controller
 			$lokasi = Lokasi::updateOrCreate(
 				[
 					'no_ijin' => $noIjin,
-					'kode_spatial' => $spatial,
+					'tcode' => $spatial,
 				],
 				array_filter([
 					'tgl_tanam' => $request->input('tanamDate'),
@@ -323,18 +323,32 @@ class PksController extends Controller
 					'lahancomment' => $request->input('lahancomment'),
 
 					'benihDate' => $request->input('benihDate'),
+					'benihSize' => $request->input('benihSize'),
 					'benihComment' => $request->input('benihComment'),
 
 					'mulsaDate' => $request->input('mulsaDate'),
+					'mulsaSize' => $request->input('mulsaSize'),
 					'mulsaComment' => $request->input('mulsaComment'),
 
 					'pupuk1Date' => $request->input('pupuk1Date'),
+					'organik1' => $request->input('organik1'),
+					'npk1' => $request->input('npk1'),
+					'dolomit1' => $request->input('dolomit1'),
+					'za1' => $request->input('za1'),
 					'pupuk1Comment' => $request->input('pupuk1Comment'),
 
 					'pupuk2Date' => $request->input('pupuk2Date'),
+					'organik2' => $request->input('organik2'),
+					'npk2' => $request->input('npk2'),
+					'dolomit2' => $request->input('dolomit2'),
+					'za2' => $request->input('za2'),
 					'pupuk2Comment' => $request->input('pupuk2Comment'),
 
 					'pupuk3Date' => $request->input('pupuk3Date'),
+					'organik3' => $request->input('organik3'),
+					'npk3' => $request->input('npk3'),
+					'dolomit3' => $request->input('dolomit3'),
+					'za3' => $request->input('za3'),
 					'pupuk3Comment' => $request->input('pupuk3Comment'),
 
 					'optDate' => $request->input('optDate'),
@@ -363,6 +377,24 @@ class PksController extends Controller
 		}
 	}
 
+	public function deleteOriginLocalRealisasi(Request $request, $spatial)
+	{
+
+		try {
+			// Perform the soft delete
+			$deletedRows = Lokasi::where('tcode', $spatial)
+				->where('origin', 'local')
+				->delete();
+
+			if ($deletedRows) {
+				return redirect()->back()->with('success', 'Data berhasil dihapus.');
+			} else {
+				return redirect()->back()->with('error', 'Tidak ada data yang dihapus.');
+			}
+		} catch (\Exception $e) {
+			return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+		}
+	}
 
 	// public function storerealisasi(Request $request, $noIjin, $spatial)
 	// {
