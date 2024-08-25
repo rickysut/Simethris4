@@ -336,8 +336,7 @@
 						}
 
 						const arraysToCheck = [
-							{ data: <?php echo json_encode($ajutanam); ?>, message: "dalam proses Verifikasi Tanam" },
-							{ data: <?php echo json_encode($ajuproduksi); ?>, message: "dalam proses Verifikasi Produksi" },
+							{ data: <?php echo json_encode($pengajuan); ?>, message: "dalam proses Verifikasi" },
 							{ data: <?php echo json_encode($ajuskl); ?>, message: "dalam proses Pengajuan SKL" },
 							{ data: <?php echo json_encode($completed); ?>, message: "telah berstatus Lunas" }
 						];

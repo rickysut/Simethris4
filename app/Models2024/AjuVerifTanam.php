@@ -28,6 +28,7 @@ class AjuVerifTanam extends Model
 
 		'check_by',
 		'verif_at',
+		'report_url',
 		'metode',
 	];
 
@@ -93,6 +94,6 @@ class AjuVerifTanam extends Model
 
 	public function assignments()
 	{
-		return $this->hasMany(AssignmentTanam::class, 'pengajuan_id');
+		return $this->hasMany(AssignmentVerifikasi::class, 'pengajuan_id');
 	}
 }

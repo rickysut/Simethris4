@@ -204,7 +204,7 @@
 							data-filter-tags="daftar skl terbit">
 							<i class="fal fa-file-certificate c-sidebar-nav-icon"></i>
 							<span class="nav-link-text text-wrap">
-								Daftar SKL Terbits
+								Daftar SKL Terbit
 							</span>
 							@php
 								$newSkl = new \App\Models\SklReads();
@@ -255,37 +255,62 @@
 			{{-- verificator task --}}
 			@can('verificator_task_access')
 				<li class="nav-title" data-i18n="nav.administation">VERIFIKASI</li>
+				@can('administrator_access')
+					<li class="c-sidebar-nav-item {{ request()->is('2024/admin/pengajuan*') ? 'active' : '' }}">
+						<a href="{{ route('2024.admin.pengajuan.') }}"
+							data-filter-tags="verifikasi tanam">
+							<i class="fal fa-download c-sidebar-nav-icon"></i>
+							<span class="nav-link-text">
+								Pengajuan Verifikasi
+							</span>
+							@php
+								$pengajuan = new \App\Models2024\AjuVerifikasi();
+								$unverified = $pengajuan->NewRequest();
+								$proceed = $pengajuan->inProcess();
+							@endphp
+							<span class="">
+								{{-- untuk 2024 --}}
+								@if ($unverified > 0 || $proceed > 0)
+									<span class="dl-ref {{ $unverified > 0 ? 'bg-danger-500' : 'bg-warning-500' }} hidden-nav-function-minify hidden-nav-function-top">
+										{{ $unverified }}/{{ $proceed }}
+									</span>
+								@endif
+							</span>
+						</a>
+					</li>
+					<li class="c-sidebar-nav-item {{ request()->is('2024/admin/permohonan*') ? 'active' : '' }}">
+						<a href="{{ route('2024.admin.permohonan.skl.index') }}"
+							data-filter-tags="verifikasi produksi">
+							<i class="fal fa-award c-sidebar-nav-icon"></i>
+							<span class="nav-link-text">Pengajuan SKL</span>
+							@php
+								$pengajuan = new \App\Models2024\AjuVerifSkl();
+								$unverified = $pengajuan->NewRequest();
+								$proceed = $pengajuan->inProcess();
+							@endphp
+							@if ($unverified > 0 || $proceed > 0)
+							<span class="dl-ref {{ $unverified > 0 ? 'bg-danger-500' : 'bg-warning-500' }} hidden-nav-function-minify hidden-nav-function-top">
+								{{ $unverified }}/{{ $proceed }}
+							</span>
+							@endif
+						</a>
+					</li>
+					<li class="c-sidebar-nav-item {{ request()->is('2024/admin/skl') ? 'active' : '' }}">
+						<a href="{{ route('2024.admin.skl.index') }}"
+							data-filter-tags="daftar skl terbit">
+							<i class="fal fa-file-certificate c-sidebar-nav-icon"></i>
+							<span class="nav-link-text text-wrap">Daftar SKL Terbit</span>
+							{{-- @php
+								$newSkl = new \App\Models\SklReads();
+								$newSklCount = $newSkl->getNewSklCount();
+							@endphp
+							@if ($newSklCount > 0)
+								<span class="dl-ref bg-danger-500 hidden-nav-function-minify hidden-nav-function-top">{{ $newSklCount }}</span>
+							@endif --}}
+						</a>
+					</li>
+				@endcan
 				@can('online_access')
-					@can('administrator_access')
-						<li class="c-sidebar-nav-item {{ request()->is('2024/admin/pengajuan*') ? 'active' : '' }}">
-							<a href="{{ route('2024.admin.pengajuan.') }}"
-								data-filter-tags="verifikasi tanam">
-								<i class="fal fa-download c-sidebar-nav-icon"></i>
-								<span class="nav-link-text">
-									Pengajuan
-								</span>
-								@php
-									$pengajuan = new \App\Models2024\AjuVerifTanam();
-									$unverified = $pengajuan->NewRequest();
-									$proceed = $pengajuan->proceedVerif();
-								@endphp
-								<span class="">
-									{{-- untuk 2024 --}}
-									@if ($unverified > 0 || $proceed > 0)
-										<span class="dl-ref {{ $unverified > 0 ? 'bg-danger-500' : 'bg-warning-500' }} hidden-nav-function-minify hidden-nav-function-top">
-											{{ $unverified }}/{{ $proceed }}
-										</span>
-									@endif
-									{{-- @if ($unverified > 0)
-										<span class="dl-ref bg-danger-500 hidden-nav-function-minify hidden-nav-function-top">{{ $unverified }}</span>
-									@endif
-									@if ($proceed > 0)
-										<span class="dl-ref bg-warning-500 hidden-nav-function-minify hidden-nav-function-top">{{ $proceed }}</span>
-									@endif --}}
-								</span>
-							</a>
-						</li>
-					@endcan
 					<li class="c-sidebar-nav-item {{ request()->is('2024/verifikator/tanam*') ? 'active' : '' }}">
 						<a href="{{ route('2024.verifikator.tanam.home') }}"
 							data-filter-tags="verifikasi tanam">
@@ -316,9 +341,8 @@
 					</li>
 				@endcan
 				@can('onfarm_access')
-					<li class="c-sidebar-nav-item {{ request()->is('verification/produksi')
-						|| request()->is('verification/produksi*') ? 'active' : '' }}">
-						<a href="{{ route('verification.produksi') }}"
+					<li class="c-sidebar-nav-item {{ request()->is('2024/verifikator/produksi*') ? 'active' : '' }}">
+						<a href="{{ route('2024.verifikator.produksi.home') }}"
 							data-filter-tags="verifikasi produksi">
 							<i class="fal fa-dolly c-sidebar-nav-icon"></i>
 							<span class="nav-link-text">Verifikasi Produksi</span>
@@ -342,67 +366,12 @@
 						</a>
 					</li>
 				@endcan
-				@can('administrator_access')
-					<li class="c-sidebar-nav-item {{ request()->is('verification/skl')
-						|| request()->is('verification/skl*') ? 'active' : '' }}">
-						<a href="{{ route('verification.skl') }}"
-							data-filter-tags="verifikasi produksi">
-							<i class="fal fa-award c-sidebar-nav-icon"></i>
-							<span class="nav-link-text">Pengajuan SKL</span>
-							@php
-								$pengajuan = new \App\Models\AjuVerifSkl();
-								$unverified = $pengajuan->NewRequest();
-								$proceed = $pengajuan->proceedVerif();
-							@endphp
-							@if ($unverified > 0 || $proceed > 0)
-							<span class="dl-ref {{ $unverified > 0 ? 'bg-danger-500' : 'bg-warning-500' }} hidden-nav-function-minify hidden-nav-function-top">
-								{{ $unverified }}/{{ $proceed }}
-							</span>
-							@endif
-							{{-- @if ($unverified > 0)
-								<span class="dl-ref bg-danger-500 hidden-nav-function-minify hidden-nav-function-top">{{ $unverified }}</span>
-							@endif
-							@if ($proceed > 0)
-								<span class="dl-ref bg-warning-500 hidden-nav-function-minify hidden-nav-function-top">{{ $proceed }}</span>
-							@endif --}}
-						</a>
-					</li>
-					{{-- <li class="c-sidebar-nav-item {{ request()->is('skl/recomended/list') ? 'active' : '' }}">
-						<a href="{{ route('skl.recomended.list') }}"
-							data-filter-tags="daftar rekomendasi skl terbit">
-							<i class="fal fa-file-certificate c-sidebar-nav-icon"></i>
-							<span class="nav-link-text text-wrap">Rekomendasi & SKL</span>
-						@php
-							$pengajuan = new \App\Models\Skl();
-							$newApproved = $pengajuan->newApprovedCount();
-						@endphp
-
-						@if ($newApproved > 0)
-							<span class="dl-ref bg-danger-500 hidden-nav-function-minify hidden-nav-function-top">{{ $newApproved }}</span>
-						@endif
-						</a>
-					</li> --}}
-					<li class="c-sidebar-nav-item {{ request()->is('skl/arsip') ? 'active' : '' }}">
-						<a href="{{ route('skl.arsip') }}"
-							data-filter-tags="daftar skl terbit">
-							<i class="fal fa-file-certificate c-sidebar-nav-icon"></i>
-							<span class="nav-link-text text-wrap">Daftar SKL Terbit</span>
-							{{-- @php
-								$newSkl = new \App\Models\SklReads();
-								$newSklCount = $newSkl->getNewSklCount();
-							@endphp
-							@if ($newSklCount > 0)
-								<span class="dl-ref bg-danger-500 hidden-nav-function-minify hidden-nav-function-top">{{ $newSklCount }}</span>
-							@endif --}}
-						</a>
-					</li>
-				@endcan
 			@endcan
 			{{-- direktur task --}}
 			@if (Auth::user()->roles[0]->title == 'Pejabat')
 				<li class="nav-title" data-i18n="nav.administation">Menu</li>
-				<li class="c-sidebar-nav-item {{ request()->is('verification/skl/recomendation*') ? 'active' : '' }}">
-					<a href="{{ route('verification.skl.recomendations') }}"
+				<li class="c-sidebar-nav-item {{ request()->is('2024/pejabat/skl/rekomendasi*') ? 'active' : '' }}">
+					<a href="{{ route('2024.pejabat.skl.rekomendasi.index') }}"
 						data-filter-tags="daftar rekomendasi penerbitan skl"
 						title="Daftar Rekomendasi Penerbitan SKL">
 						<i class="fa-fw fal fa-file-signature c-sidebar-nav-icon"></i>

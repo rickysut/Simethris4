@@ -6,7 +6,7 @@
 			<i class="bi bi-ui-checks-grid text-secondary display-4 me-3"></i>
 			<div class="logo-text">
 				<h2 class="mb-0 fw-bold">RINGKASAN HASIL</h2>
-				<p class="mb-0 text-muted">Pelaksanaan Verifikasi Realisasi Wajib Tanam Bawang Putih.</p>
+				<p class="mb-0 text-muted">Pelaksanaan Verifikasi Realisasi Wajib {{$payload['ajuTanam']->kind}} Bawang Putih.</p>
 			</div>
 		</div>
 

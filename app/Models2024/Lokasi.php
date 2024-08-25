@@ -99,6 +99,8 @@ class Lokasi extends Model
 		'prodStatus',
 		'distStatus',
 		'deleted_at',
+		'verif_t_At',
+		'verif_p_At',
 
 		// 'tgl_akhir_panen',
 		// 'tgl_akhir_tanam',

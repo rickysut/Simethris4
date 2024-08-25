@@ -336,8 +336,9 @@
 					</a>
 					{{-- Form pengajuan --}}
 					{{-- pengajuan tanam --}}
-					<form action="{{route('2024.user.commitment.formavp.submitPengajuan', $ijin)}}" method="post">
+					<form action="{{route('2024.user.commitment.submitPengajuan', $ijin)}}" method="post">
 						@csrf
+						<input type="hidden" value="PRODUKSI" id="kind" name="kind">
 						<button type="submit" class="btn btn-xs btn-warning" data-toggle="tooltip" title data-original-title="Ajukan Verifikasi Tanam" id="btnSubmit">
 							<i class="fal fa-upload mr-1"></i>
 							Ajukan
@@ -382,6 +383,13 @@
 			var noIjin = '{{$ijin}}';
 			var formattedNoIjin = noIjin.replace(/[\/.]/g, '');
 
+			function checkTanamFileKind(tanamFiles, kind) {
+				return tanamFiles.some(file => file.kind === kind && file.berkas === 'Ada');
+			}
+			function checkProdFileKind(prodFiles, kind) {
+				return prodFiles.some(file => file.kind === kind && file.berkas === 'Ada');
+			}
+
 			$.ajax({
 				url: "{{ route('2024.datafeeder.getDataPengajuan', [':noIjin']) }}".replace(':noIjin', formattedNoIjin),
 				type: "GET",
@@ -392,8 +400,12 @@
 					$('#periode').text(data.periode);
 
 					//Ringkasan Realisasi dan Kewajiban
+
 					$('#wajibTanam').text(data.wajibTanam + ' ha');
 					$('#wajibProduksi').text(data.wajibProduksi + ' ton');
+
+					var avtStatus = data.avtStatus;
+					var avpStatus = data.avpStatus;
 
 					var luasTanam = data.realisasiTanam + ' / ' + data.wajibTanam + ' ha';
 					if (data.realisasiTanam == '0' || data.realisasiTanam == null || data.realisasiTanam == undefined){
@@ -432,29 +444,33 @@
 
 					//Kelengkapan Berkas
 					//A. Berkas-berkas Tanam
-					$('#spvt').html(data.spvt ? '<span class="text-success">Ada</i></span>' : '<span class="text-danger">Tidak Ada</span>');
+					const tanamFiles = data.tanamFiles;
+					$('#spvt').html(checkTanamFileKind(tanamFiles, 'spvt') ? '<span class="text-success">Ada</i></span>' : '<span class="text-danger">Tidak Ada</span>');
 
-					$('#sptjmtanam').html(data.sptjmtanam ? '<span class="text-success">Ada</span>' : '<span class="text-danger">Tidak Ada</span>');
+					$('#sptjmtanam').html(checkTanamFileKind(tanamFiles, 'sptjmtanam') ? '<span class="text-success">Ada</span>' : '<span class="text-danger">Tidak Ada</span>');
 
-					$('#rta').html(data.rta ? '<span class="text-success">Ada</span>' : '<span class="text-danger">Tidak Ada</span>');
+					$('#rta').html(checkTanamFileKind(tanamFiles, 'rta') ? '<span class="text-success">Ada</span>' : '<span class="text-danger">Tidak Ada</span>');
 
-					$('#sphsbstanam').html(data.sphtanam ? '<span class="text-success">Ada</span>' : '<span class="text-danger">Tidak Ada</span>');
+					$('#sphsbstanam').html(checkTanamFileKind(tanamFiles, 'sphtanam') ? '<span class="text-success">Ada</span>' : '<span class="text-danger">Tidak Ada</span>');
 
-					$('#logTanam').html(data.logbooktanam ? '<span class="text-success">Ada</span>' : '<span class="text-danger">Tidak Ada</span>');
+					$('#logTanam').html(checkTanamFileKind(tanamFiles, 'logbook') ? '<span class="text-success">Ada</span>' : '<span class="text-danger">Tidak Ada</span>');
 
 
-					//B. Berkas-berkas Produksi
-					$('#spvp').html(data.spvp ? '<span class="text-success">Ada</span>' : '<span class="text-danger">Tidak Ada</span>');
 
-					$('#sptjmProduksi').html(data.sptjmproduksi ? '<span class="text-success">Ada</span>' : '<span class="text-danger">Tidak Ada</span>');
+					//B. Berkas-berkas Produksi checkProdFileKind
+					const prodFiles = data.prodFiles;
 
-					$('#rpo').html(data.rpo ? '<span class="text-success">Ada</span>' : '<span class="text-danger">Tidak Ada</span>');
+					$('#spvp').html(checkProdFileKind(prodFiles, 'spvp') ? '<span class="text-success">Ada</span>' : '<span class="text-danger">Tidak Ada</span>');
 
-					$('#sphProduksi').html(data.sphproduksi ? '<span class="text-success">Ada</span>' : '<span class="text-danger">Tidak Ada</span>');
+					$('#sptjmProduksi').html(checkProdFileKind(prodFiles, 'sptjmproduksi') ? '<span class="text-success">Ada</span>' : '<span class="text-danger">Tidak Ada</span>');
 
-					$('#logProduksi').html(data.logbookproduksi ? '<span class="text-success">Ada</span>' : '<span class="text-danger">Tidak Ada</span>');
+					$('#rpo').html(checkProdFileKind(prodFiles, 'rpo') ? '<span class="text-success">Ada</span>' : '<span class="text-danger">Tidak Ada</span>');
 
-					$('#formLa').html(data.formLa ? '<span class="text-success">Ada</span>' : '<span class="text-danger">Tidak Ada</span>');
+					$('#sphProduksi').html(checkProdFileKind(prodFiles, 'sphproduksi') ? '<span class="text-success">Ada</span>' : '<span class="text-danger">Tidak Ada</span>');
+
+					$('#logProduksi').html(checkProdFileKind(tanamFiles, 'logbook') ? '<span class="text-success">Ada</span>' : '<span class="text-danger">Tidak Ada</span>');
+
+					$('#formLa').html(checkProdFileKind(prodFiles, 'formLa') ? '<span class="text-success">Ada</span>' : '<span class="text-danger">Tidak Ada</span>');
 
 
 					var options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
@@ -478,17 +494,46 @@
 						$('#avtNote p').text('Tidak ada catatan.');
 					}
 
-					if (data.avtStatus == '1') {
-                    	$('#avtStatus').html('<span class="text-primary">Verifikasi sudah diajukan. </span> <i class="fas fa-check text-primary ml-1"></i>');
-					} else if (data.avtStatus == '2' || data.avtStatus == '3') {
-						$('#avtStatus').html('<span class="text-warning">Dalam proses pemeriksaan/verifikasi oleh Petugas. </span> <i class="fas fa-clock text-warning ml-1"></i>');
-					} else if (data.avtStatus == '4') {
-						$('#avtStatus').html('<span class="text-success">Pemeriksaan/Verifikasi telah Selesai. </span> <i class="fas fa-check ml-1"></i>');
-					} else if (data.avtStatus == '5') {
-						$('#avtStatus').html('<span class="text-danger">Laporan Realisasi harus diperbaiki (lihat catatan verifikasi). </span> <i class="fas fa-exclamation-circle ml-1"></i>');
-					} else {
-						$('#avtStatus').text('Belum/Tidak ada pengajuan.');
-					}
+					let statusMessage = '';
+					let iconClass = '';
+					let iconColorClass = '';
+
+					switch(avtStatus) {
+						case '0':
+							statusMessage = 'Verifikasi sudah diajukan.';
+							iconClass = 'fas fa-download';
+							iconColorClass = 'text-primary';
+							break;
+						case '1':
+							statusMessage = 'Penetapan Verifikator.';
+							iconClass = 'fas fa-clock';
+							iconColorClass = 'text-primary';
+							break;
+						case '2':
+						case '3':
+						case '4':
+						case '5':
+							statusMessage = 'Dalam proses pemeriksaan/verifikasi oleh Petugas.';
+							iconClass = 'fas fa-clock';
+							iconColorClass = 'text-warning';
+							break;
+						case '6':
+							statusMessage = 'Pemeriksaan/Verifikasi telah Selesai.';
+							iconClass = 'fas fa-check';
+							iconColorClass = 'text-success';
+							break;
+						case '7':
+							statusMessage = 'Laporan Realisasi harus diperbaiki (lihat catatan verifikasi).';
+							iconClass = 'fas fa-exclamation-circle';
+							iconColorClass = 'text-danger';
+							break;
+						default:
+							statusMessage = 'Belum/Tidak ada pengajuan.';
+							$('#avtStatus').text(statusMessage);
+							// return;
+					};
+
+					$('#avtStatus').html(`<span class="${iconColorClass}">${statusMessage} </span> <i class="${iconClass} ${iconColorClass} ml-1"></i>`);
 
 					//B. Verifikasi Produksi
 					var avpDate = data.avpDate ? new Date(data.avpDate) : null;
@@ -508,17 +553,43 @@
 						$('#avpNote p').text('Tidak ada catatan.');
 					}
 
-					if (data.avpStatus == '1') {
-                    	$('#avpStatus').html('<span class="text-primary">Verifikasi sudah diajukan. </span> <i class="fas fa-check text-primary ml-1"></i>');
-					} else if (data.avpStatus == '2' || data.avpStatus == '3') {
-						$('#avpStatus').html('<span class="text-warning">Dalam proses pemeriksaan/verifikasi oleh Petugas. </span> <i class="fas fa-clock text-warning ml-1"></i>');
-					} else if (data.avpStatus == '4') {
-						$('#avpStatus').html('<span class="text-success">Pemeriksaan/Verifikasi telah Selesai. </span> <i class="fas fa-check ml-1"></i>');
-					} else if (data.avpStatus == '5') {
-						$('#avpStatus').html('<span class="text-danger">Laporan Realisasi harus diperbaiki (lihat catatan verifikasi). </span> <i class="fas fa-exclamation-circle ml-1"></i>');
-					} else {
-						$('#avpStatus').text('Belum/Tidak ada pengajuan.');
-					}
+					switch(avpStatus) {
+						case '0':
+							statusMessage = 'Verifikasi sudah diajukan.';
+							iconClass = 'fas fa-download';
+							iconColorClass = 'text-primary';
+							break;
+						case '1':
+							statusMessage = 'Penetapan Verifikator.';
+							iconClass = 'fas fa-check';
+							iconColorClass = 'text-primary';
+							break;
+						case '2':
+						case '3':
+						case '4':
+						case '5':
+							statusMessage = 'Dalam proses pemeriksaan/verifikasi oleh Petugas.';
+							iconClass = 'fas fa-clock';
+							iconColorClass = 'text-warning';
+							break;
+						case '6':
+							statusMessage = 'Pemeriksaan/Verifikasi telah Selesai.';
+							iconClass = 'fas fa-check';
+							iconColorClass = 'text-success';
+							break;
+						case '7':
+							statusMessage = 'Laporan Realisasi harus diperbaiki (lihat catatan verifikasi).';
+							iconClass = 'fas fa-exclamation-circle';
+							iconColorClass = 'text-danger';
+							break;
+						default:
+							statusMessage = 'Belum/Tidak ada pengajuan.';
+							$('#avpStatus').text(statusMessage);
+							// return;
+					};
+
+
+					$('#avpStatus').html(`<span class="${iconColorClass}">${statusMessage} </span> <i class="${iconClass} ${iconColorClass} ml-1"></i>`);
 
 					// $('#btnSubmit').text('Ajukan');
 					// var avpStatus = data.avpStatus;
@@ -669,15 +740,15 @@
 								currentStatus = '-';
 							} else if (data === '1') {
 								currentStatus = 'Pengajuan';
-								htmlClass = 'text-primary';
-							} else if (data === '2' || data === '3') {
+								htmlClass = '';
+							} else if (data === '2' || data === '3' || data === '4' || data === '5' ) {
 								currentStatus = 'Diperiksa';
 								htmlClass = 'text-info';
-							} else if (data === '4') {
-								currentStatus = 'Selesai';
+							} else if (data === '6') {
+								currentStatus = 'Selesai dan Sesuai';
 								htmlClass = 'text-success';
-							} else if (data === '5') {
-								currentStatus = 'Perbaikan';
+							} else if (data === '7') {
+								currentStatus = 'Selesai dan Perbaikan';
 								htmlClass = 'text-danger';
 							} else {
 								currentStatus = '-';

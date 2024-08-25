@@ -3,15 +3,17 @@
 namespace App\Http\Controllers\Admin\Thn2024;
 
 use App\Http\Controllers\Controller;
+use App\Models2024\AjuVerifikasi;
 use App\Models2024\AjuVerifProduksi;
 use App\Models2024\AjuVerifSkl;
 use App\Models2024\AjuVerifTanam;
-use App\Models2024\AssignmentTanam;
+use App\Models2024\AssignmentVerifikasi;
 use App\Models2024\ForeignApi;
 use App\Models2024\Lokasi;
 use App\Models2024\MasterSpatial;
 use App\Models2024\Pks;
 use App\Models2024\PullRiph;
+use App\Models2024\UserFile;
 use App\Models\MasterKabupaten;
 use App\Models\User;
 use App\Models\UserDocs;
@@ -40,172 +42,27 @@ class VerifTanamController extends Controller
 	/**
 	 * PENUGASAN VERIFIKATOR
 	 */
-	public function indexpengajuan()
+
+	public function saveSelectedLocations(Request $request)
 	{
-		abort_if(Gate::denies('permission_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+		// Validasi input
+		$request->validate([
+			// 'selected_location_id' => 'required|string|exists:lokasis,tcode', // Validasi ID lokasi
+			'is_selected' => 'required|boolean' // Validasi status checkbox
+		]);
 
-		//page level
-		$module_name = 'Verifikasi Tanam';
-		$page_title = 'Pengajuan Verifikasi';
-		$page_heading = 'Daftar Pengajuan Verifikasi Tanam';
-		$heading_class = 'fal fa-file-search';
+		// Ambil data dari request
+		$selectedLocationId = $request->input('selected_location_id');
+		$isSelected = $request->input('is_selected');
 
-		$assignees = User::select('id', 'name', 'username')->whereHas('roles', function ($query) {
-			$query->where('id', 3);
-		})->get();
+		// Update status is_selected untuk lokasi dengan tcode yang dipilih
+		Lokasi::where('tcode', $selectedLocationId)
+			->update(['is_selected' => $isSelected]);
 
-		// return response()->json($assignees);
-
-		return view('t2024.commitment.indexAvt', compact('module_name', 'page_title', 'page_heading', 'heading_class', 'assignees'));
+		// Kembalikan respons JSON
+		return response()->json(['message' => 'Location updated successfully']);
 	}
 
-	public function assignment($noIjin, $tcode)
-	{
-		abort_if(Gate::denies('permission_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-
-		$module_name = 'Verifikasi Tanam';
-		$page_title = 'Penugasan Verifikator';
-		$page_heading = 'Penugasan Verifikasi Tanam';
-		$heading_class = 'fal fa-file-check';
-
-		$ijin = $noIjin;
-		$noIjin = substr($noIjin, 0, 4) . '/' .
-			substr($noIjin, 4, 2) . '.' .
-			substr($noIjin, 6, 3) . '/' .
-			substr($noIjin, 9, 1) . '/' .
-			substr($noIjin, 10, 2) . '/' .
-			substr($noIjin, 12, 4);
-
-		$userDocs = UserDocs::where('no_ijin', $noIjin)->first();
-		$npwp = str_replace(['.', '-'], '', $userDocs->npwp);
-		$commitment = PullRiph::select('no_ijin', 'periodetahun', 'tgl_ijin', 'tgl_akhir', 'nama', 'npwp')
-			->with([
-				'datauser:id,npwp_company,logo'
-			])
-			->where('no_ijin', $noIjin)->first();
-		$periodetahun = $commitment->periodetahun;
-		$avt = AjuVerifTanam::select('id', 'tcode', 'created_at')
-			->where('tcode', $tcode)
-			->first();
-
-		$pksCount = Pks::select('id', 'no_ijin')
-			->where('no_ijin', $noIjin)->count();
-
-		$lokasis = Lokasi::where('no_ijin', $noIjin)
-			->select('ktp_petani', 'luas_tanam', 'kode_spatial')
-			->get();
-
-		$kodeSpatials = $lokasis->pluck('kode_spatial')->unique();
-
-		$kabupatenIds = MasterSpatial::whereIn('kode_spatial', $kodeSpatials)
-			->pluck('kabupaten_id')
-			->unique();
-
-		$kabupaten = MasterKabupaten::whereIn('kabupaten_id', $kabupatenIds)
-			->select('kabupaten_id', 'nama_kab')
-			->get();
-
-		$anggotaCount = $lokasis->pluck('ktp_ptani')->unique()->count();
-		$luasTanam = $lokasis->sum('luas_tanam');
-		$jmlLokasi = $lokasis->count();
-
-		$verifikators = AssignmentTanam::select('id', 'tcode', 'user_id', 'pengajuan_id', 'no_sk', 'tgl_sk', 'file')
-			->where('pengajuan_id', $avt->id)
-			->with(['user:id,name'])
-			->get();
-
-		$verifikatorUserIds = $verifikators->pluck('user_id')->toArray();
-
-		$assignees = User::select('id', 'name', 'username')
-			->whereHas('roles', function ($query) {
-				$query->where('id', 3);
-			})
-			->whereNotIn('id', $verifikatorUserIds)
-			->get();
-
-		// return response()->json($kabupaten);
-
-		return view('t2024.commitment.assignment', compact('module_name', 'page_title', 'page_heading', 'heading_class', 'assignees', 'verifikators', 'commitment', 'ijin', 'avt', 'pksCount', 'anggotaCount', 'luasTanam', 'jmlLokasi', 'kabupaten'));
-	}
-
-	//tcode milik ajuveriftanam
-	public function storeAssignment(Request $request, $noIjin, $tcode)
-	{
-		abort_if(Gate::denies('permission_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-
-		try {
-			$noIjin = substr($noIjin, 0, 4) . '/' .
-				substr($noIjin, 4, 2) . '.' .
-				substr($noIjin, 6, 3) . '/' .
-				substr($noIjin, 9, 1) . '/' .
-				substr($noIjin, 10, 2) . '/' .
-				substr($noIjin, 12, 4);
-
-			$commitment = PullRiph::select('no_ijin', 'npwp', 'periodetahun')
-				->where('no_ijin', $noIjin)
-				->firstOrFail();
-
-			$realnpwp = $commitment->npwp;
-			$npwp = str_replace(['.', '-'], '', $realnpwp);
-
-			$avt = AjuVerifTanam::select('id', 'tcode', 'status')->where('tcode', $tcode)->first();
-
-			$request->validate([
-				'user_id' => 'required|exists:users,id',
-				'no_sk' => 'required|string|max:255',
-				'tgl_sk' => 'required|date',
-				'fileSk' => 'required|mimes:pdf|max:2048',
-			]);
-
-			DB::beginTransaction();
-
-			if ($avt->status === null || $avt->status === '') {
-				return redirect()->back()->withErrors(['status' => 'Status pengajuan belum sesuai']);
-			} elseif ($avt->status == 0) {
-				AjuVerifTanam::where('tcode', $tcode)->update(['status' => 1]);
-			}
-
-			$newTcode = time();
-			$assignment = AssignmentTanam::create([
-				'tcode' => $newTcode,
-				'pengajuan_id' => $avt->id,
-				'user_id' => $request->input('user_id'),
-				'no_sk' => $request->input('no_sk'),
-				'tgl_sk' => $request->input('tgl_sk'),
-			]);
-
-			if ($request->hasFile('fileSk')) {
-				$time = time();
-				$fileName = 'SK_' . $newTcode . '_' . $time . '.pdf';
-				$filePath = $request->file('fileSk')->storeAs('uploads/' . $npwp . '/' . $commitment->periodetahun, $fileName, 'public');
-				$assignment->file = $fileName;
-				$assignment->save();
-			}
-
-			DB::commit();
-			return redirect()->back()->with('success', 'Penugasan sudah dibuat dan berkas diunggah.');
-		} catch (\Exception $e) {
-			DB::rollBack();
-			return redirect()->back()->withErrors(['error' => $e->getMessage()]);
-		}
-	}
-
-	public function deleteAssignment($tcode)
-	{
-		try {
-			$assignment = AssignmentTanam::where('tcode', $tcode)->firstOrFail();
-			$assignment->delete();
-
-			return response()->json(['success' => 'Assignment successfully deleted.']);
-		} catch (\Exception $e) {
-			return response()->json(['error' => 'Failed to delete assignment: ' . $e->getMessage()], 500);
-		}
-	}
-
-
-	/**
-	 * ini ketika sudah assignment, muncul di verifikator
-	 */
 	public function index()
 	{
 		abort_if(Gate::denies('online_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
@@ -224,45 +81,35 @@ class VerifTanamController extends Controller
 	 */
 	public function markStatus(Request $request, $noIjin, $tcode, $status)
 	{
-		// Format nomor ijin
-		$noIjin = substr($noIjin, 0, 4) . '/' .
-			substr($noIjin, 4, 2) . '.' .
-			substr($noIjin, 6, 3) . '/' .
-			substr($noIjin, 9, 1) . '/' .
-			substr($noIjin, 10, 2) . '/' .
-			substr($noIjin, 12, 4);
+		$ijinUrl = $noIjin;
+		$noIjin = $this->formatNoIjin($noIjin);
 
-		// Array untuk status text
-		$statusTextArray = [
-			1 => 'Berkas-berkas',
-			2 => 'PKS',
-			3 => 'Timeline',
-			4 => 'Lokasi Tanam',
-			5 => 'Akhir'
+		$statusUrlArray = [
+			1 => '2024.verifikator.tanam.check',
+			2 => '2024.verifikator.tanam.checkpks',
+			3 => '2024.verifikator.tanam.checktimeline',
+			4 => '2024.verifikator.tanam.checkdaftarlokasi',
+			5 => '2024.verifikator.tanam.checkfinal'
 		];
 
-		// Ambil verifikasi berdasarkan tcode
-		$verifikasi = AjuVerifTanam::where('tcode', $tcode)->first();
+		$verifikasi = AjuVerifikasi::where('tcode', $tcode)->first();
 
-		// Set current phase dan next phase
-		$currentPhase = $statusTextArray[$status];
-		$nextPhase = array_key_exists($status + 1, $statusTextArray) ? $statusTextArray[$status + 1] : 'Tidak ada tahap berikutnya';
+		$nextPhaseUrl = array_key_exists($status + 1, $statusUrlArray) ? $statusUrlArray[$status + 1] : null;
 
-		// Validasi status yang diberikan
-		if (!array_key_exists($status, $statusTextArray)) {
-			return redirect()->back()->with('success', 'Tahap Pemeriksaan ' . $currentPhase . ' sudah selesai, lanjutkan ke tahap pemeriksaan ' . $nextPhase . '.');
+		if (!array_key_exists($status, $statusUrlArray)) {
+			return redirect()->route($statusUrlArray[$verifikasi->status], ['noIjin' => $ijinUrl, 'tcode' => $tcode])
+				->with('success', 'Tahap Pemeriksaan sudah selesai, lanjutkan ke tahap pemeriksaan berikutnya.');
 		}
 
-		// Pastikan status yang baru lebih besar atau sama dengan status saat ini
 		if ($status < $verifikasi->status) {
-			return redirect()->back()->with('success', 'Tahap Pemeriksaan ' . $currentPhase . ' sudah selesai, lanjutkan ke tahap pemeriksaan ' . $nextPhase . '.');
+			return redirect()->route($statusUrlArray[$verifikasi->status], ['noIjin' => $ijinUrl, 'tcode' => $tcode])
+				->with('success', 'Tahap Pemeriksaan sudah selesai, lanjutkan ke tahap pemeriksaan berikutnya.');
 		}
 
-		// Update status di database
 		$verifikasi->update(['status' => $status]);
 
-		// Redirect dengan pesan sukses
-		return redirect()->back()->with('success', 'Tahap Pemeriksaan ' . $currentPhase . ' sudah selesai, lanjutkan ke tahap pemeriksaan ' . $nextPhase . '.');
+		return redirect()->route($statusUrlArray[$status], ['noIjin' => $ijinUrl, 'tcode' => $tcode])
+			->with('success', 'Tahap Pemeriksaan sudah selesai, lanjutkan ke tahap pemeriksaan berikutnya.');
 	}
 
 	public function check(Request $request, $noIjin, $tcode)
@@ -277,23 +124,50 @@ class VerifTanamController extends Controller
 
 		$user = Auth::user();
 		$ijin = $noIjin;
-		$noIjin = substr($noIjin, 0, 4) . '/' .
-			substr($noIjin, 4, 2) . '.' .
-			substr($noIjin, 6, 3) . '/' .
-			substr($noIjin, 9, 1) . '/' .
-			substr($noIjin, 10, 2) . '/' .
-			substr($noIjin, 12, 4);
+		$noIjin = $this->formatNoIjin($noIjin);
 
-		$userDocs = UserDocs::where('no_ijin', $noIjin)->first();
-		$npwp = str_replace(['.', '-'], '', $userDocs->npwp);
+		$docs = UserFile::where('no_ijin', $noIjin)->whereIn(
+			'kind',
+			[
+				'sptjmtanam',
+				'spvt',
+				'rta',
+				'sphtanam',
+				'logbook',
+			]
+		)->get();
+
+		$docs->each(function ($doc) {
+			switch ($doc->kind) {
+				case 'sptjmtanam':
+					$doc->form = 'Surat Pertanggungjawaban Mutlak';
+					break;
+				case 'spvt':
+					$doc->form = 'Surat Permohonan Verifikasi Tanam';
+					break;
+				case 'rta':
+					$doc->form = 'Form Realisasi Tanam';
+					break;
+				case 'sphtanam':
+					$doc->form = 'Form SPH-SBS';
+					break;
+				case 'logbook':
+					$doc->form = 'Logbook';
+					break;
+				default:
+					$doc->form = null;
+					break;
+			}
+		});
+
 		$commitment = PullRiph::select('no_ijin', 'periodetahun')->where('no_ijin', $noIjin)->first();
+		$npwp = str_replace(['.', '-'], '', $commitment->npwp);
 		$periodetahun = $commitment->periodetahun;
-		$verifikasi = AjuVerifTanam::where('tcode', $tcode)->first();
-		$mapkey = ForeignApi::find(1);
+		$verifikasi = AjuVerifikasi::where('tcode', $tcode)->first();
 
 		// return response()->json($verifikasi);
 
-		return view('t2024.verifikasi.tanam.check', compact('module_name', 'page_title', 'page_heading', 'heading_class', 'ijin', 'user', 'noIjin', 'userDocs', 'periodetahun', 'npwp', 'mapkey', 'verifikasi', 'tcode'));
+		return view('t2024.verifikasi.tanam.check', compact('module_name', 'page_title', 'page_heading', 'heading_class', 'ijin', 'user', 'noIjin', 'periodetahun', 'npwp', 'verifikasi', 'tcode', 'docs'));
 	}
 
 	/**
@@ -302,7 +176,7 @@ class VerifTanamController extends Controller
 	public function saveCheckBerkas(Request $request, $noIjin)
 	{
 		$user = Auth::user();
-
+		DB::beginTransaction();
 		// Format ulang nomor ijin sesuai kebutuhan
 		$noIjin = substr($noIjin, 0, 4) . '/' .
 			substr($noIjin, 4, 2) . '.' .
@@ -310,47 +184,19 @@ class VerifTanamController extends Controller
 			substr($noIjin, 9, 1) . '/' .
 			substr($noIjin, 10, 2) . '/' .
 			substr($noIjin, 12, 4);
+		try {
 
-		// Daftar nama field yang diperbolehkan untuk diperbarui
-		$allowedFields = [
-			'sptjmtanamcheck',
-			'spvtcheck',
-			'rtacheck',
-			'sphtanamcheck',
-			'spdstcheck',
-			'logbooktanamcheck',
-		];
-
-		// Inisialisasi array untuk menampung data yang akan diupdate
-		$updateData = [];
-
-		// Periksa satu per satu field yang diperbolehkan
-		foreach ($allowedFields as $field) {
-			if ($request->has($field)) {
-				$updateData[$field] = $request->input($field);
-			}
+			UserFile::where('id', $request->input('docId'))->update([
+				'verif_by' => $user->id,
+				'verif_at' => now(),
+				'status' => $request->input('status'),
+			]);
+			DB::commit();
+			return response()->json(['message' => 'Successfully updated']);
+		} catch (\Exception $e) {
+			DB::rollBack();
+			return response()->json(['message' => 'An error occurred while updating ' . $e->getMessage()]);
 		}
-
-		// Pastikan ada setidaknya satu field yang diperbarui
-		if (!empty($updateData)) {
-			$userdocs = UserDocs::where('no_ijin', $noIjin)->first();
-
-			// Update hanya field yang diterima dari permintaan
-			$userdocs->update(array_merge($updateData, [
-				'tanamcheck_by' => $user->id,
-				'tanamverif_at' => now(),
-			]));
-
-			return response()->json([
-				'message' => 'success'
-			], 200);
-		}
-
-		// Mengembalikan respon jika tidak ada field yang ditemukan atau diizinkan untuk diperbarui
-		return response()->json([
-			'message' => 'failed',
-			'error' => 'No valid fields found in request'
-		], 400);
 	}
 
 	public function checkpks(Request $request, $noIjin, $tcode)
@@ -365,23 +211,18 @@ class VerifTanamController extends Controller
 
 		$user = Auth::user();
 		$ijin = $noIjin;
-		$noIjin = substr($noIjin, 0, 4) . '/' .
-			substr($noIjin, 4, 2) . '.' .
-			substr($noIjin, 6, 3) . '/' .
-			substr($noIjin, 9, 1) . '/' .
-			substr($noIjin, 10, 2) . '/' .
-			substr($noIjin, 12, 4);
+		$noIjin = $this->formatNoIjin($noIjin);
 
-		$userDocs = UserDocs::where('no_ijin', $noIjin)->first();
-		$npwp = str_replace(['.', '-'], '', $userDocs->npwp);
+		$userDocs = UserFile::where('no_ijin', $noIjin)->where('kind', 'pks')->get();
+		// $npwp = str_replace(['.', '-'], '', $userDocs->npwp);
 		$commitment = PullRiph::select('no_ijin', 'periodetahun')->where('no_ijin', $noIjin)->first();
 		$periodetahun = $commitment->periodetahun;
-		$verifikasi = AjuVerifTanam::where('tcode', $tcode)->first();
+		$verifikasi = AjuVerifikasi::where('tcode', $tcode)->first();
 		$mapkey = ForeignApi::find(1);
 
 		// return response()->json($verifikasi);
 
-		return view('t2024.verifikasi.tanam.checkpks', compact('module_name', 'page_title', 'page_heading', 'heading_class', 'ijin', 'user', 'noIjin', 'userDocs', 'periodetahun', 'npwp', 'mapkey', 'verifikasi', 'tcode'));
+		return view('t2024.verifikasi.tanam.checkpks', compact('module_name', 'page_title', 'page_heading', 'heading_class', 'ijin', 'user', 'noIjin', 'userDocs', 'periodetahun', 'mapkey', 'verifikasi', 'tcode'));
 	}
 
 	/**
@@ -433,18 +274,13 @@ class VerifTanamController extends Controller
 
 		$user = Auth::user();
 		$ijin = $noIjin;
-		$noIjin = substr($noIjin, 0, 4) . '/' .
-			substr($noIjin, 4, 2) . '.' .
-			substr($noIjin, 6, 3) . '/' .
-			substr($noIjin, 9, 1) . '/' .
-			substr($noIjin, 10, 2) . '/' .
-			substr($noIjin, 12, 4);
+		$noIjin = $this->formatNoIjin($noIjin);
 
 		$userDocs = UserDocs::where('no_ijin', $noIjin)->first();
 		$npwp = str_replace(['.', '-'], '', $userDocs->npwp);
 		$commitment = PullRiph::select('no_ijin', 'periodetahun')->where('no_ijin', $noIjin)->first();
 		$periodetahun = $commitment->periodetahun;
-		$verifikasi = AjuVerifTanam::where('tcode', $tcode)->first();
+		$verifikasi = AjuVerifikasi::where('tcode', $tcode)->first();
 		$mapkey = ForeignApi::find(1);
 
 		// return response()->json($verifikasi);
@@ -464,18 +300,13 @@ class VerifTanamController extends Controller
 
 		$user = Auth::user();
 		$ijin = $noIjin;
-		$noIjin = substr($noIjin, 0, 4) . '/' .
-			substr($noIjin, 4, 2) . '.' .
-			substr($noIjin, 6, 3) . '/' .
-			substr($noIjin, 9, 1) . '/' .
-			substr($noIjin, 10, 2) . '/' .
-			substr($noIjin, 12, 4);
+		$noIjin = $this->formatNoIjin($noIjin);
 
 		$userDocs = UserDocs::where('no_ijin', $noIjin)->first();
 		$npwp = str_replace(['.', '-'], '', $userDocs->npwp);
 		$commitment = PullRiph::select('no_ijin', 'periodetahun')->where('no_ijin', $noIjin)->first();
 		$periodetahun = $commitment->periodetahun;
-		$verifikasi = AjuVerifTanam::where('tcode', $tcode)->first();
+		$verifikasi = AjuVerifikasi::where('tcode', $tcode)->first();
 		$mapkey = ForeignApi::find(1);
 
 		// return response()->json($verifikasi);
@@ -483,17 +314,12 @@ class VerifTanamController extends Controller
 		return view('t2024.verifikasi.tanam.checkdaftarlokasi', compact('module_name', 'page_title', 'page_heading', 'heading_class', 'ijin', 'user', 'noIjin', 'userDocs', 'periodetahun', 'npwp', 'mapkey', 'verifikasi', 'tcode'));
 	}
 
-	public function verifLokasiByIjinBySpatial($noIjin, $verifikasi,$tcode)
+	public function verifLokasiByIjinBySpatial($noIjin, $verifikasi, $tcode)
 	{
 		abort_if(Gate::denies('online_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
 		$ijin = $noIjin;
-		$noIjin = substr($noIjin, 0, 4) . '/' .
-			substr($noIjin, 4, 2) . '.' .
-			substr($noIjin, 6, 3) . '/' .
-			substr($noIjin, 9, 1) . '/' .
-			substr($noIjin, 10, 2) . '/' .
-			substr($noIjin, 12, 4);
+		$noIjin= $this->formatNoIjin($noIjin);
 
 		$module_name = 'Verifikasi Tanam';
 		$page_title = 'Verifikasi Realisasi Tanam';
@@ -513,13 +339,77 @@ class VerifTanamController extends Controller
 			return redirect()->back()->with('Perhatian', 'Data Spatial tidak ditemukan.');
 		}
 
+		$userFiles = UserFile::where('no_ijin', $noIjin)->where('file_code', $tcode)->get();
+		$lahanFoto = $userFiles->where('kind', 'lahanfoto')->first()->file_url ?? null;
+		$mulsaFoto = $userFiles->where('kind', 'mulsaFoto')->first()->file_url ?? null;
+		$benihFoto = $userFiles->where('kind', 'benihFoto')->first()->file_url ?? null;
+		$tanamFoto = $userFiles->where('kind', 'tanamFoto')->first()->file_url ?? null;
+		$pupuk1Foto = $userFiles->where('kind', 'pupuk1Foto')->first()->file_url ?? null;
+		$pupuk2Foto = $userFiles->where('kind', 'pupuk2Foto')->first()->file_url ?? null;
+		$pupuk3Foto = $userFiles->where('kind', 'pupuk3Foto')->first()->file_url ?? null;
+		$optFoto = $userFiles->where('kind', 'optFoto')->first()->file_url ?? null;
+		$prodFoto = $userFiles->where('kind', 'prodFoto')->first()->file_url ?? null;
+
+		$timelineItems = collect([
+			['id' => 1, 'date' => $lokasi->lahandate, 'columnName' => 'lahanStatus', 'title' => 'Pengolahan Lahan', 'comment' => $lokasi->lahancomment, 'status' => $lokasi->lahanStatus, 'foto' => $lahanFoto],
+
+			['id' => 2, 'date' => $lokasi->benihDate, 'columnName' => 'benihStatus', 'title' => 'Persiapan Benih', 'comment' => $lokasi->benihComment, 'value' => 'Jumlah Benih: ' . $lokasi->benihsize . ' kg', 'status' => $lokasi->benihStatus, 'foto' => $benihFoto],
+
+			['id' => 3, 'date' => $lokasi->mulsaDate, 'columnName' => 'mulsaStatus', 'title' => 'Pemasangan Mulsa', 'comment' => $lokasi->mulsaComment, 'value' => 'Jumlah Mulsa: ' . $lokasi->mulsaSize . ' roll', 'status' => $lokasi->mulsaStatus, 'foto' => $mulsaFoto],
+
+			['id' => 4, 'date' => $lokasi->tgl_tanam, 'columnName' => 'tanamStatus', 'title' => 'Penanaman', 'comment' => $lokasi->tanamComment, 'value' => 'Luas Tanam: ' . $lokasi->luas_tanam . ' m2', 'status' => $lokasi->tanamStatus, 'foto' => $tanamFoto],
+
+			['id' => 5, 'date' => $lokasi->pupuk1Date, 'columnName' => 'pupuk1Status', 'title' => 'Pemupukan Pertama', 'comment' => $lokasi->pupuk1Comment, 'value' => 'Pupuk Organik: ' . $lokasi->organik1 . ' kg', 'value2' => 'NPK: ' . $lokasi->npk1 . ' kg', 'value3' => 'Dolomit: ' . $lokasi->dolomit1 . ' kg', 'value4' => 'ZA: ' . $lokasi->za1 . ' kg', 'status' => $lokasi->pupuk1Status, 'foto' => $pupuk1Foto],
+
+			['id' => 6, 'date' => $lokasi->pupuk2Date, 'columnName' => 'pupuk2Status', 'title' => 'Pemupukan Kedua', 'comment' => $lokasi->pupuk2Comment, 'value' => 'Pupuk Organik: ' . $lokasi->organik2 . ' kg', 'value2' => 'NPK: ' . $lokasi->npk2 . ' kg', 'value3' => 'Dolomit: ' . $lokasi->dolomit2 . ' kg', 'value4' => 'ZA: ' . $lokasi->za2 . ' kg', 'status' => $lokasi->pupuk2Status, 'foto' => $pupuk2Foto],
+
+			['id' => 7, 'date' => $lokasi->pupuk3Date, 'columnName' => 'pupuk3Status', 'title' => 'Pemupukan Ketiga', 'comment' => $lokasi->pupuk3Comment, 'value' => 'Pupuk Organik: ' . $lokasi->organik3 . ' kg', 'value2' => 'NPK: ' . $lokasi->npk3 . ' kg', 'value3' => 'Dolomit: ' . $lokasi->dolomit3 . ' kg', 'value4' => 'ZA: ' . $lokasi->za3 . ' kg', 'status' => $lokasi->pupuk3Status, 'foto' => $pupuk3Foto],
+
+			['id' => 8, 'date' => $lokasi->optDate, 'columnName' => 'optStatus', 'title' => 'Pengendalian OPT', 'comment' => $lokasi->optComment, 'status' => $lokasi->optStatus, 'foto' => $optFoto],
+
+			// ['id' => 9, 'date' => $lokasi->tgl_panen, 'columnName' => 'prodStatus', 'title' => 'Produksi/Panen', 'comment' => $lokasi->prodComment, 'value' => 'Jumlah Panen: ' . $lokasi->volume . ' ton', 'status' => $lokasi->prodStatus, 'foto' => $prodFoto],
+
+			// ['id' => 10, 'date' => $lokasi->tgl_panen, 'columnName' => 'distStatus', 'title' => 'Distribusi hasil', 'comment' => $lokasi->distComment, 'value' => 'Disimpan: ' . $lokasi->vol_benih . ' ton', 'value2' => 'Dijual: ' . $lokasi->vol_jual . ' ton', 'status' => $lokasi->distStatus],
+		]);
+
+		$timelineItems = $timelineItems->map(function ($item) {
+			// Format tanggal
+			$item['date'] = $item['date'] ? Carbon::createFromFormat('Y-m-d', $item['date'])->format('d M Y') : null;
+			if (!isset($item['status'])) {
+				$item['status'] = null;
+			}
+			return $item;
+		});
+
+		$sortedTimelineItems = $timelineItems->sort(function ($a, $b) {
+			$dateA = $a['date'] ? Carbon::createFromFormat('d M Y', $a['date']) : null;
+			$dateB = $b['date'] ? Carbon::createFromFormat('d M Y', $b['date']) : null;
+
+			// Jika tanggal sama, urutkan berdasarkan id
+			if ($dateA == $dateB) {
+				return $a['id'] <=> $b['id'];
+			}
+
+			// Jika salah satu tanggal null, tempatkan di akhir
+			if ($dateA === null) {
+				return 1;
+			}
+
+			if ($dateB === null) {
+				return -1;
+			}
+
+			// Urutkan berdasarkan tanggal
+			return $dateA <=> $dateB;
+		});
+
 		$data = [
 			'ijin' => $ijin,
 			'noIjin' => $noIjin,
 			'lokasi' => $lokasi,
 			'pks' => $pks,
 			'spatial' => $spatial,
-			// 'anggota' => $spatial->anggota,
+			'timelineItems' => $timelineItems,
 		];
 		// return response()->json($data);
 		return view('t2024.verifikasi.tanam.checkLokasi', compact('module_name', 'page_title', 'page_heading', 'heading_class', 'data', 'mapkey', 'kabupatens', 'ijin', 'lokasi', 'verifikasi'));
@@ -528,19 +418,13 @@ class VerifTanamController extends Controller
 	public function storePhaseCheck(Request $request, $noIjin, $tcode)
 	{
 		// Format the 'no_ijin' as needed
-		$formattedNoIjin = substr($noIjin, 0, 4) . '/' .
-			substr($noIjin, 4, 2) . '.' .
-			substr($noIjin, 6, 3) . '/' .
-			substr($noIjin, 9, 1) . '/' .
-			substr($noIjin, 10, 2) . '/' .
-			substr($noIjin, 12, 4);
+		$formattedNoIjin= $this->formatNoIjin($noIjin);
 
 		DB::beginTransaction();
 
 		try {
 			$lokasi = Lokasi::where('tcode', $tcode)
 				->first();
-
 			if ($lokasi) {
 				$columnName = $request->input('ColumnName');
 				$columnValue = $request->input('InputField');
@@ -551,33 +435,18 @@ class VerifTanamController extends Controller
 					]);
 
 					DB::commit();
-
-					// return response()->json([
-					// 	'message' => 'Lokasi updated successfully.',
-					// 	'lokasi' => $lokasi
-					// ], 200);
-					return redirect()->back()->with('success', 'Lokasi updated successfully.');
+					return response()->json(['message' => 'Successfully updated']);
 				} else {
 					DB::rollBack();
-					return redirect()->back()->with('error', 'Column name or value missing.');
-					// return response()->json([
-					// 	'message' => 'Column name or value missing.'
-					// ], 400);
+					return response()->json(['message' => 'Column name or value missing.']);
 				}
 			} else {
 				DB::rollBack();
-				return redirect()->back()->with('error', 'Lokasi not found.');
-				// return response()->json([
-				// 	'message' => 'Lokasi not found.'
-				// ], 404);
+				return response()->json(['message' => 'Lokasi not found.']);
 			}
 		} catch (\Exception $e) {
 			DB::rollBack();
-			return redirect()->back()->with('error', 'An error occurred while updating Lokasi: ' . $e->getMessage());
-			// return response()->json([
-			// 	'message' => 'An error occurred while updating Lokasi.',
-			// 	'error' => $e->getMessage()
-			// ], 500);
+			return response()->json(['An error occurred while updating Lokasi: ' . $e->getMessage()]);
 		}
 	}
 
@@ -587,12 +456,7 @@ class VerifTanamController extends Controller
 	public function storelokasicheck(Request $request, $noIjin, $tcode)
 	{
 		// Format the 'no_ijin' as needed
-		$formattedNoIjin = substr($noIjin, 0, 4) . '/' .
-			substr($noIjin, 4, 2) . '.' .
-			substr($noIjin, 6, 3) . '/' .
-			substr($noIjin, 9, 1) . '/' .
-			substr($noIjin, 10, 2) . '/' .
-			substr($noIjin, 12, 4);
+		$formattedNoIjin= $this->formatNoIjin($noIjin);
 
 		DB::beginTransaction();
 
@@ -618,14 +482,20 @@ class VerifTanamController extends Controller
 
 			$hasZeroValue = collect($columns)->contains(fn ($col) => $lokasi->$col == 0);
 			if ($hasZeroValue) {
-				$lokasi->update(['status' => 0]);
+				$lokasi->update([
+					'status' => 0,
+					'verif_t_at' => Carbon::now(),
+				]);
 				DB::commit();
 				return redirect()->back()->with('success', 'Verifikasi di Lahan ini telah selesai. Dan dinyatakan TIDAK SESUAI');
 			}
 
 			$allFieldsOne = collect($columns)->every(fn ($col) => $lokasi->$col == 1);
 			if ($allFieldsOne) {
-				$lokasi->update(['status' => 1]);
+				$lokasi->update([
+					'status' => 1,
+					'verif_t_at' => Carbon::now(),
+				]);
 				DB::commit();
 				return redirect()->back()->with('success', 'Verifikasi di Lahan ini telah selesai. Dan dinyatakan SESUAI');
 			}
@@ -661,7 +531,7 @@ class VerifTanamController extends Controller
 		$npwp = str_replace(['.', '-'], '', $userDocs->npwp);
 		$commitment = PullRiph::select('no_ijin', 'periodetahun')->where('no_ijin', $noIjin)->first();
 		$periodetahun = $commitment->periodetahun;
-		$verifikasi = AjuVerifTanam::where('tcode', $tcode)->first();
+		$verifikasi = AjuVerifikasi::where('tcode', $tcode)->first();
 		$mapkey = ForeignApi::find(1);
 
 		// return response()->json($verifikasi);
@@ -677,7 +547,7 @@ class VerifTanamController extends Controller
 		$user = Auth::user();
 
 		// Find the specific verification record
-		$verifikasi = AjuVerifTanam::where('tcode', $tcode)->firstOrFail();
+		$verifikasi = AjuVerifikasi::where('tcode', $tcode)->firstOrFail();
 		$periodetahun = substr($noIjin, -4);
 		$npwp = $verifikasi->npwp;
 
@@ -687,40 +557,53 @@ class VerifTanamController extends Controller
 		try {
 			DB::beginTransaction();
 
-			$filenameBatanam = $verifikasi->batanam;
-			$filenameNdhprt = $verifikasi->ndhprt;
+			$filenameBatanam = $verifikasi->fileBa;
+			$filenameNdhprt = $verifikasi->fileNdhp;
+			$directory = 'uploads/' . $fileNpwp . '/' . $periodetahun . '/' . $fileNoIjin;
+
+			$pathBaTanam = null;
+			$pathNdhprt = null;
 
 			if ($request->hasFile('batanam')) {
 				$file = $request->file('batanam');
-
 				$request->validate([
 					'batanam' => 'file|mimes:pdf|max:2048',
 				]);
 
-				$filenameBatanam = 'batanam_' . $fileNoIjin . '_' . time() . '.' . $file->extension();
-				$file->storeAs('uploads/' . $fileNpwp . '/' . $periodetahun, $filenameBatanam, 'public');
+				$filenameBatanam = 'baVerifTanam_' . $fileNoIjin . '_' . time() . '.' . $file->extension();
+				$file->storeAs($directory, $filenameBatanam, 'public');
+				$pathBaTanam = $directory . '/' . $filenameBatanam;
 			}
 
 			if ($request->hasFile('ndhprt')) {
 				$file = $request->file('ndhprt');
-
 				$request->validate([
 					'ndhprt' => 'file|mimes:pdf|max:2048',
 				]);
 
 				$filenameNdhprt = 'notdintanam_' . $fileNoIjin . '_' . time() . '.' . $file->extension();
-				$file->storeAs('uploads/' . $fileNpwp . '/' . $periodetahun, $filenameNdhprt, 'public');
+				$file->storeAs($directory, $filenameNdhprt, 'public');
+				$pathNdhprt = $directory . '/' . $filenameNdhprt;
 			}
 
-			$verifikasi->update([
+			$updateData = [
 				'note' => $request->input('note'),
 				'metode' => $request->input('metode'),
 				'status' => $request->input('status'),
 				'check_by' => $user->id,
 				'verif_at' => Carbon::now(),
-				'batanam' => $filenameBatanam, // the filename
-				'ndhprt' => $filenameNdhprt, // the filename
-			]);
+			];
+
+			if ($pathBaTanam) {
+				$updateData['fileBa'] = url($pathBaTanam);
+			}
+
+			if ($pathNdhprt) {
+				$updateData['fileNdhp'] = url($pathNdhprt);
+			}
+
+			$verifikasi->update($updateData);
+
 
 			DB::commit();
 
@@ -793,30 +676,47 @@ class VerifTanamController extends Controller
 		$ijin = $noIjin;
 		$noIjin = $this->formatNoIjin($noIjin);
 		$payload = $this->datareport($ijin, $tcode);
-
+		// return $payload;
 		return view('t2024.verifikasi.tanam.result', compact('module_name', 'page_title', 'page_heading', 'heading_class', 'ijin', 'user', 'noIjin', 'tcode', 'payload'));
 	}
 
 	public function generateReport($noIjin, $tcode)
 	{
-		//menggunakan function datareport
+		// Using the datareport function to get the payload
 		$payload = $this->datareport($noIjin, $tcode);
 
+		// Render the HTML template with payload data
 		$template = view('t2024.verifikasi.tanam.report', ['payload' => $payload])->render();
 
-        // app/public/updloads/ . $payload['npwp'] . '/' . $payload['periode'] . '/' . $noIjin . 'report_avt_' . $tcode . fileextention
-		$pdfPath = storage_path('app/public/uploads/example.pdf');
+		// Prepare the directory and file name
+		$npwp = str_replace(['.', '-'], '', $payload['npwp']);
+		$periode = $payload['periode'];
+		$fileName = 'report_vt_' .  $noIjin . '_' . $tcode . '_' . time() . '.pdf';
+		$directory = 'uploads/' . $npwp . '/' . $periode . '/' . $noIjin;
+		$path = $directory . '/' . $fileName;
 
+		$ajuVerifTanam = AjuVerifikasi::where('tcode', $tcode)
+			->first();
+
+		if ($ajuVerifTanam) {
+			$ajuVerifTanam->update(['report_url' => url($path)]);
+		}
+
+		if (!Storage::disk('public')->exists($directory)) {
+			Storage::disk('public')->makeDirectory($directory);
+		}
+
+		// Generate the PDF and save it
 		Browsershot::html($template)
 			->showBackground()
-			->margins(4, 0, 4, 0)
+			->margins(4, 0, 4, 0,)
 			->format('A4')
-			->save($pdfPath);
+			->save(Storage::disk('public')->path($path));
 
-		return response()->download($pdfPath);
+		return response()->download(Storage::disk('public')->path($path));
 	}
 
-	public function datareport ($noIjin, $tcode)
+	public function datareport($noIjin, $tcode)
 	{
 		$ijin = $noIjin;
 		$noIjin = substr($noIjin, 0, 4) . '/' .
@@ -827,10 +727,9 @@ class VerifTanamController extends Controller
 			substr($noIjin, 12, 4);
 
 		$commitment = PullRiph::where('no_ijin', $noIjin)->first();
-		$verifTanam = AjuVerifTanam::where('tcode', $tcode)->first() ?? new AjuVerifTanam();
-		$verifProduksi = AjuVerifProduksi::where('no_ijin', $noIjin)->latest()->first() ?? new AjuVerifProduksi();
-		$verifSkl = AjuVerifSkl::where('no_ijin', $noIjin)->latest()->first() ?? new AjuVerifSkl();
+		$verifTanam = AjuVerifikasi::where('tcode', $tcode)->first() ?? new AjuVerifikasi();
 		$userDocs = UserDocs::where('no_ijin', $noIjin)->first() ?? new UserDocs();
+		$userFiles = UserFile::where('no_ijin', $noIjin)->whereIn('kind', ['sptjmtanam','spvt','rta','sphtanam','logbook'])->get() ?? new UserFile();
 		$pks = Pks::where('no_ijin', $noIjin)->get() ?? new Pks();
 		$lokasis = Lokasi::where('no_ijin', $noIjin)->get() ?? new Lokasi();
 		$failPks = Pks::where('no_ijin', $noIjin)->where('status', 'Tidak Sesuai')->get() ?? new Pks();
@@ -845,11 +744,14 @@ class VerifTanamController extends Controller
 			$failLokasi = new Lokasi();
 		}
 
+		// Controller: Fetch data including related lokasi
+		$daftarLokasi = Pks::where('no_ijin', $noIjin)->with('lokasi')->get() ?? new Pks();
+
 		$tglIjin = $commitment->tgl_ijin;
 		$tglAkhir = $commitment->tgl_akhir;
 
 		// Now use these dates in your query
-		$failTime = Lokasi::select('id', 'kode_spatial', 'kode_poktan', 'no_ijin', 'tgl_tanam', 'tgl_panen', 'ktp_petani', 'verifAt')
+		$failTime = Lokasi::select('id', 'kode_spatial', 'kode_poktan', 'no_ijin', 'tgl_tanam', 'tgl_panen', 'ktp_petani', 'verif_t_at')
 			->where('no_ijin', $noIjin)
 			->where(function ($query) use ($tglIjin, $tglAkhir) {
 				$query->where(function ($query) use ($tglIjin, $tglAkhir) {
@@ -857,15 +759,15 @@ class VerifTanamController extends Controller
 						->orWhere('tgl_tanam', '<', $tglIjin)
 						->orWhere('tgl_tanam', '>', $tglAkhir);
 				})
-				->orWhere(function ($query) use ($tglIjin, $tglAkhir) {
-					$query->whereNull('tgl_panen')
-						->orWhere('tgl_panen', '<', $tglIjin)
-						->orWhere('tgl_panen', '>', $tglAkhir);
-				});
+					->orWhere(function ($query) use ($tglIjin, $tglAkhir) {
+						$query->whereNull('tgl_panen')
+							->orWhere('tgl_panen', '<', $tglIjin)
+							->orWhere('tgl_panen', '>', $tglAkhir);
+					});
 			})
 			->get();
 
-			// dd($failTime);
+		// dd($failLokasi);
 
 		$payload = [
 			'company' => $commitment->datauser->company_name,
@@ -880,35 +782,16 @@ class VerifTanamController extends Controller
 			'avtMetode' => $verifTanam->metode,
 			'avtNote' => $verifTanam->note,
 
-			'avpDate' => $verifProduksi->created_at,
-			'avpVerifAt' => $verifProduksi->verif_at,
-			'avpMetode' => $verifProduksi->metode,
-			'avpNote' => $verifProduksi->note,
-			'avpStatus' => $verifProduksi->status,
-
-			'avsklDate' => $verifSkl->created_at,
-			'avsklVerifAt' => $verifSkl->verif_at,
-			'avsklStatus' => $verifSkl->status,
-			'avsklMetode' => $verifSkl->metode,
-			'avsklNote' => $verifSkl->note,
-
-			'avsklRecomendBy' => $verifSkl->recomend_by,
-			'avsklRecomendAt' => $verifSkl->recomend_at,
-			'avsklRecomendNote' => $verifSkl->recomend_note,
-			'avsklApprovedBy' => $verifSkl->approved_by,
-			'avsklApprovedAt' => $verifSkl->approved_at,
-			'avsklPublishedAt' => $verifSkl->published_at,
-
 			'wajibTanam' => $commitment->luas_wajib_tanam,
-			'wajibProduksi' => $commitment->volume_produksi,
 			'realisasiTanam' => $commitment->lokasi->sum('luas_tanam'),
-			'realisasiProduksi' => $commitment->lokasi->sum('volume'),
 			'countAnggota' => $commitment->lokasi->groupBy('ktp_petani')->count(),
 			'countPoktan' => $commitment->lokasi->groupBy('kode_poktan')->count(),
 			'countPks' => $pks->where('berkas_pks', '!=', null)->count(),
 			'countSpatial' => $lokasis->count(),
 			'countTanam' => $lokasis->where('luas_tanam', '!=', null)->count(),
 			'userDocs' => $userDocs,
+			'userFiles' => $userFiles,
+			'daftarLokasi' => $daftarLokasi,
 			'failPks' => $failPks,
 			'failTime' => $failTime,
 			'failLokasi' => $failLokasi,

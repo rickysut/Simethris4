@@ -4,7 +4,7 @@
 @section('content')
 	{{-- @include('partials.breadcrumb') --}}
 	@include('t2024.partials.subheader')
-	@can('online_access')
+	@can('administrator_access')
 	@include('t2024.partials.sysalert')
 		<div class="row">
 			<div class="col-12">
@@ -14,7 +14,8 @@
 							<table id="avtanamTable" class="table table-sm table-bordered table-striped w-100">
 								<thead>
 									<tr>
-										<th>Periode</th>
+										<th hidden></th>
+										<th>Tahap</th>
 										<th>Pelaku Usaha</th>
 										<th>No. RIPH</th>
 										<th>Diajukan pada</th>
@@ -38,7 +39,8 @@
 	@parent
 	<script>
 		$(document).ready(function() {
-		//initialize datatable dataPengajuan
+
+			//initialize datatable dataPengajuan
 			$('#avtanamTable').dataTable({
 				responsive: true,
 				lengthChange: false,
@@ -50,12 +52,13 @@
 					"<'row'<'col-sm-12'tr>>" +
 					"<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
 				ajax: {
-					url: "{{ route('2024.datafeeder.getRequestVerifTanam') }}",
+					url: "{{ route('2024.datafeeder.getRequestVerif') }}",
 					type: "GET",
 					dataSrc: "data"
 				},
 				columns: [
-					{data: 'periode'},
+					{data: 'id', visible: false, searchable: false},
+					{data: 'tableSource'},
 					{data: 'perusahaan'},
 					{data: 'no_ijin'},
 					{data: 'created_at'},
@@ -78,18 +81,29 @@
 							var noIjin = data;
 							var tcode = row.tcode;
 							var status = row.status;
-							var viewStat = '{{ route("2024.admin.pengajuan.assignment", [":noIjin", ":tcode"]) }}'.replace(':noIjin', noIjin).replace(':tcode',tcode);
-								return `
-									<a href='`+ viewStat +`' data-toggle="tooltip" title="Lihat hasil" class="mr-1 btn btn-xs btn-icon btn-info">
-										<i class="fal fa-file-search"></i>
-									</a>
-								`;
+							var tableSource = row.tableSource;
+							var viewStat;
+
+							if (tableSource === 'TANAM') {
+								viewStat = '{{ route("2024.admin.pengajuan.assignment", [":noIjin", ":tcode"]) }}'.replace(':noIjin', noIjin).replace(':tcode', tcode);
+							} else if (tableSource === 'PRODUKSI') {
+								viewStat = '{{ route("2024.admin.pengajuan.assignment", [":noIjin", ":tcode"]) }}'.replace(':noIjin', noIjin).replace(':tcode', tcode);
+							} else {
+								viewStat = '#';
+							}
+
+							return `
+								<a href='`+ viewStat +`' data-toggle="tooltip" title="Lihat hasil" class="mr-1 btn btn-xs btn-icon btn-info">
+									<i class="fal fa-file-search"></i>
+								</a>
+							`;
 						}
 					},
 				],
+				order: [[0, 'asc']],
 				columnDefs: [
 					{
-						targets: [3, 4], // Indeks untuk kolom tanggal
+						targets: [4], // Indeks untuk kolom tanggal
 						render: function (data, type, row) {
 							if (type === 'display' || type === 'filter') {
 								return data ? moment(data).format('DD-MM-YYYY') : '-';
@@ -98,7 +112,7 @@
 						}
 					},
 					{
-						targets: [0,1,2,3,5],
+						targets: [1,2,3,4,5,6],
 						className: 'text-center'
 					}
 				],

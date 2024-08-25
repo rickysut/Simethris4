@@ -54,4 +54,8 @@ class UserFile extends Model
 	{
 		return $this->belongsTo(PullRiph::class, 'no_ijin', 'no_ijin');
 	}
+	public function pks()
+	{
+		return $this->belongsTo(Pks::class, ['kode_poktan', 'no_ijin'], ['kode_poktan', 'no_ijin']);
+	}
 }

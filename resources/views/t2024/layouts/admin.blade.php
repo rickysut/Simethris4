@@ -253,6 +253,11 @@
 
 
 		});
+
+			$('.required').each(function() {
+				var label = $("label[for='" + $(this).attr('id') + "']");
+				label.append(' <span class="text-danger">*</span>');
+			});
 		</script>
 		@yield('scripts')
 	</body>

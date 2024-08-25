@@ -10,6 +10,7 @@ use App\Models\MasterProvinsi;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Crypt;
 
 class MasterSpatial extends Model
 {
@@ -44,6 +45,18 @@ class MasterSpatial extends Model
 		'kml_url',
 		'status',
 	];
+
+	// // Accessor untuk mendekripsi ktp_petani
+    // public function getKtpPetaniAttribute($value)
+    // {
+    //     return Crypt::decryptString($value);
+    // }
+
+    // // Mutator untuk mengenkripsi ktp_petani
+    // public function setKtpPetaniAttribute($value)
+    // {
+    //     $this->attributes['ktp_petani'] = Crypt::encryptString($value);
+    // }
 
 	public function masterpoktan()
 	{

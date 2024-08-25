@@ -61,291 +61,318 @@
 			</div>
 		</div>
 		<div class="tab-pane fade" id="panel-6" role="tabpanel" aria-labelledby="panel-6">
-			<form action="{{route('2024.user.commitment.storeUserDocs', $ijin)}}" method="post" enctype="multipart/form-data" id="docsUpload">
-					@csrf
-				<div class="row mb-3">
-					<div class="col-12">
-						<div class="panel-tag fade show bg-white border-danger m-0 l-h-m-n">
-							<div class="d-flex align-items-center">
-								<i class="fas fa-exclamation-circle mr-1 text-danger"></i>
-								<div class="flex-1 text-danger">
-									<small><span class="mr-1 fw-700">PERHATIAN!</span>Seluruh Dokumen Tanam & Produksi harus diunggah sebelum <span class="fw-700 text-uppercase">Pengajuan Surat Keterangan Lunas</span> dilakukan.</small>
-								</div>
-								<a href="{{route('2024.user.commitment.index')}}" class="mr-1 btn btn-info btn-xs btn-w-m waves-effect waves-themed">Kembali</a>
-								<!-- Button trigger modal -->
-								<button type="button" class="btn btn-danger btn-xs" data-toggle="modal" data-target="#modelId">
-									Perlu Bantuan ?
-								</button>
+			<div class="row mb-3">
+				<div class="col-12">
+					<div class="panel-tag fade show bg-white border-danger m-0 l-h-m-n">
+						<div class="d-flex align-items-center">
+							<i class="fas fa-exclamation-circle mr-1 text-danger"></i>
+							<div class="flex-1 text-danger">
+								<small><span class="mr-1 fw-700">PERHATIAN!</span>Seluruh Dokumen Tanam & Produksi harus diunggah sebelum <span class="fw-700 text-uppercase">Pengajuan Surat Keterangan Lunas</span> dilakukan.</small>
 							</div>
+							<a href="{{route('2024.user.commitment.index')}}" class="mr-1 btn btn-info btn-xs btn-w-m waves-effect waves-themed">Kembali</a>
+							<!-- Button trigger modal -->
+							<button type="button" class="btn btn-danger btn-xs" data-toggle="modal" data-target="#modelId">
+								Perlu Bantuan ?
+							</button>
 						</div>
 					</div>
 				</div>
-				<div class="card-deck">
-					<div class="card" id="panel-6-a">
-						<div class="panel-hdr">
-							<h2>Dokumen Realisasi Tanam</h2>
-						</div>
-						<div class="card-body">
-							<div class="panel-tag fade show">
-								<div class="d-flex align-items-top">
-									<i class="fal fa-info-circle mr-1"></i>
-									<div class="flex-1">
-										<small>
-											Berkas-berkas yang diperlukan terkait dengan Verifikasi Tanam. Lengkapi dan unggah dokumen berikut sebelum Anda mengajukan Verifikasi Tanam. <br>
-										</small>
-									</div>
-								</div>
-							</div>
-							<div class="form-group row">
-								<label class="col-sm-3 col-form-label" for="sptjmtanam">Form SPTJM (tanam)</label>
-								<div class="col-sm-9">
-									<div class="custom-file input-group">
-										<input type="file" accept=".pdf" class="custom-file-input size-validation" name="sptjmtanam" id="sptjmtanam" value="{{ old('sptjmtanam', optional($docs)->sptjmtanam) }}" data>
-										<label class="custom-file-label" for="sptjmtanam">{{ $docs ? ($docs->sptjmtanam ? $docs->sptjmtanam : 'Pilih berkas...') : 'Pilih berkas...' }}</label>
-									</div>
-									<span class="help-block">
-										@if($docs && $docs->sptjmtanam)
-											<a href="{{ asset('storage/uploads/'.$pathNpwp.'/'.$commitment->periodetahun.'/'.$docs->sptjmtanam) }}" target="_blank">
-												Lihat Dokumen diunggah.
-											</a>
-										@else
-											<span class="text-info"><i class="fa fa-info-circle mr-1"></i>Surat Pertanggungjawaban Mutlak Realisasi Komitmen Wajib Tanam.  Pdf, max 2Mb</span>
-										@endif
-									</span>
-								</div>
-							</div>
-							<div class="form-group row">
-								<label class="col-sm-3 col-form-label" for="rta">Form RTA</label>
-								<div class="col-sm-9">
-									<div class="custom-file input-group">
-										<input type="file" accept=".pdf" class="custom-file-input size-validation" name="rta" id="rta" value="{{ old('rta', optional($docs)->rta) }}">
-										<label class="custom-file-label" for="rta">{{ $docs ? ($docs->rta ? $docs->rta : 'Pilih berkas...') : 'Pilih berkas...' }}</label>
-									</div>
-									<span class="help-block">
-										@if($docs && $docs->rta)
-											<a href="{{ asset('storage/uploads/'.$pathNpwp.'/'.$commitment->periodetahun.'/'.$docs->rta) }}" target="_blank">
-												Lihat Dokumen diunggah.
-											</a>
-										@else
-										<span class="text-info"><i class="fa fa-info-circle mr-1"></i>Form Laporan Realisasi Tanam (Form RTA).  Pdf, max 2Mb.</span>
-										@endif
-									</span>
-								</div>
-							</div>
-							<div class="form-group row">
-								<label class="col-sm-3 col-form-label" for="sphtanam">SPH-SBS Tanam</label>
-								<div class="col-sm-9">
-									<div class="custom-file input-group">
-										<input type="file" accept=".pdf" class="custom-file-input size-validation" name="sphtanam" id="sphtanam" value="{{ old('sphtanam', optional($docs)->sphtanam) }}">
-										<label class="custom-file-label" for="sphtanam">{{ $docs ? ($docs->sphtanam ? $docs->sphtanam : 'Pilih berkas...') : 'Pilih berkas...' }}</label>
-									</div>
-									<span class="help-block">
-										@if($docs && $docs->sphtanam)
-											<a href="{{ asset('storage/uploads/'.$pathNpwp.'/'.$commitment->periodetahun.'/'.$docs->sphtanam) }}" target="_blank">
-												Lihat Dokumen diunggah.
-											</a>
-										@else
-										<span class="text-info"><i class="fa fa-info-circle mr-1"></i>Form SPH-SBS Tanam dari Petugas Data Kecamatan Setempat. Pdf, max 2Mb.</span>
-										@endif
-									</span>
-								</div>
-							</div>
-							<div class="form-group row">
-								<label class="col-sm-3 col-form-label" for="logbooktanam">Logbook Tanam</label>
-								<div class="col-sm-9">
-									<div class="custom-file input-group">
-										<input type="file" accept=".pdf" class="custom-file-input size-validation" name="logbooktanam" id="logbooktanam" value="{{ old('logbooktanam', optional($docs)->logbooktanam) }}">
-										<label class="custom-file-label" for="logbooktanam">{{ $docs ? ($docs->logbooktanam ? $docs->logbooktanam : 'Pilih berkas...') : 'Pilih berkas...' }}</label>
-									</div>
-									<span class="help-block">
-										@if($docs && $docs->logbooktanam)
-											<a href="{{ asset('storage/uploads/'.$pathNpwp.'/'.$commitment->periodetahun.'/'.$docs->logbooktanam) }}" target="_blank">
-												Lihat Dokumen diunggah.
-											</a>
-										@else
-										<span class="text-info"><i class="fa fa-info-circle mr-1"></i>Logbook Tanam. Pdf, max 2Mb.</span>
-										@endif
-									</span>
-								</div>
-							</div><hr>
-							<div class="panel-tag fade show">
-								<div class="d-flex align-items-top">
-									<i class="fal fa-info-circle mr-1"></i>
-									<div class="flex-1">
-										<small>
-											Unggah berkas berikut jika Anda telah mengunggah seluruh berkas di atas dan ingin mengajukan verifikasi tanam. <br>
-										</small>
-									</div>
-								</div>
-							</div>
-							<div class="form-group row">
-								<label class="col-sm-3 col-form-label" for="spvt">Pengajuan Verifikasi Tanam</label>
-								<div class="col-sm-9">
-									<div class="custom-file input-group">
-										<input type="file" accept=".pdf" class="custom-file-input size-validation" name="spvt" id="spvt" value="{{ old('spvt', optional($docs)->spvt) }}">
-										<label class="custom-file-label" for="spvt">{{ $docs ? ($docs->spvt ? $docs->spvt : 'Pilih berkas...') : 'Pilih berkas...' }}</label>
-									</div>
-									<span class="help-block">
-										@if($docs && $docs->spvt)
-											<a href="{{ asset('storage/uploads/'.$pathNpwp.'/'.$commitment->periodetahun.'/'.$docs->spvt) }}" target="_blank">
-												Lihat Dokumen diunggah.
-											</a>
-										@else
-											<span class="text-info"><i class="fa fa-info-circle mr-1"></i>Surat Pengajuan Verifikasi Tanam. Pdf, max 2Mb.</span>
-										@endif
-									</span>
-								</div>
-							</div>
-						</div>
-						<div class="card-footer d-flex">
-							<div class="col-md-6 text-right ml-auto">
-								<button class="btn btn-primary btn-sm waves-effect waves-themed" type="submit">
-									<i class="fal fa-cloud-upload mr-1"></i>Unggah Berkas Tanam
-								</button>
-							</div>
-						</div>
+			</div>
+			<div class="card-deck">
+				<div class="card" id="panel-6-a">
+					<div class="panel-hdr">
+						<h2>Dokumen Realisasi Tanam</h2>
 					</div>
+					<div class="card-body">
+						<div class="panel-tag fade show">
+							<div class="d-flex align-items-top">
+								<i class="fal fa-info-circle mr-1"></i>
+								<div class="flex-1">
+									<small>
+										Berkas-berkas yang diperlukan terkait dengan Verifikasi Tanam. Lengkapi dan unggah dokumen berikut sebelum Anda mengajukan Verifikasi Tanam. <br>
+									</small>
+								</div>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="form-label" for="sptjmtanam">Form SPTJM (tanam)</label>
+							<form action="{{route('2024.user.commitment.storeUserDocs', $ijin)}}" method="post" enctype="multipart/form-data" id="sptjmtanam-form">
+								@csrf
+								<div class="input-group">
+									<div class="custom-file">
+										<input type="file" accept=".pdf" class="custom-file-input size-validation" name="sptjmtanam" id="sptjmtanam-fr" value="{{ old('sptjmtanam', optional($docs->where('kind', 'sptjmtanam')->first())->file_url) }}">
+										<label class="custom-file-label" for="sptjmtanam">{{ optional($docs->where('kind', 'sptjmtanam')->first())->file_code }}</label>
+									</div>
+									<div class="input-group-append">
+										<button class="btn btn-primary waves-effect waves-themed" type="submit">
+											<i class="fal fa-upload"></i>
+											Unggah
+										</button>
+									</div>
+								</div>
+							</form>
+							<span class="help-block">
+								@if($docs && optional($docs->where('kind', 'sptjmtanam')->first())->file_url)
+									<a href="{{ optional($docs->where('kind', 'sptjmtanam')->first())->file_url }}" target="_blank">
+										Lihat Dokumen diunggah.
+									</a>
+								@else
+									<span class="text-info"><i class="fa fa-info-circle mr-1"></i>Surat Pertanggungjawaban Mutlak Realisasi Komitmen Wajib Tanam.  Pdf, max 2Mb</span>
+								@endif
+							</span>
+						</div>
+						<div class="form-group">
+							<label class="form-label" for="rta">Form RTA</label>
+							<form action="{{route('2024.user.commitment.storeUserDocs', $ijin)}}" method="post" enctype="multipart/form-data" id="rta-form">
+								@csrf
+								<div class="input-group">
+									<div class="custom-file">
+										<input type="file" accept=".pdf" class="custom-file-input size-validation" name="rta" id="rta" value="{{ old('rta', optional($docs->where('kind', 'rta')->first())->file_url) }}">
+										<label class="custom-file-label" for="rta">{{ optional($docs->where('kind', 'rta')->first())->file_code }}</label>
+									</div>
+									<div class="input-group-append">
+										<button class="btn btn-primary waves-effect waves-themed" type="submit">
+											<i class="fal fa-upload"></i>
+											Unggah
+										</button>
+									</div>
+								</div>
+							</form>
+							<span class="help-block">
+								@if($docs && optional($docs->where('kind', 'rta')->first())->file_url)
+									<a href="{{ optional($docs->where('kind', 'rta')->first())->file_url }}" target="_blank">
+										Lihat Dokumen diunggah.
+									</a>
+								@else
+									<span class="text-info"><i class="fa fa-info-circle mr-1"></i>Form Laporan Realisasi Tanam (Form RTA).  Pdf, max 2Mb.</span>
+								@endif
+							</span>
+						</div>
+						<div class="form-group">
+							<label class="form-label" for="sphtanam">SPH-SBS Tanam</label>
+							<form action="{{route('2024.user.commitment.storeUserDocs', $ijin)}}" method="post" enctype="multipart/form-data" id="sphtanam-form">
+								@csrf
+								<div class="input-group">
+									<div class="custom-file">
+										<input type="file" accept=".pdf" class="custom-file-input size-validation" name="sphtanam" id="sphtanam" value="{{ old('sphtanam', optional($docs->where('kind', 'sphtanam')->first())->file_url) }}">
+										<label class="custom-file-label" for="sphtanam">{{ optional($docs->where('kind', 'sphtanam')->first())->file_code }}</label>
+									</div>
+									<div class="input-group-append">
+										<button class="btn btn-primary waves-effect waves-themed" type="submit">
+											<i class="fal fa-upload"></i>
+											Unggah
+										</button>
+									</div>
+								</div>
+							</form>
+							<span class="help-block">
+								@if($docs && optional($docs->where('kind', 'sphtanam')->first())->file_url)
+									<a href="{{ optional($docs->where('kind', 'sphtanam')->first())->file_url }}" target="_blank">
+										Lihat Dokumen diunggah.
+									</a>
+								@else
+									<span class="text-info"><i class="fa fa-info-circle mr-1"></i>Form SPH-SBS Tanam dari Petugas Data Kecamatan Setempat. Pdf, max 2Mb.</span>
+								@endif
+							</span>
+						</div>
 
-					<div class="card" id="panel-6-b">
-						<div class="panel-hdr">
-							<h2>Dokumen Realisasi Produksi</h2>
+						<div class="form-group">
+							<label class="form-label" for="logbook">Logbook <span class="text-danger">*</span></label>
+							<div class="input-group">
+								<input type="text" name="logbook" id="logbook" class="form-control" placeholder="autogenerate Logbook" aria-label="Logbook" aria-describedby="logbook" value="{{ $docs && optional($docs->where('kind', 'logbook')->first())->file_url ? 'Available' : '' }}" disabled readonly>
+								<div class="input-group-append">
+									@if($docs && optional($docs->where('kind', 'logbook')->first())->file_url)
+										<a class="btn btn-info" href="{{route('2024.datafeeder.logbookReport', $ijin)}}">
+											Re-Generate Logbook
+										</a>
+									@else
+										<a class="btn btn-warning" href="{{route('2024.datafeeder.logbookReport', $ijin)}}">
+											Autogenerate
+										</a>
+									@endif
+								</div>
+							</div>
+							<span class="help-block">
+								@if($docs && optional($docs->where('kind', 'logbook')->first())->file_url)
+									<a href="{{ optional($docs->where('kind', 'logbook')->first())->file_url }}" target="_blank">
+										Lihat Dokumen diunggah.
+									</a>
+								@else
+									<span class="text-info"><i class="fa fa-info-circle mr-1"></i>Klik Autogenerate untuk membuat Logbook secara otomatis.</span>
+								@endif
+							</span>
 						</div>
-						<div class="card-body">
-							<div class="panel-tag fade show">
-								<div class="d-flex align-items-top">
-									<i class="fal fa-info-circle mr-1"></i>
-									<div class="flex-1">
-										<small>Berkas-berkas yang diperlukan terkait dengan Verifikasi Produksi. Lengkapi dan unggah dokumen berikut sebelum Anda mengajukan Verifikasi Produksi.</small>
-									</div>
-								</div>
-							</div>
-							<div class="form-group row">
-								<label class="col-sm-3 col-form-label" for="sptjmproduksi">Form SPTJM (produksi)</label>
-								<div class="col-sm-9">
-									<div class="custom-file input-group">
-										<input type="file" accept=".pdf" class="custom-file-input size-validation" name="sptjmproduksi" id="sptjmproduksi" value="{{ old('sptjmproduksi', optional($docs)->sptjmproduksi) }}">
-										<label class="custom-file-label" for="sptjmproduksi">{{ $docs ? ($docs->sptjmproduksi ? $docs->sptjmproduksi : 'Pilih berkas...') : 'Pilih berkas...' }}</label>
-									</div>
-									<span class="help-block">
-										@if($docs && $docs->sptjmproduksi)
-											<a href="{{ asset('storage/uploads/'.$pathNpwp.'/'.$commitment->periodetahun.'/'.$docs->sptjmproduksi) }}" target="_blank">
-												Lihat Dokumen diunggah.
-											</a>
-										@else
-											<span class="text-info"><i class="fa fa-info-circle mr-1"></i>Surat Pertanggungjawaban Mutlak Realisasi Komitmen Wajib Prouksi. Pdf, max 2Mb.</span>
-										@endif
-									</span>
-								</div>
-							</div>
-							<div class="form-group row">
-								<label class="col-sm-3 col-form-label" for="rpo">Form RPO</label>
-								<div class="col-sm-9">
-									<div class="custom-file input-group">
-										<input type="file" accept=".pdf" class="custom-file-input size-validation" name="rpo" id="rpo" value="{{ old('rpo', optional($docs)->rpo) }}">
-										<label class="custom-file-label" for="rpo">{{ $docs ? ($docs->rpo ? $docs->rpo : 'Pilih berkas...') : 'Pilih berkas...' }}</label>
-									</div>
-									<span class="help-block">
-										@if($docs && $docs->rpo)
-											<a href="{{ asset('storage/uploads/'.$pathNpwp.'/'.$commitment->periodetahun.'/'.$docs->rpo) }}" target="_blank">
-												Lihat Dokumen diunggah.
-											</a>
-										@else
-										<span class="text-info"><i class="fa fa-info-circle mr-1"></i>Form laporan realisasi produksi (Form RPO). Pdf, max 2Mb.</small>
-										@endif
-									</span>
-								</div>
-							</div>
-							<div class="form-group row">
-								<label class="col-sm-3 col-form-label" for="sphproduksi">SPH-SBS Produksi</label>
-								<div class="col-sm-9">
-									<div class="custom-file input-group">
-										<input type="file" accept=".pdf" class="custom-file-input size-validation" name="sphproduksi" id="sphproduksi" value="{{ old('sphproduksi', optional($docs)->sphproduksi) }}">
-										<label class="custom-file-label" for="sphproduksi">{{ $docs ? ($docs->sphproduksi ? $docs->sphproduksi : 'Pilih berkas...') : 'Pilih berkas...' }}</label>
-									</div>
-									<span class="help-block">
-										@if($docs && $docs->sphproduksi)
-											<a href="{{ asset('storage/uploads/'.$pathNpwp.'/'.$commitment->periodetahun.'/'.$docs->sphproduksi) }}" target="_blank">
-												Lihat Dokumen diunggah.
-											</a>
-										@else
-										<span class="text-info"><i class="fa fa-info-circle mr-1"></i>Form SPH-SBS Tanam sampai produksi dari Petugas Data Kecamatan Setempat. Pdf, max 2Mb.</span>
-										@endif
-									</span>
-								</div>
-							</div>
-							<div class="form-group row">
-								<label class="col-sm-3 col-form-label" for="logbookproduksi">LogBook</label>
-								<div class="col-sm-9">
-									<div class="custom-file input-group">
-										<input type="file" accept=".pdf" class="custom-file-input size-validation" name="logbookproduksi" id="logbookproduksi" value="{{ old('logbookproduksi', optional($docs)->logbookproduksi) }}">
-										<label class="custom-file-label" for="logbookproduksi">{{ $docs ? ($docs->logbookproduksi ? $docs->logbookproduksi : 'Pilih berkas...') : 'Pilih berkas...' }}</label>
-									</div>
-									<span class="help-block">
-										@if($docs && $docs->logbookproduksi)
-											<a href="{{ asset('storage/uploads/'.$pathNpwp.'/'.$commitment->periodetahun.'/'.$docs->logbookproduksi) }}" target="_blank">
-												Lihat Dokumen diunggah.
-											</a>
-										@else
-											<span class="text-info"><i class="fa fa-info-circle mr-1"></i>Salinan lembar pencatatan oleh petani sejak tanam hingga produksi. Pdf, max 2Mb.</small>
-										@endif
-									</span>
-								</div>
-							</div>
-							<div class="form-group row">
-								<label class="col-sm-3 col-form-label" for="formLa">Form LA</label>
-								<div class="col-sm-9">
-									<div class="custom-file input-group">
-										<input type="file" accept=".pdf" class="custom-file-input size-validation" name="formLa" id="formLa" value="{{ old('formLa', optional($docs)->formLa) }}">
-										<label class="custom-file-label" for="formLa">{{ $docs ? ($docs->formLa ? $docs->formLa : 'Pilih berkas...') : 'Pilih berkas...' }}</label>
-									</div>
-									<span class="help-block">
-										@if($docs && $docs->formLa)
-											<a href="{{ asset('storage/uploads/'.$pathNpwp.'/'.$commitment->periodetahun.'/'.$docs->formLa) }}" target="_blank">
-												Lihat Dokumen diunggah.
-											</a>
-										@else
-											<span class="text-info"><i class="fa fa-info-circle mr-1"></i>Form Laporan Akhir Realisasi Komitmen Wajib Tanam-Produksi. Pdf, max 2Mb.</span>
-										@endif
-									</span>
-								</div>
-							</div><hr>
-							<div class="panel-tag fade show">
-								<div class="d-flex align-items-top">
-									<i class="fal fa-info-circle mr-1"></i>
-									<div class="flex-1">
-										<small>Unggah berkas berikut jika Anda telah mengunggah seluruh berkas di atas dan ingin mengajukan verifikasi produksi.</small>
-									</div>
-								</div>
-							</div>
-							<div class="form-group row">
-								<label class="col-sm-3 col-form-label" for="spvp">Pengajuan Verifikasi Produksi</label>
-								<div class="col-sm-9">
-									<div class="custom-file input-group">
-										<input type="file" accept=".pdf" accept=".pdf" class="custom-file-input size-validation" name="spvp" id="spvp" value="{{ old('spvp', optional($docs)->spvp) }}">
-										<label class="custom-file-label" for="spvp">{{ $docs ? ($docs->spvp ? $docs->spvp : 'Pilih berkas...') : 'Pilih berkas...' }}</label>
-									</div>
-									<span class="help-block">
-										@if($docs && $docs->spvp)
-											<a href="{{ asset('storage/uploads/'.$pathNpwp.'/'.$commitment->periodetahun.'/'.$docs->spvp) }}" target="_blank">
-												Lihat Dokumen diunggah.
-											</a>
-										@else
-											<span class="text-info"><i class="fa fa-info-circle mr-1"></i>Surat Pengajuan Verifikasi Produksi. Pdf, max 2Mb.</span>
-										@endif
-									</span>
+						<hr>
+						<div class="panel-tag fade show">
+							<div class="d-flex align-items-top">
+								<i class="fal fa-info-circle mr-1"></i>
+								<div class="flex-1">
+									<small>
+										Unggah berkas berikut jika Anda telah mengunggah seluruh berkas di atas dan ingin mengajukan verifikasi tanam. <br>
+									</small>
 								</div>
 							</div>
 						</div>
-						<div class="card-footer d-flex">
-							<div class="col-md-6 text-right ml-auto">
-								<button class="btn btn-primary btn-sm waves-effect waves-themed" type="submit">
-									<i class="fal fa-cloud-upload mr-1"></i>Unggah Berkas Produksi
-								</button>
+						<div class="form-group row">
+							<label class="col-sm-3 col-form-label" for="spvt">Pengajuan Verifikasi Tanam</label>
+							<div class="col-sm-9">
+								<div class="custom-file input-group">
+									<input type="file" accept=".pdf" class="custom-file-input size-validation" name="spvt" id="spvt" value="{{ old('spvt', optional($docs->where('kind', 'spvt')->first())->file_url) }}">
+									<label class="custom-file-label" for="spvt">{{ optional($docs->where('kind', 'spvt')->first())->file_code }}</label>
+								</div>
+								<span class="help-block">
+									@if($docs && optional($docs->where('kind', 'spvt')->first())->file_url)
+									<a href="{{ optional($docs->where('kind', 'spvt')->first())->file_url }}" target="_blank">
+										Lihat Dokumen diunggah.
+									</a>
+									@else
+										<span class="text-info"><i class="fa fa-info-circle mr-1"></i>Surat Pengajuan Verifikasi Tanam. Pdf, max 2Mb.</span>
+									@endif
+								</span>
 							</div>
 						</div>
 					</div>
 				</div>
-			</form>
+
+				<div class="card" id="panel-6-b">
+					<div class="panel-hdr">
+						<h2>Dokumen Realisasi Produksi</h2>
+					</div>
+					<div class="card-body">
+						<div class="panel-tag fade show">
+							<div class="d-flex align-items-top">
+								<i class="fal fa-info-circle mr-1"></i>
+								<div class="flex-1">
+									<small>Berkas-berkas yang diperlukan terkait dengan Verifikasi Produksi. Lengkapi dan unggah dokumen berikut sebelum Anda mengajukan Verifikasi Produksi.</small>
+								</div>
+							</div>
+						</div>
+						<div class="form-group row">
+							<label class="col-sm-3 col-form-label" for="sptjmproduksi">Form SPTJM (produksi)</label>
+							<div class="col-sm-9">
+								<div class="custom-file input-group">
+									<input type="file" accept=".pdf" class="custom-file-input size-validation" name="sptjmproduksi" id="sptjmproduksi" value="{{ old('sptjmproduksi', optional($docs->where('kind', 'sptjmproduksi')->first())->file_url) }}">
+									<label class="custom-file-label" for="sptjmproduksi">{{ optional($docs->where('kind', 'sptjmproduksi')->first())->file_code }}</label>
+								</div>
+								<span class="help-block">
+									@if($docs && optional($docs->where('kind', 'sptjmproduksi')->first())->file_url)
+									<a href="{{ optional($docs->where('kind', 'sptjmproduksi')->first())->file_url }}" target="_blank">
+										Lihat Dokumen diunggah.
+									</a>
+									@else
+										<span class="text-info"><i class="fa fa-info-circle mr-1"></i>Surat Pertanggungjawaban Mutlak Realisasi Komitmen Wajib Prouksi. Pdf, max 2Mb.</span>
+									@endif
+								</span>
+							</div>
+						</div>
+						<div class="form-group row">
+							<label class="col-sm-3 col-form-label" for="rpo">Form RPO</label>
+							<div class="col-sm-9">
+								<div class="custom-file input-group">
+									<input type="file" accept=".pdf" class="custom-file-input size-validation" name="rpo" id="rpo" value="{{ old('rpo', optional($docs->where('kind', 'rpo')->first())->file_url) }}">
+									<label class="custom-file-label" for="rpo">{{ optional($docs->where('kind', 'rpo')->first())->file_code }}</label>
+								</div>
+								<span class="help-block">
+									@if($docs && optional($docs->where('kind', 'rpo')->first())->file_url)
+									<a href="{{ optional($docs->where('kind', 'rpo')->first())->file_url }}" target="_blank">
+										Lihat Dokumen diunggah.
+									</a>
+									@else
+									<span class="text-info"><i class="fa fa-info-circle mr-1"></i>Form laporan realisasi produksi (Form RPO). Pdf, max 2Mb.</small>
+									@endif
+								</span>
+							</div>
+						</div>
+						<div class="form-group row">
+							<label class="col-sm-3 col-form-label" for="sphproduksi">SPH-SBS Produksi</label>
+							<div class="col-sm-9">
+								<div class="custom-file input-group">
+									<input type="file" accept=".pdf" class="custom-file-input size-validation" name="sphproduksi" id="sphproduksi" value="{{ old('sphproduksi', optional($docs->where('kind', 'sphproduksi')->first())->file_url) }}">
+									<label class="custom-file-label" for="sphproduksi">{{ optional($docs->where('kind', 'sphproduksi')->first())->file_code }}</label>
+								</div>
+								<span class="help-block">
+									@if($docs && optional($docs->where('kind', 'sphproduksi')->first())->file_url)
+									<a href="{{ optional($docs->where('kind', 'sphproduksi')->first())->file_url }}" target="_blank">
+										Lihat Dokumen diunggah.
+									</a>
+									@else
+									<span class="text-info"><i class="fa fa-info-circle mr-1"></i>Form SPH-SBS Tanam sampai produksi dari Petugas Data Kecamatan Setempat. Pdf, max 2Mb.</span>
+									@endif
+								</span>
+							</div>
+						</div>
+						{{-- <div class="form-group row">
+							<label class="col-sm-3 col-form-label" for="logbookproduksi">LogBook</label>
+							<div class="col-sm-9">
+								<div class="custom-file input-group">
+									<input type="file" accept=".pdf" class="custom-file-input size-validation" name="logbookproduksi" id="logbookproduksi" value="{{ old('logbookproduksi', optional($docs->where('kind', 'logbookproduksi')->first())->file_url) }}">
+									<label class="custom-file-label" for="logbookproduksi">{{ optional($docs->where('kind', 'logbookproduksi')->first())->file_code }}</label>
+								</div>
+								<span class="help-block">
+									@if($docs && optional($docs->where('kind', 'logbookproduksi')->first())->file_url)
+									<a href="{{ optional($docs->where('kind', 'logbookproduksi')->first())->file_url }}" target="_blank">
+										Lihat Dokumen diunggah.
+									</a>
+									@else
+										<span class="text-info"><i class="fa fa-info-circle mr-1"></i>Salinan lembar pencatatan oleh petani sejak tanam hingga produksi. Pdf, max 2Mb.</small>
+									@endif
+								</span>
+							</div>
+						</div> --}}
+						<div class="form-group row">
+							<label class="col-sm-3 col-form-label" for="formLa">Form LA</label>
+							<div class="col-sm-9">
+								<div class="custom-file input-group">
+									<input type="file" accept=".pdf" class="custom-file-input size-validation" name="formLa" id="formLa" value="{{ old('formLa', optional($docs->where('kind', 'formLa')->first())->file_url) }}">
+									<label class="custom-file-label" for="formLa">{{ optional($docs->where('kind', 'formLa')->first())->file_code }}</label>
+								</div>
+								<span class="help-block">
+									@if($docs && optional($docs->where('kind', 'formLa')->first())->file_url)
+										<a href="{{ optional($docs->where('kind', 'formLa')->first())->file_url }}" target="_blank">
+											Lihat Dokumen diunggah.
+										</a>
+									@else
+										<span class="text-info"><i class="fa fa-info-circle mr-1"></i>Form Laporan Akhir Realisasi Komitmen Wajib Tanam-Produksi. Pdf, max 2Mb.</span>
+									@endif
+								</span>
+							</div>
+						</div><hr>
+						<div class="panel-tag fade show">
+							<div class="d-flex align-items-top">
+								<i class="fal fa-info-circle mr-1"></i>
+								<div class="flex-1">
+									<small>Unggah berkas berikut jika Anda telah mengunggah seluruh berkas di atas dan ingin mengajukan verifikasi produksi.</small>
+								</div>
+							</div>
+						</div>
+						<div class="form-group row">
+							<label class="col-sm-3 col-form-label" for="spvp">Pengajuan Verifikasi Produksi</label>
+							<div class="col-sm-9">
+								<div class="custom-file input-group">
+									<input type="file" accept=".pdf" class="custom-file-input size-validation" name="spvp" id="spvp" value="{{ old('spvp', optional($docs->where('kind', 'spvp')->first())->file_url) }}">
+									<label class="custom-file-label" for="spvp">{{ optional($docs->where('kind', 'spvp')->first())->file_code }}</label>
+								</div>
+								<span class="help-block">
+									@if($docs && optional($docs->where('kind', 'spvp')->first())->file_url)
+										<a href="{{ optional($docs->where('kind', 'spvp')->first())->file_url }}" target="_blank">
+											Lihat Dokumen diunggah.
+										</a>
+									@else
+										<span class="text-info"><i class="fa fa-info-circle mr-1"></i>Surat Pengajuan Verifikasi Produksi. Pdf, max 2Mb.</span>
+									@endif
+								</span>
+							</div>
+						</div>
+					</div>
+					<div class="card-footer d-flex">
+						<div class="col-md-6 text-right ml-auto">
+							<button class="btn btn-primary btn-sm waves-effect waves-themed" type="submit">
+								<i class="fal fa-cloud-upload mr-1"></i>Unggah Berkas Produksi
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
 		</div>
 	</div>
 	<div class="modal fade" id="modalPks" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
@@ -782,9 +809,11 @@
 						title: 'Sukses',
 						text: 'Data PKS berhasil diperbarui!'
 					}).then(() => {
+						location.reload();
 						// Lakukan reload datatable di sini
-						dataTable.ajax.reload(); // Ganti dengan kode yang benar untuk reload datatable
-						$('#modalPks').modal('hide');
+						// Ganti dengan kode yang benar untuk reload datatable
+						// dataTable.ajax.reload();
+						// $('#modalPks').modal('hide');
 					});
 				},
 				error: function(xhr, status, error) {
@@ -793,6 +822,12 @@
 						icon: 'error',
 						title: 'Gagal',
 						text: 'Terjadi kesalahan saat memperbarui data PKS. Silakan coba lagi!'
+					}).then(() => {
+						location.reload();
+						// Lakukan reload datatable di sini
+						// Ganti dengan kode yang benar untuk reload datatable
+						// dataTable.ajax.reload();
+						// $('#modalPks').modal('hide');
 					});
 				}
 			});

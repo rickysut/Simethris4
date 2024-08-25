@@ -27,6 +27,7 @@ return new class extends Migration
 
 			$table->bigInteger('check_by')->nullable();
 			$table->date('verif_at')->nullable();
+			$table->text('report_url')->nullable();
 			$table->string('metode')->nullable();
 			$table->timestamps();
 			$table->softDeletes();

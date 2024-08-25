@@ -3,10 +3,9 @@
 namespace App\Http\Controllers\Admin\Thn2024;
 
 use App\Http\Controllers\Controller;
-use App\Models2024\AjuVerifProduksi;
+use App\Models2024\AjuVerifikasi;
 use App\Models2024\AjuVerifSkl;
-use App\Models2024\AjuVerifTanam;
-use App\Models2024\DataRealisasi;
+use App\Models2024\Completed;
 use App\Models2024\FileManagement;
 use App\Models2024\Lokasi;
 use App\Models2024\MasterAnggota;
@@ -14,10 +13,7 @@ use App\Models2024\MasterPoktan;
 use App\Models2024\MasterSpatial;
 use App\Models2024\Pks;
 use App\Models2024\PullRiph;
-use App\Models\AjuVerifSkl as ModelsAjuVerifSkl;
-use App\Models\MasterProvinsi;
-use App\Models\MasterKabupaten;
-use App\Models\MasterKecamatan;
+use App\Models2024\UserFile;
 use App\Models\MasterDesa;
 use App\Models\UserDocs;
 use Illuminate\Http\Request;
@@ -37,6 +33,170 @@ class DataFeederController extends Controller
 	}
 
 	public function getAllMyCommitment(Request $request)
+	{
+		$draw = $request->input('draw', 1);
+		$start = $request->input('start', 0);
+		$length = $request->input('length', 10);
+		$searchValue = $request->input('search.value', '');
+		$order = $request->input('order', []);
+		$columns = $request->input('columns', []);
+
+		//Catatan: tambahkan logika jika tidak memiliki npwp, tidak bisa masuk atau jika role 2
+		$npwp = Auth::user()->data_user->npwp_company;
+
+		// Base query
+		$query = PullRiph::select('id', 'no_ijin', 'periodetahun', 'tgl_ijin', 'volume_riph', 'luas_wajib_tanam', 'volume_produksi')
+			->where('npwp', $npwp)
+			->with(['skl', 'lokasi', 'pks', 'ajutanam', 'ajuproduksi', 'ajuskl', 'completed', 'userFiles']);
+		// dd($query);
+		// Apply search filter
+		if (!empty($searchValue)) {
+			$query = $query->where(function ($q) use ($searchValue) {
+				$q->where('no_ijin', 'like', "%{$searchValue}%")
+					->orWhere('periodetahun', 'like', "%{$searchValue}%")
+					->orWhere('tgl_ijin', 'like', "%{$searchValue}%")
+					->orWhere('volume_riph', 'like', "%{$searchValue}%")
+					->orWhere('luas_wajib_tanam', 'like', "%{$searchValue}%")
+					->orWhere('volume_produksi', 'like', "%{$searchValue}%");
+			});
+		}
+
+		// Calculate total and filtered records
+		$totalRecords = $query->count();
+		$filteredRecords = $query->count();
+
+		// Apply ordering
+		if (!empty($order)) {
+			$orderColumnIndex = $order[0]['column'];
+			$orderDirection = $order[0]['dir'];
+			$orderColumn = $columns[$orderColumnIndex]['data'];
+			switch ($orderColumn) {
+				case 'ijin_full':
+					$query = $query->orderBy('no_ijin', $orderDirection);
+					break;
+				case 'periodetahun':
+					$query = $query->orderBy('periodetahun', $orderDirection);
+					break;
+				default:
+					$query = $query->orderBy('id', 'asc');
+					break;
+			}
+		}
+
+		// Apply pagination
+		$data = $query->skip($start)->take($length)->get();
+
+		// Process data
+		foreach ($data as $commitment) {
+			$commitment->sumRealisasiLuas = $commitment->lokasi->sum('luas_tanam');
+			$commitment->sumRealisasiPanen = $commitment->lokasi->sum('volume');
+			$commitment->pksCount = $commitment->pks->count();
+			$commitment->pksFileCount = $commitment->pks->whereNotNull('berkas_pks')->count();
+
+			$commitment->pksComplete = ($commitment->pksCount === $commitment->pksFileCount) ? 'Lengkap' : 'Belum Lengkap';
+
+			$UserFiles = $commitment->userfiles->whereIn('kind', ['spvt', 'sptjmtanam', 'rta', 'sphtanam', 'logbook', 'spvp', 'sptjmproduksi', 'rpo', 'sphproduksi', 'logbookproduksi', 'formLa']);
+
+			//pemeriksaan berkas tanam
+			$tanamDocsKinds = ['spvt', 'sptjmtanam', 'rta', 'sphtanam', 'logbook'];
+			$foundTanamKinds = $UserFiles->pluck('kind')->unique()->toArray();
+			$missingTanamKinds = array_diff($tanamDocsKinds, $foundTanamKinds);
+
+			if (!empty($missingTanamKinds)) {
+				$tanamDocsComplete = false;
+			} else {
+				$tanamDocsComplete = true;
+				foreach ($UserFiles as $file) {
+					if (is_null($file->file_url)) {
+						$tanamDocsComplete = false;
+						break;
+					}
+				}
+			}
+			$commitment->tanamDocs = $tanamDocsComplete ? "Lengkap" : "Belum Lengkap";
+
+			// pemeriksaan berkas produksi
+			$produksiDocsKinds = ['spvp', 'sptjmproduksi', 'rpo', 'sphproduksi', 'logbook', 'formLa'];
+			$foundProduksiKinds = $UserFiles->pluck('kind')->unique()->toArray();
+			$missingProduksiKinds = array_diff($produksiDocsKinds, $foundProduksiKinds);
+
+			if (!empty($missingProduksiKinds)) {
+				$produksiDocsComplete = false;
+			} else {
+				$produksiDocsComplete = true;
+				foreach ($UserFiles as $file) {
+					if (is_null($file->file_url)) {
+						$produksiDocsComplete = false;
+						break;
+					}
+				}
+			}
+			$commitment->produksiDocs = $produksiDocsComplete ? "Lengkap" : "Belum Lengkap";
+
+			$commitment->noIjin = str_replace(['/', '.'], "", $commitment->no_ijin);
+			$commitment->avTanamStatus = $commitment->ajutanam()->exists() ? $commitment->ajutanam()->latest()->first()->status : "Tidak ada";
+			$commitment->avProdStatus = $commitment->ajuproduksi()->exists() ? $commitment->ajuproduksi()->latest()->first()->status : "Tidak ada";
+			$commitment->avSklStatus = $commitment->ajuskl()->exists() ? $commitment->ajuskl()->latest()->first()->status : "Tidak ada";
+			$commitment->completeStatus = $commitment->completed()->exists() ? 'Lunas' : "Belum Lunas";
+
+			$commitment->siapVerifTanam = (
+				$commitment->sumRealisasiLuas === 0 || //harus ada penanaman
+				$commitment->pksComplete !== 'Lengkap' || //pks harus lengkap
+				$commitment->tanamDocs !== 'Lengkap') //berkas harus lengkap
+				? 'Belum Siap' : 'Siap';
+
+			$commitment->siapVerifProduksi =
+				($commitment->volume_produksi * 10000 > $commitment->sumRealisasiPanen || //harus false
+					$commitment->pksComplete !== 'Lengkap' || //pks harus lengkap
+					$commitment->tanamDocs !== 'Lengkap' || //berkas tanam harus lengkap
+					$commitment->produksiDocs !== 'Lengkap') //berkas produksi harus lengkap
+				? 'Belum Siap' : 'Siap';
+
+			$commitment->siapVerifSkl =
+				($commitment->pksComplete !== 'Lengkap' || //pks harus lengkap
+					$commitment->tanamDocs !== 'Lengkap' || //berkas tanam harus lengkap
+					$commitment->produksiDocs !== 'Lengkap' || //berkas produksi harus lengkap
+					$commitment->avProdStatus !== '6') //status verifikasi produksi harus 6
+				? 'Belum Siap' : 'Siap';
+			// $commitment->siapVerifSkl = ( $commitment->avProdStatus !== '4') ? 'Belum Siap' : 'Siap';
+
+		}
+
+		// Map data to the required format
+		$mappedData = $data->map(function ($item) {
+			return [
+				'id' => $item->id,
+				'ijin_full' => $item->no_ijin,
+				'noIjin' => $item->noIjin,
+				'periodetahun' => $item->periodetahun,
+				'tgl_terbit' => $item->tgl_ijin,
+				'volume' => $item->volume_riph,
+				'wajib_tanam' => floor($item->luas_wajib_tanam * 1000) / 1000 * 10000, //meter persegi
+				'wajib_produksi' => $item->volume_produksi,
+				'sumRealisasiLuas' => $item->sumRealisasiLuas, //meter persegi
+				'sumRealisasiPanen' => $item->sumRealisasiPanen,
+				'pksComplete' => $item->pksComplete,
+				'tanamDocs' => $item->tanamDocs,
+				'siapVerifTanam' => 'Siap', //$item->siapVerifTanam
+				'produksiDocs' => $item->produksiDocs,
+				'siapVerifProduksi' => 'Siap', //,$item->siapVerifProduksi
+				'avTanamStatus' => $item->avTanamStatus,
+				'avProdStatus' => $item->avProdStatus,
+				'siapVerifSkl' => $item->siapVerifSkl, //
+				'avSklStatus' => $item->avSklStatus,
+				'completeStatus' => $item->completeStatus,
+			];
+		});
+
+		return response()->json([
+			'draw' => $draw,
+			'recordsTotal' => $totalRecords,
+			'recordsFiltered' => $filteredRecords,
+			'data' => $mappedData,
+		]);
+	}
+
+	public function getAllMyCommitmentOld(Request $request)
 	{
 		$draw = $request->input('draw', 1);
 		$start = $request->input('start', 0);
@@ -97,17 +257,42 @@ class DataFeederController extends Controller
 
 			$commitment->pksComplete = ($commitment->pksCount === $commitment->pksFileCount) ? 'Lengkap' : 'Belum Lengkap';
 
-			$tanamDocsFields = ['spvt', 'sptjmtanam', 'rta', 'sphtanam', 'logbooktanam'];
-			$produksiDocsFields = ['spvp', 'sptjmproduksi', 'rpo', 'sphproduksi', 'logbookproduksi', 'formLa'];
+			$UserFiles = $commitment->userfiles->whereIn('kind', ['spvt', 'sptjmtanam', 'rta', 'sphtanam', 'logbook', 'spvp', 'sptjmproduksi', 'rpo', 'sphproduksi', 'logbookproduksi', 'formLa']);
 
-			$tanamDocsComplete = !array_filter($tanamDocsFields, function ($field) use ($commitment) {
-				return empty($commitment->userDocs->$field);
-			});
+			//pemeriksaan berkas tanam
+			$tanamDocsKinds = ['spvt', 'sptjmtanam', 'rta', 'sphtanam', 'logbook'];
+			$foundTanamKinds = $UserFiles->pluck('kind')->unique()->toArray();
+			$missingTanamKinds = array_diff($tanamDocsKinds, $foundTanamKinds);
+
+			if (!empty($missingTanamKinds)) {
+				$tanamDocsComplete = false;
+			} else {
+				$tanamDocsComplete = true;
+				foreach ($UserFiles as $file) {
+					if (is_null($file->file_url)) {
+						$tanamDocsComplete = false;
+						break;
+					}
+				}
+			}
 			$commitment->tanamDocs = $tanamDocsComplete ? "Lengkap" : "Belum Lengkap";
 
-			$produksiDocsComplete = !array_filter($produksiDocsFields, function ($field) use ($commitment) {
-				return empty($commitment->userDocs->$field);
-			});
+			// pemeriksaan berkas produksi
+			$produksiDocsKinds = ['spvp', 'sptjmproduksi', 'rpo', 'sphproduksi', 'logbook', 'formLa'];
+			$foundProduksiKinds = $UserFiles->pluck('kind')->unique()->toArray();
+			$missingProduksiKinds = array_diff($produksiDocsKinds, $foundProduksiKinds);
+
+			if (!empty($missingProduksiKinds)) {
+				$produksiDocsComplete = false;
+			} else {
+				$produksiDocsComplete = true;
+				foreach ($UserFiles as $file) {
+					if (is_null($file->file_url)) {
+						$produksiDocsComplete = false;
+						break;
+					}
+				}
+			}
 			$commitment->produksiDocs = $produksiDocsComplete ? "Lengkap" : "Belum Lengkap";
 
 			$commitment->noIjin = str_replace(['/', '.'], "", $commitment->no_ijin);
@@ -117,13 +302,24 @@ class DataFeederController extends Controller
 			$commitment->completeStatus = $commitment->completed()->exists() ? 'Lunas' : "Belum Lunas";
 
 			$commitment->siapVerifTanam = (
-				$commitment->sumRealisasiLuas === 0 ||
-				$commitment->pksComplete !== 'Lengkap' ||
-				$commitment->tanamDocs !== 'Lengkap') ? 'Belum Siap' : 'Siap';
+				$commitment->sumRealisasiLuas === 0 || //harus ada penanaman
+				$commitment->pksComplete !== 'Lengkap' || //pks harus lengkap
+				$commitment->tanamDocs !== 'Lengkap') //berkas harus lengkap
+				? 'Belum Siap' : 'Siap';
 
-			$commitment->siapVerifProduksi = ($commitment->volume_produksi > $commitment->sumRealisasiPanen || $commitment->pksComplete !== 'Lengkap' || $commitment->tanamDocs !== 'Lengkap' || $commitment->prduksiDocs !== 'Lengkap') ? 'Belum Siap' : 'Siap';
+			$commitment->siapVerifProduksi =
+				($commitment->volume_produksi > $commitment->sumRealisasiPanen || //harus false
+					$commitment->pksComplete !== 'Lengkap' || //pks harus lengkap
+					$commitment->tanamDocs !== 'Lengkap' || //berkas tanam harus lengkap
+					$commitment->produksiDocs !== 'Lengkap') //berkas produksi harus lengkap
+				? 'Belum Siap' : 'Siap';
 
-			$commitment->siapVerifSkl = ($commitment->pksComplete !== 'Lengkap' || $commitment->tanamDocs !== 'Lengkap' || $commitment->produksiDocs !== 'Lengkap' || $commitment->avProdStatus !== '4') ? 'Belum Siap' : 'Siap';
+			$commitment->siapVerifSkl =
+				($commitment->pksComplete !== 'Lengkap' || //pks harus lengkap
+					$commitment->tanamDocs !== 'Lengkap' || //berkas tanam harus lengkap
+					$commitment->produksiDocs !== 'Lengkap' || //berkas produksi harus lengkap
+					$commitment->avProdStatus !== '6') //status verifikasi produksi harus 6
+				? 'Belum Siap' : 'Siap';
 			// $commitment->siapVerifSkl = ( $commitment->avProdStatus !== '4') ? 'Belum Siap' : 'Siap';
 
 		}
@@ -137,15 +333,15 @@ class DataFeederController extends Controller
 				'periodetahun' => $item->periodetahun,
 				'tgl_terbit' => $item->tgl_ijin,
 				'volume' => $item->volume_riph,
-				'wajib_tanam' => $item->luas_wajib_tanam,
+				'wajib_tanam' => floor($item->luas_wajib_tanam * 1000) / 1000 * 10000, //meter persegi
 				'wajib_produksi' => $item->volume_produksi,
-				'sumRealisasiLuas' => $item->sumRealisasiLuas,
+				'sumRealisasiLuas' => $item->sumRealisasiLuas, //meter persegi
 				'sumRealisasiPanen' => $item->sumRealisasiPanen,
 				'pksComplete' => $item->pksComplete,
 				'tanamDocs' => $item->tanamDocs,
 				'siapVerifTanam' => $item->siapVerifTanam,
 				'produksiDocs' => $item->produksiDocs,
-				'siapVerifProduksi' => $item->siapVerifProduksi,
+				'siapVerifProduksi' => $item->siapVerifProduksi, //,
 				'avTanamStatus' => $item->avTanamStatus,
 				'avProdStatus' => $item->avProdStatus,
 				'siapVerifSkl' => $item->siapVerifSkl,
@@ -174,7 +370,8 @@ class DataFeederController extends Controller
 		$npwp = str_replace(['.', '-'], '', $commitment->npwp);
 		$periodetahun = $commitment->periodetahun;
 
-		$linkBerkas = $pks->berkas_pks ? asset('storage/uploads/' . $npwp . '/' . $periodetahun . '/' . $pks->berkas_pks) : null;
+		$berkasPks = UserFile::where('kind', 'pks')->where('no_ijin', $pks->no_ijin)->where('file_code', $pks->kode_poktan)->first();
+		$linkBerkas = optional($berkasPks)->file_url ?? null;
 
 		if ($pks) {
 			$data = $pks->toArray();
@@ -273,7 +470,16 @@ class DataFeederController extends Controller
 		$noIjin = $this->formatNoIjin($noIjin);
 
 		$commitment = PullRiph::where('no_ijin', $noIjin)->first();
-		$query = Pks::query()
+		if (!$commitment) {
+			return response()->json([
+				"draw" => intval($request->input('draw')),
+				"recordsTotal" => 0,
+				"recordsFiltered" => 0,
+				"data" => [],
+			]);
+		}
+
+		$pksQuery = Pks::query()
 			->select('id', 'kode_poktan', 'no_ijin', 'nama_poktan', 'no_perjanjian', 'tgl_perjanjian_start', 'tgl_perjanjian_end', 'varietas_tanam', 'periode_tanam', 'berkas_pks', 'status', 'note')
 			->where('no_ijin', $commitment->no_ijin)
 			->withCount('lokasi')
@@ -282,22 +488,39 @@ class DataFeederController extends Controller
 					->groupBy('kode_poktan', 'no_ijin');
 			}]);
 
-		// Paginasi sesuai permintaan DataTables
+		$pksRecords = $pksQuery->get();
+
+		// Retrieve UserFile records that match no_ijin and have file_code matching kode_poktan
+		$userFiles = UserFile::query()
+			->where('no_ijin', $commitment->no_ijin)
+			->whereIn('file_code', $pksRecords->pluck('kode_poktan'))
+			->select('no_ijin', 'file_code', 'file_url') // Select only file_code and file_url
+			->get()
+			->groupBy('file_code');
+
+		// Merge UserFile records into Pks results
+		$pksRecords->each(function ($pksRecord) use ($userFiles) {
+			$userFile = $userFiles->get($pksRecord->kode_poktan);
+			$pksRecord->file_url = $userFile ? $userFile->first()->file_url : null;
+		});
+
+		// Paginate according to DataTables request
 		$draw = $request->input('draw');
 		$length = $request->input('length');
 		$start = $request->input('start');
 
 		if ($length <= 0) {
-			$length = 10; // Atur ke nilai default jika length <= 0
+			$length = 10; // Set to default if length <= 0
 		}
 
-		$data = $query->paginate($length, ['*'], 'page', max(1, $start / $length + 1));
-		$items = $data->items();
-		foreach ($items as $item) {
+		$paginatedData = $pksRecords->slice($start, $length)->values();
+		$totalRecords = $pksRecords->count();
+
+		foreach ($paginatedData as $item) {
 			if (is_null($item->tgl_perjanjian_start) || is_null($item->varietas_tanam) || is_null($item->berkas_pks)) {
 				$item->statusData = null;
 			} else {
-				$item->statusData = 'Filled'; // Atur status yang sesuai jika tidak null
+				$item->statusData = 'Filled'; // Set appropriate status if not null
 			}
 
 			$item->total_luas_lahan = $item->lokasi->sum('total_luas_lahan');
@@ -305,18 +528,19 @@ class DataFeederController extends Controller
 
 		return response()->json([
 			"draw" => intval($draw),
-			"recordsTotal" => $data->total(),
-			"recordsFiltered" => $data->total(),
-			"data" => $data->items(),
+			"recordsTotal" => $totalRecords,
+			"recordsFiltered" => $totalRecords,
+			"data" => $paginatedData,
 		]);
 	}
+
 
 	public function getLokasiByPks(Request $request, $noIjin, $poktanId)
 	{
 		// Format the noIjin parameter
 		$noIjin = $this->formatNoIjin($noIjin);
 
-		$dataRealisasi = Lokasi::select('origin','no_ijin', 'tcode','kode_poktan', 'luas_tanam', 'volume')
+		$dataRealisasi = Lokasi::select('origin', 'no_ijin', 'tcode', 'kode_poktan', 'luas_tanam', 'volume')
 			->where('no_ijin', $noIjin)
 			->where('kode_poktan', $poktanId)
 			->get();
@@ -407,24 +631,24 @@ class DataFeederController extends Controller
 		$noIjin = $this->formatNoIjin($noIjin);
 
 		// Memeriksa apakah ada minimal satu record dengan status yang tidak null
-		$hasNonNullStatus = Lokasi::where('no_ijin', $noIjin)
-			->whereNotNull('status')
-			->exists();
+		// $hasNonNullStatus = Lokasi::where('no_ijin', $noIjin)
+		// 	->whereNotNull('status')
+		// 	->exists();
 
-		if (!$hasNonNullStatus) {
-			// Jika tidak ada record dengan status yang tidak null, kembalikan data kosong
-			return response()->json([
-				'draw' => $request->input('draw', 1),
-				'recordsTotal' => 0,
-				'recordsFiltered' => 0,
-				'totalRealisasiLuas' => 0,
-				'totalRealisasiProduksi' => 0,
-				'data' => [],
-			]);
-		}
+		// if (!$hasNonNullStatus) {
+		// 	// Jika tidak ada record dengan status yang tidak null, kembalikan data kosong
+		// 	return response()->json([
+		// 		'draw' => $request->input('draw', 1),
+		// 		'recordsTotal' => 0,
+		// 		'recordsFiltered' => 0,
+		// 		'totalRealisasiLuas' => 0,
+		// 		'totalRealisasiProduksi' => 0,
+		// 		'data' => [],
+		// 	]);
+		// }
 
 		// Jika ada minimal satu record dengan status yang tidak null, ambil semua data
-		$dataRealisasi = Lokasi::select('no_ijin', 'luas_tanam', 'volume')
+		$dataRealisasi = Lokasi::select('no_ijin', 'luas_tanam', 'volume', 'status', 'is_selected')
 			->where('no_ijin', $noIjin)
 			->get();
 
@@ -511,7 +735,6 @@ class DataFeederController extends Controller
 			'data' => $data,
 		]);
 	}
-
 
 	public function getLokasiByIjinNik($noIjin, $nik)
 	{
@@ -680,7 +903,6 @@ class DataFeederController extends Controller
 			'data' => $spatials,
 		]);
 	}
-
 
 	public function getAllPoktan(Request $request)
 	{
@@ -930,15 +1152,305 @@ class DataFeederController extends Controller
 		return response()->json($data);
 	}
 
+
+	public function getRequestVerif(Request $request)
+	{
+		$user = Auth::user();
+		$draw = $request->input('draw', 1);
+		$start = $request->input('start', 0);
+		$length = $request->input('length', 10);
+		$searchValue = $request->input('search.value', '');
+		$order = $request->input('order', []);
+		$columns = $request->input('columns', []);
+		$periodeFilter = $request->input('periode', null);
+		$statusFilter = $request->input('status', null);
+
+		$completedNoIjins = Completed::pluck('no_ijin');
+
+		$query = AjuVerifikasi::select('id', 'kind', 'tcode', 'npwp', 'no_ijin', 'check_by', 'verif_at', 'status', 'note', 'created_at')
+			->orderBy('id', 'ASC')
+			->whereNotIn('no_ijin', $completedNoIjins)
+			->where(function ($query) use ($user) {
+				$query->whereHas('assignments', function ($query) use ($user) {
+					$query->where('user_id', $user->id);
+				})
+					->orWhere(function ($query) use ($user) {
+						if ($user->id == 1) {
+							$query->where('id', '>', 0);
+						}
+					});
+			})
+			->with([
+				'verifikator:id,name',
+				'datauser:id,npwp_company,company_name',
+				'commitment:id,no_ijin,periodetahun',
+				'assignments:id,tcode,pengajuan_id,user_id',
+				'assignments.user:id,name'
+			]);
+
+
+		if ($periodeFilter) {
+			$query->whereHas('commitment', function ($query) use ($periodeFilter) {
+				$query->where('periodetahun', $periodeFilter);
+			});
+		}
+
+		//filter ini untuk daftar pengajuan tanam
+		if ($statusFilter !== null) {
+			switch ($statusFilter) {
+				case 1:
+					$query->where('status', '>', 0);
+					break;
+				case 2:
+					$query->whereBetween('status', [1, 5]);
+					break;
+				case 3:
+					$query->where('status', '>', 5);
+					break;
+				default:
+					$query->whereBetween('status', [1, 5]);
+					break;
+			}
+		} else {
+			$query->whereBetween('status', [0, 5]);
+		}
+
+		$data = $query->get();
+
+		$data = $data->map(function ($item) {
+			return [
+				'id' => $item->id,
+				'tcode' => $item->tcode,
+				'check_by' => $item->check_by,
+				// 'verifikator' => $item->verifikator ? $item->verifikator->name : null,
+				'periode' => $item->commitment ? $item->commitment->periodetahun : null,
+				'perusahaan' => $item->datauser ? $item->datauser->company_name : null,
+				'no_ijin' => $item->no_ijin,
+				'created_at' => $item->created_at,
+				'verif_at' => $item->verif_at,
+				'status' => $item->status,
+				'ijin' => str_replace(['/', '.', '-'], '', $item->no_ijin),
+				'assignments' => $item->assignments->map(function ($assignment) {
+					return [
+						'id' => $assignment->id,
+						'user_id' => $assignment->user_id,
+						'user_name' => $assignment->user ? $assignment->user->name : null,
+						'tcode' => $assignment ? $assignment->tcode : null,
+						'no_sk' => $assignment->no_sk,
+						'tgl_sk' => $assignment->tgl_sk,
+						'file' => $assignment->file,
+					];
+				}),
+				'tableSource' => $item->kind,
+			];
+		});
+
+		if ($searchValue) {
+			$data = $data->filter(function ($item) use ($searchValue) {
+				return strpos(strtolower($item['periode']), strtolower($searchValue)) !== false ||
+					strpos(strtolower($item['perusahaan']), strtolower($searchValue)) !== false ||
+					strpos(strtolower($item['no_ijin']), strtolower($searchValue)) !== false ||
+					strpos(strtolower($item['ijin']), strtolower($searchValue)) !== false ||
+					strpos(strtolower($item['status']), strtolower($searchValue)) !== false;
+			})->values();
+		}
+
+		if (!empty($order)) {
+			$orderColumn = $order[0]['column'];
+			$orderDirection = $order[0]['dir'];
+			$columnName = $columns[$orderColumn]['data'];
+
+			$data = $data->sortBy(function ($item) use ($columnName) {
+				return $item[$columnName];
+			}, SORT_REGULAR, $orderDirection === 'desc')->values();
+		}
+
+		$totalRecords = $data->count();
+		$filteredRecords = $data->count();
+
+		$verifList = $data->slice($start, $length)->values();
+
+		return response()->json([
+			'draw' => $draw,
+			'recordsTotal' => $totalRecords,
+			'recordsFiltered' => $filteredRecords,
+			'data' => $verifList,
+		]);
+	}
+
+	public function getRequestSkl(Request $request)
+	{
+		$user = Auth::user();
+		$draw = $request->input('draw', 1);
+		$start = $request->input('start', 0);
+		$length = $request->input('length', 10);
+		$searchValue = $request->input('search.value', '');
+		$order = $request->input('order', []);
+		$columns = $request->input('columns', []);
+		$periodeFilter = $request->input('periode', null);
+		$statusFilter = $request->input('status', null);
+
+		$query = AjuVerifSkl::orderBy('id', 'ASC')
+			->where('status', '<', 4)
+			->with([
+				'datauser:id,npwp_company,company_name',
+				'verifikator:id,name',
+				'recomendBy:id,name',
+				'direktur:id,name',
+				'commitment:id,no_ijin,periodetahun',
+			]);
+
+		if ($periodeFilter) {
+			$query->whereHas('commitment', function ($query) use ($periodeFilter) {
+				$query->where('periodetahun', $periodeFilter);
+			});
+		}
+
+		//filter ini untuk daftar pengajuan tanam
+		if ($statusFilter !== null) {
+			switch ($statusFilter) {
+				case 1:
+					$query->where('status', '>', 0);
+					break;
+				case 2:
+					$query->whereBetween('status', [1, 5]);
+					break;
+				case 3:
+					$query->where('status', '>', 5);
+					break;
+				default:
+					$query->whereBetween('status', [1, 5]);
+					break;
+			}
+		} else {
+			$query->whereBetween('status', [0, 5]);
+		}
+
+		$data = $query->get();
+
+		$data = $data->map(function ($item) {
+			return [
+				'id' => $item->id,
+				'tcode' => $item->tcode,
+				'check_by' => $item->check_by,
+				'datauser' => $item->datauser ? $item->datauser->name : null,
+				'verifikator' => $item->verifikator ? $item->verifikator->name : null,
+				'recomendby' => $item->recomendby ? $item->recomendby->name : null,
+				'direktur' => $item->direktur ? $item->direktur->name : null,
+				'periode' => $item->commitment ? $item->commitment->periodetahun : null,
+				'perusahaan' => $item->datauser ? $item->datauser->company_name : null,
+				'no_ijin' => $item->no_ijin,
+				'ijin' => str_replace(['/', '.', '-'], '', $item->no_ijin),
+				'created_at' => $item->created_at,
+				'verif_at' => $item->verif_at,
+				'report_url' => $item->report_url,
+				'draft_url' => $item->draft_url,
+				'no_skl' => $item->no_skl,
+				'published_at' => $item->published_at,
+				'skl_url' => $item->skl_url,
+				'status' => $item->status,
+			];
+		});
+
+		if ($searchValue) {
+			$data = $data->filter(function ($item) use ($searchValue) {
+				return strpos(strtolower($item['periode']), strtolower($searchValue)) !== false ||
+					strpos(strtolower($item['perusahaan']), strtolower($searchValue)) !== false ||
+					strpos(strtolower($item['no_ijin']), strtolower($searchValue)) !== false ||
+					strpos(strtolower($item['ijin']), strtolower($searchValue)) !== false ||
+					strpos(strtolower($item['status']), strtolower($searchValue)) !== false;
+			})->values();
+		}
+
+		if (!empty($order)) {
+			$orderColumn = $order[0]['column'];
+			$orderDirection = $order[0]['dir'];
+			$columnName = $columns[$orderColumn]['data'];
+
+			$data = $data->sortBy(function ($item) use ($columnName) {
+				return $item[$columnName];
+			}, SORT_REGULAR, $orderDirection === 'desc')->values();
+		}
+
+		$totalRecords = $data->count();
+		$filteredRecords = $data->count();
+
+		$verifList = $data->slice($start, $length)->values();
+
+		return response()->json([
+			'draw' => $draw,
+			'recordsTotal' => $totalRecords,
+			'recordsFiltered' => $filteredRecords,
+			'data' => $verifList,
+		]);
+	}
+
 	public function getDataPengajuan($noIjin)
 	{
 		$noIjin = $this->formatNoIjin($noIjin);
 
 		$commitment = PullRiph::where('no_ijin', $noIjin)->first();
-		$verifTanam = AjuVerifTanam::where('no_ijin', $noIjin)->latest()->first() ?? new AjuVerifTanam();
-		$verifProduksi = AjuVerifProduksi::where('no_ijin', $noIjin)->latest()->first() ?? new AjuVerifProduksi();
+		$verifTanam = AjuVerifikasi::where('no_ijin', $noIjin)->where('kind', 'TANAM')->latest()->first() ?? new AjuVerifikasi();
+		$verifProduksi = AjuVerifikasi::where('no_ijin', $noIjin)->where('kind', 'PRODUKSI')->latest()->first() ?? new AjuVerifikasi();
 		$verifSkl = AjuVerifSkl::where('no_ijin', $noIjin)->latest()->first() ?? new AjuVerifSkl();
+
+		$userFiles = $commitment->userfiles
+			->whereIn('kind', [
+				'spvt',
+				'sptjmtanam',
+				'rta',
+				'sphtanam',
+				'logbook',
+				'spvp',
+				'sptjmproduksi',
+				'rpo',
+				'sphproduksi',
+				'logbookproduksi',
+				'formLa'
+			]);
+
+		$tanamDocsKinds = ['spvt', 'sptjmtanam', 'rta', 'sphtanam', 'logbook'];
+		$prodDocsKinds = ['spvp', 'sptjmproduksi', 'rpo', 'sphproduksi', 'formLa'];
+
+		$docTanamStatuses = [];
+		$docProdStatuses = [];
+
+		foreach ($tanamDocsKinds as $kind) {
+			$document = $userFiles->firstWhere('kind', $kind);
+			if ($document) {
+				$docTanamStatuses[$kind] = $document->file_url ? 'Ada' : 'Tidak Ada';
+			} else {
+				$docTanamStatuses[$kind] = 'Tidak Ada';
+			}
+		}
+
+		foreach ($prodDocsKinds as $kind) {
+			$document = $userFiles->firstWhere('kind', $kind);
+			if ($document) {
+				$docProdStatuses[$kind] = $document->file_url ? 'Ada' : 'Tidak Ada';
+			} else {
+				$docProdStatuses[$kind] = 'Tidak Ada';
+			}
+		}
+
+		// Filter and process tanam files
+		$tanamFiles = $userFiles->filter(function ($file) use ($tanamDocsKinds) {
+			return in_array($file->kind, $tanamDocsKinds);
+		})->map(function ($file) use ($docTanamStatuses) {
+			$file->berkas = $docTanamStatuses[$file->kind] ?? 'Tidak Ada';
+			return $file;
+		})->values()->toArray();
+
+		// Filter and process prod files
+		$prodFiles = $userFiles->filter(function ($file) use ($prodDocsKinds) {
+			return in_array($file->kind, $prodDocsKinds);
+		})->map(function ($file) use ($docProdStatuses) {
+			$file->berkas = $docProdStatuses[$file->kind] ?? 'Tidak Ada';
+			return $file;
+		})->values()->toArray();
+
 		$userDocs = UserDocs::where('no_ijin', $noIjin)->first() ?? new UserDocs();
+
 		$pks = Pks::where('no_ijin', $noIjin)->get() ?? new Pks();
 		$lokasis = Lokasi::where('no_ijin', $noIjin)->get() ?? new Lokasi();
 
@@ -978,10 +1490,255 @@ class DataFeederController extends Controller
 			'countPks' => $pks->where('berkas_pks', '!=', null)->count(),
 			'countSpatial' => $lokasis->count(),
 			'countTanam' => $lokasis->where('luas_tanam', '!=', null)->count(),
-			'userDocs' => $userDocs,
+			// 'userDocs' => $userDocs,
+			'tanamFiles' => $tanamFiles,
+			'prodFiles' => $prodFiles,
 		];
 
 		return response()->json($data);
+	}
+
+	public function getRequestVerifTanam(Request $request)
+	{
+		$user = Auth::user();
+		$draw = $request->input('draw', 1);
+		$start = $request->input('start', 0);
+		$length = $request->input('length', 10);
+		$searchValue = $request->input('search.value', '');
+		$order = $request->input('order', []);
+		$columns = $request->input('columns', []);
+		$periodeFilter = $request->input('periode', null);
+		$statusFilter = $request->input('status', null);
+
+		// Build the query
+		$query = AjuVerifikasi::select('id', 'kind', 'tcode', 'npwp', 'no_ijin', 'check_by', 'verif_at', 'status', 'note', 'created_at')
+			->where('kind', 'TANAM')
+			->where(function ($query) use ($user) {
+				$query->whereHas('assignments', function ($query) use ($user) {
+					$query->where('user_id', $user->id);
+				})
+					->orWhere(function ($query) use ($user) {
+						if ($user->id == 1) {
+							$query->where('id', '>', 0); // or any condition that always returns true
+						}
+					});
+			})
+			->with([
+				'verifikator:id,name',
+				'datauser:id,npwp_company,company_name',
+				'commitment:id,no_ijin,periodetahun',
+				'assignments:id,tcode,pengajuan_id,user_id',
+				'assignments.user:id,name'
+			]);
+
+		if ($periodeFilter) {
+			$query->whereHas('commitment', function ($query) use ($periodeFilter) {
+				$query->where('periodetahun', $periodeFilter);
+			});
+		}
+
+		//filter ini untuk daftar pengajuan tanam
+		if ($statusFilter !== null) {
+			switch ($statusFilter) {
+				case 1:
+					$query->where('status', '>', 0);
+					break;
+				case 2:
+					$query->whereBetween('status', [1, 5]);
+					break;
+				case 3:
+					$query->where('status', '>', 5);
+					break;
+				default:
+					$query->whereBetween('status', [1, 5]);
+					break;
+			}
+		} else {
+			$query->whereBetween('status', [1, 7]);
+		}
+
+		$data = $query->get();
+
+		$data = $data->map(function ($item) {
+			return [
+				'id' => $item->id,
+				'tcode' => $item->tcode,
+				'check_by' => $item->check_by,
+				// 'verifikator' => $item->verifikator ? $item->verifikator->name : null,
+				'periode' => $item->commitment ? $item->commitment->periodetahun : null,
+				'perusahaan' => $item->datauser ? $item->datauser->company_name : null,
+				'no_ijin' => $item->no_ijin,
+				'created_at' => $item->created_at,
+				'verif_at' => $item->verif_at,
+				'status' => $item->status,
+				'ijin' => str_replace(['/', '.', '-'], '', $item->no_ijin),
+				'assignments' => $item->assignments->map(function ($assignment) {
+					return [
+						'id' => $assignment->id,
+						'user_id' => $assignment->user_id,
+						'user_name' => $assignment->user ? $assignment->user->name : null,
+						'tcode' => $assignment ? $assignment->tcode : null,
+						'no_sk' => $assignment->no_sk,
+						'tgl_sk' => $assignment->tgl_sk,
+						'file' => $assignment->file,
+					];
+				}),
+				'tableSource' => $item->kind,
+			];
+		});
+
+		if ($searchValue) {
+			$data = $data->filter(function ($item) use ($searchValue) {
+				return strpos(strtolower($item['periode']), strtolower($searchValue)) !== false ||
+					strpos(strtolower($item['perusahaan']), strtolower($searchValue)) !== false ||
+					strpos(strtolower($item['no_ijin']), strtolower($searchValue)) !== false ||
+					strpos(strtolower($item['ijin']), strtolower($searchValue)) !== false ||
+					strpos(strtolower($item['status']), strtolower($searchValue)) !== false;
+			})->values();
+		}
+
+		if (!empty($order)) {
+			$orderColumn = $order[0]['column'];
+			$orderDirection = $order[0]['dir'];
+			$columnName = $columns[$orderColumn]['data'];
+
+			$data = $data->sortBy(function ($item) use ($columnName) {
+				return $item[$columnName];
+			}, SORT_REGULAR, $orderDirection === 'desc')->values();
+		}
+
+		$totalRecords = $data->count();
+		$filteredRecords = $data->count();
+
+		$verifList = $data->slice($start, $length)->values();
+
+		return response()->json([
+			'draw' => $draw,
+			'recordsTotal' => $totalRecords,
+			'recordsFiltered' => $filteredRecords,
+			'data' => $verifList,
+		]);
+	}
+
+	public function getRequestVerifProduksi(Request $request)
+	{
+		$user = Auth::user();
+		$draw = $request->input('draw', 1);
+		$start = $request->input('start', 0);
+		$length = $request->input('length', 10);
+		$searchValue = $request->input('search.value', '');
+		$order = $request->input('order', []);
+		$columns = $request->input('columns', []);
+		$periodeFilter = $request->input('periode', null);
+		$statusFilter = $request->input('status', null);
+
+		// Build the query
+		$query = AjuVerifikasi::select('id', 'kind', 'tcode', 'npwp', 'no_ijin', 'check_by', 'verif_at', 'status', 'note', 'created_at')
+			->where(function ($query) use ($user) {
+				$query->whereHas('assignments', function ($query) use ($user) {
+					$query->where('user_id', $user->id);
+				})
+					->orWhere(function ($query) use ($user) {
+						if ($user->id == 1) {
+							$query->where('id', '>', 0); // or any condition that always returns true
+						}
+					});
+			})
+			->where('kind', 'PRODUKSI')
+			->with([
+				'verifikator:id,name',
+				'datauser:id,npwp_company,company_name',
+				'commitment:id,no_ijin,periodetahun',
+				'assignments:id,tcode,pengajuan_id,user_id',
+				'assignments.user:id,name'
+			]);
+
+		if ($periodeFilter) {
+			$query->whereHas('commitment', function ($query) use ($periodeFilter) {
+				$query->where('periodetahun', $periodeFilter);
+			});
+		}
+
+		if ($statusFilter !== null) {
+			switch ($statusFilter) {
+				case 1:
+					$query->where('status', '>', 0);
+					break;
+				case 2:
+					$query->whereBetween('status', [1, 5]);
+					break;
+				case 3:
+					$query->where('status', '>', 5);
+					break;
+				default:
+					$query->whereBetween('status', [1, 5]);
+					break;
+			}
+		} else {
+			$query->whereBetween('status', [1, 7]);
+		}
+
+		$data = $query->get();
+
+		$data = $data->map(function ($item) {
+			return [
+				'id' => $item->id,
+				'tcode' => $item->tcode,
+				'check_by' => $item->check_by,
+				// 'verifikator' => $item->verifikator ? $item->verifikator->name : null,
+				'periode' => $item->commitment ? $item->commitment->periodetahun : null,
+				'perusahaan' => $item->datauser ? $item->datauser->company_name : null,
+				'no_ijin' => $item->no_ijin,
+				'created_at' => $item->created_at,
+				'verif_at' => $item->verif_at,
+				'status' => $item->status,
+				'ijin' => str_replace(['/', '.', '-'], '', $item->no_ijin),
+				'assignments' => $item->assignments->map(function ($assignment) {
+					return [
+						'id' => $assignment->id,
+						'user_id' => $assignment->user_id,
+						'user_name' => $assignment->user ? $assignment->user->name : null,
+						'tcode' => $assignment ? $assignment->tcode : null,
+						'no_sk' => $assignment->no_sk,
+						'tgl_sk' => $assignment->tgl_sk,
+						'file' => $assignment->file,
+					];
+				}),
+				'tableSource' => 'PRODUKSI',
+			];
+		});
+
+		if ($searchValue) {
+			$data = $data->filter(function ($item) use ($searchValue) {
+				return strpos(strtolower($item['periode']), strtolower($searchValue)) !== false ||
+					strpos(strtolower($item['perusahaan']), strtolower($searchValue)) !== false ||
+					strpos(strtolower($item['no_ijin']), strtolower($searchValue)) !== false ||
+					strpos(strtolower($item['ijin']), strtolower($searchValue)) !== false ||
+					strpos(strtolower($item['status']), strtolower($searchValue)) !== false;
+			})->values();
+		}
+
+		if (!empty($order)) {
+			$orderColumn = $order[0]['column'];
+			$orderDirection = $order[0]['dir'];
+			$columnName = $columns[$orderColumn]['data'];
+
+			$data = $data->sortBy(function ($item) use ($columnName) {
+				return $item[$columnName];
+			}, SORT_REGULAR, $orderDirection === 'desc')->values();
+		}
+
+		$totalRecords = $data->count();
+		$filteredRecords = $data->count();
+
+		$verifList = $data->slice($start, $length)->values();
+
+		return response()->json([
+			'draw' => $draw,
+			'recordsTotal' => $totalRecords,
+			'recordsFiltered' => $filteredRecords,
+			'data' => $verifList,
+		]);
 	}
 
 	public function getVerifTanamHistory(Request $request, $noIjin)
@@ -998,8 +1755,9 @@ class DataFeederController extends Controller
 		$columns = $request->input('columns', []);
 
 		// Build the query
-		$query = AjuVerifTanam::select('id', 'no_ijin', 'check_by', 'verif_at', 'status', 'note', 'created_at')
+		$query = AjuVerifikasi::select('id', 'no_ijin', 'check_by', 'verif_at', 'status', 'note', 'created_at')
 			->where('no_ijin', $noIjin)
+			->where('kind', 'TANAM')
 			->with('verifikator');
 
 		// Get total records count
@@ -1090,8 +1848,9 @@ class DataFeederController extends Controller
 		$columns = $request->input('columns', []);
 
 		// Build the query
-		$query = AjuVerifProduksi::select('id', 'no_ijin', 'check_by', 'verif_at', 'status', 'note', 'created_at')
+		$query = AjuVerifikasi::select('id', 'kind', 'no_ijin', 'check_by', 'verif_at', 'status', 'note', 'created_at')
 			->where('no_ijin', $noIjin)
+			->where('kind', 'PRODUKSI')
 			->with('verifikator');
 
 		// Get total records count
@@ -1259,131 +2018,91 @@ class DataFeederController extends Controller
 		]);
 	}
 
-	public function getRequestVerifTanam(Request $request)
+	//lokasi sampling menggunakan slovin
+	public function getLocationSampling(Request $request, $noIjin)
 	{
-		$user = Auth::user();
+		// Ambil parameter dari request
 		$draw = $request->input('draw', 1);
 		$start = $request->input('start', 0);
 		$length = $request->input('length', 10);
 		$searchValue = $request->input('search.value', '');
 		$order = $request->input('order', []);
 		$columns = $request->input('columns', []);
-		$periodeFilter = $request->input('periode', null);
-		$statusFilter = $request->input('status', null);
 
-		// Build the query
-		$query = AjuVerifTanam::select('id', 'tcode', 'npwp', 'no_ijin', 'check_by', 'verif_at', 'status', 'note', 'created_at')
-			->when($user->roles[0]->title !== 'Administrator', function ($query) {
-				$query->whereBetween('status', [0, 7]);
-			})
-			// ->where(function ($query) use ($user) {
-			// 	$query->where('check_by', null)
-			// 		->orWhere('check_by', $user->id);
-			// })
-			->where(function ($query) use ($user) {
-				$query->whereHas('assignments', function ($query) use ($user) {
-					$query->where('user_id', $user->id);
-				})
-					->orWhere(function ($query) use ($user) {
-						if ($user->id == 1) {
-							$query->where('id', '>', 0); // or any condition that always returns true
-						}
-					});
-			})
-			->with([
-				'verifikator:id,name',
-				'datauser:id,npwp_company,company_name',
-				'commitment:id,no_ijin,periodetahun',
-				'assignments:id,tcode,pengajuan_id,user_id',
-				'assignments.user:id,name'
-			]);
+		// Format no_ijin
+		$noIjin = $this->formatNoIjin($noIjin);
 
-		if ($periodeFilter) {
-			$query->whereHas('commitment', function ($query) use ($periodeFilter) {
-				$query->where('periodetahun', $periodeFilter);
+		// Ambil data lokasi dari database
+		$lokasis = Lokasi::select('id', 'tcode', 'kode_spatial', 'no_ijin', 'is_selected')
+			->where('no_ijin', $noIjin)
+			->with(['spatial' => function ($query) {
+				$query->select('kode_spatial', 'kelurahan_id', 'kecamatan_id', 'kabupaten_id')
+					->with('desa:kelurahan_id,nama_desa')
+					->with('kecamatan:kecamatan_id,nama_kecamatan')
+					->with('kabupaten:kabupaten_id,nama_kab');
+			}])
+			->get();
+
+		$populasi = $lokasis->count(); // Total populasi
+
+		// Hitung ukuran sampel menggunakan rumus Slovin
+		$me = 0.2; // Margin error 5%
+		if ($populasi > 0) {
+			$n = $populasi / (1 + $populasi * pow($me, 2));
+			$n = ceil($n);
+		} else {
+			$n = 0;
+		}
+
+		// Pisahkan lokasi yang sudah dipilih
+		$selectedLocations = $lokasis->where('is_selected', 1);
+		$selectedCount = $selectedLocations->count();
+		$remainingSampleSize = $n - $selectedCount;
+
+		// Ambil lokasi yang belum dipilih dan acak untuk memenuhi ukuran sampel yang tersisa
+		if ($remainingSampleSize > 0) {
+			$remainingLocations = $lokasis->where('is_selected', 0)->shuffle()->take($remainingSampleSize);
+		} else {
+			$remainingLocations = collect();
+		}
+
+		// Gabungkan lokasi terpilih dan lokasi yang dipilih acak
+		$sampleLocations = $selectedLocations->merge($remainingLocations);
+
+		// Terapkan penyaringan jika ada
+		if ($searchValue) {
+			$sampleLocations = $sampleLocations->filter(function ($item) use ($searchValue) {
+				return strpos(strtolower($item->kode_spatial), strtolower($searchValue)) !== false ||
+					strpos(strtolower($item->spatial->desa->nama_desa), strtolower($searchValue)) !== false ||
+					strpos(strtolower($item->spatial->kecamatan->nama_kecamatan), strtolower($searchValue)) !== false ||
+					strpos(strtolower($item->spatial->kabupaten->nama_kab), strtolower($searchValue)) !== false;
 			});
 		}
 
-		if ($statusFilter !== null) {
-			switch ($statusFilter) {
-				case 1:
-					$query->where('status', '>', 0);
-					break;
-				case 2:
-					$query->whereBetween('status', [1, 5]);
-					break;
-				case 3:
-					$query->where('status', '>', 5);
-					break;
-				default:
-					// Apply default filter for status between 0 and 5 if no filter is selected
-					$query->whereBetween('status', [1, 5]);
-					break;
-			}
-		} else {
-			// Apply default filter for status between 0 and 5 if no filter is selected
-			$query->whereBetween('status', [1, 5]);
-		}
-
-		$data = $query->get();
-
-		$data = $data->map(function ($item) {
-			return [
-				'id' => $item->id,
-				'tcode' => $item->tcode,
-				'check_by' => $item->check_by,
-				// 'verifikator' => $item->verifikator ? $item->verifikator->name : null,
-				'periode' => $item->commitment ? $item->commitment->periodetahun : null,
-				'perusahaan' => $item->datauser ? $item->datauser->company_name : null,
-				'no_ijin' => $item->no_ijin,
-				'created_at' => $item->created_at,
-				'verif_at' => $item->verif_at,
-				'status' => $item->status,
-				'ijin' => str_replace(['/', '.', '-'], '', $item->no_ijin),
-				'assignments' => $item->assignments->map(function ($assignment) {
-					return [
-						'id' => $assignment->id,
-						'user_id' => $assignment->user_id,
-						'user_name' => $assignment->user ? $assignment->user->name : null,
-						'tcode' => $assignment ? $assignment->tcode : null,
-						'no_sk' => $assignment->no_sk,
-						'tgl_sk' => $assignment->tgl_sk,
-						'file' => $assignment->file,
-					];
-				}),
-			];
-		});
-
-		if ($searchValue) {
-			$data = $data->filter(function ($item) use ($searchValue) {
-				return strpos(strtolower($item['periode']), strtolower($searchValue)) !== false ||
-					strpos(strtolower($item['perusahaan']), strtolower($searchValue)) !== false ||
-					strpos(strtolower($item['no_ijin']), strtolower($searchValue)) !== false ||
-					strpos(strtolower($item['ijin']), strtolower($searchValue)) !== false ||
-					strpos(strtolower($item['status']), strtolower($searchValue)) !== false;
-			})->values();
-		}
-
+		// Terapkan pengurutan jika ada
 		if (!empty($order)) {
 			$orderColumn = $order[0]['column'];
 			$orderDirection = $order[0]['dir'];
 			$columnName = $columns[$orderColumn]['data'];
 
-			$data = $data->sortBy(function ($item) use ($columnName) {
-				return $item[$columnName];
-			}, SORT_REGULAR, $orderDirection === 'desc')->values();
+			$sampleLocations = $sampleLocations->sortBy(function ($item) use ($columnName) {
+				return $item->{$columnName};
+			}, SORT_REGULAR, $orderDirection === 'desc');
 		}
 
-		$totalRecords = $data->count();
-		$filteredRecords = $data->count();
+		// Hitung total dan filtered records
+		$totalRecords = $n;
+		$filteredRecords = $sampleLocations->count();
 
-		$verifList = $data->slice($start, $length)->values();
+		// Paginasi data
+		$sampleLocations = $sampleLocations->slice($start, $length)->values();
 
+		// Kembalikan respons JSON
 		return response()->json([
-			'draw' => $draw,
+			'draw' => intval($draw),
 			'recordsTotal' => $totalRecords,
 			'recordsFiltered' => $filteredRecords,
-			'data' => $verifList,
+			'data' => $sampleLocations
 		]);
 	}
 
@@ -1392,8 +2111,9 @@ class DataFeederController extends Controller
 		$userId = Auth::user()->id;
 		$noIjin = $this->formatNoIjin($noIjin);
 
-		$query = AjuVerifTanam::select('id', 'npwp', 'no_ijin', 'check_by', 'verif_at', 'status', 'note', 'created_at')
+		$query = AjuVerifikasi::select('id', 'kind', 'npwp', 'no_ijin', 'check_by', 'verif_at', 'status', 'note', 'created_at')
 			->where('no_ijin', $noIjin)
+			->where('kind', 'TANAM')
 			->with([
 				'commitment:no_ijin,tgl_ijin,tgl_akhir,periodetahun',
 				'datauser:id,npwp_company,company_name,logo',
@@ -1409,6 +2129,54 @@ class DataFeederController extends Controller
 				'perusahaan' => $query->datauser ? $query->datauser->company_name : null,
 				'sumLuas' => $query->commitment->lokasi->sum('luas_lahan'),
 				'sumLuasTanam' => $query->commitment->lokasi->sum('luas_tanam'),
+				'countPks' => $query->commitment->pks->where('berkas_pks', '!=', null)->count(),
+				'countPoktan' => $query->commitment->lokasi->groupBy('kode_poktan')->count(),
+				'countSpatial' => $query->commitment->lokasi->count(),
+				'countTanam' => $query->commitment->lokasi->where('luas_tanam', '!=', null)->count(),
+				'countAnggota' => $query->commitment->lokasi->groupBy('ktp_petani')->count(),
+				'logo' => $query->datauser && $query->datauser->logo ? asset('storage/' . $query->datauser->logo) : asset('/img/avatars/farmer.png'),
+				'no_ijin' => $query->no_ijin,
+				'tgl_ijin' => $query->commitment->tgl_ijin,
+				'tgl_akhir' => $query->commitment->tgl_akhir,
+				'created_at' => $query->created_at,
+				'verif_at' => $query->verif_at,
+				'status' => $query->status,
+				'ijin' => str_replace(['/', '.', '-'], '', $query->no_ijin),
+			];
+		} else {
+			$data = null; // Handle the case where no data is found
+		}
+
+		return response()->json([
+			'userId' => $userId,
+			'data' => $data,
+		]);
+	}
+	public function getVerifProduksiByIjin(Request $request, $noIjin)
+	{
+		$userId = Auth::user()->id;
+		$noIjin = $this->formatNoIjin($noIjin);
+
+		$query = AjuVerifikasi::select('id', 'kind', 'npwp', 'no_ijin', 'check_by', 'verif_at', 'status', 'note', 'created_at')
+			->where('no_ijin', $noIjin)
+			->where('kind', 'PRODUKSI')
+			->with([
+				'commitment:no_ijin,tgl_ijin,tgl_akhir,periodetahun,volume_produksi',
+				'datauser:id,npwp_company,company_name,logo',
+				'verifikator:id,name',
+			])->first();
+
+		if ($query) {
+			$data = [
+				'id' => $query->id,
+				'check_by' => $query->check_by,
+				'verifikator' => $query->verifikator ? $query->verifikator->name : null,
+				'periode' => $query->commitment ? $query->commitment->periodetahun : null,
+				'perusahaan' => $query->datauser ? $query->datauser->company_name : null,
+				'sumLuas' => $query->commitment->lokasi->sum('luas_lahan'),
+				'sumLuasTanam' => $query->commitment->lokasi->sum('luas_tanam'),
+				'sumWajibVol' => $query->commitment ? $query->commitment->volume_produksi : null,
+				'sumPanen' => $query->commitment->lokasi->sum('volume'),
 				'countPks' => $query->commitment->pks->where('berkas_pks', '!=', null)->count(),
 				'countPoktan' => $query->commitment->lokasi->groupBy('kode_poktan')->count(),
 				'countSpatial' => $query->commitment->lokasi->count(),
@@ -1602,7 +2370,6 @@ class DataFeederController extends Controller
 		return response()->json($data);
 	}
 
-
 	//get spatial by status
 	public function getspatial(Request $request)
 	{
@@ -1748,6 +2515,43 @@ class DataFeederController extends Controller
 				'source' => $item->source,
 			];
 		});
+
+		return response()->json([
+			'draw' => $draw,
+			'recordsTotal' => $totalRecords,
+			'recordsFiltered' => $filteredRecords,
+			'data' => $data,
+		]);
+	}
+
+	public function getAllSkls(Request $request)
+	{
+		$draw = $request->input('draw', 1);
+		$start = $request->input('start', 0);
+		$length = $request->input('length', 10);
+		$searchValue = $request->input('search.value', '');
+		$order = $request->input('order', []);
+		$columns = $request->input('columns', []);
+
+		$query = Completed::with(['datauser:id,npwp_company,company_name']);
+
+		// Count total records without filters
+		$totalRecords = $query->count();
+
+		if (!empty($searchValue)) {
+			$query->where(function ($q) use ($searchValue) {
+				$q->whereHas('datauser', function ($query) use ($searchValue) {
+					$query->where('npwp_company', 'like', "%{$searchValue}%")
+						->orWhere('company_name', 'like', "%{$searchValue}%");
+				});
+			});
+		}
+
+		// Count filtered records after applying search
+		$filteredRecords = $query->count();
+
+		// Apply pagination
+		$data = $query->skip($start)->take($length)->get();
 
 		return response()->json([
 			'draw' => $draw,

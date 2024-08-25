@@ -17,7 +17,7 @@ return new class extends Migration
         Schema::create('t2024_user_files', function (Blueprint $table) {
 			$table->bigIncrements('id'); // index
 			$table->string('kind', 55); // jenis berkas: spvt, sptjm, foto, dan lainnya
-			$table->string('no_ijin', 17); // relasi dengan nomor ijin
+			$table->string('no_ijin'); // relasi dengan nomor ijin
 			$table->string('file_code', 255)->unique(); // kode unik untuk identifier
 			$table->text('file_url')->nullable(); // alamat url full path
 			$table->bigInteger('verif_by')->nullable(); // optional jika diperlukan

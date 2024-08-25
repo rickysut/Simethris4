@@ -13,10 +13,14 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('t2024_assignment_tanams', function (Blueprint $table) {
+		Schema::dropIfExists('t2024_assignment_tanams');
+		Schema::dropIfExists('t2024_assignment_verifikasis');
+        Schema::create('t2024_assignment_verifikasis', function (Blueprint $table) {
 			$table->bigIncrements('id');
 			$table->string('tcode')->nullable();
 			$table->unsignedBigInteger('pengajuan_id')->nullable();
+			$table->string('kode_pengajuan')->nullable();
+			$table->string('no_ijin')->nullable();
 			$table->integer('user_id')->nullable();
 			$table->string('no_sk')->nullable();
 			$table->date('tgl_sk')->nullable();

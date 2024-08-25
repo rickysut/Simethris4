@@ -11,78 +11,7 @@
 	@include('t2024.partials.sysalert')
 		<div class="row" id="contentToPrint">
 			<div class="col-lg-3">
-				<div class="card mb-g">
-					<div class="card-header">
-						<div class="d-flex flex-row pt-2  border-top-0 border-left-0 border-right-0">
-							<div class="d-inline-block align-middle mr-3">
-								<span class="profile-image rounded-circle d-block" style="background-image:url(); background-size: cover;" id="companyLogo"></span>
-							</div>
-							<h3 class="mb-0 flex-1 text-dark fw-500">
-								<span id="companytitle"></span>
-								<small class="m-0 l-h-n font-weight-bold"></small>
-							</h3>
-							<span class="">
-							</span>
-						</div>
-					</div>
-					<div class="card-body">
-						<div class="row">
-							<div class="form-group col-12">
-								<label class="text-muted" for="no_ijin">Nomor RIPH</label>
-								<div class="input-group">
-									<span class="font-weight-bold" id="no_ijin" name="no_ijin"></span>
-								</div>
-							</div>
-
-							<div class="form-group col-12">
-								<label class="text-muted" for="tgl_ijin">Tanggal Ijin RIPH</label>
-								<div class="input-group">
-									<span class="font-weight-bold" id="tgl_ijin" name="tgl_ijin"></span>
-								</div>
-							</div>
-							<div class="form-group col-12">
-								<label class="text-muted" for="tgl_akhir">Tanggal Akhir RIPH</label>
-								<div class="input-group">
-									<span class="font-weight-bold" id="tgl_akhir" name="tgl_akhir"></span>
-								</div>
-							</div>
-							<div class="form-group col-12">
-								<label class="text-muted" for="created_at">Tanggal Pengajuan Verifikasi</label>
-								<div class="input-group">
-									<span class="font-weight-bold" id="created_at" name="created_at"></span>
-								</div>
-							</div>
-						</div>
-						<hr>
-						<div class="row">
-							<div class="col-12"><h5 class="font-weight-bold">Ringkasan</h5></div>
-							<div class="form-group col-12">
-								<label class="text-muted" for="countPks">Kemitraan</label>
-								<div class="input-group">
-									<span class="font-weight-bold" id="countPks" name="countPks"></span>
-								</div>
-							</div>
-							<div class="form-group col-12">
-								<label class="text-muted" for="jml_anggota">Jumlah Anggota</label>
-								<div class="input-group">
-									<span class="font-weight-bold" id="jml_anggota" name="jml_anggota"></span>
-								</div>
-							</div>
-							<div class="form-group col-12">
-								<label class="text-muted" for="luas_tanam">Realisasi Tanam</label>
-								<div class="input-group">
-									<span class="font-weight-bold" id="luas_tanam" name="luas_tanam"></span>
-								</div>
-							</div>
-							<div class="form-group col-12">
-								<label class="text-muted" for="jml_titik">Lokasi Tanam</label>
-								<div class="input-group">
-									<span class="font-weight-bold" id="jml_titik" name="jml_titik"></span>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
+				@include('t2024.verifikasi.tanam.infocard')
 			</div>
 			<div class="col-lg-9">
 				<div id="panel-5" class="panel">
@@ -103,9 +32,9 @@
 								<form action="{{route('2024.verifikator.tanam.storeFinalCheck', [$ijin, $tcode])}}" method="POST" enctype="multipart/form-data">
 									@csrf
 									<div class="panel-content">
-										<input type="text" name="no_ijin" value="{{$verifikasi->no_ijin}}">
-										<input type="text" name="tcode" value="{{$verifikasi->tcode}}">
-										<input type="text" name="npwp" value="{{$verifikasi->npwp}}">
+										<input type="hidden" name="no_ijin" value="{{$verifikasi->no_ijin}}">
+										<input type="hidden" name="tcode" value="{{$verifikasi->tcode}}">
+										<input type="hidden" name="npwp" value="{{$verifikasi->npwp}}">
 
 										<div class="form-group row">
 											<label class="col-md-3 col-lg-2 col-form-label">Hasil Pemeriksaan<sup class="text-danger"> *</sup></label>
@@ -122,11 +51,11 @@
 											<label class="col-md-3 col-lg-2 col-form-label">Nota Dinas<sup class="text-danger"> *</sup></label>
 											<div class="col-md-9 col-lg-10">
 												<div class="custom-file input-group">
-													<input type="file" accept=".pdf" class="custom-file-input" name="ndhprt" id="ndhprt" value="{{ old('ndhprt', $verifikasi ? $verifikasi->ndhprt : '') }}">
-													<label class="custom-file-label" for="ndhprt">{{ old('ndhprt', $verifikasi ? $verifikasi->ndhprt : 'pilih berkas') }}</label>
+													<input type="file" accept=".pdf" class="custom-file-input" name="ndhprt" id="ndhprt" value="{{ old('fileNdhp', $verifikasi ? $verifikasi->fileNdhp : '') }}" >
+													<label class="custom-file-label" for="fileNdhp">{{ old('fileNdhp', $verifikasi ? $verifikasi->fileNdhp : 'pilih berkas') }}</label>
 												</div>
-												@if ($verifikasi->ndhprt)
-													<a href="#" class="help-block" data-toggle="modal" data-target="#viewDocs" data-doc="{{ asset('storage/uploads/'.$npwp.'/'.$commitment->periodetahun.'/'.$verifikasi->ndhprt) }}">
+												@if ($verifikasi->fileNdhp)
+													<a href="{{ $verifikasi->fileNdhp }}" class="help-block" target="blank">
 														<i class="fas fa-search mr-1"></i>
 														Lihat Nota Dinas.
 													</a>
@@ -139,11 +68,11 @@
 											<label class="col-md-3 col-lg-2 col-form-label">Berita Acara<sup class="text-danger">*</sup></label>
 											<div class="col-md-9 col-lg-10">
 												<div class="custom-file input-group">
-													<input type="file" accept=".pdf" class="custom-file-input" name="batanam" id="batanam" value="{{ old('batanam', $verifikasi ? $verifikasi->batanam : '') }}">
-													<label class="custom-file-label" for="batanam">{{ old('batanam', $verifikasi ? $verifikasi->batanam : 'pilih berkas') }}</label>
+													<input type="file" accept=".pdf" class="custom-file-input" name="batanam" id="batanam" value="{{ old('fileBa', $verifikasi ? $verifikasi->fileBa : '') }}">
+													<label class="custom-file-label" for="batanam">{{ old('fileBa', $verifikasi ? $verifikasi->fileBa : 'pilih berkas') }}</label>
 												</div>
-												@if ($verifikasi->batanam)
-													<a href="#" class="help-block" data-toggle="modal" data-target="#viewDocs" data-doc="{{ asset('storage/uploads/'.$npwp.'/'.$commitment->periodetahun.'/'.$verifikasi->batanam) }}">
+												@if ($verifikasi->fileBa)
+													<a href="{{ $verifikasi->fileBa }}" class="help-block" target="blank">
 														<i class="fas fa-search mr-1"></i>
 														Lihat Berita Acara.
 													</a>

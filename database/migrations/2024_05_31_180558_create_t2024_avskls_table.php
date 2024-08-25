@@ -16,14 +16,14 @@ return new class extends Migration
 		Schema::create('t2024_avskls', function (Blueprint $table) {
 			$table->bigIncrements('id');
 			$table->string('npwp');
-			$table->unsignedBigInteger('commitment_id');
 			$table->string('no_ijin');
-			$table->string('no_pengajuan')->nullable();
-			$table->string('status')->nullable(); //
+			$table->string('tcode')->nullable();
+			$table->string('status')->nullable();
 
 			//file upload
-			$table->string('baskls')->nullable();
-			$table->string('ndhpskl')->nullable(); //nota dinas hasil pemeriksaan realisasi produksi
+			$table->text('report_url')->nullable();
+			$table->text('baskls')->nullable();
+			$table->text('ndhpskl')->nullable(); //nota dinas hasil pemeriksaan realisasi produksi
 
 			$table->bigInteger('check_by')->nullable();
 			$table->date('verif_at')->nullable();
@@ -33,10 +33,13 @@ return new class extends Migration
 			$table->bigInteger('recomend_by')->nullable();
 			$table->date('recomend_at')->nullable();
 			$table->text('recomend_note')->nullable();
+			$table->text('draft_url')->nullable(); //untuk di ttd
 
 			$table->bigInteger('approved_by')->nullable();
 			$table->date('approved_at')->nullable();
+			$table->string('no_skl')->nullable();
 			$table->text('published_at')->nullable();
+			$table->text('skl_url')->nullable(); //skl sudah ttd
 
 			$table->timestamps();
 			$table->softDeletes();

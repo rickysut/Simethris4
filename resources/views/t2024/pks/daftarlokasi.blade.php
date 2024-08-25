@@ -59,7 +59,7 @@
 							<thead class="thead-themed">
 								<th>Kode Lokasi</th>
 								<th>Pelaksana</th>
-								<th>Realisasi Tanam</th>
+								<th>Realisasi Tanam (m2)</th>
 								<th>Tanggal</th>
 								<th>Realisasi Panen</th>
 								<th>Tanggal</th>
@@ -73,12 +73,12 @@
 									<th class="text-right" colspan="7">TOTAL REALISASI</th>
 								</tr>
 								<tr>
-									<th class="text-right" colspan="6">Realisasi Luas Tanam: </th>
-									<th class="text-right" id="totalRealisasiLuas"> ha</th>
+									<th class="text-right" colspan="5">Realisasi Luas Tanam: </th>
+									<th class="text-right" id="totalRealisasiLuas" colspan="2"> ha</th>
 								</tr>
 								<tr>
-									<th class="text-right" colspan="6">Realisasi Volume Panen</th>
-									<th class="text-right" id="totalRealisasiProduksi"> ton</th>
+									<th class="text-right" colspan="5">Realisasi Volume Panen</th>
+									<th class="text-right" id="totalRealisasiProduksi" colspan="2"> ton</th>
 								</tr>
 							</tfoot>
 						</table>
@@ -124,11 +124,11 @@
 						var json = JSON.parse(data);
 						// Update the span with id=totalRealisasiProduksi
 						$('#totalRealisasiProduksi').text(json.totalRealisasiProduksi + ' ton');
-						var luasInHectares = json.totalRealisasiLuas / 10000; // Convert square meters to hectares
+						var luasInHectares = json.totalRealisasiLuas; // Convert square meters to hectares
 						var formattedLuas = luasInHectares.toLocaleString('id-ID', { maximumFractionDigits: 4 });
 
 						// Update totalRealisasiLuas span
-						$('#totalRealisasiLuas').text(formattedLuas + ' ha');
+						$('#totalRealisasiLuas').text(formattedLuas + ' m2');
 						return data;
 					}
 				},

@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use \DateTimeInterface;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Crypt;
 
 class MasterAnggota extends Model
 {
@@ -40,6 +41,24 @@ class MasterAnggota extends Model
 		'kabupaten_id',
 		'provinsi_id',
 	];
+
+	/**
+	 * enkriptor dan dekriptor ktp
+	 */
+
+	// // Accessor untuk mendekripsi ktp_petani
+    // public function getKtpPetaniAttribute($value)
+    // {
+    //     return Crypt::decryptString($value);
+    // }
+
+    // // Mutator untuk mengenkripsi ktp_petani
+    // public function setKtpPetaniAttribute($value)
+    // {
+    //     $this->attributes['ktp_petani'] = Crypt::encryptString($value);
+    // }
+
+	//======================================================================//
 
 	public function masterpoktan()
 	{

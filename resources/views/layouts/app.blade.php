@@ -109,7 +109,7 @@
     <script src="{{ asset('js/vendors.bundle.js') }}"></script>
     <script src="{{ asset('js/app.bundle.js') }}"></script>
 	<script src="{{ asset('js/smartadmin/notifications/sweetalert2/sweetalert2.bundle.js') }}"></script>
-	<script src="{{asset('sw.js')}}"></script>
+	{{-- <script src="{{asset('sw.js')}}"></script> --}}
 	<script>
 		if ('serviceWorker' in navigator) {
 			navigator.serviceWorker.register('sw.js')

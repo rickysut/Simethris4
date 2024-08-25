@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Admin\Thn2024;
 
 use App\Http\Controllers\Controller;
 use App\Models\AjuVerifProduksi;
@@ -24,7 +24,7 @@ use Illuminate\Support\Facades\Storage;
 
 class PengajuanController extends Controller
 {
-	//halaman daftar pengajuan untuk importir
+	//halaman daftar pengajuan untuk Importir
 	public function index(Request $request)
 	{
 		$module_name = 'Proses RIPH';

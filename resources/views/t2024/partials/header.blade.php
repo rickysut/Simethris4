@@ -35,7 +35,7 @@
 	@php($getRecomendations = null)
 @endif
 
-<header class="page-header shadow-0" role="banner">
+<header class="page-header shadow" role="banner">
 	<!-- we need this logo when user switches to nav-function-top -->
 	<div class="page-logo">
 		<a href="#" class="page-logo-link press-scale-down d-flex align-items-center position-relative"

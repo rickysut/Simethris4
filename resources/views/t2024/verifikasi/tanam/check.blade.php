@@ -1,6 +1,6 @@
 @extends('t2024.layouts.admin')
 @section('styles')
-<link rel="stylesheet" media="screen, print" href="{{ asset('css/miscellaneous/lightgallery/lightgallery.bundle.css') }}">
+
 @endsection
 @section('content')
 {{-- @include('t2024.partials.breadcrumb') --}}
@@ -11,78 +11,7 @@
 	@include('t2024.partials.sysalert')
 		<div class="row" id="contentToPrint">
 			<div class="col-lg-3">
-				<div class="card mb-g">
-					<div class="card-header">
-						<div class="d-flex flex-row pt-2  border-top-0 border-left-0 border-right-0">
-							<div class="d-inline-block align-middle mr-3">
-								<span class="profile-image rounded-circle d-block" style="background-image:url(); background-size: cover;" id="companyLogo"></span>
-							</div>
-							<h3 class="mb-0 flex-1 text-dark fw-500">
-								<span id="companytitle"></span>
-								<small class="m-0 l-h-n font-weight-bold"></small>
-							</h3>
-							<span class="">
-							</span>
-						</div>
-					</div>
-					<div class="card-body">
-						<div class="row">
-							<div class="form-group col-12">
-								<label class="text-muted" for="no_ijin">Nomor RIPH</label>
-								<div class="input-group">
-									<span class="font-weight-bold" id="no_ijin" name="no_ijin"></span>
-								</div>
-							</div>
-
-							<div class="form-group col-12">
-								<label class="text-muted" for="tgl_ijin">Tanggal Ijin RIPH</label>
-								<div class="input-group">
-									<span class="font-weight-bold" id="tgl_ijin" name="tgl_ijin"></span>
-								</div>
-							</div>
-							<div class="form-group col-12">
-								<label class="text-muted" for="tgl_akhir">Tanggal Akhir RIPH</label>
-								<div class="input-group">
-									<span class="font-weight-bold" id="tgl_akhir" name="tgl_akhir"></span>
-								</div>
-							</div>
-							<div class="form-group col-12">
-								<label class="text-muted" for="created_at">Tanggal Pengajuan Verifikasi</label>
-								<div class="input-group">
-									<span class="font-weight-bold" id="created_at" name="created_at"></span>
-								</div>
-							</div>
-						</div>
-						<hr>
-						<div class="row">
-							<div class="col-12"><h5 class="font-weight-bold">Ringkasan</h5></div>
-							<div class="form-group col-12">
-								<label class="text-muted" for="countPks">Kemitraan</label>
-								<div class="input-group">
-									<span class="font-weight-bold" id="countPks" name="countPks"></span>
-								</div>
-							</div>
-							<div class="form-group col-12">
-								<label class="text-muted" for="jml_anggota">Jumlah Anggota</label>
-								<div class="input-group">
-									<span class="font-weight-bold" id="jml_anggota" name="jml_anggota"></span>
-								</div>
-							</div>
-							<div class="form-group col-12">
-								<label class="text-muted" for="luas_tanam">Realisasi Tanam</label>
-								<div class="input-group">
-									<span class="font-weight-bold" id="luas_tanam" name="luas_tanam"></span>
-								</div>
-							</div>
-							<div class="form-group col-12">
-								<label class="text-muted" for="jml_titik">Lokasi Tanam</label>
-								<div class="input-group">
-									<span class="font-weight-bold" id="jml_titik" name="jml_titik"></span>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
+				@include('t2024.verifikasi.tanam.infocard')
 			</div>
 			<div class="col-lg-9">
 				<div id="panel-1" class="panel">
@@ -101,111 +30,48 @@
 					</div>
 					<div class="panel-container show">
 						<div class="panel-content">
-							<table class="table table-striped table-responsive table-bordered table-sm w-100" id="attchCheck">
+							<table class="table table-striped table-bordered table-sm w-100" id="attchCheck">
 								<thead class="thead-themed text-uppercase text-muted">
 									<tr>
-										<th>Form</th>
-										<th>Nama Berkas</th>
-										<th>Tindakan</th>
-										<th>Hasil Periksa</th>
+										<th style="width: 35%">Form</th>
+										<th style="width: 30%" class="text-center">Tindakan</th>
+										<th style="width: 35%">Hasil Periksa</th>
 									</tr>
 								</thead>
 								<tbody>
-									<tr>
-										<td>Surat Pertanggungjawaban Mutlak</td>
-										<td>{{$userDocs->sptjmtanam}}</td>
-										<td>
-											@if ($userDocs->sptjmtanam)
-												<a href="{{ asset('storage/uploads/'.$npwp.'/'.$periodetahun.'/'.$userDocs->sptjmtanam) }}" download>
-													<i class="fas fa-download mr-1"></i>
-													Unduh Dokumen
-												</a>
-											@endif
-										</td>
-										<td>
-											<select class="form-control form-control-sm saveCheckBerkas" name="sptjmtanamcheck" id="sptjmtanamcheck">
-												<option value="">- Pilih status -</option>
-												<option value="sesuai" {{ $userDocs->sptjmtanamcheck == 'sesuai' ? 'selected' : '' }}>Ada/Sesuai</option>
-												<option value="perbaiki" {{ $userDocs->sptjmtanamcheck == 'perbaiki' ? 'selected' : '' }}>Tidak Ada/Tidak Sesuai</option>
-											</select>
-										</td>
-									</tr>
-									<tr>
-										<td>Surat Pengajuan Verifikasi Tanam</td>
-										<td>{{$userDocs->spvt}}</td>
-										<td>
-											@if ($userDocs->spvt)
-												<a href="{{ asset('storage/uploads/'.$npwp.'/'.$periodetahun.'/'.$userDocs->spvt) }}" download>
-													<i class="fas fa-download mr-1"></i>
-													Unduh Dokumen
-												</a>
-											@endif
-										</td>
-										<td>
-											<select class="form-control form-control-sm saveCheckBerkas" name="spvtcheck" id="spvtcheck">
-												<option value="">- Pilih status -</option>
-												<option value="sesuai" {{ $userDocs->spvtcheck == 'sesuai' ? 'selected' : '' }}>Ada/Sesuai</option>
-												<option value="perbaiki" {{ $userDocs->spvtcheck == 'perbaiki' ? 'selected' : '' }}>Tidak Ada/Tidak Sesuai</option>
-											</select>
-										</td>
-									</tr>
-									<tr>
-										<td>Form Realisasi Tanam</td>
-										<td>{{$userDocs->rta}}</td>
-										<td>
-											@if ($userDocs->rta)
-												<a href="{{ asset('storage/uploads/'.$npwp.'/'.$periodetahun.'/'.$userDocs->rta) }}" download>
-													<i class="fas fa-download mr-1"></i>
-													Unduh Dokumen
-												</a>
-											@endif
-										</td>
-										<td>
-											<select class="form-control form-control-sm saveCheckBerkas" name="rtacheck" id="rtacheck">
-												<option value="">- Pilih status -</option>
-												<option value="sesuai" {{ $userDocs->rtacheck == 'sesuai' ? 'selected' : '' }}>Ada/Sesuai</option>
-												<option value="perbaiki" {{ $userDocs->rtacheck == 'perbaiki' ? 'selected' : '' }}>Tidak Ada/Perbaikan</option>
-											</select>
-										</td>
-									</tr>
-									<tr>
-										<td>Form SPH-SBS</td>
-										<td>{{$userDocs->sphtanam}}</td>
-										<td>
-											@if ($userDocs->sphtanam)
-												<a href="{{ asset('storage/uploads/'.$npwp.'/'.$periodetahun.'/'.$userDocs->sphtanam) }}" download>
-													<i class="fas fa-download mr-1"></i>
-													Unduh Dokumen
-												</a>
-											@endif
-										</td>
-										<td>
-											<select class="form-control form-control-sm saveCheckBerkas" name="sphtanamcheck" id="sphtanamcheck">
-												<option value="">- Pilih status -</option>
-												<option value="sesuai" {{ $userDocs->sphtanamcheck == 'sesuai' ? 'selected' : '' }}>Ada/Sesuai</option>
-												<option value="perbaiki" {{ $userDocs->sphtanamcheck == 'perbaiki' ? 'selected' : '' }}>Tidak Ada/Tidak Sesuai</option>
-											</select>
-										</td>
-									</tr>
-									<tr>
-										<td>Logbook (s.d tanam)</td>
-										<td>{{$userDocs->logbooktanam}}</td>
-										<td>
-											@if ($userDocs->logbooktanam)
-												<a href="{{ asset('storage/uploads/'.$npwp.'/'.$periodetahun.'/'.$userDocs->logbooktanam) }}"  download>
-													<i class="fas fa-download mr-1"></i>
-													Unduh Dokumen
-												</a>
-											@endif
-										</td>
-										<td>
-											<select class="form-control form-control-sm saveCheckBerkas" name="logbooktanamcheck" id="logbooktanamcheck">
-												<option value="">- Pilih status -</option>
-												<option value="sesuai" {{ $userDocs->logbooktanamcheck == 'sesuai' ? 'selected' : '' }}>Ada/Sesuai</option>
-												<option value="perbaiki" {{ $userDocs->logbooktanamcheck == 'perbaiki' ? 'selected' : '' }}>Tidak Ada/Tidak Sesuai</option>
-											</select>
-										</td>
-									</tr>
+									@foreach ($docs as $doc)
+										<tr>
+											<td>{{$doc->form}}</td>
+											<td class="text-center">
+												@if ($doc->file_url)
+													<a href="{{$doc->file_url}}" target="_blank">
+														<i class="fas fa-download mr-1"></i>
+														Lihat Dokumen
+													</a>
+												@else
+													@if ($doc->form === 'Logbook')
+														<a href="">
+															<i class="fas fa-cogs mr-1"></i>
+															Generate Logbook
+														</a>
+													@else
+														<span> - </span>
+													@endif
+												@endif
+											</td>
+											<td>
+												<form action="{{ route("2024.verifikator.tanam.saveCheckBerkas", $ijin) }}" method="post">
+													@csrf
+													<input type="hidden" value="{{$doc->id}}" name="docId" id="docId">
+													<select class="form-control form-control-sm saveCheckBerkas" name="status" id="status">
+														<option value="">- Pilih status -</option>
+														<option value="1" {{ $doc->status == '1' ? 'selected' : '' }}>Ada/Sesuai</option>
+														<option value="0" {{ $doc->status == '0' ? 'selected' : '' }}>Tidak Ada/Tidak Sesuai</option>
+													</select>
+												</form>
+											</td>
+										</tr>
+									@endforeach
 								</tbody>
 							</table>
 						</div>
@@ -236,10 +102,32 @@
 	<script>
 
 		$(document).ready(function() {
-
+			$('#attchCheck').dataTable({
+				responsive: true,
+				lengthChange: false,
+				ordering: false,
+				searching: false,
+			});
 			var noIjin = '{{$ijin}}';
 			var tcode = '{{$verifikasi->tcode}}';
 			var formattedNoIjin = noIjin.replace(/[\/.]/g, '');
+
+			$(document).on('change', '.saveCheckBerkas', function() {
+				var form = $(this).closest('form');
+				var formData = form.serialize();
+				$.ajax({
+					url: form.attr('action'),
+					type: 'POST',
+					data: formData,
+					success: function(response) {
+						console.log('sukses');
+					},
+					error: function(xhr, status, error) {
+						alert('An error occurred while updating: ' + xhr.responseText);
+					}
+				});
+			});
+
 			function formatDate(dateString) {
 				if (!dateString) return '';
 				var date = new Date(dateString);
@@ -281,102 +169,6 @@
 					var logoUrl = response.data.logo;
 					$('#companyLogo').css('background-image', 'url(' + logoUrl + ')');
 				}
-			});
-
-			//simpan hasi pemeriksaan tahap berkas
-			$(document).on('change', '.saveCheckBerkas', function() {
-				var field = $(this).attr('id');
-				var url = '{{ route("2024.verifikator.tanam.saveCheckBerkas", ":noIjin") }}'.replace(':noIjin', noIjin);
-
-				var data = {
-					_token: '{{ csrf_token() }}'
-				};
-
-				// Mengambil nilai dari select yang diubah
-				data[field] = $(this).val();
-
-				$.ajax({
-					url: url,
-					type: 'POST',
-					data: data,
-					success: function(response) {
-						var statusText = $('#' + field + ' option:selected').text();
-						Swal.fire({
-							icon: 'success',
-							title: 'Progress Pemeriksaan',
-							text: 'Berkas sudah diperiksa dengan status ' + statusText,
-						}).then((result) => {
-							if (result.isConfirmed) {
-								// Reload DataTable atau tindakan lain
-								$('#lokasiCheck').DataTable().ajax.reload();
-							}
-						});
-					},
-					error: function(xhr, status, error) {
-						Swal.fire({
-							icon: 'error',
-							title: 'Error',
-							text: 'There was an error updating the status.',
-						});
-					}
-				});
-			});
-
-			//menandai fase/tahap pemeriksaan
-			$(document).on('click', '.btnStatus', function() {
-				var status = $(this).data('status');
-				var url = '{{ route("2024.verifikator.tanam.markStatus", [":noIjin", ":tcode", ":status"]) }}'
-					.replace(':noIjin', noIjin)
-					.replace(':tcode', tcode)
-					.replace(':status', status);
-
-				$.ajax({
-					url: url,
-					type: 'POST',
-					data: {
-						_token: '{{ csrf_token() }}'
-					},
-					success: function(response) {
-						console.log('Response Status:', response.status);
-						var statusText;
-						var statusInt = parseInt(response.status);
-						switch (statusInt) {
-							case 2:
-								statusText = 'BERKAS-BERKAS';
-								break;
-							case 3:
-								statusText = 'PKS';
-								break;
-							case 4:
-								statusText = 'TIMELINE REALISASI';
-								break;
-							case 5:
-								statusText = 'LOKASI TANAM';
-								break;
-							default:
-								statusText = 'Unknown Status';
-								break;
-						}
-
-						Swal.fire({
-							icon: 'success',
-							title: 'Progress Pemeriksaan',
-							text: 'Status pemeriksaan ' + statusText + ' ditandai SELESAI',
-						}).then((result) => {
-							if (result.isConfirmed) {
-
-								$('#lokasiCheck').DataTable().ajax.reload();
-							}
-						});
-					},
-					error: function(xhr, status, error) {
-						Swal.fire({
-							icon: 'error',
-							title: 'Error',
-							text: 'There was an error updating the status.',
-						});
-					}
-				});
 			});
 		});
 	</script>

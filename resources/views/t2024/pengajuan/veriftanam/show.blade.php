@@ -227,9 +227,10 @@
 					</a>
 					{{-- Form pengajuan --}}
 					{{-- pengajuan tanam --}}
-					<form action="{{route('2024.user.commitment.formavt.submitPengajuan', $ijin)}}" method="post">
+					<form action="{{route('2024.user.commitment.submitPengajuan', $ijin)}}" method="post" enctype="multipart/form-data">
 						@csrf
-						<button type="submit" class="btn btn-xs btn-warning d-block" data-toggle="tooltip" title data-original-title="Ajukan Verifikasi Tanam" id="btnSubmit">
+						<input type="hidden" value="TANAM" id="kind" name="kind">
+						<button type="submit" class="btn btn-xs btn-warning d-none" data-toggle="tooltip" title data-original-title="Ajukan Verifikasi Tanam" id="btnSubmit">
 							<i class="fal fa-upload mr-1"></i>
 							Ajukan
 						</button>
@@ -273,6 +274,10 @@
 			var noIjin = '{{$ijin}}';
 			var formattedNoIjin = noIjin.replace(/[\/.]/g, '');
 
+			function checkTanamFileKind(tanamFiles, kind) {
+				return tanamFiles.some(file => file.kind === kind && file.berkas === 'Ada');
+			}
+
 			$.ajax({
 				url: "{{ route('2024.datafeeder.getDataPengajuan', [':noIjin']) }}".replace(':noIjin', formattedNoIjin),
 				type: "GET",
@@ -283,15 +288,16 @@
 					$('#periode').text(data.periode);
 
 					//Ringkasan Realisasi dan Kewajiban
+					var avtStatus = data.avtStatus;
 					var wajibTanam = data.wajibTanam * 10000;
 					var realisasi = data.realisasiTanam;
 					var wajibTanamFormatted = wajibTanam.toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
 					var realisasiFormatted = realisasi.toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
 
 					var luasTanam = realisasiFormatted + ' / ' + wajibTanamFormatted + ' m2';
-					if (realisasiFormatted == '0' || realisasiFormatted == null || realisasiFormatted == undefined){
+					if (realisasi == '0' || realisasi == null || realisasi == undefined){
 						$('#realisasiTanam').html('<span class="text-danger">' + luasTanam + '</span>');
-					}else if (wajibTanamFormatted > realisasiFormatted){
+					}else if (wajibTanam > realisasi){
 						$('#realisasiTanam').html('<span class="text-warning">' + luasTanam + '</span>');
 					}else{
 						$('#realisasiTanam').html('<span class="text-success">' + luasTanam + '</span>');
@@ -308,25 +314,26 @@
 					//Ringkasan Kemitraan
 					$('#countAnggota').text(data.countAnggota + ' orang');
 					$('#countPoktan').text(data.countPoktan + ' kelompok');
+					$('#countPks').text(data.countPks + ' Berkas');
 
-					if (data.countPoktan > data.countPks) {
-						$('#countPks').html('<span class="text-danger">' + data.countPks +' PKS</span>');
-					} else {
-						$('#countPks').html('<span class="text-danger">' + data.countPks +' PKS</span>');
-					}
-
+					// if (data.countPoktan > data.countPks) {
+					// 	$('#countPks').html('<span class="text-danger">' + data.countPks +' PKS</span>');
+					// } else {
+					// 	$('#countPks').html('<span class="text-danger">' + data.countPks +' PKS</span>');
+					// }
 
 					//Kelengkapan Berkas
 					//A. Berkas-berkas Tanam
-					$('#spvt').html(data.spvt ? '<span class="text-success">Ada</i></span>' : '<span class="text-danger">Tidak Ada</span>');
+					const tanamFiles = data.tanamFiles;
+					$('#spvt').html(checkTanamFileKind(tanamFiles, 'spvt') ? '<span class="text-success">Ada</i></span>' : '<span class="text-danger">Tidak Ada</span>');
 
-					$('#sptjmtanam').html(data.sptjmtanam ? '<span class="text-success">Ada</span>' : '<span class="text-danger">Tidak Ada</span>');
+					$('#sptjmtanam').html(checkTanamFileKind(tanamFiles, 'sptjmtanam') ? '<span class="text-success">Ada</span>' : '<span class="text-danger">Tidak Ada</span>');
 
-					$('#rta').html(data.rta ? '<span class="text-success">Ada</span>' : '<span class="text-danger">Tidak Ada</span>');
+					$('#rta').html(checkTanamFileKind(tanamFiles, 'rta') ? '<span class="text-success">Ada</span>' : '<span class="text-danger">Tidak Ada</span>');
 
-					$('#sphsbstanam').html(data.sphtanam ? '<span class="text-success">Ada</span>' : '<span class="text-danger">Tidak Ada</span>');
+					$('#sphsbstanam').html(checkTanamFileKind(tanamFiles, 'sphtanam') ? '<span class="text-success">Ada</span>' : '<span class="text-danger">Tidak Ada</span>');
 
-					$('#logTanam').html(data.logbooktanam ? '<span class="text-success">Ada</span>' : '<span class="text-danger">Tidak Ada</span>');
+					$('#logTanam').html(checkTanamFileKind(tanamFiles, 'logbook') ? '<span class="text-success">Ada</span>' : '<span class="text-danger">Tidak Ada</span>');
 
 
 					var options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
@@ -338,6 +345,8 @@
 
 					var avtVerifAt = data.avtVerifAt ? new Date(data.avtVerifAt) : null;
 					var formattedAvtVerifAt = avtVerifAt ? avtVerifAt.toLocaleDateString('id-ID', options) : '-';
+					var countPoktan = data.countPoktan;
+					var countPks = data.countPks;
 
 					$('#avtDate').text(formattedAvtDate ?? '-');
 					$('#avtVerifAt').text(formattedAvtVerifAt ?? '-');
@@ -354,10 +363,10 @@
 					let iconClass = '';
 					let iconColorClass = '';
 
-					switch(data.avtStatus) {
+					switch(avtStatus) {
 						case '0':
 							statusMessage = 'Verifikasi sudah diajukan.';
-							iconClass = 'fas fa-check';
+							iconClass = 'fas fa-download';
 							iconColorClass = 'text-primary';
 							break;
 						case '1':
@@ -386,20 +395,16 @@
 						default:
 							statusMessage = 'Belum/Tidak ada pengajuan.';
 							$('#avtStatus').text(statusMessage);
-							return;
-					}
+							// return;
+					};
+
 
 					$('#avtStatus').html(`<span class="${iconColorClass}">${statusMessage} </span> <i class="${iconClass} ${iconColorClass} ml-1"></i>`);
 
-
 					$('#btnSubmit').text('Ajukan');
-					var avtStatus = data.avtStatus;
-					var realisasiProduksi = data.realisasiProduksi;
-					var countPoktan = data.countPoktan;
-					var countPks = data.countPks;
-					if (avtStatus === null && realisasiProduksi >= data.wajibProduksi) {
+					if (avtStatus == null || avtStatus == undefined) {
 						$('#btnSubmit').removeClass('d-none');
-					} else if (avtStatus == '7' && realisasiProduksi >= data.wajibProduksi) {
+					} else if (avtStatus === '7') {
 						$('#btnSubmit').removeClass('d-none');
 						$('#btnSubmit').text('Ajukan Ulang');
 					} else {
@@ -543,14 +548,14 @@
 							} else if (data === '1') {
 								currentStatus = 'Pengajuan';
 								htmlClass = '';
-							} else if (data === '2' || data === '3') {
+							} else if (data === '2' || data === '3' || data === '4' || data === '5' ) {
 								currentStatus = 'Diperiksa';
-								htmlClass = '';
-							} else if (data === '4') {
-								currentStatus = 'Selesai';
+								htmlClass = 'text-info';
+							} else if (data === '6') {
+								currentStatus = 'Selesai dan Sesuai';
 								htmlClass = 'text-success';
-							} else if (data === '5') {
-								currentStatus = 'Perbaikan';
+							} else if (data === '7') {
+								currentStatus = 'Selesai dan Perbaikan';
 								htmlClass = 'text-danger';
 							} else {
 								currentStatus = '-';

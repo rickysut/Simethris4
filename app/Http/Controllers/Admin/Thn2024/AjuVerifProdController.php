@@ -54,10 +54,10 @@ class AjuVerifProdController extends Controller
 		$commitment = PullRiph::where('npwp', $npwp)->where('no_ijin', $noIjin)->firstOrFail();
 		AjuVerifProduksi::create(
 			[
+				'tcode' => time(),
 				'npwp' => $npwp,
-				'commitment_id' => $commitment->id,
 				'no_ijin' => $noIjin,
-				'status' => 1,
+				'status' => 0,
 			],
 		);
 

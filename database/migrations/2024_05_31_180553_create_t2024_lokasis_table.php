@@ -27,7 +27,7 @@ return new class extends Migration
 			$table->string('periode_tanam')->nullable();
 
 			$table->date('tgl_tanam')->nullable();
-			$table->decimal('luas_tanam')->nullable();
+			$table->integer('luas_tanam')->nullable();
 			$table->text('tanamComment')->nullable();
             $table->text('tanamFoto')->nullable();
             $table->tinyInteger('tanamStatus')->nullable();
@@ -95,8 +95,10 @@ return new class extends Migration
             $table->tinyInteger('distStatus')->nullable();
 			//----------------------------------------------------------------
 			$table->integer('status')->nullable();
-			$table->date('verifAt')->nullable();
+			$table->date('verif_t_At')->nullable();
+			$table->date('verif_p_At')->nullable();
 			$table->string('varietas')->nullable(); //unused
+			$table->tinyInteger('is_selected')->default(0);
 			$table->timestamps();
 			$table->softDeletes();
         });

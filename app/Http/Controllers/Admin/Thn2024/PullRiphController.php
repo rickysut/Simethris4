@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin\Thn2024;
 
 use App\Http\Controllers\Controller;
+use App\Models2024\AjuVerifikasi;
 use Illuminate\Http\Request;
 
 use App\Models2024\PullRiph;
@@ -38,12 +39,7 @@ class PullRiphController extends Controller
 		$npwp_company = (Auth::user()::find(Auth::user()->id)->data_user->npwp_company ?? null);
 		$noIjins = PullRiph::where('npwp', $npwp_company)->select('no_ijin')->get();
 		// Cari ajutanam yang memiliki nomor ijin dari $noIjins
-		$ajutanam = AjuVerifTanam::whereIn('no_ijin', $noIjins)
-			->whereNotIn('status', [0, 7])
-			->get();
-
-		// Cari ajuproduksi dengan nomor ijin dari $noIjins
-		$ajuproduksi = AjuVerifProduksi::whereIn('no_ijin', $noIjins)
+		$pengajuan = AjuVerifikasi::whereIn('no_ijin', $noIjins)
 			->whereNotIn('status', [0, 7])
 			->get();
 
@@ -52,7 +48,9 @@ class PullRiphController extends Controller
 
 		// Cari completed dengan nomor ijin dari $noIjins
 		$completed = Completed::whereIn('no_ijin', $noIjins)->get();
-		return view('t2024.pullriph.index', compact('module_name', 'page_title', 'page_heading', 'heading_class', 'npwp_company', 'noIjins', 'ajutanam', 'ajuproduksi', 'ajuskl', 'completed'));
+
+		// dd($pengajuan);
+		return view('t2024.pullriph.index', compact('module_name', 'page_title', 'page_heading', 'heading_class', 'npwp_company', 'noIjins', 'pengajuan',  'ajuskl', 'completed'));
 	}
 
 	public function checkYear(Request $request)

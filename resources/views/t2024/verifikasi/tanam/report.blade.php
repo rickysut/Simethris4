@@ -24,7 +24,8 @@
 	<div class="main small">
     	@include('t2024.verifikasi.tanam.reportContentTitle')
     	@include('t2024.verifikasi.tanam.reportContent')
-    	@include('t2024.verifikasi.tanam.reportContentSign')
+    	{{-- @include('t2024.verifikasi.tanam.reportContentSign') --}}
+		@include('t2024.verifikasi.tanam.reportContentDetail')
 	</div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"

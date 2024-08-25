@@ -52,36 +52,49 @@
 		</div>
 		<div class="col-md-7">
 			<ul class="list-group list-group-flush mt-2">
-				<li class="d-flex justify-content-between list-group-item">
-					<span class=text-muted>Surat Pengajuan Verifikasi Tanam</span>
-					<span class=fw-semibold>
-						<i class="bi bi-{{ $payload['userDocs']->spvtcheck = 'sesuai' ? 'check-square-fill text-success' : 'x-square-fill text-danger' }}"></i>
-					</span>
-				</li>
-				<li class="d-flex justify-content-between list-group-item">
-					<span class=text-muted>Surat Pertanggungjawaban Mutlak</span>
-					<span class=fw-semibold>
-						<i class="bi bi-{{ $payload['userDocs']->sptjmtanamcheck = 'sesuai' ? 'check-square-fill text-success' : 'x-square-fill text-danger' }}"></i>
-					</span>
-				</li>
-				<li class="d-flex justify-content-between list-group-item">
-					<span class=text-muted>Form Realisasi Tanam</span>
-					<span class=fw-semibold>
-						<i class="bi bi-{{ $payload['userDocs']->rtacheck = 'sesuai' ? 'check-square-fill text-success' : 'x-square-fill text-danger' }}"></i>
-					</span>
-				</li>
-				<li class="d-flex justify-content-between list-group-item">
-					<span class=text-muted>SPH-SBS Tanam</span>
-					<span class=fw-semibold>
-						<i class="bi bi-{{ $payload['userDocs']->sphtanamcheck = 'sesuai' ? 'check-square-fill text-success' : 'x-square-fill text-danger' }}"></i>
-					</span>
-				</li>
-				<li class="d-flex justify-content-between list-group-item">
-					<span class=text-muted>Logbook s.d Tanam</span>
-					<span class=fw-semibold>
-						<i class="bi bi-{{ $payload['userDocs']->logbooktanamcheck = 'sesuai' ? 'check-square-fill text-success' : 'x-square-fill text-danger' }}"></i>
-					</span>
-				</li>
+				@foreach($payload['userFiles'] as $file)
+					<li class="d-flex justify-content-between list-group-item">
+						<span class=text-muted>
+							@switch($file->kind)
+								@case('sptjmtanam')
+									Surat Pertanggungjawaban Mutlak (Tanam)
+									@break
+								@case('sptjmproduksi')
+									Surat Pertanggungjawaban Mutlak (Produksi)
+									@break
+								@case('spvt')
+									Surat Permohonan Verifikasi Tanam
+									@break
+								@case('spvp')
+									Surat Permohonan Verifikasi Produksi
+									@break
+								@case('sphtanam')
+									SPH-SBS (Tanam)
+									@break
+								@case('sphproduksi')
+									SPH-SBS (Produksi)
+									@break
+								@case('rta')
+									Form Realisasi Tanam
+									@break
+								@case('rpo')
+									Form Realisasi Produksi
+									@break
+								@case('logbook')
+									Logbook
+									@break
+								@case('formLa')
+									Form Laporan Akhir
+									@break
+								@default
+									{{ $file->kind }}
+							@endswitch
+						</span>
+						<span class=fw-semibold>
+							<i class="bi bi-{{ $file->status == '1' ? 'check-square-fill text-success' : 'x-square-fill text-danger' }}"></i>
+						</span>
+					</li>
+				@endforeach
 			</ul>
 		</div>
 	</div>
@@ -89,9 +102,7 @@
 	<div class="row d-flex align-items-start">
 		<div class="col-md-5">
 			<span class="fw-bold h6">D. Ringkasan Hasil Verifikasi</span>
-			<p class="small text-muted">Tanggal pengajuan diambil dari tanggal saat pelaku usaha men-submit pengajuan.</p>
-			<p class="small text-muted">Tanggal verifikasi diambil dari tanggal mana, karena verifikasi memiliki rentang tanggal.</p>
-			<p class="small text-muted">Metode Verifikasi, diambil dari mana, karena setiap verifikasi tentu terdapat lebih dari 1 metode.</p>
+			<p class="small text-muted">Hasil verifikasi tanam</p>
 		</div>
 		<div class="col-md-7">
 			<ul class="list-group list-group-flush mt-2">
@@ -114,7 +125,6 @@
 			</ul>
 		</div>
 	</div>
-	<hr>
 </div>
 <div class="pagebreak"></div>
 <div class="container mt-4">
@@ -142,7 +152,7 @@
 				</tbody>
 			</table>
 		</div>
-	</div><hr>
+	</div>
 </div>
 <div class="pagebreak"></div>
 <div class="container mt-4">
@@ -166,13 +176,13 @@
 							<td>{{$timeline->ktp_petani}} - {{$timeline->masteranggota->nama_petani}}</td>
 							<td class="text-end">{{$timeline->tgl_tanam ? $timeline->tgl_tanam : 'tidak ada'}}</td>
 							<td class="text-end">{{$timeline->tgl_panen ? $timeline->tgl_panen : 'tidak ada'}}</td>
-							<td class="text-end">{{$timeline->verifAt}}</td>
+							<td class="text-end">{{$timeline->verif_t_at}}</td>
 						</tr>
 					@endforeach
 				</tbody>
 			</table>
 		</div>
-	</div><hr>
+	</div>
 </div>
 <div class="pagebreak"></div>
 <div class="container mt-4">
@@ -200,7 +210,7 @@
 								{{ $lokasi->luas_lahan ? number_format((float)$lokasi->luas_lahan, 0, ',', '.') . ' m²' : 'Tidak Ada' }}
 							</td>
 							<td>{{$lokasi->ktp_petani}} - {{$lokasi->masteranggota->nama_petani}}</td>
-							<td class="text-end">{{ \Carbon\Carbon::parse($lokasi->verif_at)->locale('id')->translatedFormat('F j, Y') }}</td>
+							<td class="text-end">{{ $lokasi->verif_t_at }}</td>
 						</tr>
 					@endforeach
 				</tbody>
@@ -208,3 +218,4 @@
 		</div>
 	</div>
 </div>
+<div class="pagebreak"></div>

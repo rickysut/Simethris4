@@ -110,7 +110,7 @@
     @include('partials.pagesettings')
     <script src="{{ asset('js/vendors.bundle.js') }}"></script>
     <script src="{{ asset('js/app.bundle.js') }}"></script>
-	<script src="{{asset('sw.js')}}"></script>
+	{{-- <script src="{{asset('sw.js')}}"></script> --}}
 	<script>
 		if ('serviceWorker' in navigator) {
 			navigator.serviceWorker.register('sw.js')

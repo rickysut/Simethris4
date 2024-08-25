@@ -55,10 +55,14 @@ class Pks extends Model
 		return $this->hasMany(Lokasi::class, ['kode_poktan', 'no_ijin'], ['kode_poktan', 'no_ijin']);
 	}
 
+	public function userfile()
+	{
+		return $this->hasMany(userfile::class, ['kode_poktan', 'no_ijin'], ['kode_poktan', 'no_ijin']);
+	}
 
 	public function masterpoktan()
 	{
-		return $this->belongsTo(MasterPoktan::class, 'kode_poktan');
+		return $this->belongsTo(MasterPoktan::class, 'kode_poktan', 'kode_poktan');
 	}
 
 	public function anggota()
