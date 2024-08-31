@@ -108,7 +108,6 @@
 									</a>
 								`;
 							} else if (status === "3") {
-
 								//jika belum ada no_skl
 								if (row.no_skl === null || row.no_skl === undefined) {
 									actionBtn = `
@@ -240,6 +239,13 @@
 										}
 									});
 								});
+							} else if (status === "5"){
+								//jalankan route post returnVerif
+								actionBtn = `
+									<a class="btn btn-icon btn-xs btn-default waves-effect waves-themed" title="Ditolak">
+										<i class="fa fa-ban text-danger"></i>
+									</a>
+								`;
 							} else {
 								actionBtn = '';
 							}

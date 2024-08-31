@@ -8,6 +8,7 @@ use App\Models2024\MasterAnggota;
 use App\Models2024\MasterPoktan;
 use App\Models2024\MasterSpatial;
 use App\Models2024\PullRiph;
+use App\Models\MasterKabupaten;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -23,10 +24,19 @@ class SpatialController extends Controller
 	{
 		$module_name = 'Spatial';
 		$page_title = 'Data Spatial';
-		$page_heading = 'Daftar Spatial Wajib Tanam';
+		$page_heading = 'Peta Spatial Wajib Tanam Produksi Bawang Putih';
 		$heading_class = 'bi bi-globe-asia-australia';
 
-		return view('t2024.spatial.index', compact('module_name', 'page_title', 'page_heading', 'heading_class'));
+		$ijins = PullRiph::select('no_ijin')->get();
+
+		$kabupatens = MasterSpatial::distinct()->pluck('kabupaten_id');
+
+		//output array kabupaten
+		$indexKabupaten = MasterKabupaten::whereIn('kabupaten_id', $kabupatens)->select('kabupaten_id','nama_kab')->get()->toArray();
+
+		$mapkey = ForeignApi::find(1);
+
+		return view('t2024.spatial.index', compact('module_name', 'page_title', 'page_heading', 'heading_class' , 'mapkey', 'ijins', 'indexKabupaten'));
 	}
 
 	/**
@@ -51,7 +61,7 @@ class SpatialController extends Controller
 
 		try {
 			$request->validate([
-				'kml_url' => 'required|file|mimes:kml,xml,application/vnd.google-earth.kml+xml|max:2048', // Maksimum ukuran file 2MB
+				'kml_url' => 'required|file|mimes:kml,xml,application/vnd.google-earth.kml+xml|max:2048',
 			]);
 
 			if ($request->hasFile('kml_url')) {
@@ -67,7 +77,7 @@ class SpatialController extends Controller
 
 			$kelurahanId = $request->input('kelurahan_id');
 			$namaKelompok = $request->input('poktan_name');
-			$hashedKodePoktan = md5($kelurahanId . $namaKelompok); // Hash kelurahan_id and nama_kelompok
+			$hashedKodePoktan = md5($kelurahanId . $namaKelompok);
 			$kodePoktan = 'poktan_' . $hashedKodePoktan;
 
 			$masterPoktan = MasterPoktan::updateOrCreate(
@@ -120,10 +130,6 @@ class SpatialController extends Controller
 					'kelurahan_id' => $request->input('kelurahan_id'),
 					'status' => 0,
 					'kml_url' => $filePath,
-					// 'komoditas' => $request->input('komoditas'),
-					// 'nama_petugas' => $request->input('nama_petugas'),
-					// 'tgl_peta' => $request->input('tgl_peta'),
-					// 'tgl_tanam' => $request->input('tgl_tanam'),
 				]
 			);
 

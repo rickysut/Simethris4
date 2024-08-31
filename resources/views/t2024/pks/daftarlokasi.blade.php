@@ -123,12 +123,14 @@
 					dataFilter: function(data){
 						var json = JSON.parse(data);
 						// Update the span with id=totalRealisasiProduksi
-						$('#totalRealisasiProduksi').text(json.totalRealisasiProduksi + ' ton');
 						var luasInHectares = json.totalRealisasiLuas; // Convert square meters to hectares
+						var volOutput = json.totalRealisasiProduksi/1000; // Convert square meters to hectares
 						var formattedLuas = luasInHectares.toLocaleString('id-ID', { maximumFractionDigits: 4 });
+						var formattedVolOutput = volOutput.toLocaleString('id-ID', { maximumFractionDigits: 2 });
 
 						// Update totalRealisasiLuas span
 						$('#totalRealisasiLuas').text(formattedLuas + ' m2');
+						$('#totalRealisasiProduksi').text(formattedVolOutput + ' ton');
 						return data;
 					}
 				},

@@ -83,14 +83,13 @@ class VerifSklController extends Controller
 		$validUser = Auth::user();
 		$guess = $request->input('verified');
 		$verif_note = $request->input('recomend_note');
-		$status = $request->input('status');
 		if ($guess != $validUser->username) {
 			return redirect()->back()->with('error', 'Validasi nama pengguna GAGAL!, Isi nama pengguna Anda yang benar.');
 		}
-
-		if ($status = 2) {
+		$status = $request->input('status');
+		// dd($status);
+		if ($status == 2) {
 			$payload = $this->payload($noIjin, $tcode);
-
 			$now = now();
 
 			AjuVerifSkl::where('tcode', $tcode)->update([
@@ -100,8 +99,8 @@ class VerifSklController extends Controller
 				'verif_note' => $verif_note,
 				'recomend_by' => $validUser->id,
 				'recomend_at' => $now,
-				'recomend_note' => $now,
-				'status' => 2,
+				'recomend_note' => $verif_note,
+				'status' => $status,
 			]);
 
 			return redirect()->route('2024.admin.permohonan.skl.index')->with('success', 'Rekomendasi Penerbitan SKL berhasil diajukan kepada pimpinan.');
@@ -111,10 +110,29 @@ class VerifSklController extends Controller
 				'verif_at' => now(),
 				'metode' => 'on system',
 				'verif_note' => $verif_note,
-				'status' => 6,
+				'status' => $status,
 			]);
 			return redirect()->route('2024.admin.permohonan.skl.index')->with('success', 'Permohonan Penerbitan SKL berhasil dikembalikan kepada Pelaku Usaha.');
 		}
+	}
+
+	/**
+	 * metode mengembalikan ke importir (status 5 -> 6)
+	 * belum ada. harus di buat di sini
+	*/
+
+	public function returnVerif(Request $request, $noIjin, $tcode)
+	{
+		abort_if(Gate::denies('permission_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
+		$validUser = Auth::user();
+		AjuVerifSkl::where('tcode', $tcode)->update([
+			'check_by' => $validUser->id,
+			'verif_at' => now(),
+			'metode' => 'on system',
+			'status' => 6,
+		]);
+		return redirect()->route('2024.admin.permohonan.skl.index')->with('success', 'Permohonan Penerbitan SKL berhasil dikembalikan kepada Pelaku Usaha.');
 	}
 
 	public function generateRepReqSkl($noIjin, $tcode)

@@ -102,6 +102,9 @@
 									<li class="timeline-item mb-5">
 										<h5 class="mb-3 data-title" id="title_{{ $item['id'] }}" data-toggle="collapse" data-target="#content_{{ $item['id'] }}">
 											<span class="mr-1 fw-500">{{ $item['date'] ?? '?' }} : </span>
+											<span class="fw-700 text-{{ $item['status'] === 1 ? 'success' : ($item['status'] === 0 ? 'danger' : 'warning') }}">
+												<i class="fa fa-{{ $item['status'] === 1 ? 'check' : ($item['status'] === 0 ? 'ban' : 'exclamation-circle') }}"></i>
+											</span>
 											<span class="fw-700 text-primary">{{ $item['title'] }}</span>
 										</h5>
 										<div class="collapse" id="content_{{ $item['id'] }}" data-parent="#js_demo_accordion-1">

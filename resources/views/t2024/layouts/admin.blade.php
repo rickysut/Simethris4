@@ -102,7 +102,7 @@
 		</form>
 		<!-- end page wrapper -->
 		<!-- begin quick menu -->
-		@include('partials.quickmenu')
+		{{-- @include('partials.quickmenu') --}}
 		<!-- end quick menu -->
 		{{-- base app script --}}
 		<script src="{{ asset('js/app.js') }}"></script>

@@ -1,5 +1,60 @@
 @extends('t2024.layouts.admin')
 @section('content')
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+    async function updateAllDesa() {
+        try {
+            // Ambil list provinsiIds
+            const response = await axios.get('/2024/spatial/master-wilayah/updateAllDesaFromBPS');
+            const provinsiIds = response.data.provinsiIds;
+
+            if (!provinsiIds.length) {
+                alert('Tidak ada provinsi untuk diperbarui.');
+                return;
+            }
+
+            let progressElement = document.getElementById('progress');
+            let statusElement = document.getElementById('status');
+            let waitTimeElement = document.getElementById('waitTime');
+
+            for (let i = 0; i < provinsiIds.length; i++) {
+                let provinsiId = provinsiIds[i];
+
+                statusElement.innerText = `Memperbarui provinsi ID ${provinsiId}...`;
+
+                let updateResponse = await axios.get(`/2024/spatial/master-wilayah/updateDesaFromBPS/${provinsiId}`);
+                let updateResult = updateResponse.data;
+
+                if (updateResult.success) {
+                    statusElement.innerText = `Sukses: ${updateResult.message}`;
+                } else {
+                    statusElement.innerText = `Gagal: ${updateResult.message}`;
+                }
+
+                // Update progress
+                let progress = Math.round(((i + 1) / provinsiIds.length) * 100);
+                progressElement.innerText = `Progress: ${progress}%`;
+
+                // Jeda 1 menit dengan tampilan waktu sisa
+                if (i < provinsiIds.length - 1) {
+                    let waitTime = 60; // waktu tunggu dalam detik
+                    while (waitTime > 0) {
+                        waitTimeElement.innerText = `Menunggu ${waitTime} detik sebelum melanjutkan...`;
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+                        waitTime--;
+                    }
+                    waitTimeElement.innerText = 'Menunggu selesai. Melanjutkan...';
+                }
+            }
+
+            statusElement.innerText = 'Proses pembaruan selesai.';
+        } catch (error) {
+            console.error('Terjadi kesalahan:', error);
+            alert('Terjadi kesalahan saat memperbarui data.');
+        }
+    }
+</script>
+
 {{-- @include('t2024.partials.breadcrumb') --}}
 @include('t2024.partials.subheader')
 @include('t2024.partials.sysalert')
@@ -13,6 +68,13 @@
 					</h2>
 				</div>
 				<div class="panel-container show">
+					<div class="panel-content" hidden>
+						<h1>Pembaruan Data Desa</h1>
+						<button onclick="updateAllDesa()">Mulai Pembaruan</button>
+						<div id="progress">Progress: 0%</div>
+						<div id="status">Status: </div>
+						<div id="waitTime">Menunggu...</div>
+					</div>
 					<div class="panel-content">
 						<div class="row justify-content-between">
 							<div class="form-group col-lg-4">
@@ -79,8 +141,8 @@
 
 		var urlUpdateProv = "{{ route('2024.spatial.updateProvinsiFromBPS', '') }}";
 		var urlUpdateKab = function(provinsiId) { return "{{ route('2024.spatial.updateKabupatenFromBPS', '') }}/" + provinsiId; };
-		var urlUpdateKec = function(kabupatenId) { return "{{ route('2024.spatial.updateKecamatanFromBPS', '') }}/" + kabupatenId; };
-		var urlUpdateDesa = function(kecamatanId) { return "{{ route('2024.spatial.updateDesaFromBPS', '') }}/" + kecamatanId; };
+		var urlUpdateKec = function(provinsiId) { return "{{ route('2024.spatial.updateKecamatanFromBPS', '') }}/" + provinsiId; };
+		var urlUpdateDesa = function(provinsiId) { return "{{ route('2024.spatial.updateDesaFromBPS', '') }}/" + provinsiId; };
 
 		var status = 'need update';
 
@@ -139,7 +201,18 @@
 					width: '20%',
 					title: 'Tindakan',
 					render: function (data, type, row) {
-						return `<button type="button" class="btn btn-default btn-xs btnUpdate" data-id="${data}" data-level="provinsi">Selaraskan data Kabupaten</button>`;
+						let url1 = `{{ route('2024.spatial.updateKabupatenFromBPS', ':id') }}`;
+						url1 = url1.replace(':id', data);
+						let url2 = `{{ route('2024.spatial.updateKecamatanFromBPS', ':id') }}`;
+						url2 = url2.replace(':id', data);
+						let url3 = `{{ route('2024.spatial.updateDesaFromBPS', ':id') }}`;
+						url3 = url3.replace(':id', data);
+
+						return `
+							<a href="${url1}" type="button" class="btn btn-icon btn-info btn-xs">1</a>
+							<a href="${url2}" type="button" class="btn btn-icon btn-warning btn-xs">2</a>
+							<a href="${url3}" type="button" class="btn btn-icon btn-danger btn-xs">3</a>
+						`;
 					}
 				}
 			],
@@ -203,31 +276,9 @@
 				columns: [
 					{ data: idField, title: idField.replace('_', ' ').toUpperCase(), width: '15%' },
 					{ data: nameField, title: 'NAMA BPS (' + idField.split('_')[0].toUpperCase() +')'},
-					{
-						data: idField,
-						title: 'Tindakan',
-						width: '20%',
+					{ data: idField, title: 'Tindakan', width: '20%',
 						render: function (data, type, row) {
-							let nextLevel;
-							switch(level) {
-								case 'provinsi':
-									nextLevel = 'kabupaten';
-									break;
-								case 'kabupaten':
-									nextLevel = 'kecamatan';
-									break;
-								case 'kecamatan':
-									nextLevel = 'kelurahan';
-									break;
-								case 'kelurahan':
-									nextLevel = '';
-									break;
-							}
-							if (nextLevel) {
-								return `<button type="button" class="btn btn-default btn-xs btnUpdate" data-id="${data}" data-level="${nextLevel}">Selaraskan data ${nextLevel}</button>`;
-							} else {
-								return '';
-							}
+							return '';
 						}
 					}
 				],

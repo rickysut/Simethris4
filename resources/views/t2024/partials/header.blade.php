@@ -4,11 +4,11 @@
 
 @if (Auth::user()->roles[0]->title == 'Admin' || Auth::user()->roles[0]->title == 'Pejabat' || Auth::user()->roles[0]->title == 'Verifikator')
 	{{-- tanam --}}
-	@php($cntAjuVerifTanam = \App\Models2024\AjuVerifTanam::newPengajuanCount())
-	@php($getAjuVerifTanam = \App\Models2024\AjuVerifTanam::getNewPengajuan())
+	@php($cntAjuVerifTanam = \App\Models2024\AjuVerifikasi::newPengajuanCount())
+	@php($getAjuVerifTanam = \App\Models2024\AjuVerifikasi::getNewPengajuan())
 	{{-- produksi --}}
-	@php($cntAjuVerifProduksi = \App\Models2024\AjuVerifProduksi::newPengajuanCount())
-	@php($getAjuVerifProduksi = \App\Models2024\AjuVerifProduksi::getNewPengajuan())
+	@php($cntAjuVerifProduksi = \App\Models2024\AjuVerifikasi::newPengajuanCount())
+	@php($getAjuVerifProduksi = \App\Models2024\AjuVerifikasi::getNewPengajuan())
 	{{-- skl --}}
 	@php($cntAjuVerifSkl = \App\Models2024\AjuVerifSkl::newPengajuanCount())
 	@php($getAjuVerifSkl = \App\Models2024\AjuVerifSkl::getNewPengajuan())

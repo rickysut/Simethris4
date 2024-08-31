@@ -452,6 +452,10 @@ Route::group(['prefix' => '2024', 'as' => '2024.', 'namespace' => 'Admin', 'midd
 
 			Route::get('/getLocDataByIjinBySpatial/{noIjin}/{spatial}', 'DataFeederController@getLocDataByIjinBySpatial')->name('getLocDataByIjinBySpatial');
 			Route::post('/postLocDataByIjinBySpatial', 'DataFeederController@postLocDataByIjinBySpatial')->name('postLocDataByIjinBySpatial');
+			Route::post('/responseGetLocationInKabupaten', 'DataFeederController@responseGetLocationInKabupaten')->name('responseGetLocationInKabupaten');
+			Route::post('/responseGetSpatialDetail', 'DataFeederController@responseGetSpatialDetail')->name('responseGetSpatialDetail');
+			Route::get('/responseGetSpatialMoreDetail/{spatial}', 'DataFeederController@responseGetSpatialMoreDetail')->name('responseGetSpatialMoreDetail');
+			Route::get('/getInvalidNik', 'DataFeederController@getInvalidNik')->name('getInvalidNik');
 
 			Route::get('/postLocDataByIjinBySpatial', 'DataFeederController@postLocDataByIjinBySpatial')->name('postLocDataByIjinBySpatial');
 
@@ -486,6 +490,7 @@ Route::group(['prefix' => '2024', 'as' => '2024.', 'namespace' => 'Admin', 'midd
 					Route::get('/', 'VerifSklController@index')->name('index');
 					Route::get('/{noIjin}/{tcode}', 'VerifSklController@check')->name('check');
 					Route::post('/{noIjin}/{tcode}', 'VerifSklController@storeVerifSkl')->name('storeVerifSkl');
+					Route::post('/return/{noIjin}/{tcode}', 'VerifSklController@returnVerif')->name('returnVerif');
 					Route::post('/draft/{noIjin}/{tcode}', 'VerifSklController@draftSkl')->name('draftSkl');
 
 					Route::get('/generateRepReqSkl/{noIjin}/{tcode}', 'VerifSklController@generateRepReqSkl')->name('generateRepReqSkl');
@@ -638,8 +643,9 @@ Route::group(['prefix' => '2024', 'as' => '2024.', 'namespace' => 'Admin', 'midd
 			Route::get('/master-wilayah/updateFromBPS', 'MasterWilayahController@updateFromBPS')->name('updateFromBPS');
 			Route::get('/master-wilayah/updateProvinsiFromBPS', 'MasterWilayahController@updateProvinsiFromBPS')->name('updateProvinsiFromBPS');
 			Route::get('/master-wilayah/updateKabupatenFromBPS/{provinsiId}', 'MasterWilayahController@updateKabupatenFromBPS')->name('updateKabupatenFromBPS');
-			Route::get('/master-wilayah/updateKecamatanFromBPS/{kabupatenId}', 'MasterWilayahController@updateKecamatanFromBPS')->name('updateKecamatanFromBPS');
-			Route::get('/master-wilayah/updateDesaFromBPS/{kecamatanId}', 'MasterWilayahController@updateDesaFromBPS')->name('updateDesaFromBPS');
+			Route::get('/master-wilayah/updateKecamatanFromBPS/{provinsiId}', 'MasterWilayahController@updateKecamatanFromBPS')->name('updateKecamatanFromBPS');
+			Route::get('/master-wilayah/updateDesaFromBPS/{provinsiId}', 'MasterWilayahController@updateDesaFromBPS')->name('updateDesaFromBPS');
+			Route::get('/master-wilayah/updateAllDesaFromBPS', 'MasterWilayahController@updateAllDesaFromBPS')->name('updateAllDesaFromBPS');
 
 			Route::get('/simulator', 'SpatialController@simulatorJarak')->name('simulatorJarak');
 		});

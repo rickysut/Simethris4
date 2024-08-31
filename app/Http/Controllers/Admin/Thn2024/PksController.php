@@ -226,6 +226,7 @@ class PksController extends Controller
 
 	public function storeFoto(Request $request, $noIjin, $spatial)
 	{
+		$ijin = $noIjin;
 		// Format $noIjin
 		$noIjinFormatted = substr($noIjin, 0, 4) . '/' .
 			substr($noIjin, 4, 2) . '.' .
@@ -286,7 +287,7 @@ class PksController extends Controller
 					$filename = $field . '_' . time() . '_' . $noIjin . '_' . $spatial . '.' . $extension;
 
 					// Simpan file ke storage
-					$path = 'uploads/' . $npwp . '/' . $periode;
+					$path = 'uploads/' . $npwp . '/' . $periode . '/' . $ijin;
 					$file->storeAs($path, $filename, 'public');
 					$fullPath = url($path . '/' . $filename);
 

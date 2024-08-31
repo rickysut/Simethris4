@@ -49,16 +49,17 @@ class AjuVerifikasi extends Model
 			->count();
 	}
 
+	public static function getNewPengajuan()
+	{
+		return self::where('status', '0')->get();
+	}
+
 
 
 
 	public static function newPengajuanCount(): int
 	{
 		return self::where('status', '0')->count();
-	}
-	public static function getNewPengajuan()
-	{
-		return self::where('status', '0')->get();
 	}
 
 	public function commitment()

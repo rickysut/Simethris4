@@ -295,8 +295,8 @@
 			const nikPetani = placemark.querySelector("SimpleData[name='NIK']").textContent;
 			const petani = placemark.querySelector("SimpleData[name='PETANI']").textContent;
 			const luas = placemark.querySelector("SimpleData[name='LUAS_LAHAN']").textContent;
-			const x = parseFloat(placemark.querySelector("SimpleData[name='LATITUDE']").textContent);
-			const y = parseFloat(placemark.querySelector("SimpleData[name='LONGITUDE']").textContent);
+			const y = parseFloat(placemark.querySelector("SimpleData[name='LATITUDE']").textContent);
+			const x = parseFloat(placemark.querySelector("SimpleData[name='LONGITUDE']").textContent);
 			const altitude = parseFloat(placemark.querySelector("SimpleData[name='ALTITUDE']").textContent);
 			const desa_id = placemark.querySelector("SimpleData[name='ID_DESA']").textContent;
 			const poktanName = placemark.querySelector("SimpleData[name='POKTAN']").textContent;

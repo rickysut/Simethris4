@@ -312,7 +312,7 @@ class CommitmentController extends Controller
 					$fileExtension = $file->extension();
 					$file_name = $field . '_' . $ijin . '_' . time() . '.' . $fileExtension;
 					// $file_path = $file->storeAs('uploads/' . $npwp . '/' . $commitment->periodetahun, $file_name, 'public');
-					$path = 'uploads/' . $npwp . '/' . $commitment->periodetahun;
+					$path = 'uploads/' . $npwp . '/' . $commitment->periodetahun . '/' . $ijin;
 					$file->storeAs($path, $file_name, 'public');
 					$fullPath = url($path . '/' . $file_name);
 					// $fullPath = url('storage/' . $file_path);

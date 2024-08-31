@@ -294,9 +294,9 @@ class VerifProduksiController extends Controller
 		abort_if(Gate::denies('online_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
 		//page level
-		$module_name = 'Verifikasi Tanam';
-		$page_title = 'Verifikasi Tanam';
-		$page_heading = 'Data Pengajuan Verifikasi Tanam';
+		$module_name = 'Verifikasi Produksi';
+		$page_title = 'Verifikasi Produksi';
+		$page_heading = 'Data Pengajuan Verifikasi Produksi';
 		$heading_class = 'fal fa-file-search';
 
 		$user = Auth::user();
@@ -321,8 +321,8 @@ class VerifProduksiController extends Controller
 		$ijin = $noIjin;
 		$noIjin = $this->formatNoIjin($noIjin);
 
-		$module_name = 'Verifikasi Tanam';
-		$page_title = 'Verifikasi Realisasi Tanam';
+		$module_name = 'Verifikasi Produksi';
+		$page_title = 'Verifikasi Realisasi Tanam-Produksi';
 		$page_heading = $page_title;
 		$heading_class = 'fal fa-farm';
 
@@ -367,9 +367,9 @@ class VerifProduksiController extends Controller
 
 			['id' => 8, 'date' => $lokasi->optDate, 'columnName' => 'optStatus', 'title' => 'Pengendalian OPT', 'comment' => $lokasi->optComment, 'status' => $lokasi->optStatus, 'foto' => $optFoto],
 
-			['id' => 9, 'date' => $lokasi->tgl_panen, 'columnName' => 'prodStatus', 'title' => 'Produksi/Panen', 'comment' => $lokasi->prodComment, 'value' => 'Jumlah Panen: ' . $lokasi->volume . ' ton', 'status' => $lokasi->prodStatus, 'foto' => $prodFoto],
+			['id' => 9, 'date' => $lokasi->tgl_panen, 'columnName' => 'prodStatus', 'title' => 'Produksi/Panen', 'comment' => $lokasi->prodComment, 'value' => 'Jumlah Panen: ' . $lokasi->volume . ' kg', 'status' => $lokasi->prodStatus, 'foto' => $prodFoto],
 
-			['id' => 10, 'date' => $lokasi->tgl_panen, 'columnName' => 'distStatus', 'title' => 'Distribusi hasil', 'comment' => $lokasi->distComment, 'value' => 'Disimpan: ' . $lokasi->vol_benih . ' ton', 'value2' => 'Dijual: ' . $lokasi->vol_jual . ' ton', 'status' => $lokasi->distStatus],
+			['id' => 10, 'date' => $lokasi->tgl_panen, 'columnName' => 'distStatus', 'title' => 'Distribusi hasil', 'comment' => $lokasi->distComment, 'value' => 'Disimpan: ' . $lokasi->vol_benih . ' kg', 'value2' => 'Dijual: ' . $lokasi->vol_jual . ' kg', 'status' => $lokasi->distStatus],
 		]);
 
 		$timelineItems = $timelineItems->map(function ($item) {
@@ -612,7 +612,7 @@ class VerifProduksiController extends Controller
 			DB::commit();
 
 			// return redirect()->back()->with('success', 'Sukses');
-			return redirect()->route('2024.verifikator.tanam.result', [$noIjin, $tcode])->with('success', 'Pemeriksaan Realisasi Komitmen Wajib Tanam dinyatakan Selesai dan Data berhasil disimpan.');
+			return redirect()->route('2024.verifikator.produksi.result', [$noIjin, $tcode])->with('success', 'Pemeriksaan Realisasi Komitmen Wajib Tanam dinyatakan Selesai dan Data berhasil disimpan.');
 		} catch (\Exception $e) {
 			DB::rollback();
 			return redirect()->back()->with('error', 'Terjadi kesalahan saat menyimpan data: ' . $e->getMessage());

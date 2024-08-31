@@ -154,10 +154,16 @@
 									data: 'status',
 									render: function(data, type, row) {
 										var status;
-										if (data === 1) {
-											status = '<span class="badge badge-success btn-xs btn-icon text"><i class="fal fa-check"></i></span>';
-										} else if (data === 0) {
-											status = '<span class="badge badge-danger btn-xs btn-icon text"><i class="fal fa-ban"></i></span>';
+										var prodStatus = row.prodStatus;
+										var distStatus = row.distStatus;
+										if (prodStatus || distStatus) {
+											if (data === 1) {
+												status = `<span class="badge badge-success btn-xs btn-icon text"><i class="fal fa-check"></i></span>`;
+											} else if (data === 0) {
+												status = '<span class="badge badge-danger btn-xs btn-icon text"><i class="fal fa-ban"></i></span>';
+											} else {
+												status = '<span class="badge badge-warning btn-xs btn-icon text"><i class="fal fa-exclamation-circle"></i></span>';
+											}
 										} else {
 											status = '<span class="badge badge-warning btn-xs btn-icon text"><i class="fal fa-exclamation-circle"></i></span>';
 										}

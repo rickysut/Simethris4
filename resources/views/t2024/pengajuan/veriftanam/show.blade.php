@@ -4,265 +4,197 @@
 	@include('t2024.partials.subheader')
 	@include('t2024.partials.sysalert')
 
-	<div class="row">
-		<div class="col-12">
-			<div class="text-center">
-				<i class="fal fa-badge-check fa-3x subheader-icon"></i>
-				<h2>Ringkasan Data</h2>
-				<div class="row justify-content-center">
-					<p class="lead">Ringkasan {{$page_heading}}.</p>
-				</div>
-			</div>
-
-			<div id="panel-1" class="panel">
-				<div class="panel-container">
-					<div class="panel-content">
-						<table class="table table-hover table-sm w-100" style="border: none; border-top:none; border-bottom:none;" id="dataTable">
-							<thead class="">
-								<th  style="width: 32%"></th>
-								<th style="width: 1%"></th>
-								<th></th>
-								<th></th>
-							</thead>
-							<tbody>
-								<tr>
-									<td class="text-uppercase fw-500 h6">RINGKASAN UMUM</td>
-									<td></td>
-									<td></td>
-									<td></td>
-								</tr>
-								<tr>
-									<td class="text-muted">Perusahaan</td>
-									<td>:</td>
-									<td class="fw-500" id="companyName"></td>
-									<td></td>
-								</tr>
-								<tr>
-									<td class="text-muted">Nomor Ijin (RIPH)</td>
-									<td>:</td>
-									<td class="fw-500" id="noIjin"></td>
-									<td></td>
-								</tr>
-								<tr>
-									<td class="text-muted">Periode RIPH</td>
-									<td>:</td>
-									<td class="fw-500" id="periode"></td>
-									<td></td>
-								</tr>
-								<tr class="bg-primary-50" style="height: 25px; opacity: 0.2">
-									<td></td>
-									<td></td>
-									<td></td>
-									<td></td>
-								</tr>
-								<tr>
-									<td class="text-uppercase fw-500 h6">RINGKASAN KEWAJIBAN DAN REALISASI</td>
-									<td></td>
-									<td></td>
-									<td></td>
-								</tr>
-								<tr>
-									<td class="text-muted">Realisasi Tanam</td>
-									<td>:</td>
-									<td class="fw-500" id="realisasiTanam">
-										<span></span>
-										<i></i>
-									</td>
-									<td></td>
-								</tr>
-								<tr>
-									<td class="text-muted">Jumlah Lokasi Tanam/Spasial</td>
-									<td>:</td>
-									<td class="fw-500" id="countSpatial"></td>
-									<td></td>
-								</tr>
-								<tr class="" style="height: 25px;">
-									<td></td>
-									<td></td>
-									<td></td>
-									<td></td>
-								</tr>
-								<tr>
-									<td class="text-uppercase fw-500 h6">RINGKASAN KEMITRAAN</td>
-									<td></td>
-									<td></td>
-									<td></td>
-								</tr>
-								<tr>
-									<td class="text-muted">Jumlah Petani Mitra</td>
-									<td>:</td>
-									<td class="fw-500" id="countAnggota"></td>
-									<td></td>
-								</tr>
-								<tr>
-									<td class="text-muted">Jumlah Kelompok Tani Mitra</td>
-									<td>:</td>
-									<td class="fw-500" id="countPoktan"></td>
-									<td></td>
-								</tr>
-								<tr>
-									<td class="text-muted">Jumlah Perjanjian (PKS) diunggah</td>
-									<td>:</td>
-									<td class="fw-500" id="countPks">
-										<span></span>
-										<i></i>
-									</td>
-									<td></td>
-								</tr>
-								<tr class="bg-primary-50" style="height: 25px; opacity: 0.2">
-									<td></td>
-									<td></td>
-									<td></td>
-									<td></td>
-								</tr>
-
-								<tr>
-									<td class="text-uppercase fw-500">KELENGKAPAN BERKAS</td>
-									<td></td>
-									<td></td>
-									<td></td>
-								</tr>
-								<tr>
-									<td class="text-uppercase fw-500">A. TAHAP TANAM</td>
-									<td></td>
-									<td></td>
-									<td></td>
-								</tr>
-								<tr>
-									<td class="text-muted pl-4">Surat Pengajuan Verifikasi Tanam</td>
-									<td>:</td>
-									<td class="fw-500" id="spvt">
-									</td>
-									<td></td>
-								</tr>
-								<tr>
-									<td class="text-muted pl-4">Surat Pertanggungjawaban Mutlak (Tanam)</td>
-									<td>:</td>
-									<td class="fw-500" id="sptjmtanam"></td>
-									<td></td>
-								</tr>
-								<tr>
-									<td class="text-muted pl-4">Form Realisasi Tanam</td>
-									<td>:</td>
-									<td class="fw-500" id="rta"></td>
-									<td></td>
-								</tr>
-								<tr>
-									<td class="text-muted pl-4">SPH-SBS (Tanam)</td>
-									<td>:</td>
-									<td class="fw-500" id="sphsbstanam"></td>
-									<td></td>
-								</tr>
-								<tr>
-									<td class="text-muted pl-4">Logbook (s.d Tanam)</td>
-									<td>:</td>
-									<td class="fw-500" id="logTanam"></td>
-									<td></td>
-								</tr>
-
-								{{-- hasil pemeriksaan --}}
-								<tr class="bg-primary-50" style="height: 25px; opacity: 0.2">
-									<td></td>
-									<td></td>
-									<td></td>
-									<td></td>
-								</tr>
-								<tr>
-									<td class="text-uppercase fw-500 h6">RINGKASAN HASIL</td>
-									<td></td>
-									<td></td>
-									<td></td>
-								</tr>
-								<tr>
-									<td class="text-uppercase fw-500">A. VERIFIKASI TANAM</td>
-									<td></td>
-									<td></td>
-									<td></td>
-								</tr>
-								<tr>
-									<td class="text-muted pl-4">Tanggal Pengajuan</td>
-									<td>:</td>
-									<td class="fw-500" id="avtDate"></td>
-									<td></td>
-								</tr>
-								<tr>
-									<td class="text-muted pl-4">Tanggal Verifikasi</td>
-									<td>:</td>
-									<td class="fw-500" id="avtVerifAt"></td>
-									<td></td>
-								</tr>
-								<tr>
-									<td class="text-muted pl-4">Metode Verifikasi</td>
-									<td>:</td>
-									<td class="fw-500" id="avtMetode"></td>
-									<td></td>
-								</tr>
-								<tr>
-									<td class="text-muted pl-4">Catatan Verifikasi</td>
-									<td>:</td>
-									<td class="fw-500" id="avtNote">
-										<p></p>
-									</td>
-									<td></td>
-								</tr>
-								<tr>
-									<td class="text-muted pl-4">Hasil Verifikasi</td>
-									<td>:</td>
-									<td class="fw-500" id="avtStatus">
-
-									</td>
-									<td></td>
-								</tr>
-							</tbody>
-						</table>
-					</div>
-				</div>
-
-				<div class="card-footer d-flex justify-content-end">
-					<a href="{{ route('2024.user.commitment.index') }}"
-						class="btn btn-xs btn-info mr-1" data-toggle="tooltip"
-						title data-original-title="Kembali">
-						<i class="fal fa-undo mr-1"></i>
-						Kembali
-					</a>
-					{{-- Form pengajuan --}}
-					{{-- pengajuan tanam --}}
-					<form action="{{route('2024.user.commitment.submitPengajuan', $ijin)}}" method="post" enctype="multipart/form-data">
-						@csrf
-						<input type="hidden" value="TANAM" id="kind" name="kind">
-						<button type="submit" class="btn btn-xs btn-warning d-none" data-toggle="tooltip" title data-original-title="Ajukan Verifikasi Tanam" id="btnSubmit">
-							<i class="fal fa-upload mr-1"></i>
-							Ajukan
-						</button>
-					</form>
-				</div>
-			</div>
-		</div>
-	</div>
-
-	<div class="row">
-		<div class="col-12">
-			<div id="panel-1" class="panel">
-				<div class="panel-hdr">
-					<h5>Riwayat Pengajuan Verifikasi</h5>
-				</div>
-				<div class="panel-container show">
-					<div class="panel-content">
-						<table class="table table-hover table-sm w-100" style="border: none; border-top:none; border-bottom:none;" id="tblVerifHistory">
-							<thead class="">
-								<th>Tanggal Diajukan</th>
-								<th>Verifikator</th>
-								<th>Tanggal Verifikasi</th>
-								<th>Status</th>
-								<th>Catatan</th>
-							</thead>
-							<tbody></tbody>
-						</table>
+	<section id="heading">
+		<div class="row">
+			<div class="col-12">
+				<div class="text-center">
+					<i class="fal fa-badge-check fa-3x subheader-icon"></i>
+					<h2>Ringkasan Data</h2>
+					<div class="row justify-content-center">
+						<p class="lead">Ringkasan {{$page_heading}}.</p>
 					</div>
 				</div>
 			</div>
 		</div>
-	</div>
+	</section>
+	<section id="summary">
+		<div class="row">
+			<div class="col-12">
+				<div id="panel-1" class="panel">
+					<div class="panel-container">
+						<div class="panel-content p-5">
+							<div class="row d-flex align-items-start">
+								<div class="col-md-4">
+									<span class="fw-bold h6 text-uppercase">RINGKASAN UMum</span>
+								</div>
+								<div class="col-md-8">
+									<ul class="list-group list-group-flush">
+										<li class="list-group-item d-flex justify-content-start align-items-start">
+											<span class="text-muted col-6">Perusahaan</span>
+											<span class="fw-500" id="companyName"></span>
+										</li>
+										<li class="list-group-item d-flex justify-content-start align-items-start">
+											<span class="text-muted col-6">Nomor Ijin</span>
+											<span class="fw-500" id="noIjin"></span>
+										</li>
+										<li class="list-group-item d-flex justify-content-start align-items-start">
+											<span class="text-muted col-6">Periode RIPH</span>
+											<span class="fw-500" id="periode"></span>
+										</li>
+									</ul>
+								</div>
+							</div>
+							<hr>
+							<div class="row d-flex align-items-start">
+								<div class="col-md-4">
+									<span class="fw-bold h6 text-uppercase">RINGKASAN KEWAJIBAN DAN REALISASI</span>
+								</div>
+								<div class="col-md-8">
+									<ul class="list-group list-group-flush">
+										<li class="list-group-item d-flex justify-content-start align-items-start">
+											<span class="text-muted col-6">Realisasi Tanam (m2)</span>
+											<span class="fw-500" id="realisasiTanam"></span>
+										</li>
+										<li class="list-group-item d-flex justify-content-start align-items-start">
+											<span class="text-muted col-6">Jumlah Lokasi Tanam</span>
+											<span class="fw-500" id="countSpatial"></span>
+										</li>
+									</ul>
+								</div>
+							</div>
+							<hr>
+							<div class="row d-flex align-items-start">
+								<div class="col-md-4">
+									<span class="fw-bold h6 text-uppercase">RINGKASAN KEMITRAAN</span>
+								</div>
+								<div class="col-md-8">
+									<ul class="list-group list-group-flush">
+										<li class="list-group-item d-flex justify-content-start align-items-start">
+											<span class="text-muted col-6">Jumlah Petani Mitra</span>
+											<span class="fw-500" id="countAnggota"></span>
+										</li>
+										<li class="list-group-item d-flex justify-content-start align-items-start">
+											<span class="text-muted col-6">Jumlah Kelompok Tani Mitra</span>
+											<span class="fw-500" id="countPoktan"></span>
+										</li>
+										<li class="list-group-item d-flex justify-content-start align-items-start">
+											<span class="text-muted col-6">Jumlah Perjanjian (PKS) diunggah</span>
+											<span class="fw-500" id="countPks"></span>
+										</li>
+									</ul>
+								</div>
+							</div>
+							<hr>
+							<div class="row d-flex align-items-start">
+								<div class="col-md-4">
+									<span class="fw-bold h6 text-uppercase">KELENGKAPAN BERKAS</span>
+								</div>
+								<div class="col-md-8">
+									<ul class="list-group list-group-flush">
+										<li class="list-group-item d-flex justify-content-start align-items-start">
+											<span class="text-muted col-6">Surat Pengajuan Verifikasi Tanam</span>
+											<span class="fw-500" id="spvt"></span>
+										</li>
+										<li class="list-group-item d-flex justify-content-start align-items-start">
+											<span class="text-muted col-6">Surat Pertanggungjawaban Mutlak (Tanam)</span>
+											<span class="fw-500" id="sptjmtanam"></span>
+										</li>
+										<li class="list-group-item d-flex justify-content-start align-items-start">
+											<span class="text-muted col-6">Form Realisasi Tanam</span>
+											<span class="fw-500" id="rta"></span>
+										</li>
+										<li class="list-group-item d-flex justify-content-start align-items-start">
+											<span class="text-muted col-6">SPH-SBS (Tanam)</span>
+											<span class="fw-500" id="sphsbstanam"></span>
+										</li>
+										<li class="list-group-item d-flex justify-content-start align-items-start">
+											<span class="text-muted col-6">Logbook (s.d Tanam)</span>
+											<span class="fw-500" id="logTanam"></span>
+										</li>
+									</ul>
+								</div>
+							</div>
+							<hr>
+							<div class="row d-flex align-items-start">
+								<div class="col-md-4">
+									<span class="fw-bold h6 text-uppercase">RINGKASAN VERIFIKASI</span>
+								</div>
+								<div class="col-md-8">
+									<ul class="list-group list-group-flush">
+										<li class="list-group-item d-flex justify-content-start align-items-start">
+											<span class="text-muted col-6">Tanggal Pengajuan</span>
+											<span class="fw-500" id="avtDate"></span>
+										</li>
+										<li class="list-group-item d-flex justify-content-start align-items-start">
+											<span class="text-muted col-6">Tanggal Verifikasi</span>
+											<span class="fw-500" id="avtVerifAt"></span>
+										</li>
+										<li class="list-group-item d-flex justify-content-start align-items-start">
+											<span class="text-muted col-6">Metode Verifikasi</span>
+											<span class="fw-500" id="avtMetode"></span>
+										</li>
+										<li class="list-group-item d-flex justify-content-start align-items-start">
+											<span class="text-muted col-6">Catatan Verifikasi</span>
+											<span class="fw-500" id="avtNote">
+												<p></p>
+											</span>
+										</li>
+										<li class="list-group-item d-flex justify-content-start align-items-start">
+											<span class="text-muted col-6">Hasil Verifikasi</span>
+											<span class="fw-500" id="avtStatus"></span>
+										</li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="card-footer d-flex justify-content-end">
+						<a href="{{ route('2024.user.commitment.index') }}"
+							class="btn btn-xs btn-info mr-1" data-toggle="tooltip"
+							title data-original-title="Kembali">
+							<i class="fal fa-undo mr-1"></i>
+							Kembali
+						</a>
+						<form action="{{route('2024.user.commitment.submitPengajuan', $ijin)}}" method="post" enctype="multipart/form-data">
+							@csrf
+							<input type="hidden" value="TANAM" id="kind" name="kind">
+							<button type="submit" class="btn btn-xs btn-warning d-none" data-toggle="tooltip" title data-original-title="Ajukan Verifikasi Tanam" id="btnSubmit">
+								<i class="fal fa-upload mr-1"></i>
+								Ajukan
+							</button>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+	<section id="history">
+		<div class="row">
+			<div class="col-12">
+				<div id="panel-2" class="panel">
+					<div class="panel-hdr">
+						<h5>Riwayat Pengajuan Verifikasi</h5>
+					</div>
+					<div class="panel-container show">
+						<div class="panel-content">
+							<table class="table table-hover table-sm w-100" style="border: none; border-top:none; border-bottom:none;" id="tblVerifHistory">
+								<thead class="">
+									<th>Tanggal Diajukan</th>
+									<th>Verifikator</th>
+									<th>Tanggal Verifikasi</th>
+									<th>Status</th>
+									<th>Laporan</th>
+								</thead>
+								<tbody></tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
 
 
 @endsection
@@ -564,9 +496,9 @@
 						}
 					},
 					{
-						data: 'note',
+						data: 'reportUrl',
 						render: function (data, type, row) {
-							return data ? `<p>${data}</p>` : '-';
+							return data ? `<a href="${data}" target="_blank">Lihat</a>` : '-';
 						}
 					},
 				],

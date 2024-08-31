@@ -127,14 +127,33 @@ td {
 					data: 'noIjin',
 					render: function (data, type, row) {
 						var noIjin = data;
+						var avSklStatus = row.avSklStatus;
+						var formAvSkl = "{{ route('2024.user.commitment.formavskl', ':noIjin') }}".replace(':noIjin', noIjin);
 						var url = "{{ route('2024.user.commitment.realisasi', ':noIjin') }}".replace(':noIjin', noIjin);
-						return `
-							<a href="`+ url +`"
-								class="btn btn-xs btn-warning" data-toggle="tooltip"
-								title data-original-title="Isi Laporan Realisasi Tanam dan Produksi">
-								<i class="fal fa-edit"></i> Lengkapi Realisasi
-							</a>
-						`;
+						switch (avSklStatus) {
+							case '0':
+							case '1':
+							case '2':
+							case '3':
+							case '4':
+							case '5':
+								return `<a href="${formAvSkl}" class="btn btn-xs btn-info" data-toggle="tooltip"
+										title data-original-title="Data Pengajuan">
+										<i class="fal fa-view"></i> Lihat Data
+									</a>`;
+							case '6':
+								return `<a href="`+ url +`"
+									class="btn btn-xs btn-warning" data-toggle="tooltip"
+									title data-original-title="Isi Laporan Realisasi Tanam dan Produksi">
+									<i class="fal fa-edit"></i> Perbaiki Data Realisasi
+								</a>`;
+							default:
+								return `<a href="`+ url +`"
+									class="btn btn-xs btn-warning" data-toggle="tooltip"
+									title data-original-title="Isi Laporan Realisasi Tanam dan Produksi">
+									<i class="fal fa-edit"></i> Lengkapi Realisasi
+								</a>`;
+						}
 					}
 				},
 				{
@@ -237,48 +256,41 @@ td {
 						var noIjin = row.noIjin;
 						var status = data;
 						var avSklStatus = row.avSklStatus;
+						var completeStatus = row.completeStatus;
 						var formAvSkl = "{{ route('2024.user.commitment.formavskl', ':noIjin') }}".replace(':noIjin', noIjin);
-
-						if (status === "Belum Siap") {
-							return "Belum Siap";
-						} else if (status === "Siap") {
-							switch (avSklStatus) {
-								case "Tidak ada":
-									return `<a href="${formAvSkl}" class="btn btn-icon btn-xs btn-warning">
-												<i class="fal fa-upload"></i>
-											</a>`;
-								case "1":
-									return `<a href="${formAvSkl}" class="btn btn-icon btn-xs btn-info">
-												<i class="fal fa-clock"></i>
-											</a>`;
-								case "2":
-								case "3":
-									return `<a href="${formAvSkl}" class="btn btn-icon btn-xs btn-warning">
-												<i class="fal fa-hourglass"></i>
-											</a>`;
-								case "4":
-									return `<a href="${formAvSkl}" class="btn btn-icon btn-xs btn-success">
-												<i class="fal fa-check"></i>
-											</a>`;
-								case "5":
-									return `<div class="dropdown">
-												<a href="#" class="btn btn-danger btn-xs btn-icon" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-													<i class="fa fa-exclamation"></i>
-												</a>
-												<div class="dropdown-menu">
-													<a class="dropdown-item" style="text-decoration: none !important;" href="${formAvSkl}" target="_blank">
-														Lihat Hasil Verifikasi
-													</a>
-													<a class="dropdown-item" style="text-decoration: none !important;" href="${formAvSkl}" target="_blank" data-toggle="tooltip" title="Perbaiki data dan laporan. Lalu ajukan verifikasi ulang.">
-														Ajukan Ulang
-													</a>
-												</div>
-											</div>`;
-								default:
-									return '';
-							}
+						if(completeStatus === "Lunas"){
+							return `<span class="btn btn-icon btn-xs btn-success">
+										<i class="fal fa-check"></i>
+									</span>`;
 						} else {
-							return "error";
+							if (status === "Belum Siap") {
+								return "Belum Siap";
+							} else if (status === "Siap") {
+								switch (avSklStatus) {
+									case "Tidak ada":
+										return `<a href="${formAvSkl}" class="btn btn-icon btn-xs btn-warning">
+													<i class="fal fa-upload"></i>
+												</a>`;
+									case "0":
+										return createProgressBar("Pengajuan Verifikasi", 20, "text-warning");
+									case "1":
+										return createProgressBar("Pendelegasian Verifikator", 40, "text-warning");
+									case "2":
+										return createProgressBar("Direkomendasikan", 60, "text-warning");
+									case "3":
+										return createProgressBar("Disetujui", 80, "text-warning");
+									case "4":
+									return createProgressBar("Pemeriksaan Selesai", 100, "text-success", true, formAvp);
+									case "5":
+										return createProgressBar("Ditolak", 100, "text-danger");
+									case "6":
+										return createProgressBar("Perbaiki Data", 0, "text-danger", true, formAvSkl);
+									default:
+										return '';
+								}
+							} else {
+								return "error";
+							}
 						}
 					}
 				},

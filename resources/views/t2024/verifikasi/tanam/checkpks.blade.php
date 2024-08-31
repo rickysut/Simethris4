@@ -143,15 +143,24 @@
 								$('td:eq(4)', row).addClass('text-center');
 								$(row).css('cursor', 'pointer');
 								$(row).on('click', function() {
+									// Tutup baris lain yang diperluas
+									if ($('.expanded-row').length > 0) {
+										$('.expanded-row').prev().removeClass('selected');
+										$('.expanded-row').remove(); // Hapus baris yang sebelumnya diperluas
+									}
+
+									// Berikan kelas 'selected' pada baris yang diklik
 									$('#pksCheck tbody tr').removeClass('selected');
 									$(this).addClass('selected');
 
+									// Periksa apakah baris berikutnya sudah diperluas
 									if ($(this).next().hasClass('expanded-row')) {
-										$(this).next().remove();
+										$(this).next().remove(); // Collapse baris jika sudah diperluas
 									} else {
-										var formHTML = '<tr class="expanded-row"><td colspan="5">';
+										var formHTML = '<tr class="expanded-row"><td colspan="5" class="bg-primary-50">';
 
 										var berkasUrl = data.file_url;
+										var noPks = data.no_perjanjian;
 										console.log(data.file_url);
 										formHTML += '<form class="" id="expandForm">';
 											formHTML += '<ul class="list-group">';
@@ -161,7 +170,7 @@
 														formHTML += '<span class="text-left">Berkas:</span>';
 													formHTML += '</div>';
 													formHTML += '<div class="col-md-9">';
-														formHTML += '<span class="text-left"><a href="' + berkasUrl + '" target="blank"> Unduh Berkas </a></div></span>';
+														formHTML += '<span class="text-left"><a href="' + berkasUrl + '" target="blank"> Lihat Berkas '+ noPks +' </a></div></span>';
 													formHTML += '</div>';
 												formHTML += '</li>';
 
@@ -263,8 +272,11 @@
 							title: 'Progress Pemeriksaan',
 							text: 'Status pemeriksaan ditandai sebagai ' + status,
 						}).then((result) => {
-							if (result.isConfirmed) {
+							console.log("Swal Result:", result);
 								$('#pksCheck').DataTable().ajax.reload();
+							if (result.isConfirmed) {
+								console.log("Swal Confirmed");
+								window.location.reload();
 							}
 						});
 					},

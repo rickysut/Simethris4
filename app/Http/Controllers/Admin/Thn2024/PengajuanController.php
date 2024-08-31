@@ -20,9 +20,11 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Storage;
+use Spatie\Browsershot\Browsershot;
 
 class PengajuanController extends Controller
 {
@@ -100,7 +102,44 @@ class PengajuanController extends Controller
 	// prosedur pengajuan verifikasi
 	public function submitPengajuan(Request $request, $noIjin)
 	{
+		// Using the datareport function to get the payload
+		$payload = $this->logbookReport($noIjin);
+
+		// dd($payload);
+
+		// Render the HTML template with payload data
+		$template = view('t2024.logbook.index', ['payload' => $payload])->render();
+
+		// Prepare the directory and file name
+		$npwp = str_replace(['.', '-'], '', $payload['npwp']);
+		$periode = $payload['periode'];
+		$fileName = 'logbook_' .  $noIjin . '_' . '_' . time() . '.pdf';
+		$directory = 'uploads/' . $npwp . '/' . $periode . '/' . $noIjin;
+		$path = $directory . '/' . $fileName;
+
+		UserFile::updateOrCreate(
+			[
+				'no_ijin' => $payload['noIjin'],
+				'kind' => 'logbook',
+			],
+			[
+				'file_code' => $fileName,
+				'file_url' => url($path),
+			]
+		);
+
+		if (!Storage::disk('public')->exists($directory)) {
+			Storage::disk('public')->makeDirectory($directory);
+		}
+
+		// Generate the PDF and save it
+		Browsershot::html($template)
+			->showBackground()
+			->margins(4, 0, 4, 0,)
+			->format('A4')
+			->save(Storage::disk('public')->path($path));
 		// Format `noIjin` sesuai kebutuhan
+
 		$formattedNoIjin = $this->formatNoIjin($noIjin);
 
 		// Mendapatkan `npwp` dari user yang sedang login
@@ -120,6 +159,43 @@ class PengajuanController extends Controller
 
 		// Redirect kembali dengan pesan sukses
 		return redirect()->back()->with('success', 'Permohonan Verifikasi ' . $kind . ' berhasil dikirimkan.');
+	}
+
+	public function logbookReport($noIjin)
+	{
+		$ijin = $noIjin;
+		$noIjin = substr($noIjin, 0, 4) . '/' .
+			substr($noIjin, 4, 2) . '.' .
+			substr($noIjin, 6, 3) . '/' .
+			substr($noIjin, 9, 1) . '/' .
+			substr($noIjin, 10, 2) . '/' .
+			substr($noIjin, 12, 4);
+
+		$commitment = PullRiph::where('no_ijin', $noIjin)->first();
+		$lokasis = Lokasi::where('no_ijin', $noIjin)
+		->with([
+			'pullriph' => function ($query){
+				$query->select(
+					'id',
+					'nama',
+					'no_ijin'
+				);
+			}
+		])
+		->get() ?? new Lokasi();
+		$userFiles = UserFile::where('no_ijin', $noIjin)->first() ?? new UserFile();
+
+		$payload = [
+			'company' => $commitment->datauser->company_name,
+			'npwp' => $commitment->datauser->npwp_company,
+			'ijin' => $ijin,
+			'noIjin' => $commitment->no_ijin,
+			'periode' => $commitment->periodetahun,
+			'lokasis' => $lokasis,
+			'userFiles' => $userFiles,
+		];
+
+		return $payload;
 	}
 
 	//untuk verifikasi tanam dan produksi

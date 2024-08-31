@@ -69,6 +69,6 @@ class AjuVerifTanamController extends Controller
 			]
 		);
 
-		return redirect()->back()->with('success', 'Verifikasi Tanam berhasil diajukan.');
+		return redirect()->back()->with('success', 'Permohonan Verifikasi berhasil diajukan.');
     }
 }

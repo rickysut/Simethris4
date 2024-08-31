@@ -806,10 +806,15 @@ class VerifTanamController extends Controller
 	{
 		$module_name = 'Verifikasi Tanam';
 		$page_title = 'Simulator Spatial';
-		$page_heading = 'Marker Finder Simulator';
+		$page_heading = 'Pencarian Lokasi Verifikasi';
 		$heading_class = 'fal fa-map-marked-alt';
 
 		$ijins = PullRiph::select('no_ijin')->get();
+
+		$spatials = MasterSpatial::with('kabupaten')
+		->get();
+
+		// dd($spatials);
 
 		$myLocus = [
 			[

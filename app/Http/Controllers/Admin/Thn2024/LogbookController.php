@@ -23,6 +23,8 @@ class LogbookController extends Controller
 		// Using the datareport function to get the payload
 		$payload = $this->logbookReport($noIjin);
 
+		// dd($payload);
+
 		// Render the HTML template with payload data
 		$template = view('t2024.logbook.index', ['payload' => $payload])->render();
 
@@ -56,8 +58,6 @@ class LogbookController extends Controller
 			->save(Storage::disk('public')->path($path));
 
 		return redirect()->back()->with('success', 'Berkas berhasil dibuat.');
-		//langsung download
-		// return response()->download(Storage::disk('public')->path($path));
 	}
 
     public function generateLogbook($noIjin)

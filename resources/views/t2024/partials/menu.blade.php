@@ -319,9 +319,17 @@
 								Verifikasi Tanam
 							</span>
 							@php
-								$pengajuan = new \App\Models2024\AjuVerifTanam();
-								$unverified = $pengajuan->NewRequest();
-								$proceed = $pengajuan->proceedVerif();
+								// Count unverified requests where kind is 'TANAM'
+								$unverified = \App\Models2024\AjuVerifikasi::where('kind', 'TANAM')
+									->where('status', '1')
+									->whereNotIn('no_ijin', \App\Models2024\Completed::pluck('no_ijin')->toArray())
+									->count();
+
+								// Count requests in process where kind is 'TANAM'
+								$proceed = \App\Models2024\AjuVerifikasi::where('kind', 'TANAM')
+									->whereBetween('status', [1, 5])
+									->whereNotIn('no_ijin', \App\Models2024\Completed::pluck('no_ijin')->toArray())
+									->count();
 							@endphp
 							<span class="">
 								{{-- untuk 2024 --}}
@@ -330,12 +338,6 @@
 										{{ $unverified }}/{{ $proceed }}
 									</span>
 								@endif
-								{{-- @if ($unverified > 0)
-									<span class="dl-ref bg-danger-500 hidden-nav-function-minify hidden-nav-function-top">{{ $unverified }}</span>
-								@endif
-								@if ($proceed > 0)
-									<span class="dl-ref bg-warning-500 hidden-nav-function-minify hidden-nav-function-top">{{ $proceed }}</span>
-								@endif --}}
 							</span>
 						</a>
 					</li>
@@ -347,22 +349,24 @@
 							<i class="fal fa-dolly c-sidebar-nav-icon"></i>
 							<span class="nav-link-text">Verifikasi Produksi</span>
 							@php
-								$pengajuan = new \App\Models\AjuVerifProduksi();
-								$unverified = $pengajuan->NewRequest();
-								$proceed = $pengajuan->proceedVerif();
+								// Count unverified requests where kind is 'PRODUKSI'
+								$unverified1 = \App\Models2024\AjuVerifikasi::where('kind', 'PRODUKSI')
+									->where('status', '1')
+									->whereNotIn('no_ijin', \App\Models2024\Completed::pluck('no_ijin')->toArray())
+									->count();
+
+								// Count requests in process where kind is 'PRODUKSI'
+								$proceed1 = \App\Models2024\AjuVerifikasi::where('kind', 'PRODUKSI')
+									->whereBetween('status', [1, 5])
+									->whereNotIn('no_ijin', \App\Models2024\Completed::pluck('no_ijin')->toArray())
+									->count();
 							@endphp
 							{{-- untuk 2024 --}}
-							@if ($unverified > 0 || $proceed > 0)
-								<span class="dl-ref {{ $unverified > 0 ? 'bg-danger-500' : 'bg-warning-500' }} hidden-nav-function-minify hidden-nav-function-top">
-									{{ $unverified }}/{{ $proceed }}
+							@if ($unverified1 > 0 || $proceed1 > 0)
+								<span class="dl-ref {{ $unverified1 > 0 ? 'bg-danger-500' : 'bg-warning-500' }} hidden-nav-function-minify hidden-nav-function-top">
+									{{ $unverified1 }}/{{ $proceed1 }}
 								</span>
 							@endif
-							{{-- @if ($unverified > 0)
-								<span class="dl-ref bg-danger-500 hidden-nav-function-minify hidden-nav-function-top">{{ $unverified }}</span>
-							@endif
-							@if ($proceed > 0)
-								<span class="dl-ref bg-warning-500 hidden-nav-function-minify hidden-nav-function-top">{{ $proceed }}</span>
-							@endif --}}
 						</a>
 					</li>
 				@endcan
@@ -378,6 +382,14 @@
 						<span class="nav-link-text">
 							Permohonan SKL
 						</span>
+						@php
+							$newRecomendations = \App\Models2024\AjuVerifSkl::where('status', '2')
+								->whereNotIn('no_ijin', \App\Models2024\Completed::pluck('no_ijin')->toArray())
+								->count();
+							$sklProccess = \App\Models2024\AjuVerifSkl::whereBetween('status', [1, 5])
+								->whereNotIn('no_ijin', \App\Models2024\Completed::pluck('no_ijin')->toArray())
+								->count();
+						@endphp
 						@php
 							$skl = new \App\Models\Skl();
 							$newRecomendation = $skl->NewRecomendation();

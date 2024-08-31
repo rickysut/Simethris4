@@ -98,7 +98,7 @@ class DataFeederController extends Controller
 			$UserFiles = $commitment->userfiles->whereIn('kind', ['spvt', 'sptjmtanam', 'rta', 'sphtanam', 'logbook', 'spvp', 'sptjmproduksi', 'rpo', 'sphproduksi', 'logbookproduksi', 'formLa']);
 
 			//pemeriksaan berkas tanam
-			$tanamDocsKinds = ['spvt', 'sptjmtanam', 'rta', 'sphtanam', 'logbook'];
+			$tanamDocsKinds = ['spvt', 'sptjmtanam', 'rta', 'sphtanam'];
 			$foundTanamKinds = $UserFiles->pluck('kind')->unique()->toArray();
 			$missingTanamKinds = array_diff($tanamDocsKinds, $foundTanamKinds);
 
@@ -116,7 +116,7 @@ class DataFeederController extends Controller
 			$commitment->tanamDocs = $tanamDocsComplete ? "Lengkap" : "Belum Lengkap";
 
 			// pemeriksaan berkas produksi
-			$produksiDocsKinds = ['spvp', 'sptjmproduksi', 'rpo', 'sphproduksi', 'logbook', 'formLa'];
+			$produksiDocsKinds = ['spvp', 'sptjmproduksi', 'rpo', 'sphproduksi', 'formLa'];
 			$foundProduksiKinds = $UserFiles->pluck('kind')->unique()->toArray();
 			$missingProduksiKinds = array_diff($produksiDocsKinds, $foundProduksiKinds);
 
@@ -146,7 +146,7 @@ class DataFeederController extends Controller
 				? 'Belum Siap' : 'Siap';
 
 			$commitment->siapVerifProduksi =
-				($commitment->volume_produksi * 10000 > $commitment->sumRealisasiPanen || //harus false
+				($commitment->volume_produksi * 1000 > $commitment->sumRealisasiPanen || //harus false
 					$commitment->pksComplete !== 'Lengkap' || //pks harus lengkap
 					$commitment->tanamDocs !== 'Lengkap' || //berkas tanam harus lengkap
 					$commitment->produksiDocs !== 'Lengkap') //berkas produksi harus lengkap
@@ -177,9 +177,9 @@ class DataFeederController extends Controller
 				'sumRealisasiPanen' => $item->sumRealisasiPanen,
 				'pksComplete' => $item->pksComplete,
 				'tanamDocs' => $item->tanamDocs,
-				'siapVerifTanam' => 'Siap', //$item->siapVerifTanam
+				'siapVerifTanam' => $item->siapVerifTanam, //
 				'produksiDocs' => $item->produksiDocs,
-				'siapVerifProduksi' => 'Siap', //,$item->siapVerifProduksi
+				'siapVerifProduksi' => $item->siapVerifProduksi, //,
 				'avTanamStatus' => $item->avTanamStatus,
 				'avProdStatus' => $item->avProdStatus,
 				'siapVerifSkl' => $item->siapVerifSkl, //
@@ -721,6 +721,8 @@ class DataFeederController extends Controller
 				'tgl_tanam' => $item->tgl_tanam ? date('d-m-Y', strtotime($item->tgl_tanam)) : null,
 				'volume_panen' => $item->volume,
 				'tgl_panen' => $item->tgl_panen ? date('d-m-Y', strtotime($item->tgl_panen)) : null,
+				'prodStatus' => $item->prodStatus,
+				'distStatus' => $item->distStatus,
 				'status' => $item->status,
 			];
 		});
@@ -1291,7 +1293,7 @@ class DataFeederController extends Controller
 		$statusFilter = $request->input('status', null);
 
 		$query = AjuVerifSkl::orderBy('id', 'ASC')
-			->where('status', '<', 4)
+			->where('status', '!=', 4)
 			->with([
 				'datauser:id,npwp_company,company_name',
 				'verifikator:id,name',
@@ -1755,7 +1757,7 @@ class DataFeederController extends Controller
 		$columns = $request->input('columns', []);
 
 		// Build the query
-		$query = AjuVerifikasi::select('id', 'no_ijin', 'check_by', 'verif_at', 'status', 'note', 'created_at')
+		$query = AjuVerifikasi::select('id', 'no_ijin', 'check_by', 'verif_at', 'status', 'report_url', 'created_at')
 			->where('no_ijin', $noIjin)
 			->where('kind', 'TANAM')
 			->with('verifikator');
@@ -1769,7 +1771,8 @@ class DataFeederController extends Controller
 				$q->where('check_by', 'like', "%{$searchValue}%")
 					->orWhere('verif_at', 'like', "%{$searchValue}%")
 					->orWhere('status', 'like', "%{$searchValue}%")
-					->orWhere('note', 'like', "%{$searchValue}%");
+					// ->orWhere('note', 'like', "%{$searchValue}%")
+				;
 			});
 		}
 
@@ -1792,9 +1795,9 @@ class DataFeederController extends Controller
 				case 'verif_at':
 					$query = $query->orderBy('verif_at', $orderDirection);
 					break;
-				case 'note':
-					$query = $query->orderBy('note', $orderDirection);
-					break;
+					// case 'note':
+					// 	$query = $query->orderBy('note', $orderDirection);
+					// 	break;
 				default:
 					$query = $query->orderBy('id', 'desc');
 					break;
@@ -1821,7 +1824,8 @@ class DataFeederController extends Controller
 				'checkBy' => $item->checkBy,
 				'status' => $item->status,
 				'verifAt' => $item->verif_at,
-				'note' => $item->note,
+				// 'note' => $item->note,
+				'reportUrl' => $item->report_url,
 			];
 		});
 
@@ -1848,7 +1852,7 @@ class DataFeederController extends Controller
 		$columns = $request->input('columns', []);
 
 		// Build the query
-		$query = AjuVerifikasi::select('id', 'kind', 'no_ijin', 'check_by', 'verif_at', 'status', 'note', 'created_at')
+		$query = AjuVerifikasi::select('id', 'kind', 'no_ijin', 'check_by', 'verif_at', 'status', 'report_url', 'created_at')
 			->where('no_ijin', $noIjin)
 			->where('kind', 'PRODUKSI')
 			->with('verifikator');
@@ -1862,7 +1866,8 @@ class DataFeederController extends Controller
 				$q->where('check_by', 'like', "%{$searchValue}%")
 					->orWhere('verif_at', 'like', "%{$searchValue}%")
 					->orWhere('status', 'like', "%{$searchValue}%")
-					->orWhere('note', 'like', "%{$searchValue}%");
+					// ->orWhere('note', 'like', "%{$searchValue}%")
+				;
 			});
 		}
 
@@ -1885,9 +1890,9 @@ class DataFeederController extends Controller
 				case 'verif_at':
 					$query = $query->orderBy('verif_at', $orderDirection);
 					break;
-				case 'note':
-					$query = $query->orderBy('note', $orderDirection);
-					break;
+					// case 'note':
+					// 	$query = $query->orderBy('note', $orderDirection);
+					// 	break;
 				default:
 					$query = $query->orderBy('id', 'desc');
 					break;
@@ -1915,6 +1920,7 @@ class DataFeederController extends Controller
 				'status' => $item->status,
 				'verifAt' => $item->verif_at,
 				'note' => $item->note,
+				'reportUrl' => $item->report_url,
 			];
 		});
 
@@ -2211,6 +2217,114 @@ class DataFeederController extends Controller
 
 		return $distance;
 	}
+
+	//response saat android meminta data lokasi kabupaten
+	public function responseGetLocationInKabupaten(Request $request)
+	{
+		$request->validate([
+			'kabupaten_id' => 'required|array',
+			'kabupaten_id.*' => 'string',  // Each kabupaten_id should be a string
+		]);
+
+		$kabupatens = $request->input('kabupaten_id');
+
+		$spatials = MasterSpatial::whereIn('kabupaten_id', $kabupatens)->get(['kabupaten_id', 'provinsi_id', 'kode_spatial', 'latitude', 'longitude', 'status']);
+
+		// Return the spatial data as JSON
+		return response()->json($spatials);
+		//MasterSpatials berisi kabupaten_id, provinsi_id, kode_spatial, latitude, longitude, dan beberapa field lain
+
+	}
+
+	public function responseGetSpatialDetail(Request $request)
+	{
+		// Validate the incoming request data
+		$request->validate([
+			'kode_spatial' => 'required|string',
+		]);
+
+		// Retrieve the kode_spatial from the request
+		$kodeSpatial = $request->input('kode_spatial');
+
+		// Fetch the spatial entity details from the database
+		$spatialDetail = MasterSpatial::where('kode_spatial', $kodeSpatial)->first();
+
+		// Check if the spatial entity exists
+		if ($spatialDetail) {
+			// Return the details as a JSON response
+			return response()->json([
+				'details' => [
+					'status' => $spatialDetail->status,
+					'latitude' => $spatialDetail->latitude,
+					'longitude' => $spatialDetail->longitude,
+					'nama_petani' => $spatialDetail->nama_petani,
+					'polygon' => $spatialDetail->polygon,
+					'luas' => $spatialDetail->luas_lahan,
+					'wilayah' => $spatialDetail->provinsi->nama,
+				]
+			]);
+		} else {
+			// Return an empty details array if the spatial entity was not found
+			return response()->json([
+				'details' => []
+			]);
+		}
+	}
+
+	public function responseGetSpatialMoreDetail($spatial)
+	{
+		//informasi lahan
+		$lahan = MasterSpatial::where('kode_spatial', $spatial)
+        ->with([
+            'provinsi' => function($query) {
+                $query->select('provinsi_id', 'nama');
+            },
+            'kabupaten' => function($query) {
+                $query->select('kabupaten_id', 'nama_kab');
+            },
+            'kecamatan' => function($query) {
+                $query->select('kecamatan_id', 'nama_kecamatan');
+            },
+            'desa' => function($query) {
+                $query->select('kelurahan_id', 'nama_desa');
+            }
+        ])
+        ->first();
+		//informasi kelompok tani
+		$poktan = MasterPoktan::where('kode_poktan', $lahan->kode_poktan)->first();
+		$lokasi = Lokasi::where('kode_spatial', $spatial)->first();
+		if ($lokasi) {
+			$kemitraanAktif = PullRiph::where('no_ijin', $lokasi->no_ijin)
+				->whereDoesntHave('completed')
+				->first();
+
+			$historyKemitraan = PullRiph::where('no_ijin', $lokasi->no_ijin)
+				->whereHas('completed')
+				->get();
+		} else {
+			// Jika lokasi tidak ditemukan, set kemitraanAktif dan historyKemitraan ke null atau koleksi kosong
+			$kemitraanAktif = null;
+			$historyKemitraan = collect();
+		}
+		return response()->json([
+			'infoLahan' => $lahan,
+			'infoPoktan' => $poktan,
+			'lokasi' => $lokasi,
+			'kemitraanAktif' => $kemitraanAktif,
+			'historyKemitraan' => $historyKemitraan
+		]);
+	}
+
+	public function getInvalidNik()
+	{
+		// Retrieve records where the length of 'ktp_petani' is less than 16 characters
+		$invalidNiks = MasterSpatial::select('kode_spatial', 'ktp_petani', 'nama_petani')->whereRaw('CHAR_LENGTH(ktp_petani) < 16')
+			->orWhereNull('ktp_petani') // Optionally include records with null NIK
+			->get();
+
+		return $invalidNiks;
+	}
+
 
 	//response saat android mengirim data current location dan nomor riph (no_ijin)
 	public function responseGetLocByRad(Request $request)

@@ -27,8 +27,8 @@
 								</form>
 							{{-- jika ada --}}
 							@else
-								{{-- jika status bernilai 7 --}}
-								@if ($payload['lastVSkl']->status == 7)
+								{{-- jika status bernilai 6 --}}
+								@if ($payload['lastVSkl']->status == 6)
 									<form action="{{route('2024.user.commitment.reSubmitPengajuanSkl', $ijin)}}" method="post">
 										@csrf
 										<button class="btn btn-sm btn-primary" type="submit">
@@ -46,7 +46,7 @@
 								{{-- jika report_url tidak ada --}}
 								@else
 									<a href="{{ $payload['lastVSkl']->report_url }}"
-										class="btn btn-sm btn-success" target="_blank">
+										class="btn btn-sm btn-success ml-2" target="_blank">
 										<i class="fal fa-download"></i> Lihat
 									</a>
 								@endif

@@ -16,314 +16,179 @@
 
 			<div id="panel-1" class="panel">
 				<div class="panel-container">
-					<div class="panel-content">
-						<table class="table table-hover table-sm w-100" style="border: none; border-top:none; border-bottom:none;" id="dataTable">
-							<thead class="">
-								<th  style="width: 32%"></th>
-								<th style="width: 1%"></th>
-								<th></th>
-								<th></th>
-							</thead>
-							<tbody>
-								<tr>
-									<td class="text-uppercase fw-500 h6">RINGKASAN UMUM</td>
-									<td></td>
-									<td></td>
-									<td></td>
-								</tr>
-								<tr>
-									<td class="text-muted">Perusahaan</td>
-									<td>:</td>
-									<td class="fw-500" id="companyName"></td>
-									<td></td>
-								</tr>
-								<tr>
-									<td class="text-muted">Nomor Ijin (RIPH)</td>
-									<td>:</td>
-									<td class="fw-500" id="noIjin"></td>
-									<td></td>
-								</tr>
-								<tr>
-									<td class="text-muted">Periode RIPH</td>
-									<td>:</td>
-									<td class="fw-500" id="periode"></td>
-									<td></td>
-								</tr>
-								<tr class="bg-primary-50" style="height: 25px; opacity: 0.2">
-									<td></td>
-									<td></td>
-									<td></td>
-									<td></td>
-								</tr>
-								<tr>
-									<td class="text-uppercase fw-500 h6">RINGKASAN KEWAJIBAN DAN REALISASI</td>
-									<td></td>
-									<td></td>
-									<td></td>
-								</tr>
-								<tr>
-									<td class="text-muted">Luas Wajib Tanam</td>
-									<td>:</td>
-									<td class="fw-500" id="wajibTanam"></td>
-									<td></td>
-								</tr>
-								<tr>
-									<td class="text-muted">Volume Wajib Produksi</td>
-									<td>:</td>
-									<td class="fw-500" id="wajibProduksi"></td>
-									<td></td>
-								</tr>
-								<tr>
-									<td class="text-muted">Realisasi Tanam</td>
-									<td>:</td>
-									<td class="fw-500" id="realisasiTanam">
-										<span></span>
-										<i></i>
-									</td>
-									<td></td>
-								</tr>
-								<tr>
-									<td class="text-muted">Jumlah Lokasi Tanam/Spasial</td>
-									<td>:</td>
-									<td class="fw-500" id="countSpatial"></td>
-									<td></td>
-								</tr>
-								<tr>
-									<td class="text-muted">Realisasi Produksi</td>
-									<td>:</td>
-									<td class="fw-500" id="sumPanen"></td>
-									<td></td>
-								</tr>
-								<tr class="" style="height: 25px;">
-									<td></td>
-									<td></td>
-									<td></td>
-									<td></td>
-								</tr>
-								<tr>
-									<td class="text-uppercase fw-500 h6">RINGKASAN KEMITRAAN</td>
-									<td></td>
-									<td></td>
-									<td></td>
-								</tr>
-								<tr>
-									<td class="text-muted">Jumlah Petani Mitra</td>
-									<td>:</td>
-									<td class="fw-500" id="countAnggota"></td>
-									<td></td>
-								</tr>
-								<tr>
-									<td class="text-muted">Jumlah Kelompok Tani Mitra</td>
-									<td>:</td>
-									<td class="fw-500" id="countPoktan"></td>
-									<td></td>
-								</tr>
-								<tr>
-									<td class="text-muted">Jumlah Perjanjian (PKS) diunggah</td>
-									<td>:</td>
-									<td class="fw-500" id="countPks">
-									</td>
-									<td></td>
-								</tr>
-								<tr class="bg-primary-50" style="height: 25px; opacity: 0.2">
-									<td></td>
-									<td></td>
-									<td></td>
-									<td></td>
-								</tr>
+					<div class="panel-content p-5">
 
-								<tr>
-									<td class="text-uppercase fw-500">KELENGKAPAN BERKAS</td>
-									<td></td>
-									<td></td>
-									<td></td>
-								</tr>
-								{{-- tanam --}}
-								<tr>
-									<td class="text-uppercase fw-500">A. TAHAP TANAM</td>
-									<td></td>
-									<td></td>
-									<td></td>
-								</tr>
-								<tr>
-									<td class="text-muted pl-4">Surat Pengajuan Verifikasi Tanam</td>
-									<td>:</td>
-									<td class="fw-500" id="spvt">
-									</td>
-									<td></td>
-								</tr>
-								<tr>
-									<td class="text-muted pl-4">Surat Pertanggungjawaban Mutlak (Tanam)</td>
-									<td>:</td>
-									<td class="fw-500" id="sptjmtanam"></td>
-									<td></td>
-								</tr>
-								<tr>
-									<td class="text-muted pl-4">Form Realisasi Tanam</td>
-									<td>:</td>
-									<td class="fw-500" id="rta"></td>
-									<td></td>
-								</tr>
-								<tr>
-									<td class="text-muted pl-4">SPH-SBS (Tanam)</td>
-									<td>:</td>
-									<td class="fw-500" id="sphsbstanam"></td>
-									<td></td>
-								</tr>
-								<tr>
-									<td class="text-muted pl-4">Logbook (s.d Tanam)</td>
-									<td>:</td>
-									<td class="fw-500" id="logTanam"></td>
-									<td></td>
-								</tr>
-
-								<tr class="" style="height: 25px;">
-									<td></td>
-									<td></td>
-									<td></td>
-									<td></td>
-								</tr>
-								{{-- produksi --}}
-								<tr>
-									<td class="text-uppercase fw-500">B. TAHAP PRODUKSI</td>
-									<td></td>
-									<td></td>
-									<td></td>
-								</tr>
-								<tr>
-									<td class="text-muted pl-4">Surat Pengajuan Verifikasi Produksi</td>
-									<td>:</td>
-									<td class="fw-500" id="spvp"></td>
-									<td></td>
-								</tr>
-								<tr>
-									<td class="text-muted pl-4">Surat Pertanggungjawaban Mutlak (Produksi)</td>
-									<td>:</td>
-									<td class="fw-500" id="sptjmProduksi"></td>
-									<td></td>
-								</tr>
-								<tr>
-									<td class="text-muted pl-4">Form Realisasi Produksi</td>
-									<td>:</td>
-									<td class="fw-500" id="rpo"></td>
-									<td></td>
-								</tr>
-								<tr>
-									<td class="text-muted pl-4">SPH-SBS (Produksi)</td>
-									<td>:</td>
-									<td class="fw-500" id="sphProduksi"></td>
-									<td></td>
-								</tr>
-								<tr>
-									<td class="text-muted pl-4">Logbook (s.d Produksi)</td>
-									<td>:</td>
-									<td class="fw-500" id="logProduksi"></td>
-									<td></td>
-								</tr>
-								<tr>
-									<td class="text-muted pl-4">Laporan Akhir</td>
-									<td>:</td>
-									<td class="fw-500" id="formLa"></td>
-									<td></td>
-								</tr>
-
-								{{-- hasil pemeriksaan --}}
-								<tr class="bg-primary-50" style="height: 25px; opacity: 0.2">
-									<td></td>
-									<td></td>
-									<td></td>
-									<td></td>
-								</tr>
-								<tr>
-									<td class="text-uppercase fw-500 h6">RINGKASAN HASIL</td>
-									<td></td>
-									<td></td>
-									<td></td>
-								</tr>
-								<tr>
-									<td class="text-uppercase fw-500">A. VERIFIKASI TANAM</td>
-									<td></td>
-									<td></td>
-									<td></td>
-								</tr>
-								<tr>
-									<td class="text-muted pl-4">Tanggal Pengajuan</td>
-									<td>:</td>
-									<td class="fw-500" id="avtDate"></td>
-									<td></td>
-								</tr>
-								<tr>
-									<td class="text-muted pl-4">Tanggal Verifikasi</td>
-									<td>:</td>
-									<td class="fw-500" id="avtVerifAt"></td>
-									<td></td>
-								</tr>
-								<tr>
-									<td class="text-muted pl-4">Metode Verifikasi</td>
-									<td>:</td>
-									<td class="fw-500" id="avtMetode"></td>
-									<td></td>
-								</tr>
-								<tr>
-									<td class="text-muted pl-4">Catatan Verifikasi</td>
-									<td>:</td>
-									<td class="fw-500" id="avtNote">
-										<p></p>
-									</td>
-									<td></td>
-								</tr>
-								<tr>
-									<td class="text-muted pl-4">Hasil Verifikasi</td>
-									<td>:</td>
-									<td class="fw-500" id="avtStatus"></td>
-									<td></td>
-								</tr>
-								<tr class="" style="height: 25px;">
-									<td></td>
-									<td></td>
-									<td></td>
-									<td></td>
-								</tr>
-								<tr>
-									<td class="text-uppercase fw-500">B. VERIFIKASI PRODUKSI</td>
-									<td></td>
-									<td></td>
-									<td></td>
-								</tr>
-								<tr>
-									<td class="text-muted pl-4">Tanggal Pengajuan</td>
-									<td>:</td>
-									<td class="fw-500" id="avpDate"></td>
-									<td></td>
-								</tr>
-								<tr>
-									<td class="text-muted pl-4">Tanggal Verifikasi</td>
-									<td>:</td>
-									<td class="fw-500" id="avpVerifAt"></td>
-									<td></td>
-								</tr>
-								<tr>
-									<td class="text-muted pl-4">Metode Verifikasi</td>
-									<td>:</td>
-									<td class="fw-500" id="avpMetode"></td>
-									<td></td>
-								</tr>
-								<tr>
-									<td class="text-muted pl-4">Catatan Verifikasi</td>
-									<td>:</td>
-									<td class="fw-500" id="avpNote">
-										<p></p>
-									</td>
-									<td></td>
-								</tr>
-								<tr>
-									<td class="text-muted pl-4">Hasil Verifikasi</td>
-									<td>:</td>
-									<td class="fw-500" id="avpStatus"></td>
-									<td></td>
-								</tr>
-							</tbody>
-						</table>
+						<div class="row d-flex align-items-start">
+							<div class="col-md-4">
+								<span class="fw-bold h6 text-uppercase">RINGKASAN UMum</span>
+							</div>
+							<div class="col-md-8">
+								<ul class="list-group list-group-flush">
+									<li class="list-group-item d-flex justify-content-start align-items-start">
+										<span class="text-muted col-6">Perusahaan</span>
+										<span class="fw-500" id="companyName"></span>
+									</li>
+									<li class="list-group-item d-flex justify-content-start align-items-start">
+										<span class="text-muted col-6">Nomor Ijin</span>
+										<span class="fw-500" id="noIjin"></span>
+									</li>
+									<li class="list-group-item d-flex justify-content-start align-items-start">
+										<span class="text-muted col-6">Periode RIPH</span>
+										<span class="fw-500" id="periode"></span>
+									</li>
+								</ul>
+							</div>
+						</div>
+						<hr>
+						<div class="row d-flex align-items-start">
+							<div class="col-md-4">
+								<span class="fw-bold h6 text-uppercase">RINGKASAN KEWAJIBAN DAN REALISASI</span>
+							</div>
+							<div class="col-md-8">
+								<ul class="list-group list-group-flush">
+									<li class="list-group-item d-flex justify-content-start align-items-start">
+										<span class="text-muted col-6">Realisasi Tanam (m2)</span>
+										<span class="fw-500" id="realisasiTanam"></span>
+									</li>
+									<li class="list-group-item d-flex justify-content-start align-items-start">
+										<span class="text-muted col-6">Realisasi Produksi</span>
+										<span class="fw-500" id="sumPanen"></span>
+									</li>
+									<li class="list-group-item d-flex justify-content-start align-items-start">
+										<span class="text-muted col-6">Jumlah Lokasi Tanam</span>
+										<span class="fw-500" id="countSpatial"></span>
+									</li>
+								</ul>
+							</div>
+						</div>
+						<hr>
+						<div class="row d-flex align-items-start">
+							<div class="col-md-4">
+								<span class="fw-bold h6 text-uppercase">RINGKASAN KEMITRAAN</span>
+							</div>
+							<div class="col-md-8">
+								<ul class="list-group list-group-flush">
+									<li class="list-group-item d-flex justify-content-start align-items-start">
+										<span class="text-muted col-6">Jumlah Petani Mitra</span>
+										<span class="fw-500" id="countAnggota"></span>
+									</li>
+									<li class="list-group-item d-flex justify-content-start align-items-start">
+										<span class="text-muted col-6">Jumlah Kelompok Tani Mitra</span>
+										<span class="fw-500" id="countPoktan"></span>
+									</li>
+									<li class="list-group-item d-flex justify-content-start align-items-start">
+										<span class="text-muted col-6">Jumlah Perjanjian (PKS) diunggah</span>
+										<span class="fw-500" id="countPks"></span>
+									</li>
+								</ul>
+							</div>
+						</div>
+						<hr>
+						<div class="row d-flex align-items-start">
+							<div class="col-md-4">
+								<span class="fw-bold h6 text-uppercase">KELENGKAPAN BERKAS</span>
+							</div>
+							<div class="col-md-8">
+								<ul class="list-group list-group-flush">
+									<li class="list-group-item d-flex justify-content-start align-items-start">
+										<span class="text-muted col-6">Surat Pengajuan Verifikasi Produksi</span>
+										<span class="fw-500" id="spvp"></span>
+									</li>
+									<li class="list-group-item d-flex justify-content-start align-items-start">
+										<span class="text-muted col-6">Surat Pertanggungjawaban Mutlak (Tanam)</span>
+										<span class="fw-500" id="sptjmtanam"></span>
+									</li>
+									<li class="list-group-item d-flex justify-content-start align-items-start">
+										<span class="text-muted col-6">Surat Pertanggungjawaban Mutlak (Produksi)</span>
+										<span class="fw-500" id="sptjmProduksi"></span>
+									</li>
+									<li class="list-group-item d-flex justify-content-start align-items-start">
+										<span class="text-muted col-6">Form Realisasi Tanam</span>
+										<span class="fw-500" id="rta"></span>
+									</li>
+									<li class="list-group-item d-flex justify-content-start align-items-start">
+										<span class="text-muted col-6">Form Realisasi Produksi</span>
+										<span class="fw-500" id="rpo"></span>
+									</li>
+									<li class="list-group-item d-flex justify-content-start align-items-start">
+										<span class="text-muted col-6">Logbook</span>
+										<span class="fw-500" id="logProduksi"></span>
+									</li>
+									<li class="list-group-item d-flex justify-content-start align-items-start">
+										<span class="text-muted col-6">SPH-SBS (Tanam)</span>
+										<span class="fw-500" id="sphsbstanam"></span>
+									</li>
+									<li class="list-group-item d-flex justify-content-start align-items-start">
+										<span class="text-muted col-6">SPH-SBS (Produksi)</span>
+										<span class="fw-500" id="sphProduksi"></span>
+									</li>
+									<li class="list-group-item d-flex justify-content-start align-items-start">
+										<span class="text-muted col-6">Laporan Akhir</span>
+										<span class="fw-500" id="formLa"></span>
+									</li>
+								</ul>
+							</div>
+						</div>
+						<hr>
+						<div class="row d-flex align-items-start">
+							<div class="col-md-4">
+								<span class="fw-bold h6 text-uppercase">RINGKASAN HASIL VERIFIKASI</span>
+							</div>
+							<div class="col-md-8">
+								<ul class="list-group list-group-flush">
+									<li class="list-group-item">
+										<span class="col-6 fw-500">A. TAHAP TANAM</span>
+									</li>
+									<li class="list-group-item d-flex justify-content-start align-items-start">
+										<span class="text-muted col-6">Tanggal Pengajuan</span>
+										<span class="fw-500" id="avtDate"></span>
+									</li>
+									<li class="list-group-item d-flex justify-content-start align-items-start">
+										<span class="text-muted col-6">Tanggal Verifikasi</span>
+										<span class="fw-500" id="avtVerifAt"></span>
+									</li>
+									<li class="list-group-item d-flex justify-content-start align-items-start">
+										<span class="text-muted col-6">Metode Verifikasi</span>
+										<span class="fw-500" id="avtMetode"></span>
+									</li>
+									<li class="list-group-item d-flex justify-content-start align-items-start">
+										<span class="text-muted col-6">Catatan Verifikasi</span>
+										<span class="fw-500" id="avtNote">
+											<p></p>
+										</span>
+									</li>
+									<li class="list-group-item d-flex justify-content-start align-items-start">
+										<span class="text-muted col-6">Hasil Verifikasi</span>
+										<span class="fw-500" id="avtStatus"></span>
+									</li>
+									<li class="list-group-item">
+										<span class="col-6 fw-500">B. TAHAP PRODUKSI</span>
+									</li>
+									<li class="list-group-item d-flex justify-content-start align-items-start">
+										<span class="text-muted col-6">Tanggal Pengajuan</span>
+										<span class="fw-500" id="avpDate"></span>
+									</li>
+									<li class="list-group-item d-flex justify-content-start align-items-start">
+										<span class="text-muted col-6">Tanggal Verifikasi</span>
+										<span class="fw-500" id="avpVerifAt"></span>
+									</li>
+									<li class="list-group-item d-flex justify-content-start align-items-start">
+										<span class="text-muted col-6">Metode Verifikasi</span>
+										<span class="fw-500" id="avpMetode"></span>
+									</li>
+									<li class="list-group-item d-flex justify-content-start align-items-start">
+										<span class="text-muted col-6">Catatan Verifikasi</span>
+										<span class="fw-500" id="avpNote">
+											<p></p>
+										</span>
+									</li>
+									<li class="list-group-item d-flex justify-content-start align-items-start">
+										<span class="text-muted col-6">Hasil Verifikasi</span>
+										<span class="fw-500" id="avpStatus"></span>
+									</li>
+								</ul>
+							</div>
+						</div>
 					</div>
 				</div>
 
@@ -363,7 +228,7 @@
 								<th>Verifikator</th>
 								<th>Tanggal Verifikasi</th>
 								<th>Status</th>
-								<th>Catatan</th>
+								<th>Laporan</th>
 							</thead>
 							<tbody></tbody>
 						</table>
@@ -401,16 +266,19 @@
 
 					//Ringkasan Realisasi dan Kewajiban
 
-					$('#wajibTanam').text(data.wajibTanam + ' ha');
-					$('#wajibProduksi').text(data.wajibProduksi + ' ton');
-
 					var avtStatus = data.avtStatus;
 					var avpStatus = data.avpStatus;
 
-					var luasTanam = data.realisasiTanam + ' / ' + data.wajibTanam + ' ha';
-					if (data.realisasiTanam == '0' || data.realisasiTanam == null || data.realisasiTanam == undefined){
+					var wajibTanam = data.wajibTanam * 10000;
+
+					var realisasi = data.realisasiTanam;
+					var wajibTanamFormatted = wajibTanam.toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+					var realisasiFormatted = realisasi.toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+
+					var luasTanam = realisasiFormatted + ' / ' + wajibTanamFormatted + ' m2';
+					if (realisasi == '0' || realisasi == null || realisasi == undefined){
 						$('#realisasiTanam').html('<span class="text-danger">' + luasTanam + '</span>');
-					}else if (data.wajibTanam > data.realisasiTanam){
+					}else if (wajibTanam > realisasi){
 						$('#realisasiTanam').html('<span class="text-warning">' + luasTanam + '</span>');
 					}else{
 						$('#realisasiTanam').html('<span class="text-success">' + luasTanam + '</span>');
@@ -424,22 +292,23 @@
 						$('#countSpatial').html('<span class="text-success">' + titikTanam + '</span>');
 					}
 
-					var volProduksi = data.realisasiProduksi + ' / ' + data.wajibProduksi + ' ton';
-					if (data.wajibProduksi > data.realisasiProduksi){
-						$('#sumPanen').html('<span class="text-danger">' + volProduksi +'</span>');
+					var realP = data.realisasiProduksi;
+					var realisasiProduksi = data.realisasiProduksi/1000;
+					var realPFormatted = realisasiProduksi.toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+
+					var volProduksi = realPFormatted + ' / ' + data.wajibProduksi + ' ton';
+					if (realP == '0' || realP == null || realP == undefined){
+						$('#sumPanen').html('<span class="text-danger">' + volProduksi + '</span>');
+					}else if (realisasiProduksi > realP){
+						$('#sumPanen').html('<span class="text-warning">' + volProduksi + '</span>');
 					}else{
-						$('#sumPanen').html('<span class="text-success">' + volProduksi +'</span>');
+						$('#sumPanen').html('<span class="text-success">' + volProduksi + '</span>');
 					}
 
 					//Ringkasan Kemitraan
 					$('#countAnggota').text(data.countAnggota + ' orang');
 					$('#countPoktan').text(data.countPoktan + ' kelompok');
-
-					if (data.countPoktan > data.countPks) {
-						$('#countPks').html('<span class="text-danger">' + data.countPks +' PKS</span>');
-					} else {
-						$('#countPks').html('<span class="text-danger">' + data.countPks +' PKS</span>');
-					}
+					$('#countPks').text(data.countPks + ' Berkas');
 
 
 					//Kelengkapan Berkas
@@ -584,6 +453,8 @@
 							break;
 						default:
 							statusMessage = 'Belum/Tidak ada pengajuan.';
+							iconClass = '';
+							iconColorClass = '';
 							$('#avpStatus').text(statusMessage);
 							// return;
 					};
@@ -591,100 +462,23 @@
 
 					$('#avpStatus').html(`<span class="${iconColorClass}">${statusMessage} </span> <i class="${iconClass} ${iconColorClass} ml-1"></i>`);
 
-					// $('#btnSubmit').text('Ajukan');
-					// var avpStatus = data.avpStatus;
-					// var realisasiProduksi = data.realisasiProduksi;
-					// var countPoktan = data.countPoktan;
-					// var countPks = data.countPks;
-					// if (avpStatus === null && realisasiProduksi >= data.wajibProduksi) {
-					// 	$('#btnSubmit').removeClass('d-none');
-					// } else if (avpStatus === '5' && realisasiProduksi >= data.wajibProduksi) {
-					// 	$('#btnSubmit').removeClass('d-none');
-					// 	$('#btnSubmit').text('Ajukan Ulang');
-					// } else {
-					// 	$('#btnSubmit').addClass('d-none');
-					// }
+					$('#btnSubmit').text('Ajukan');
+					var avpStatus = data.avpStatus;
+					var realisasiProduksi = data.realisasiProduksi;
+					var countPoktan = data.countPoktan;
+					var countPks = data.countPks;
+					if (avpStatus === null && realisasiProduksi >= data.wajibProduksi) {
+						$('#btnSubmit').removeClass('d-none');
+					} else if (avpStatus === '5' && realisasiProduksi >= data.wajibProduksi) {
+						$('#btnSubmit').removeClass('d-none');
+						$('#btnSubmit').text('Ajukan Ulang');
+					} else {
+						$('#btnSubmit').addClass('d-none');
+					}
 				},
 				error: function(xhr, status, error) {
 					console.error('Error fetching data:', error);
 				}
-			});
-
-			$('#dataTable').dataTable(
-			{
-				responsive: true,
-				lengthChange: false,
-				ordering: false,
-				pageLength: -1,
-				dom:
-					"<'row mb-3'<'col-sm-12 col-md-6 d-flex align-items-center justify-content-start'><'col-sm-12 col-md-6 d-flex align-items-center justify-content-end'B>>" +
-					"<'row'<'col-sm-12'tr>>" +
-					"<'row'<'col-sm-12 col-md-5'><'col-sm-12 col-md-7'>>",
-				buttons: [
-					{
-						extend: 'pdfHtml5',
-						text: '<i class="fa fa-file-pdf"></i>',
-						titleAttr: 'Generate PDF',
-						className: 'btn-outline-danger btn-sm btn-icon mr-1',
-						customize: function(doc) {
-							doc.pageMargins = [10, 20, 10, 20];
-							doc.styles.tableHeader = {
-								fontSize: 12,
-								bold: true,
-								alignment: 'center'
-							};
-							doc.defaultStyle = {
-								fontSize: 10
-							};
-							doc.content[1].table.widths = [
-								'25%',
-								'5%',
-								'12%',
-								'13%',
-								'45%',
-							];
-						},
-						exportOptions: {
-							columns: [0, 2]
-						}
-					},
-					{
-						extend: 'excelHtml5',
-						text: '<i class="fa fa-file-excel"></i>',
-						titleAttr: 'Generate Excel',
-						className: 'btn-outline-success btn-sm btn-icon mr-1',
-						exportOptions: {
-							columns: [0, 2]
-						},
-						customize: function(xlsx) {
-							var sheet = xlsx.xl.worksheets['sheet1.xml'];
-
-							// Mengatur lebar kolom
-							$('col', sheet).each(function() {
-								$(this).attr('width', 30);
-							});
-
-							// Menambahkan gaya khusus
-							$('row c[r^="C"]', sheet).each(function() {
-								if ($('is t', this).text() == 'Some Text') {
-									$(this).attr('s', '42');
-								}
-							});
-
-							// Menambahkan border ke header
-							$('row:first c', sheet).attr('s', '2');
-						}
-					},
-					{
-						extend: 'print',
-						text: '<i class="fa fa-print"></i>',
-						titleAttr: 'Print Table',
-						className: 'btn-outline-primary btn-sm btn-icon mr-1',
-						exportOptions: {
-							columns: [0, 2]
-						},
-					}
-				]
 			});
 
 			var table = $('#tblVerifHistory').DataTable({
@@ -757,9 +551,9 @@
 						}
 					},
 					{
-						data: 'note',
+						data: 'reportUrl',
 						render: function (data, type, row) {
-							return data ? `<p>${data}</p>` : '-';
+							return data ? `<a href="${data}" target="_blank">Lihat</a>` : '-';
 						}
 					},
 				],

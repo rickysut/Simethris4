@@ -16,10 +16,10 @@ class MasterWilayahController extends Controller
 {
 	protected $module_name;
 
-    public function __construct()
-    {
-        $this->module_name = 'Master Data Wilayah';
-    }
+	public function __construct()
+	{
+		$this->module_name = 'Master Data Wilayah';
+	}
 	public function index()
 	{
 		$module_name = $this->module_name;
@@ -30,7 +30,7 @@ class MasterWilayahController extends Controller
 
 		return view('t2024.masterwilayah.index', compact('module_name', 'page_title', 'page_heading', 'heading_class', 'page_desc'));
 	}
-    public function updateFromBPS()
+	public function updateFromBPS()
 	{
 		// Ambil data provinsi dari API BPS
 		$responseProvinsi = Http::get('https://sig.bps.go.id/rest-bridging/getwilayah?level=provinsi&parent=0');
@@ -184,6 +184,7 @@ class MasterWilayahController extends Controller
 			try {
 				foreach ($data as $provinsi) {
 					$provinsiId = $provinsi['kode_bps'];
+					$provinsiDagri = $provinsi['kode_dagri'];
 					$provinsiName = $provinsi['nama_bps'];
 
 					if ($existingProvinces->has($provinsiId)) {
@@ -194,6 +195,7 @@ class MasterWilayahController extends Controller
 					} else {
 						MasterProvinsi::create([
 							'provinsi_id' => $provinsiId,
+							'kode_dagri' => $provinsiDagri,
 							'nama' => $provinsiName
 						]);
 					}
@@ -228,6 +230,7 @@ class MasterWilayahController extends Controller
 			try {
 				foreach ($data as $kabupaten) {
 					$kabupatenId = $kabupaten['kode_bps'];
+					$kabupatenDagri = $kabupaten['kode_dagri'];
 					$kabupatenName = $kabupaten['nama_bps'];
 
 					if ($existingKabupaten->has($kabupatenId)) {
@@ -239,6 +242,7 @@ class MasterWilayahController extends Controller
 						MasterKabupaten::create([
 							'provinsi_id' => $provinsiId,
 							'kabupaten_id' => $kabupatenId,
+							'kode_dagri' => $kabupatenDagri,
 							'nama_kab' => $kabupatenName
 						]);
 					}
@@ -250,101 +254,99 @@ class MasterWilayahController extends Controller
 
 				DB::commit();
 
-				return response()->json(['message' => 'Districts table has been updated successfully.']);
+				return redirect()->back()->with('success', 'Daftar Kabupaten berhasil diperbarui.');
 			} catch (\Exception $e) {
 				DB::rollback();
-				return response()->json(['message' => 'Failed to update districts table.'], 500);
+				return redirect()->back()->with('error', 'Gagal memperbarui Daftar Kabupaten.');
 			}
 		} else {
-			return response()->json(['message' => 'Failed to fetch data from BPS API.'], 500);
+			return redirect()->back()->with('error', 'Gagal memperoleh data dari BPS.');
 		}
 	}
 
-	public function updateKecamatanFromBPS($kabupatenId)
+	public function updateKecamatanFromBPS($provinsiId)
 	{
-		$response = Http::get("https://sig.bps.go.id/rest-bridging/getwilayah?level=kecamatan&parent=$kabupatenId");
+		// Mengirim permintaan GET ke endpoint BPS dengan provinsiId
+		$response = Http::get("https://sig.bps.go.id/rest-bridging/getwilayah?level=kecamatan&parent=$provinsiId");
 		$data = $response->json();
 
 		if ($response->successful() && is_array($data)) {
-			$existingKecamatan = MasterKecamatan::where('kabupaten_id', $kabupatenId)->get()->keyBy('kecamatan_id');
-
+			// Mulai transaksi database
 			DB::beginTransaction();
 
 			try {
 				foreach ($data as $kecamatan) {
-					$kecamatanId = $kecamatan['kode_bps'];
-					$kecamatanName = $kecamatan['nama_bps'];
+					// Memecah kode_bps untuk mendapatkan kabupaten_id
+					$kabupatenId = substr($kecamatan['kode_bps'], 0, 4);
 
-					if ($existingKecamatan->has($kecamatanId)) {
-						if ($existingKecamatan[$kecamatanId]->nama_kecamatan != $kecamatanName) {
-							$existingKecamatan[$kecamatanId]->update(['nama_kecamatan' => $kecamatanName]);
-						}
-						$existingKecamatan->forget($kecamatanId);
-					} else {
-						MasterKecamatan::create([
+					// Memperbarui atau membuat data kecamatan
+					DB::table('data_kecamatans')->updateOrInsert(
+						['kecamatan_id' => $kecamatan['kode_bps']],
+						[
 							'kabupaten_id' => $kabupatenId,
-							'kecamatan_id' => $kecamatanId,
-							'nama_kecamatan' => $kecamatanName
-						]);
-					}
+							'nama_kecamatan' => $kecamatan['nama_bps'],
+							'kode_dagri' => $kecamatan['kode_dagri']
+						]
+					);
 				}
 
-				foreach ($existingKecamatan as $kecamatan) {
-					$kecamatan->delete();
-				}
-
+				// Commit transaksi jika semua berjalan lancar
 				DB::commit();
 
-				return response()->json(['message' => 'Sub-districts table has been updated successfully.']);
+				return redirect()->back()->with('success', 'Daftar Kecamatan berhasil diperbarui.');
 			} catch (\Exception $e) {
-				DB::rollback();
-				return response()->json(['message' => 'Failed to update sub-districts table.'], 500);
+				// Rollback transaksi jika terjadi kesalahan
+				DB::rollBack();
+				return redirect()->back()->with('error', 'Gagal memperbarui Daftar Kecamatan.');
 			}
 		} else {
-			return response()->json(['message' => 'Failed to fetch data from BPS API.'], 500);
+			return redirect()->back()->with('error', 'Gagal memperoleh data dari BPS.');
 		}
 	}
 
-	public function updateDesaFromBPS($kecamatanId)
-	{
-		$response = Http::get("https://sig.bps.go.id/rest-bridging/getwilayah?level=desa&parent=$kecamatanId");
-		$data = $response->json();
-		if ($response->successful() && is_array($data)) {
-			$existingDesa = MasterDesa::where('kecamatan_id', $kecamatanId)->get()->keyBy('kelurahan_id');
-			DB::beginTransaction();
+	public function updateDesaFromBPS($provinsiId)
+    {
+        // Mengirim permintaan GET ke endpoint BPS dengan provinsiId
+        $response = Http::get("https://sig.bps.go.id/rest-bridging/getwilayah?level=desa&parent=$provinsiId");
+        $data = $response->json();
 
-			try {
-				foreach ($data as $desa) {
-					$desaId = $desa['kode_bps'];
-					$desaName = $desa['nama_bps'];
+        if ($response->successful() && is_array($data)) {
+            // Memulai transaksi database
+            DB::beginTransaction();
 
-					if ($existingDesa->has($desaId)) {
-						if ($existingDesa[$desaId]->nama_desa != $desaName) {
-							$existingDesa[$desaId]->update(['nama_desa' => $desaName]);
-						}
-						$existingDesa->forget($desaId);
-					} else {
-						MasterDesa::create([
-							'kecamatan_id' => $kecamatanId,
-							'kelurahan_id' => $desaId,
-							'nama_desa' => $desaName
-						]);
-					}
-				}
+            try {
+                foreach ($data as $desa) {
+                    // Mendapatkan kecamatan_id dari 7 digit pertama kode_bps
+                    $kecamatanId = substr($desa['kode_bps'], 0, 7);
 
-				foreach ($existingDesa as $desa) {
-					$desa->delete();
-				}
+                    // Memperbarui atau menambahkan data desa
+                    DB::table('data_desas')->updateOrInsert(
+                        ['kelurahan_id' => $desa['kode_bps']],
+                        [
+                            'kecamatan_id' => $kecamatanId,
+                            'nama_desa' => $desa['nama_bps'],
+                            'kode_dagri' => $desa['kode_dagri']
+                        ]
+                    );
+                }
 
-				DB::commit();
+                // Commit transaksi jika semua berhasil
+                DB::commit();
+                return response()->json(['success' => true, 'message' => "Data desa untuk provinsi ID $provinsiId berhasil diperbarui."]);
+            } catch (\Exception $e) {
+                // Rollback transaksi jika terjadi kesalahan
+                DB::rollBack();
+                return response()->json(['success' => false, 'message' => 'Gagal memerbarui data Desa: ' . $e->getMessage()]);
+            }
+        } else {
+            return response()->json(['success' => false, 'message' => 'Gagal memperoleh data dari BPS.']);
+        }
+    }
 
-				return response()->json(['message' => 'Villages table has been updated successfully.']);
-			} catch (\Exception $e) {
-				DB::rollback();
-				return response()->json(['message' => 'Failed to update villages table.'], 500);
-			}
-		} else {
-			return response()->json(['message' => 'Failed to fetch data from BPS API.'], 500);
-		}
-	}
+    public function updateAllDesaFromBPS()
+    {
+        $provinsiIds = MasterProvinsi::select('provinsi_id')->pluck('provinsi_id');
+
+        return response()->json(['provinsiIds' => $provinsiIds]);
+    }
 }
