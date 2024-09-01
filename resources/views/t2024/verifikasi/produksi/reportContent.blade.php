@@ -228,22 +228,24 @@
 					</tr>
 				</thead>
 				<tbody>
-					@foreach ($payload['failLokasi'] as $lokasi)
-						<tr>
-							<td>{{$lokasi->kode_spatial ? $lokasi->kode_spatial : 'Tidak Ada'}}</td>
-							<td class="text-end">
-								{{ $lokasi->luas_tanam ? number_format((float)$lokasi->luas_tanam, 0, ',', '.') . ' m²' : 'Tidak Ada' }}
-							</td>
-							<td class="text-end">
-								{{ $lokasi->luas_lahan ? number_format((float)$lokasi->luas_lahan, 0, ',', '.') . ' m²' : 'Tidak Ada' }}
-							</td>
-							<td class="text-end">
-								{{ $lokasi->luas_lahan ? number_format((float)$lokasi->volume, 0, ',', '.') . ' kg' : 'Tidak Ada' }}
-							</td>
-							<td>{{$lokasi->ktp_petani}} - {{$lokasi->masteranggota->nama_petani}}</td>
-							<td class="text-end">{{ $lokasi->verif_p_at }}</td>
-						</tr>
-					@endforeach
+					@if (!empty($payload['failLokasi']) && is_array($payload['failLokasi']))
+						@foreach ($payload['failLokasi'] as $lokasi)
+							<tr>
+								<td>{{$lokasi->kode_spatial ? $lokasi->kode_spatial : 'Tidak Ada'}}</td>
+								<td class="text-end">
+									{{ $lokasi->luas_tanam ? number_format((float)$lokasi->luas_tanam, 0, ',', '.') . ' m²' : 'Tidak Ada' }}
+								</td>
+								<td class="text-end">
+									{{ $lokasi->luas_lahan ? number_format((float)$lokasi->luas_lahan, 0, ',', '.') . ' m²' : 'Tidak Ada' }}
+								</td>
+								<td class="text-end">
+									{{ $lokasi->luas_lahan ? number_format((float)$lokasi->volume, 0, ',', '.') . ' kg' : 'Tidak Ada' }}
+								</td>
+								<td>{{$lokasi->ktp_petani}} - {{$lokasi->masteranggota->nama_petani}}</td>
+								<td class="text-end">{{ $lokasi->verif_p_at }}</td>
+							</tr>
+						@endforeach
+					@endif
 				</tbody>
 			</table>
 		</div>

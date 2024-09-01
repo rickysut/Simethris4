@@ -24,7 +24,7 @@ class SpatialController extends Controller
 	{
 		$module_name = 'Spatial';
 		$page_title = 'Data Spatial';
-		$page_heading = 'Peta Spatial Wajib Tanam Produksi Bawang Putih';
+		$page_heading = 'Peta Lahan Wajib Tanam Produksi Bawang Putih';
 		$heading_class = 'bi bi-globe-asia-australia';
 
 		$ijins = PullRiph::select('no_ijin')->get();

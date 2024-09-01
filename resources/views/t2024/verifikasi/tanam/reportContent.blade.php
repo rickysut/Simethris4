@@ -184,38 +184,52 @@
 		</div>
 	</div>
 </div>
-<div class="pagebreak"></div>
-<div class="container mt-4">
-	<div class="row">
-		<div class="col-12">
-			<span class="fw-bold h6">G. Daftar Lokasi yang dinyatakan TIDAK SESUAI</span>
-			<table class="table table-sm mt-3 w-100">
-				<thead>
-					<tr>
-						<th>Kode Lokasi</th>
-						<th>Luas Lahan</th>
-						<th>Luas Tanam</th>
-						<th>Pengelola</th>
-						<th>Tanggal Verifikasi</th>
-					</tr>
-				</thead>
-				<tbody>
-					@foreach ($payload['failLokasi'] as $lokasi)
+
+	<div class="pagebreak"></div>
+	<div class="container mt-4">
+		<div class="row">
+			<div class="col-12">
+				<span class="fw-bold h6">G. Daftar Lokasi yang dinyatakan TIDAK SESUAI</span>
+				<table class="table table-sm mt-3 w-100">
+					<thead>
 						<tr>
-							<td>{{$lokasi->kode_spatial ? $lokasi->kode_spatial : 'Tidak Ada'}}</td>
-							<td class="text-end">
-								{{ $lokasi->luas_tanam ? number_format((float)$lokasi->luas_tanam, 0, ',', '.') . ' m²' : 'Tidak Ada' }}
-							</td>
-							<td class="text-end">
-								{{ $lokasi->luas_lahan ? number_format((float)$lokasi->luas_lahan, 0, ',', '.') . ' m²' : 'Tidak Ada' }}
-							</td>
-							<td>{{$lokasi->ktp_petani}} - {{$lokasi->masteranggota->nama_petani}}</td>
-							<td class="text-end">{{ $lokasi->verif_t_at }}</td>
+							<th>Kode Lokasi</th>
+							<th>Luas Lahan</th>
+							<th>Luas Tanam</th>
+							<th>Pengelola</th>
+							<th>Tanggal Verifikasi</th>
 						</tr>
-					@endforeach
-				</tbody>
-			</table>
+					</thead>
+					<tbody>
+						@if (!empty($payload['failLokasi']) && is_array($payload['failLokasi']))
+							@foreach ($payload['failLokasi'] as $lokasi)
+								@if (is_object($lokasi))
+									<tr>
+										<td>{{ $lokasi->kode_spatial ? $lokasi->kode_spatial : 'Tidak Ada' }}</td>
+										<td class="text-end">
+											{{ $lokasi->luas_tanam ? number_format((float)$lokasi->luas_tanam, 0, ',', '.') . ' m²' : 'Tidak Ada' }}
+										</td>
+										<td class="text-end">
+											{{ $lokasi->luas_lahan ? number_format((float)$lokasi->luas_lahan, 0, ',', '.') . ' m²' : 'Tidak Ada' }}
+										</td>
+										<td>{{ $lokasi->ktp_petani }} - {{ $lokasi->masteranggota->nama_petani }}</td>
+										<td class="text-end">{{ $lokasi->verif_t_at }}</td>
+									</tr>
+								@else
+									<tr>
+										<td colspan="5">Data tidak valid</td>
+									</tr>
+								@endif
+							@endforeach
+						@else
+							<tr>
+								<td colspan="5">Tidak ada data untuk ditampilkan</td>
+							</tr>
+						@endif
+					</tbody>
+
+				</table>
+			</div>
 		</div>
 	</div>
-</div>
-<div class="pagebreak"></div>
+	<div class="pagebreak"></div>

@@ -82,7 +82,7 @@
 		<div class="modal-dialog modal-dialog-centered" role="document">
 			<div class="modal-content">
 				<div class="modal-header">
-					<h5 class="modal-title">sm</h5>
+					<h5 class="modal-title">Unggah Berkas</h5>
 					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 						<span aria-hidden="true">&times;</span>
 					</button>
@@ -212,7 +212,7 @@
 							<div id="myMap" style="height:500px; width: 100%;"></div>
 
 							<div class="row row-grid no-gutters">
-								<div class="col-sm-12 col-md-4 col-xl-3">
+								<div class="col-sm-12 col-md-4">
 									<div class="px-3 py-2 d-flex align-items-center m-2">
 										<span class="d-inline-block ml-2 text-muted">
 											<i class="fal fa-globe-asia color-info-500 mr-1"></i>
@@ -230,7 +230,7 @@
 										</div>
 									</div>
 								</div>
-								<div class="col-sm-12 col-md-4 col-xl-3">
+								<div class="col-sm-12 col-md-4">
 									<div class="px-3 py-2 d-flex align-items-center m-2">
 										<span class="d-inline-block ml-2 text-muted">
 											<i class="fal fa-lock-open-alt color-success-500 mr-1"></i>
@@ -248,7 +248,7 @@
 										</div>
 									</div>
 								</div>
-								<div class="col-sm-12 col-md-4 col-xl-3">
+								<div class="col-sm-12 col-md-4">
 									<div class="px-3 py-2 d-flex align-items-center m-2">
 										<span class="d-inline-block ml-2 text-muted">
 											<i class="fal fa-lock color-warning-500 mr-1"></i>
@@ -596,7 +596,7 @@
 
     function initMap() {
         map = new google.maps.Map(document.getElementById('myMap'), {
-            mapTypeId: google.maps.MapTypeId.HYBRID,
+            mapTypeId: google.maps.MapTypeId.SATELLITE,
             center: initialCenter,
             zoom: initialZoom,
             mapTypeControl: false,

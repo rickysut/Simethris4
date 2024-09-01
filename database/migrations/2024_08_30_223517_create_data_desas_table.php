@@ -15,8 +15,8 @@ return new class extends Migration
     {
         Schema::create('data_desas', function (Blueprint $table) {
             $table->id();
-            $table->integer('kecamatan_id');
-            $table->integer('kelurahan_id');
+            $table->string('kecamatan_id');
+            $table->string('kelurahan_id');
             $table->text('kode_dagri')->nullable();
             $table->text('nama_desa');
             $table->text('lat')->nullable();

@@ -265,7 +265,7 @@
 
 					$('#sphsbstanam').html(checkTanamFileKind(tanamFiles, 'sphtanam') ? '<span class="text-success">Ada</span>' : '<span class="text-danger">Tidak Ada</span>');
 
-					$('#logTanam').html(checkTanamFileKind(tanamFiles, 'logbook') ? '<span class="text-success">Ada</span>' : '<span class="text-danger">Tidak Ada</span>');
+					$('#logTanam').html(checkTanamFileKind(tanamFiles, 'logbook') ? '<span class="text-success">Generated</span>' : '<span class="text-muted">Auto generate</span>');
 
 
 					var options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };

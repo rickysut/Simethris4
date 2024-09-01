@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('data_provinsis', function (Blueprint $table) {
             $table->id();
-            $table->integer('provinsi_id');
+            $table->string('provinsi_id');
             $table->text('kode_dagri')->nullable();
             $table->text('nama');
             $table->text('lat')->nullable();

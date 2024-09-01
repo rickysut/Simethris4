@@ -15,8 +15,8 @@ return new class extends Migration
     {
         Schema::create('data_kecamatans', function (Blueprint $table) {
             $table->id();
-            $table->integer('kabupaten_id');
-            $table->integer('kecamatan_id');
+            $table->string('kabupaten_id');
+            $table->string('kecamatan_id');
             $table->text('kode_dagri')->nullable();
             $table->text('nama_kecamatan');
             $table->text('lat')->nullable();

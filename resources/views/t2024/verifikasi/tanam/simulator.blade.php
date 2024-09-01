@@ -81,8 +81,8 @@
 			<div class="panel" id="panel-peta">
 				<div class="panel-container show">
 					<div class="panel-content">
-						{{-- <form action="{{route('2024.spatial.responseGetLocByRad')}}" enctype="multipart/form-data" method="POST" id="formSubmit">
-							@csrf --}}
+						<form action="{{route('2024.datafeeder.responseGetLocByRad')}}" enctype="multipart/form-data" method="POST" id="formSubmit">
+							@csrf
 							<div class="row d-flex justify-content-between">
 								<div class="col-lg-6 mb-5">
 
@@ -93,7 +93,7 @@
 									</ul>
 								</div>
 							</div>
-						{{-- </form> --}}
+						</form>
 					</div>
 				</div>
 			</div>

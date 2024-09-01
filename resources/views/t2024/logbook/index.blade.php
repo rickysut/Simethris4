@@ -48,7 +48,7 @@
 				</div>
 				<div class="row justify-content-center align-items-start mb-2">
 					<div class="col-12 d-flex justify-content-between align-items-center">
-						<h6 class="mb-0 fw-bold">Kelompok Tani Mitra: {{$lokasi->pks->masterpoktan->nama_kelompok}}</h6>
+						{{-- <h6 class="mb-0 fw-bold">Kelompok Tani Mitra: {{$lokasi->pks->masterpoktan->nama_kelompok}}</h6> --}}
 						<h6 class="mb-0 fw-bold">Pelaku Usaha: {{$payload['company']}}</h6>
 					</div>
 				</div>

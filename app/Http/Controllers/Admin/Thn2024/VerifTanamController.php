@@ -276,7 +276,7 @@ class VerifTanamController extends Controller
 		$ijin = $noIjin;
 		$noIjin = $this->formatNoIjin($noIjin);
 
-		$userDocs = UserDocs::where('no_ijin', $noIjin)->first();
+		$userDocs = UserFile::where('no_ijin', $noIjin)->first();
 		$npwp = str_replace(['.', '-'], '', $userDocs->npwp);
 		$commitment = PullRiph::select('no_ijin', 'periodetahun')->where('no_ijin', $noIjin)->first();
 		$periodetahun = $commitment->periodetahun;
@@ -302,7 +302,7 @@ class VerifTanamController extends Controller
 		$ijin = $noIjin;
 		$noIjin = $this->formatNoIjin($noIjin);
 
-		$userDocs = UserDocs::where('no_ijin', $noIjin)->first();
+		$userDocs = UserFile::where('no_ijin', $noIjin)->first();
 		$npwp = str_replace(['.', '-'], '', $userDocs->npwp);
 		$commitment = PullRiph::select('no_ijin', 'periodetahun')->where('no_ijin', $noIjin)->first();
 		$periodetahun = $commitment->periodetahun;
@@ -527,7 +527,7 @@ class VerifTanamController extends Controller
 			substr($noIjin, 10, 2) . '/' .
 			substr($noIjin, 12, 4);
 
-		$userDocs = UserDocs::where('no_ijin', $noIjin)->first();
+		$userDocs = UserFile::where('no_ijin', $noIjin)->first();
 		$npwp = str_replace(['.', '-'], '', $userDocs->npwp);
 		$commitment = PullRiph::select('no_ijin', 'periodetahun')->where('no_ijin', $noIjin)->first();
 		$periodetahun = $commitment->periodetahun;

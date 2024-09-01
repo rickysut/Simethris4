@@ -341,14 +341,14 @@ class VerifSklController extends Controller
 
 	public function uploadSkl(Request $request, $noIjin, $tcode)
 	{
+		$ijin = $noIjin;
 		$noIjin = $this->formatNoIjin($noIjin);
 		$Skl = AjuVerifSkl::where('tcode', $tcode)->first();
 		$commitment = PullRiph::where('no_ijin', $noIjin)->first();
 		if (!$commitment) {
 			return redirect()->route('2024.admin.permohonan.skl.index')->with('error', 'Commitment tidak ditemukan.');
 		}
-
-		$npwp = $commitment->npwp;
+		$npwp = str_replace(['.', '-'], '', $commitment->npwp);
 		$periode = $commitment->periodetahun;
 
 		if ($request->hasFile('skl_url')) {
@@ -357,8 +357,8 @@ class VerifSklController extends Controller
 			]);
 
 			$file = $request->file('skl_url');
-			$filename = 'skl_' . $noIjin . '_' . time() . '.' . $file->getClientOriginalExtension();
-			$directory = 'uploads/' . $npwp . '/' . $periode . '/' . $noIjin;
+			$filename = 'skl_' . $ijin . '_' . time() . '.' . $file->getClientOriginalExtension();
+			$directory = 'uploads/' . $npwp . '/' . $periode . '/' . $ijin;
 
 			// Menyimpan file ke disk publik
 			$path = $file->storeAs($directory, $filename, 'public');
