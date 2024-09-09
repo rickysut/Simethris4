@@ -45,6 +45,8 @@
 
 	<link rel="manifest" href="{{asset('manifest.json')}}">
 
+	<link rel="stylesheet" media="screen, print" href="{{ asset('css/smartadmin/notifications/sweetalert2/sweetalert2.bundle.css') }}">
+
     @yield('style')
 
     <!-- CSRF Token -->
@@ -52,10 +54,11 @@
 
     <!-- Scripts -->
     <link rel="stylesheet" href="{{ asset('css/app.css') }}" />
+	{{-- <script src="https://www.google.com/recaptcha/api.js"></script> --}}
 </head>
 
 <body class="">
-    <div class="page-wrapper">
+    <div class="page-wrapper auth">
         <div class="page-inner bg-brand-gradient">
             <div class="page-content-wrapper bg-transparent m-0">
                 <div class="height-10 w-100 shadow-lg px-4 bg-brand-gradient hidden-sm-down">
@@ -66,8 +69,8 @@
                                 <img src="{{ asset('img/logo-icon.png') }}" alt="simethris" aria-roledescription="logo" style="width:150px; height:auto;">
                             </span>
                             <span class="page-logo-text mr-1 d-sm-block d-md-none">Simethris MobileApp</span>
-                        </div> 
-                        
+                        </div>
+
                         <div class="ml-auto">
                             <ol class="nav">
                                 @guest
@@ -89,7 +92,7 @@
                     </div>
                 </div>
 
-                <div class="flex-1 my-bg" style="background: url(img/pattern-1.svg) no-repeat center bottom fixed; background-size: cover;">
+                <div class="flex-1" style="background: url(img/simet-bawang-pagi.webp) no-repeat center top fixed; background-size: cover;">
                     <div class="container py-4 py-lg-5 my-lg-5 px-4 px-sm-0">
                         @yield('content')
                     </div>
@@ -102,9 +105,11 @@
         </div>
     </div>
     @include('partials.pagesettings')
+	@stack('scripts')
     <script src="{{ asset('js/vendors.bundle.js') }}"></script>
     <script src="{{ asset('js/app.bundle.js') }}"></script>
-	<script src="{{asset('sw.js')}}"></script>
+	<script src="{{ asset('js/smartadmin/notifications/sweetalert2/sweetalert2.bundle.js') }}"></script>
+	{{-- <script src="{{asset('sw.js')}}"></script> --}}
 	<script>
 		if ('serviceWorker' in navigator) {
 			navigator.serviceWorker.register('sw.js')

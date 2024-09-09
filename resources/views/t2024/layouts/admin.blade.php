@@ -18,7 +18,7 @@
 		<link rel="stylesheet" href="{{ asset('css/app.css') }}" />
 		<link id="vendorsbundle" rel="stylesheet" media="screen, print" href="{{ asset('css/smartadmin/vendors.bundle.css') }}">
 		<link id="appbundle" rel="stylesheet" media="screen, print" href="{{ asset('css/smartadmin/app.bundle.css') }}">
-		{{-- <link id="customtheme" rel="stylesheet" media="screen, print" href="{{ asset('css/smartadmin/custom.css') }}"> --}}
+		{{-- <link id="customtheme" rel="stylesheet" media="screen, print" href="{{ asset('css/custom.css') }}"> --}}
 		<link id="mytheme" rel="stylesheet" media="screen, print" href="#">
 		<link id="myskin" rel="stylesheet" media="screen, print" href="{{ asset('css/smartadmin/skins/skin-master.css') }}">
 		<!-- Place favicon.ico in the root directory -->
@@ -81,29 +81,7 @@
 					<!-- begin page content -->
 					<main id="js-page-content" role="main" class="page-content">
 						<!-- start alert pesan -->
-						@if(session('message'))
-							<div class="alert alert-success alert-dismissible fade show" role="alert">
-								<button type="button" class="close" data-dismiss="alert" aria-label="Close">
-									<span aria-hidden="true"><i class="fal fa-times-circle"></i></span>
-								</button>
-								<strong>{{ session('message') }}.</strong>
-							</div>
-						@endif
-						<!-- end alert pesan -->
-						<!-- start alert error -->
-						@if($errors->count() > 0)
-							<div class="alert alert-danger alert-dismissible fade show" role="alert">
-								<button type="button" class="close" data-dismiss="alert" aria-label="Close">
-									<span aria-hidden="true"><i class="fal fa-times-circle"></i></span>
-								</button>
-								<strong>PERHATIAN!</strong>
-								<ul class="list-unstyled">
-									@foreach($errors->all() as $error)
-									<li>{{ $error }}</li>
-									@endforeach
-								</ul>
-							</div>
-						@endif
+						{{-- @include('t2024.partials.sysalert') --}}
 						<!-- end alert error -->
 						@yield('content')
 					</main>
@@ -124,7 +102,7 @@
 		</form>
 		<!-- end page wrapper -->
 		<!-- begin quick menu -->
-		@include('partials.quickmenu')
+		{{-- @include('partials.quickmenu') --}}
 		<!-- end quick menu -->
 		{{-- base app script --}}
 		<script src="{{ asset('js/app.js') }}"></script>
@@ -275,6 +253,11 @@
 
 
 		});
+
+			$('.required').each(function() {
+				var label = $("label[for='" + $(this).attr('id') + "']");
+				label.append(' <span class="text-danger">*</span>');
+			});
 		</script>
 		@yield('scripts')
 	</body>

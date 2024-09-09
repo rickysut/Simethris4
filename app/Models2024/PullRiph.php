@@ -3,11 +3,11 @@
 namespace App\Models2024;
 
 use App\Models\DataUser;
+use App\Models2024\UserFile;
 // use App\Models\PenangkarRiph;
 use App\Models\User;
 use App\Models\UserDocs;
 use App\Traits\Auditable;
-use Dflydev\DotAccessData\Data;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -63,7 +63,7 @@ class PullRiph extends Model
 
 	public function getFormattedNoIjinAttribute()
     {
-        return str_replace(['/', '.', ' '], '', $this->no_ijin);
+        // return str_replace(['/', '.', ' '], '', $this->no_ijin);
     }
 
 	public function user()
@@ -80,10 +80,9 @@ class PullRiph extends Model
 	{
 		return $this->hasOne(UserDocs::class, 'no_ijin', 'no_ijin');
 	}
-
-	public function penangkar_riph()
+	public function userfiles()
 	{
-		return $this->hasMany(PenangkarRiph::class, 'no_ijin', 'no_ijin');
+		return $this->hasMany(UserFile::class, 'no_ijin', 'no_ijin');
 	}
 
 	public function pks()
@@ -98,18 +97,23 @@ class PullRiph extends Model
 
 	public function ajutanam()
 	{
-		return $this->hasMany(AjuVerifTanam::class, 'no_ijin', 'no_ijin');
+		return $this->hasMany(AjuVerifikasi::class, 'no_ijin', 'no_ijin')->where('kind', 'TANAM');
 	}
 
 	public function latestAjutanam()
     {
-        return $this->hasOne(AjuVerifTanam::class, 'no_ijin', 'no_ijin')->latest();
+        return $this->hasOne(AjuVerifikasi::class, 'no_ijin', 'noIjin')->where('kind', 'TANAM')->latest();
     }
 
 	public function ajuproduksi()
 	{
-		return $this->hasMany(AjuVerifProduksi::class, 'no_ijin', 'no_ijin');
+		return $this->hasMany(AjuVerifikasi::class, 'no_ijin', 'no_ijin')->where('kind', 'PRODUKSI');
 	}
+
+	public function latestAjuproduksi()
+    {
+        return $this->hasOne(AjuVerifikasi::class, 'no_ijin', 'noIjin')->where('kind', 'PRODUKSI')->latest();
+    }
 
 	public function ajuskl()
 	{
@@ -124,10 +128,5 @@ class PullRiph extends Model
 	public function completed()
 	{
 		return $this->hasOne(Completed::class, 'no_ijin', 'no_ijin');
-	}
-
-	public function datarealisasi()
-	{
-		return $this->hasMany(DataRealisasi::class, 'no_ijin', 'no_ijin');
 	}
 }

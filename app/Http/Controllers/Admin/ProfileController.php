@@ -32,8 +32,6 @@ class ProfileController extends Controller
 		$page_heading = 'Myprofile';
 		$heading_class = 'fa fa-user';
 		$this->data_user = Auth::user()::find(auth()->id())->data_user;
-
-		// $access_token = $this->access_token;
 		$data_user = $this->data_user;
 		// dd($data_user);
 		return view('admin.profiles.index', compact(
@@ -98,25 +96,14 @@ class ProfileController extends Controller
 	{
 		//$user = User::find($id);
 		$data = $request->all();
+		$regdata = [];
+		$request->validate([
+			'avatar' => 'mimes:jpeg,jpg,png|mimetypes:image/jpeg,image/png|max:2048',
+			'logo' => 'mimes:jpeg,jpg,png|mimetypes:image/jpeg,image/png|max:2048',
+			'imagektp' => 'mimes:jpeg,jpg,png|mimetypes:image/jpeg,image/png|max:2048',
+			'assignment' => 'mimes:pdf|mimetypes:application/pdf|max:2048',
+		]);
 
-		$regdata = [
-			'name'          => $data['name'],
-			'mobile_phone'  => $data['mobile_phone'],
-			'fix_phone'     => $data['fix_phone'],
-			'company_name'  => $data['company_name'],
-			'pic_name'      => $data['pic_name'],
-			'jabatan'       => $data['jabatan'],
-			'npwp_company'  => $data['npwp_company'],
-			'nib_company'   => $data['nib_company'],
-			'address_company' => $data['address_company'],
-			'provinsi'      => $data['provinsi'],
-			'kabupaten'     => $data['kabupaten'],
-			'kecamatan'     => $data['kecamatan'],
-			'desa'          => $data['desa'],
-			'kodepos'       => $data['kodepos'],
-			'ktp'           => $data['ktp'],
-			'email_company' => $data['email_company']
-		];
 		$avatar_path = '';
 		$realnpwp = $data['npwp_company'];
 		$npwp = str_replace('.', '', $realnpwp);

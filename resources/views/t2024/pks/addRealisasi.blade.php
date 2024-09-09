@@ -38,17 +38,17 @@
 				</div>
 
 
-				<div class="panel-container collapse">
+				<div class="panel-container show">
 					<div id="myMap" cl style="height: 370px; width: 100%;"></div>
 					<div class="panel-content">
 						<ul class="list-group">
 							<li class="list-group-item d-flex align-items-start justify-content-between">
 								<span class="text-muted">Pemilik/Pengelola</span>
-								<span class="fw-500">{{$data['lokasi']->nama_petani}}</span>
+								<span class="fw-500">{{$data['spatial']->nama_petani}}</span>
 							</li>
 							<li class="list-group-item d-flex align-items-start justify-content-between">
 								<span class="text-muted">NIK Pemilik/Pengelola</span>
-								<span class="fw-500">{{$data['lokasi']->ktp_petani}}</span>
+								<span class="fw-500">{{$data['spatial']->ktp_petani}}</span>
 							</li>
 							<li class="list-group-item d-flex align-items-start justify-content-between">
 								<span class="text-muted">Luas Lahan (m2)</span>
@@ -96,16 +96,23 @@
 									</a>
 								</div>
 								<div id="logKeg-lahan" class="collapse" data-parent="#logKeg" style="">
-									<form action="{{ route('2024.user.commitment.storefoto', ['noIjin' => $ijin, 'spatial' => $data['spatial']->kode_spatial]) }}" enctype="multipart/form-data" method="post">
+									<form action="{{ route('2024.user.commitment.storefoto', ['noIjin' => $ijin, 'spatial' => $data['lokasi']->tcode]) }}" enctype="multipart/form-data" method="post">
 										@csrf
 										<div class="card-body">
 											<div class="row d-flex">
 												<div class="col-md-4 mb-3">
 													<div class="card" style="width: 100%; padding-top: 100%; position: relative; overflow: hidden;">
-														<div class="card-image" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-															background-image: url('{{ $data['lokasi']->lahanfoto ? asset("storage/{$data['lokasi']->lahanfoto}") : asset("img/posts_img/default-post-image-light.svg") }}');
-															background-size: cover; background-repeat: no-repeat; background-position: center;">
-														</div>
+														@if (optional($data['fotos']->firstWhere('kind', 'lahanfoto'))->file_url)
+															<div class="card-image" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+																background-image: url('{{ asset(str_replace('https://simethris4.test/storage/', 'storage/', optional($data['fotos']->firstWhere('kind', 'lahanfoto'))->file_url)) }}');
+																background-size: cover; background-repeat: no-repeat; background-position: center;">
+															</div>
+														@else
+															<div class="card-image" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+																background-image: url('{{ asset('img/posts_img/default-post-image-light.svg') }}');
+																background-size: cover; background-repeat: no-repeat; background-position: center;">
+															</div>
+														@endif
 													</div>
 												</div>
 												<div class="col-md-8">
@@ -123,14 +130,16 @@
 														<textarea class="form-control" id="lahancomment" name="lahancomment" rows="2">{{$data['lokasi']->lahancomment}}</textarea>
 													</div>
 													<div class="form-group d-none d-lg-block">
-														<label class="form-label" for="lahanfoto">Bukti Kegiatan</label>
+														<label class="form-label" for="lahanfoto">Bukti Kegiatan Lahan Foto</label>
 														<div class="input-group">
 															<div class="custom-file">
-																<input type="file" class="custom-file-input" id="lahanfoto" name="lahanfoto" aria-describedby="lahanfoto" accept=".jpeg, .jpg, .png" value="$data['lokasi']->lahanfoto">
-																<label class="custom-file-label" for="lahanfoto">Cari foto</label>
+																<input type="file" accept=".jpg" class="custom-file-input size-validation" name="lahanfoto" id="lahanfoto">
+																<label class="custom-file-label" for="lahanfoto">Cari file</label>
 															</div>
 														</div>
-														<label for="lahanfoto" class="help-block text-truncate text-truncate-lg">{{$data['lokasi']->lahanfoto }}</label>
+														<label for="lahanfoto" class="help-block text-truncate text-truncate-lg">
+															{{ optional($data['fotos']->firstWhere('kind', 'lahanfoto'))->file_url }}
+														</label>
 													</div>
 												</div>
 											</div>
@@ -160,16 +169,23 @@
 									</a>
 								</div>
 								<div id="logKeg-benih" class="collapse" data-parent="#logKeg" style="">
-									<form action="{{ route('2024.user.commitment.storefoto', ['noIjin' => $ijin, 'spatial' => $data['spatial']->kode_spatial]) }}" enctype="multipart/form-data" method="post">
+									<form action="{{ route('2024.user.commitment.storefoto', ['noIjin' => $ijin, 'spatial' => $data['lokasi']->tcode]) }}" enctype="multipart/form-data" method="post">
 										@csrf
 										<div class="card-body">
 											<div class="row d-flex">
 												<div class="col-md-4 mb-3">
 													<div class="card" style="width: 100%; padding-top: 100%; position: relative; overflow: hidden;">
-														<div class="card-image" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-															background-image: url('{{ $data['lokasi']->benihFoto ? asset("storage/{$data['lokasi']->benihFoto}") : asset("img/posts_img/default-post-image-light.svg") }}');
-															background-size: cover; background-repeat: no-repeat; background-position: center;">
-														</div>
+														@if (optional($data['fotos']->firstWhere('kind', 'benihFoto'))->file_url)
+															<div class="card-image" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+																background-image: url('{{ asset(str_replace('https://simethris4.test/storage/', 'storage/', optional($data['fotos']->firstWhere('kind', 'benihFoto'))->file_url)) }}');
+																background-size: cover; background-repeat: no-repeat; background-position: center;">
+															</div>
+														@else
+															<div class="card-image" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+																background-image: url('{{ asset('img/posts_img/default-post-image-light.svg') }}');
+																background-size: cover; background-repeat: no-repeat; background-position: center;">
+															</div>
+														@endif
 													</div>
 												</div>
 												<div class="col-md-8">
@@ -183,6 +199,10 @@
 														<input class="form-control" id="benihDate" type="date" name="benihDate" value="{{$data['lokasi']->benihDate}}">
 													</div>
 													<div class="form-group">
+														<label class="form-label" for="benihSize">Volume (kg)</label>
+														<input class="form-control" id="benihSize" type="number" step="0,1" name="benihSize" value="{{$data['lokasi']->benihsize}}">
+													</div>
+													<div class="form-group">
 														<label class="form-label" for="benihComment">Keterangan</label>
 														<textarea class="form-control" id="benihComment" name="benihComment" rows="2">{{$data['lokasi']->benihComment}}</textarea>
 													</div>
@@ -193,6 +213,9 @@
 																<input type="file" class="custom-file-input" id="benihFoto" name="benihFoto" aria-describedby="benihFoto" accept=".jpeg, .jpg, .png">
 																<label class="custom-file-label" for="benihFoto">input foto kegiatan</label>
 															</div>
+															<label for="benihFoto" class="help-block text-truncate text-truncate-lg">
+																{{ optional($data['fotos']->firstWhere('kind', 'benihFoto'))->file_url }}
+															</label>
 														</div>
 													</div>
 												</div>
@@ -223,16 +246,23 @@
 									</a>
 								</div>
 								<div id="logKeg-mulsa" class="collapse" data-parent="#logKeg" style="">
-									<form action="{{ route('2024.user.commitment.storefoto', ['noIjin' => $ijin, 'spatial' => $data['spatial']->kode_spatial]) }}" enctype="multipart/form-data" method="post">
+									<form action="{{ route('2024.user.commitment.storefoto', ['noIjin' => $ijin, 'spatial' => $data['lokasi']->tcode]) }}" enctype="multipart/form-data" method="post">
 										@csrf
 										<div class="card-body">
 											<div class="row d-flex">
 												<div class="col-md-4 mb-3">
 													<div class="card" style="width: 100%; padding-top: 100%; position: relative; overflow: hidden;">
-														<div class="card-image" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-															background-image: url('{{ $data['lokasi']->mulsaFoto ? asset("storage/{$data['lokasi']->mulsaFoto}") : asset("img/posts_img/default-post-image-light.svg") }}');
-															background-size: cover; background-repeat: no-repeat; background-position: center;">
-														</div>
+														@if (optional($data['fotos']->firstWhere('kind', 'mulsaFoto'))->file_url)
+															<div class="card-image" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+																background-image: url('{{ asset(str_replace('https://simethris4.test/storage/', 'storage/', optional($data['fotos']->firstWhere('kind', 'mulsaFoto'))->file_url)) }}');
+																background-size: cover; background-repeat: no-repeat; background-position: center;">
+															</div>
+														@else
+															<div class="card-image" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+																background-image: url('{{ asset('img/posts_img/default-post-image-light.svg') }}');
+																background-size: cover; background-repeat: no-repeat; background-position: center;">
+															</div>
+														@endif
 													</div>
 												</div>
 												<div class="col-md-8">
@@ -246,6 +276,10 @@
 														<input class="form-control" id="mulsaDate" type="date" name="mulsaDate" value="{{$data['lokasi']->mulsaDate}}">
 													</div>
 													<div class="form-group">
+														<label class="form-label" for="mulsaSize">Jumlah (Roll)</label>
+														<input class="form-control" id="mulsaSize" type="number" name="mulsaSize" value="{{$data['lokasi']->mulsaSize}}">
+													</div>
+													<div class="form-group">
 														<label class="form-label" for="mulsaComment">Keterangan</label>
 														<textarea class="form-control" id="mulsaComment" name="mulsaComment" rows="2">{{$data['lokasi']->mulsaComment}}</textarea>
 													</div>
@@ -256,6 +290,9 @@
 																<input type="file" class="custom-file-input" id="mulsaFoto" name="mulsaFoto" aria-describedby="mulsaFoto" accept=".jpeg, .jpg, .png">
 																<label class="custom-file-label" for="mulsaFoto">input foto kegiatan</label>
 															</div>
+															<label for="mulsaFoto" class="help-block text-truncate text-truncate-lg">
+																{{ optional($data['fotos']->firstWhere('kind', 'mulsaFoto'))->file_url }}
+															</label>
 														</div>
 													</div>
 												</div>
@@ -286,16 +323,23 @@
 									</a>
 								</div>
 								<div id="logKeg-tanam" class="collapse" data-parent="#logKeg" style="">
-									<form action="{{ route('2024.user.commitment.storefoto', ['noIjin' => $ijin, 'spatial' => $data['spatial']->kode_spatial]) }}" enctype="multipart/form-data" method="post">
+									<form action="{{ route('2024.user.commitment.storefoto', ['noIjin' => $ijin, 'spatial' => $data['lokasi']->tcode]) }}" enctype="multipart/form-data" method="post">
 										@csrf
 										<div class="card-body">
 											<div class="row d-flex">
 												<div class="col-md-4 mb-3">
 													<div class="card" style="width: 100%; padding-top: 100%; position: relative; overflow: hidden;">
-														<div class="card-image" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-															background-image: url('{{ $data['lokasi']->tanamFoto ? asset("storage/{$data['lokasi']->tanamFoto}") : asset("img/posts_img/default-post-image-light.svg") }}');
-															background-size: cover; background-repeat: no-repeat; background-position: center;">
-														</div>
+														@if (optional($data['fotos']->firstWhere('kind', 'tanamFoto'))->file_url)
+															<div class="card-image" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+																background-image: url('{{ asset(str_replace('https://simethris4.test/storage/', 'storage/', optional($data['fotos']->firstWhere('kind', 'tanamFoto'))->file_url)) }}');
+																background-size: cover; background-repeat: no-repeat; background-position: center;">
+															</div>
+														@else
+															<div class="card-image" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+																background-image: url('{{ asset('img/posts_img/default-post-image-light.svg') }}');
+																background-size: cover; background-repeat: no-repeat; background-position: center;">
+															</div>
+														@endif
 													</div>
 												</div>
 												<div class="col-md-8">
@@ -323,6 +367,9 @@
 																<input type="file" class="custom-file-input" id="tanamFoto" name="tanamFoto" aria-describedby="tanamFoto" accept=".jpeg, .jpg, .png">
 																<label class="custom-file-label" for="tanamFoto">input foto kegiatan</label>
 															</div>
+															<label for="tanamFoto" class="help-block text-truncate text-truncate-lg">
+																{{ optional($data['fotos']->firstWhere('kind', 'tanamFoto'))->file_url }}
+															</label>
 														</div>
 													</div>
 												</div>
@@ -353,16 +400,23 @@
 									</a>
 								</div>
 								<div id="logKeg-pupuk-1" class="collapse" data-parent="#logKeg" style="">
-									<form action="{{ route('2024.user.commitment.storefoto', ['noIjin' => $ijin, 'spatial' => $data['spatial']->kode_spatial]) }}" enctype="multipart/form-data" method="post">
+									<form action="{{ route('2024.user.commitment.storefoto', ['noIjin' => $ijin, 'spatial' => $data['lokasi']->tcode]) }}" enctype="multipart/form-data" method="post">
 										@csrf
 										<div class="card-body">
 											<div class="row d-flex">
 												<div class="col-md-4 mb-3">
 													<div class="card" style="width: 100%; padding-top: 100%; position: relative; overflow: hidden;">
-														<div class="card-image" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-															background-image: url('{{ $data['lokasi']->pupuk1Foto ? asset("storage/{$data['lokasi']->pupuk1Foto}") : asset("img/posts_img/default-post-image-light.svg") }}');
-															background-size: cover; background-repeat: no-repeat; background-position: center;">
-														</div>
+														@if (optional($data['fotos']->firstWhere('kind', 'pupuk1Foto'))->file_url)
+															<div class="card-image" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+																background-image: url('{{ asset(str_replace('https://simethris4.test/storage/', 'storage/', optional($data['fotos']->firstWhere('kind', 'pupuk1Foto'))->file_url)) }}');
+																background-size: cover; background-repeat: no-repeat; background-position: center;">
+															</div>
+														@else
+															<div class="card-image" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+																background-image: url('{{ asset('img/posts_img/default-post-image-light.svg') }}');
+																background-size: cover; background-repeat: no-repeat; background-position: center;">
+															</div>
+														@endif
 													</div>
 												</div>
 												<div class="col-md-8">
@@ -376,6 +430,22 @@
 														<input class="form-control" id="pupuk1Date" type="date" name="pupuk1Date" value="{{$data['lokasi']->pupuk1Date}}">
 													</div>
 													<div class="form-group">
+														<label class="form-label" for="organik1">Pupuk Organik (ton)</label>
+														<input class="form-control" id="organik1" type="number" step="0,1" name="organik1" value="{{$data['lokasi']->organik1}}">
+													</div>
+													<div class="form-group">
+														<label class="form-label" for="npk1">NPK (kg)</label>
+														<input class="form-control" id="npk1" type="number" step="0,1" name="npk1" value="{{$data['lokasi']->npk1}}">
+													</div>
+													<div class="form-group">
+														<label class="form-label" for="dolomit1">Dolomit (kg)</label>
+														<input class="form-control" id="dolomit1" type="number" step="0,1" name="dolomit1" value="{{$data['lokasi']->dolomit1}}">
+													</div>
+													<div class="form-group">
+														<label class="form-label" for="za1">ZA (kg)</label>
+														<input class="form-control" id="za1" type="number" step="0,1" name="za1" value="{{$data['lokasi']->za1}}">
+													</div>
+													<div class="form-group">
 														<label class="form-label" for="pupuk1Comment">Keterangan</label>
 														<textarea class="form-control" id="pupuk1Comment" name="pupuk1Comment" rows="2">{{$data['lokasi']->pupuk1Comment}}</textarea>
 													</div>
@@ -386,6 +456,9 @@
 																<input type="file" class="custom-file-input" id="pupuk1Foto" name="pupuk1Foto" aria-describedby="pupuk1Foto" accept=".jpeg, .jpg, .png">
 																<label class="custom-file-label" for="pupuk1Foto">input foto kegiatan</label>
 															</div>
+															<label for="pupuk1Foto" class="help-block text-truncate text-truncate-lg">
+																{{ optional($data['fotos']->firstWhere('kind', 'pupuk1Foto'))->file_url }}
+															</label>
 														</div>
 													</div>
 												</div>
@@ -416,16 +489,23 @@
 									</a>
 								</div>
 								<div id="logKeg-pupuk-2" class="collapse" data-parent="#logKeg" style="">
-									<form action="{{ route('2024.user.commitment.storefoto', ['noIjin' => $ijin, 'spatial' => $data['spatial']->kode_spatial]) }}" enctype="multipart/form-data" method="post">
+									<form action="{{ route('2024.user.commitment.storefoto', ['noIjin' => $ijin, 'spatial' => $data['lokasi']->tcode]) }}" enctype="multipart/form-data" method="post">
 										@csrf
 										<div class="card-body">
 											<div class="row d-flex">
 												<div class="col-md-4 mb-3">
 													<div class="card" style="width: 100%; padding-top: 100%; position: relative; overflow: hidden;">
-														<div class="card-image" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-															background-image: url('{{ $data['lokasi']->pupuk2Foto ? asset("storage/{$data['lokasi']->pupuk2Foto}") : asset("img/posts_img/default-post-image-light.svg") }}');
-															background-size: cover; background-repeat: no-repeat; background-position: center;">
-														</div>
+														@if (optional($data['fotos']->firstWhere('kind', 'pupuk2Foto'))->file_url)
+															<div class="card-image" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+																background-image: url('{{ asset(str_replace('https://simethris4.test/storage/', 'storage/', optional($data['fotos']->firstWhere('kind', 'pupuk2Foto'))->file_url)) }}');
+																background-size: cover; background-repeat: no-repeat; background-position: center;">
+															</div>
+														@else
+															<div class="card-image" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+																background-image: url('{{ asset('img/posts_img/default-post-image-light.svg') }}');
+																background-size: cover; background-repeat: no-repeat; background-position: center;">
+															</div>
+														@endif
 													</div>
 												</div>
 												<div class="col-md-8">
@@ -439,6 +519,22 @@
 														<input class="form-control" id="pupuk2Date" type="date" name="pupuk2Date" value="{{$data['lokasi']->pupuk2Date}}">
 													</div>
 													<div class="form-group">
+														<label class="form-label" for="organik2">Pupuk Organik (ton)</label>
+														<input class="form-control" id="organik2" type="number" step="0,1" name="organik2" value="{{$data['lokasi']->organik2}}">
+													</div>
+													<div class="form-group">
+														<label class="form-label" for="npk2">NPK (kg)</label>
+														<input class="form-control" id="npk2" type="number" step="0,1" name="npk2" value="{{$data['lokasi']->npk2}}">
+													</div>
+													<div class="form-group">
+														<label class="form-label" for="dolomit2">Dolomit (kg)</label>
+														<input class="form-control" id="dolomit2" type="number" step="0.02" name="dolomit2" value="{{$data['lokasi']->dolomit2}}">
+													</div>
+													<div class="form-group">
+														<label class="form-label" for="za2">ZA (kg)</label>
+														<input class="form-control" id="za2" type="number" step="0,1" name="za2" value="{{$data['lokasi']->za2}}">
+													</div>
+													<div class="form-group">
 														<label class="form-label" for="pupuk2Comment">Keterangan</label>
 														<textarea class="form-control" id="pupuk2Comment" name="pupuk2Comment" rows="2">{{$data['lokasi']->pupuk2Comment}}</textarea>
 													</div>
@@ -449,6 +545,9 @@
 																<input type="file" class="custom-file-input" id="pupuk2Foto" name="pupuk2Foto" aria-describedby="pupuk2Foto" accept=".jpeg, .jpg, .png">
 																<label class="custom-file-label" for="pupuk2Foto">input foto kegiatan</label>
 															</div>
+															<label for="pupuk2Foto" class="help-block text-truncate text-truncate-lg">
+																{{ optional($data['fotos']->firstWhere('kind', 'pupuk2Foto'))->file_url }}
+															</label>
 														</div>
 													</div>
 												</div>
@@ -479,16 +578,23 @@
 									</a>
 								</div>
 								<div id="logKeg-pupuk-3" class="collapse" data-parent="#logKeg" style="">
-									<form action="{{ route('2024.user.commitment.storefoto', ['noIjin' => $ijin, 'spatial' => $data['spatial']->kode_spatial]) }}" enctype="multipart/form-data" method="post">
+									<form action="{{ route('2024.user.commitment.storefoto', ['noIjin' => $ijin, 'spatial' => $data['lokasi']->tcode]) }}" enctype="multipart/form-data" method="post">
 										@csrf
 										<div class="card-body">
 											<div class="row d-flex">
 												<div class="col-md-4 mb-3">
 													<div class="card" style="width: 100%; padding-top: 100%; position: relative; overflow: hidden;">
-														<div class="card-image" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-															background-image: url('{{ $data['lokasi']->pupuk3Foto ? asset("storage/{$data['lokasi']->pupuk3Foto}") : asset("img/posts_img/default-post-image-light.svg") }}');
-															background-size: cover; background-repeat: no-repeat; background-position: center;">
-														</div>
+														@if (optional($data['fotos']->firstWhere('kind', 'pupuk3Foto'))->file_url)
+															<div class="card-image" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+																background-image: url('{{ asset(str_replace('https://simethris4.test/storage/', 'storage/', optional($data['fotos']->firstWhere('kind', 'pupuk3Foto'))->file_url)) }}');
+																background-size: cover; background-repeat: no-repeat; background-position: center;">
+															</div>
+														@else
+															<div class="card-image" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+																background-image: url('{{ asset('img/posts_img/default-post-image-light.svg') }}');
+																background-size: cover; background-repeat: no-repeat; background-position: center;">
+															</div>
+														@endif
 													</div>
 												</div>
 												<div class="col-md-8">
@@ -502,6 +608,22 @@
 														<input class="form-control" id="pupuk3Date" type="date" name="pupuk3Date" value="{{$data['lokasi']->pupuk3Date}}">
 													</div>
 													<div class="form-group">
+														<label class="form-label" for="organik3">Pupuk Organik (ton)</label>
+														<input class="form-control" id="organik3" type="number" step="0,1" name="organik3" value="{{$data['lokasi']->organik3}}">
+													</div>
+													<div class="form-group">
+														<label class="form-label" for="npk3">NPK (kg)</label>
+														<input class="form-control" id="npk3" type="number" step="0,1" name="npk3" value="{{$data['lokasi']->npk3}}">
+													</div>
+													<div class="form-group">
+														<label class="form-label" for="dolomit3">Dolomit (kg)</label>
+														<input class="form-control" id="dolomit3" type="number" step="0.02" name="dolomit3" value="{{$data['lokasi']->dolomit3}}">
+													</div>
+													<div class="form-group">
+														<label class="form-label" for="za3">ZA (kg)</label>
+														<input class="form-control" id="za3" type="number" step="0,1" name="za3" value="{{$data['lokasi']->za3}}">
+													</div>
+													<div class="form-group">
 														<label class="form-label" for="pupuk3Comment">Keterangan</label>
 														<textarea class="form-control" id="pupuk3Comment" name="pupuk3Comment" rows="2">{{$data['lokasi']->pupuk3Comment}}</textarea>
 													</div>
@@ -512,6 +634,9 @@
 																<input type="file" class="custom-file-input" id="pupuk3Foto" name="pupuk3Foto" aria-describedby="pupuk3Foto" accept=".jpeg, .jpg, .png">
 																<label class="custom-file-label" for="pupuk3Foto">input foto kegiatan</label>
 															</div>
+															<label for="pupuk3Foto" class="help-block text-truncate text-truncate-lg">
+																{{ optional($data['fotos']->firstWhere('kind', 'pupuk3Foto'))->file_url }}
+															</label>
 														</div>
 													</div>
 												</div>
@@ -542,16 +667,23 @@
 									</a>
 								</div>
 								<div id="logKeg-OPT" class="collapse" data-parent="#logKeg" style="">
-									<form action="{{ route('2024.user.commitment.storefoto', ['noIjin' => $ijin, 'spatial' => $data['spatial']->kode_spatial]) }}" enctype="multipart/form-data" method="post">
+									<form action="{{ route('2024.user.commitment.storefoto', ['noIjin' => $ijin, 'spatial' => $data['lokasi']->tcode]) }}" enctype="multipart/form-data" method="post">
 										@csrf
 										<div class="card-body">
 											<div class="row d-flex">
 												<div class="col-md-4 mb-3">
 													<div class="card" style="width: 100%; padding-top: 100%; position: relative; overflow: hidden;">
-														<div class="card-image" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-															background-image: url('{{ $data['lokasi']->optFoto ? asset("storage/{$data['lokasi']->optFoto}") : asset("img/posts_img/default-post-image-light.svg") }}');
-															background-size: cover; background-repeat: no-repeat; background-position: center;">
-														</div>
+														@if (optional($data['fotos']->firstWhere('kind', 'optFoto'))->file_url)
+															<div class="card-image" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+																background-image: url('{{ asset(str_replace('https://simethris4.test/storage/', 'storage/', optional($data['fotos']->firstWhere('kind', 'optFoto'))->file_url)) }}');
+																background-size: cover; background-repeat: no-repeat; background-position: center;">
+															</div>
+														@else
+															<div class="card-image" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+																background-image: url('{{ asset('img/posts_img/default-post-image-light.svg') }}');
+																background-size: cover; background-repeat: no-repeat; background-position: center;">
+															</div>
+														@endif
 													</div>
 												</div>
 												<div class="col-md-8">
@@ -575,6 +707,9 @@
 																<input type="file" class="custom-file-input" id="optFoto" name="optFoto" aria-describedby="optFoto" accept=".jpeg, .jpg, .png">
 																<label class="custom-file-label" for="optFoto">input foto kegiatan</label>
 															</div>
+															<label for="optFoto" class="help-block text-truncate text-truncate-lg">
+																{{ optional($data['fotos']->firstWhere('kind', 'optFoto'))->file_url }}
+															</label>
 														</div>
 													</div>
 												</div>
@@ -605,16 +740,23 @@
 									</a>
 								</div>
 								<div id="logKeg-produksi" class="collapse" data-parent="#logKeg" style="">
-									<form action="{{ route('2024.user.commitment.storefoto', ['noIjin' => $ijin, 'spatial' => $data['spatial']->kode_spatial]) }}" enctype="multipart/form-data" method="post">
+									<form action="{{ route('2024.user.commitment.storefoto', ['noIjin' => $ijin, 'spatial' => $data['lokasi']->tcode]) }}" enctype="multipart/form-data" method="post">
 										@csrf
 										<div class="card-body">
 											<div class="row d-flex">
 												<div class="col-md-4 mb-3">
 													<div class="card" style="width: 100%; padding-top: 100%; position: relative; overflow: hidden;">
-														<div class="card-image" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-															background-image: url('{{ $data['lokasi']->prodFoto ? asset("storage/{$data['lokasi']->prodFoto}") : asset("img/posts_img/default-post-image-light.svg") }}');
-															background-size: cover; background-repeat: no-repeat; background-position: center;">
-														</div>
+														@if (optional($data['fotos']->firstWhere('kind', 'prodFoto'))->file_url)
+															<div class="card-image" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+																background-image: url('{{ asset(str_replace('https://simethris4.test/storage/', 'storage/', optional($data['fotos']->firstWhere('kind', 'prodFoto'))->file_url)) }}');
+																background-size: cover; background-repeat: no-repeat; background-position: center;">
+															</div>
+														@else
+															<div class="card-image" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+																background-image: url('{{ asset('img/posts_img/default-post-image-light.svg') }}');
+																background-size: cover; background-repeat: no-repeat; background-position: center;">
+															</div>
+														@endif
 													</div>
 												</div>
 												<div class="col-md-8">
@@ -628,8 +770,8 @@
 														<input class="form-control" id="prodDate" type="date" name="prodDate" value="{{$data['lokasi']->tgl_panen}}">
 													</div>
 													<div class="form-group">
-														<label class="form-label" for="prodVol">Volume Panen</label>
-														<input class="form-control" id="prodVol" type="number" name="prodVol" value="{{$data['lokasi']->volume}}">
+														<label class="form-label" for="prodVol">Volume Panen (kg)</label>
+														<input class="form-control" id="prodVol" type="number" step="1" name="prodVol" value="{{$data['lokasi']->volume}}">
 													</div>
 													<div class="form-group">
 														<label class="form-label" for="prodComment">Keterangan</label>
@@ -642,6 +784,9 @@
 																<input type="file" class="custom-file-input" id="prodFoto" name="prodFoto" aria-describedby="prodFoto" accept=".jpeg, .jpg, .png">
 																<label class="custom-file-label" for="prodFoto">Cari foto</label>
 															</div>
+															<label for="prodFoto" class="help-block text-truncate text-truncate-lg">
+																{{ optional($data['fotos']->firstWhere('kind', 'prodFoto'))->file_url }}
+															</label>
 														</div>
 													</div>
 												</div>
@@ -672,16 +817,23 @@
 									</a>
 								</div>
 								<div id="logKeg-distribusi" class="collapse" data-parent="#logKeg" style="">
-									<form action="{{ route('2024.user.commitment.storefoto', ['noIjin' => $ijin, 'spatial' => $data['spatial']->kode_spatial]) }}" enctype="multipart/form-data" method="post">
+									<form action="{{ route('2024.user.commitment.storefoto', ['noIjin' => $ijin, 'spatial' => $data['lokasi']->tcode]) }}" enctype="multipart/form-data" method="post">
 										@csrf
 										<div class="card-body">
 											<div class="row d-flex">
 												<div class="col-md-4 mb-3">
 													<div class="card" style="width: 100%; padding-top: 100%; position: relative; overflow: hidden;">
-														<div class="card-image" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-															background-image: url('{{ $data['lokasi']->distFoto ? asset("storage/{$data['lokasi']->distFoto}") : asset("img/posts_img/default-post-image-light.svg") }}');
-															background-size: cover; background-repeat: no-repeat; background-position: center;">
-														</div>
+														@if (optional($data['fotos']->firstWhere('kind', 'distFoto'))->file_url)
+															<div class="card-image" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+																background-image: url('{{ asset(str_replace('https://simethris4.test/storage/', 'storage/', optional($data['fotos']->firstWhere('kind', 'distFoto'))->file_url)) }}');
+																background-size: cover; background-repeat: no-repeat; background-position: center;">
+															</div>
+														@else
+															<div class="card-image" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+																background-image: url('{{ asset('img/posts_img/default-post-image-light.svg') }}');
+																background-size: cover; background-repeat: no-repeat; background-position: center;">
+															</div>
+														@endif
 													</div>
 												</div>
 												<div class="col-md-8">
@@ -691,12 +843,12 @@
 														</button>
 													</div>
 													<div class="form-group">
-														<label class="form-label" for="distStored">Untuk Benih</label>
-														<input class="form-control" id="distStored" type="number" name="distStored" value="{{$data['lokasi']->vol_benih}}">
+														<label class="form-label" for="distStored">Untuk Benih (kg)</label>
+														<input class="form-control" id="distStored" type="number" step="1" name="distStored" value="{{$data['lokasi']->vol_benih}}" onkeyup="updateFields()" disabled>
 													</div>
 													<div class="form-group">
-														<label class="form-label" for="distSale">Untuk Dijual</label>
-														<input class="form-control" id="distSale" type="number" name="distSale" value="{{$data['lokasi']->vol_jual}}">
+														<label class="form-label" for="distSale">Untuk Dijual (kg)</label>
+														<input class="form-control" id="distSale" type="number" step="1" name="distSale" value="{{$data['lokasi']->vol_jual}}" readonly>
 													</div>
 													<div class="form-group">
 														<label class="form-label" for="distComment">Keterangan</label>
@@ -709,6 +861,9 @@
 																<input type="file" class="custom-file-input" id="distFoto" name="distFoto" aria-describedby="distFoto" accept=".jpeg, .jpg, .png">
 																<label class="custom-file-label" for="distFoto">Cari foto</label>
 															</div>
+															<label for="distFoto" class="help-block text-truncate text-truncate-lg">
+																{{ optional($data['fotos']->firstWhere('kind', 'distFoto'))->file_url }}
+															</label>
 														</div>
 													</div>
 												</div>
@@ -750,46 +905,46 @@
 		var ktpPetani = $('#ktp_petani');
 
 
-		$('#distStored').prop('disabled', true);
+		// $('#distStored').prop('disabled', true);
     	// $('#vol_jual').prop('readonly', true);
 
-		function updateVolJual() {
-			var volume = parseFloat($('#prodVol').val());
-			var volBenih = parseFloat($('#distStored').val()) || 0; // Treat null as 0
+		// function updateVolJual() {
+		// 	var volume = parseFloat($('#prodVol').val());
+		// 	var volBenih = parseFloat($('#distStored').val()) || 0; // Treat null as 0
 
-			if (!isNaN(volume) && volume >= 0 && volBenih >= 0 && volBenih <= volume) {
-				$('#distStored').val(volume - volBenih);
-			} else {
-				$('#distStored').val('');
-			}
-		}
+		// 	if (!isNaN(volume) && volume >= 0 && volBenih >= 0 && volBenih <= volume) {
+		// 		$('#distStored').val(volume - volBenih);
+		// 	} else {
+		// 		$('#distStored').val('');
+		// 	}
+		// }
 
-		// Reset vol_benih and vol_jual on change of volume
-		$('#prodVol').on('input', function() {
-			var volume = parseFloat($(this).val());
-			if (isNaN(volume) || volume < 0) {
-				$(this).val('').attr('placeholder', 'Masukkan nilai volume yang valid.');
-				$('#distStored').val('').prop('disabled', true);
-				$('#vol_jual').val('').prop('readonly', true);
-			} else {
-				$(this).attr('placeholder', '');
-				$('#distStored').prop('disabled', false);
-				$('#distSale').prop('readonly', false);
-				updateVolJual();
-			}
-		});
+		// // Reset vol_benih and vol_jual on change of volume
+		// $('#prodVol').on('input', function() {
+		// 	var volume = parseFloat($(this).val());
+		// 	if (isNaN(volume) || volume < 0) {
+		// 		$(this).val('').attr('placeholder', 'Masukkan nilai volume yang valid.');
+		// 		// $('#distStored').val('').prop('disabled', true);
+		// 		// $('#vol_jual').val('').prop('readonly', true);
+		// 	} else {
+		// 		$(this).attr('placeholder', '');
+		// 		// $('#distStored').prop('disabled', false);
+		// 		// $('#distSale').prop('readonly', false);
+		// 		updateVolJual();
+		// 	}
+		// });
 
-		// Reset vol_jual if vol_benih is changed
-		$('#distStored').on('input', function() {
-			var volBenih = parseFloat($(this).val());
-			var volume = parseFloat($('#prodVol').val());
-			if (isNaN(volBenih) || volBenih < 0 || volBenih > volume) {
-				$(this).val('').attr('placeholder', 'Masukkan nilai vol benih yang valid.');
-			} else {
-				$(this).attr('placeholder', '');
-				updateVolJual();
-			}
-		});
+		// // Reset vol_jual if vol_benih is changed
+		// $('#distStored').on('input', function() {
+		// 	var volBenih = parseFloat($(this).val());
+		// 	var volume = parseFloat($('#prodVol').val());
+		// 	if (isNaN(volBenih) || volBenih < 0 || volBenih > volume) {
+		// 		$(this).val('').attr('placeholder', 'Masukkan nilai vol benih yang valid.');
+		// 	} else {
+		// 		$(this).attr('placeholder', '');
+		// 		updateVolJual();
+		// 	}
+		// });
 
 		function clearMarkers() {
 			markers.forEach(marker => marker.setMap(null));
@@ -868,5 +1023,26 @@
 	$('#tblLogbook').dataTable({
 		responsive: true,
 	});
+
+	function updateFields() {
+		var prodVol = parseFloat(document.getElementById('prodVol').value) || 0;
+		var distStored = parseFloat(document.getElementById('distStored').value) || 0;
+		var distSale = prodVol - distStored;
+
+		// Enable/disable distStored based on prodVol value
+		if (prodVol > 1) {
+			document.getElementById('distStored').disabled = false;
+		} else {
+			document.getElementById('distStored').disabled = true;
+			document.getElementById('distStored').value = 0;
+			distStored = 0;
+		}
+
+		// Calculate distSale
+		document.getElementById('distSale').value = distSale >= 0 ? distSale : 0;
+	}
+
+	// Initial call to set the correct state
+	updateFields();
 </script>
 @endsection

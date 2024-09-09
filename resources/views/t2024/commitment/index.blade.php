@@ -18,15 +18,15 @@ td {
 				<div class="panel-content">
 					<table id="datatable" class="table table-bordered table-hover table-striped table-sm w-100">
 						<thead class="thead-themed">
-							<th>No. RIPH</th>
+							<th width="15%">No. RIPH</th>
 							{{-- <th>Tahun</th>
 							<th>Tgl. Terbit</th>
 							<th>Vol. RIPH</th>
 							<th>Kewajiban</th> --}}
-							<th>Data</th>
-							<th>Tanam</th>
-							<th>Prod</th>
-							<th>SKL</th>
+							<th width="15%">Laporan Realisasi</th>
+							<th width="20%">Verifikasi Tanam</th>
+							<th width="20%">Verifikasi Prod</th>
+							<th width="20%">Verifikasi SKL</th>
 						</thead>
 						<tbody>
 
@@ -65,14 +65,14 @@ td {
 			},
 
 			columnDefs:[
-				// {
-				// 	targets: [5, 6, 7, 8],
-				// 	className: "text-center"
-				// },
-				// {
-				// 	targets: [4,5,6,7,8],
-				// 	orderable: false
-				// }
+				{
+					targets: [1,2,3,4],
+					className: "text-center"
+				},
+				{
+					targets: [1,2,3,4],
+					orderable: false
+				}
 			],
 
 			columns: [
@@ -88,53 +88,37 @@ td {
 						`;
 					}
 				},
-				// { data: 'periodetahun'},
-				// { data: 'tgl_terbit'},
-				// {
-				// 	data: 'volume',
-				// 	render: function (data, type, row) {
-				// 		var formattedVolume = new Intl.NumberFormat('id-ID').format(data);
-				// 		return formattedVolume;
-				// 	}
-				// },
-				// {
-				// 	data: 'wajib_produksi',
-				// 	render: function (data, type, row) {
-				// 		var wajibLuas = row.wajib_tanam; // bagi /1000 Mengonversi meter persegi ke ribuan hektar
-				// 		var formattedLuas = new Intl.NumberFormat('id-ID', { maximumFractionDigits: 3 }).format(wajibLuas);
-				// 		var formattedProd = new Intl.NumberFormat('id-ID', { maximumFractionDigits: 2 }).format(data);
-				// 		return `
-				// 			<div class="row">
-				// 				<div class="col-3">
-				// 					Tanam
-				// 				</div>
-				// 				<div class="col-9 text-right">
-				// 					`+ formattedLuas +` ha
-				// 				</div>
-				// 			</div>
-				// 			<div class="row">
-				// 				<div class="col-3">
-				// 					Produksi
-				// 				</div>
-				// 				<div class="col-9 text-right">
-				// 					`+ formattedProd +` ha ton
-				// 				</div>
-				// 			</div>
-				// 		`;
-				// 	}
-				// },
 				{
 					data: 'noIjin',
 					render: function (data, type, row) {
 						var noIjin = data;
+						var avSklStatus = row.avSklStatus;
+						var formAvSkl = "{{ route('2024.user.commitment.formavskl', ':noIjin') }}".replace(':noIjin', noIjin);
 						var url = "{{ route('2024.user.commitment.realisasi', ':noIjin') }}".replace(':noIjin', noIjin);
-						return `
-							<a href="`+ url +`"
-								class="btn btn-icon btn-xs btn-primary" data-toggle="tooltip"
-								title data-original-title="Isi Laporan Realisasi Tanam dan Produksi">
-								<i class="fal fa-edit"></i>
-							</a>
-						`;
+						switch (avSklStatus) {
+							case '0':
+							case '1':
+							case '2':
+							case '3':
+							case '4':
+							case '5':
+								return `<a href="${formAvSkl}" class="btn btn-xs btn-info" data-toggle="tooltip"
+										title data-original-title="Data Pengajuan">
+										<i class="fal fa-view"></i> Lihat Data
+									</a>`;
+							case '6':
+								return `<a href="`+ url +`"
+									class="btn btn-xs btn-warning" data-toggle="tooltip"
+									title data-original-title="Isi Laporan Realisasi Tanam dan Produksi">
+									<i class="fal fa-edit"></i> Perbaiki Data Realisasi
+								</a>`;
+							default:
+								return `<a href="`+ url +`"
+									class="btn btn-xs btn-warning" data-toggle="tooltip"
+									title data-original-title="Isi Laporan Realisasi Tanam dan Produksi">
+									<i class="fal fa-edit"></i> Lengkapi Realisasi
+								</a>`;
+						}
 					}
 				},
 				{
@@ -143,37 +127,44 @@ td {
 						var noIjin = row.noIjin;
 						var status = data;
 						var avTanamStatus = row.avTanamStatus;
+						var completeStatus = row.completeStatus;
 						var formAvt = "{{ route('2024.user.commitment.formavt', ':noIjin') }}".replace(':noIjin', noIjin);
 
-						if (status === "Belum Siap") {
-							return "Belum Siap";
-						} else if (status === "Siap") {
-							switch (avTanamStatus) {
-								case 'Tidak ada':
-									return `<a href="${formAvt}" class="btn btn-icon btn-xs btn-warning">
-												<i class="fal fa-upload"></i>
-											</a>`;
-								case '0':
-									return createProgressBar("Pengajuan Verifikasi", 5, "text-warning");
-								case '1':
-									return createProgressBar("Pendelegasian Verifikator", 10, "text-warning");
-								case '2':
-									return createProgressBar("Pemeriksaan Berkas Kelengkapan", 20, "text-warning");
-								case '3':
-									return createProgressBar("Pemeriksaan Berkas PKS", 35, "text-warning");
-								case '4':
-									return createProgressBar("Pemeriksaan Kesesuaian Tanggal Tanam", 55, "text-warning");
-								case '5':
-									return createProgressBar("Pemeriksaan Lokasi Tanam dan Bukti-bukti", 95, "text-warning");
-								case '6':
-									return createProgressBar("Pemeriksaan Selesai", 100, "text-success", true, formAvt);
-								case '7':
-									return createProgressBar("Pemeriksaan Selesai", 100, "text-danger", true, formAvt);
-								default:
-									return "Status tidak diketahui";
-							}
+						if(completeStatus === "Lunas"){
+							return `<span class="btn btn-icon btn-xs btn-success">
+										<i class="fal fa-check"></i>
+									</span>`;
 						} else {
-							return "Status tidak valid";
+							if (status === "Belum Siap") {
+								return "Belum Siap";
+							} else if (status === "Siap") {
+								switch (avTanamStatus) {
+									case 'Tidak ada':
+										return `<a href="${formAvt}" class="btn btn-icon btn-xs btn-warning">
+													<i class="fal fa-upload"></i>
+												</a>`;
+									case '0':
+										return createProgressBar("Pengajuan Verifikasi", 5, "text-warning");
+									case '1':
+										return createProgressBar("Pendelegasian Verifikator", 10, "text-warning");
+									case '2':
+										return createProgressBar("Pemeriksaan Berkas Kelengkapan", 20, "text-warning");
+									case '3':
+										return createProgressBar("Pemeriksaan Berkas PKS", 35, "text-warning");
+									case '4':
+										return createProgressBar("Pemeriksaan Kesesuaian Tanggal Tanam", 55, "text-warning");
+									case '5':
+										return createProgressBar("Pemeriksaan Lokasi Tanam dan Bukti-bukti", 95, "text-warning");
+									case '6':
+										return createProgressBar("Pemeriksaan Selesai", 100, "text-success", true, formAvt);
+									case '7':
+										return createProgressBar("Pemeriksaan Selesai", 100, "text-danger", true, formAvt);
+									default:
+										return "Status tidak diketahui";
+								}
+							} else {
+								return "Status tidak valid";
+							}
 						}
 					}
 				},
@@ -183,48 +174,44 @@ td {
 						var noIjin = row.noIjin;
 						var status = data;
 						var avProdStatus = row.avProdStatus;
+						var completeStatus = row.completeStatus;
 						var formAvp = "{{ route('2024.user.commitment.formavp', ':noIjin') }}".replace(':noIjin', noIjin);
 
-						if (status === "Belum Siap") {
-							return "Belum Siap";
-						} else if (status === "Siap") {
-							switch (avProdStatus) {
-								case "Tidak ada":
-									return `<a href="${formAvp}" class="btn btn-icon btn-xs btn-warning">
-												<i class="fal fa-upload"></i>
-											</a>`;
-								case "1":
-									return `<a href="${formAvp}" class="btn btn-icon btn-xs btn-info">
-												<i class="fal fa-clock"></i>
-											</a>`;
-								case "2":
-								case "3":
-									return `<a href="${formAvp}" class="btn btn-icon btn-xs btn-warning">
-												<i class="fal fa-hourglass"></i>
-											</a>`;
-								case "4":
-									return `<a href="${formAvp}" class="btn btn-icon btn-xs btn-success">
-												<i class="fal fa-check"></i>
-											</a>`;
-								case "5":
-									return `<div class="dropdown">
-												<a href="#" class="btn btn-danger btn-xs btn-icon" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-													<i class="fa fa-exclamation"></i>
-												</a>
-												<div class="dropdown-menu">
-													<a class="dropdown-item" style="text-decoration: none !important;" href="${formAvp}" target="_blank">
-														Lihat Hasil Verifikasi
-													</a>
-													<a class="dropdown-item" style="text-decoration: none !important;" href="${formAvp}" target="_blank" data-toggle="tooltip" title="Perbaiki data dan laporan. Lalu ajukan verifikasi ulang.">
-														Ajukan Ulang
-													</a>
-												</div>
-											</div>`;
-								default:
-									return '';
-							}
+						if(completeStatus === "Lunas"){
+							return `<span class="btn btn-icon btn-xs btn-success">
+										<i class="fal fa-check"></i>
+									</span>`;
 						} else {
-							return "error";
+							if (status === "Belum Siap") {
+								return "Belum Siap";
+							} else if (status === "Siap") {
+								switch (avProdStatus) {
+									case 'Tidak ada':
+										return `<a href="${formAvp}" class="btn btn-icon btn-xs btn-warning">
+													<i class="fal fa-upload"></i>
+												</a>`;
+									case '0':
+										return createProgressBar("Pengajuan Verifikasi", 5, "text-warning");
+									case '1':
+										return createProgressBar("Pendelegasian Verifikator", 10, "text-warning");
+									case '2':
+										return createProgressBar("Pemeriksaan Berkas Kelengkapan", 20, "text-warning");
+									case '3':
+										return createProgressBar("Pemeriksaan Berkas PKS", 35, "text-warning");
+									case '4':
+										return createProgressBar("Pemeriksaan Kesesuaian Tanggal Tanam", 55, "text-warning");
+									case '5':
+										return createProgressBar("Pemeriksaan Lokasi Tanam dan Bukti-bukti", 95, "text-warning");
+									case '6':
+										return createProgressBar("Pemeriksaan Selesai", 100, "text-success", true, formAvp);
+									case '7':
+										return createProgressBar("Pemeriksaan Selesai", 100, "text-danger", true, formAvp);
+									default:
+										return "Status tidak diketahui";
+								}
+							} else {
+								return "Status tidak valid";
+							}
 						}
 					}
 				},
@@ -234,64 +221,51 @@ td {
 						var noIjin = row.noIjin;
 						var status = data;
 						var avSklStatus = row.avSklStatus;
+						var completeStatus = row.completeStatus;
 						var formAvSkl = "{{ route('2024.user.commitment.formavskl', ':noIjin') }}".replace(':noIjin', noIjin);
-
-						if (status === "Belum Siap") {
-							return "Belum Siap";
-						} else if (status === "Siap") {
-							switch (avSklStatus) {
-								case "Tidak ada":
-									return `<a href="${formAvSkl}" class="btn btn-icon btn-xs btn-warning">
-												<i class="fal fa-upload"></i>
-											</a>`;
-								case "1":
-									return `<a href="${formAvSkl}" class="btn btn-icon btn-xs btn-info">
-												<i class="fal fa-clock"></i>
-											</a>`;
-								case "2":
-								case "3":
-									return `<a href="${formAvSkl}" class="btn btn-icon btn-xs btn-warning">
-												<i class="fal fa-hourglass"></i>
-											</a>`;
-								case "4":
-									return `<a href="${formAvSkl}" class="btn btn-icon btn-xs btn-success">
-												<i class="fal fa-check"></i>
-											</a>`;
-								case "5":
-									return `<div class="dropdown">
-												<a href="#" class="btn btn-danger btn-xs btn-icon" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-													<i class="fa fa-exclamation"></i>
-												</a>
-												<div class="dropdown-menu">
-													<a class="dropdown-item" style="text-decoration: none !important;" href="${formAvSkl}" target="_blank">
-														Lihat Hasil Verifikasi
-													</a>
-													<a class="dropdown-item" style="text-decoration: none !important;" href="${formAvSkl}" target="_blank" data-toggle="tooltip" title="Perbaiki data dan laporan. Lalu ajukan verifikasi ulang.">
-														Ajukan Ulang
-													</a>
-												</div>
-											</div>`;
-								default:
-									return '';
-							}
+						if(completeStatus === "Lunas"){
+							return `<span class="btn btn-icon btn-xs btn-success">
+										<i class="fal fa-check"></i>
+									</span>`;
 						} else {
-							return "error";
+							if (status === "Belum Siap") {
+								return "Belum Siap";
+							} else if (status === "Siap") {
+								switch (avSklStatus) {
+									case "Tidak ada":
+										return `<a href="${formAvSkl}" class="btn btn-icon btn-xs btn-warning">
+													<i class="fal fa-upload"></i>
+												</a>`;
+									case "0":
+										return createProgressBar("Pengajuan Verifikasi", 20, "text-warning");
+									case "1":
+										return createProgressBar("Pendelegasian Verifikator", 40, "text-warning");
+									case "2":
+										return createProgressBar("Direkomendasikan", 60, "text-warning");
+									case "3":
+										return createProgressBar("Disetujui", 80, "text-warning");
+									case "4":
+									return createProgressBar("Pemeriksaan Selesai", 100, "text-success", true, formAvp);
+									case "5":
+										return createProgressBar("Ditolak", 100, "text-danger");
+									case "6":
+										return createProgressBar("Perbaiki Data", 0, "text-danger", true, formAvSkl);
+									default:
+										return '';
+								}
+							} else {
+								return "error";
+							}
 						}
 					}
 				},
 			],
 			dom:
-				"<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6 d-flex align-items-center justify-content-end'>>" + // Move the select element to the left of the datatable buttons
+				"<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6 d-flex align-items-center justify-content-end'>>" +
 				"<'row mb-3'<'col-sm-12 col-md-6 d-flex align-items-center justify-content-start'f><'col-sm-12 col-md-6 d-flex align-items-center justify-content-end'B>>" +
 				"<'row'<'col-sm-12'tr>>" +
 				"<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
 			buttons: [
-				/*{
-					extend:    'colvis',
-					text:      'Column Visibility',
-					titleAttr: 'Col visibility',
-					className: 'mr-sm-3'
-				},*/
 				{
 					extend: 'pdfHtml5',
 					text: '<i class="fa fa-file-pdf"></i>',
@@ -354,7 +328,15 @@ td {
 					exportOptions: {
 						columns: [0, 1, 2, 3, 4]
 					},
-				}
+				},
+				{
+					text: '<i class="fa fa-plus"></i>',
+					className: 'btn-info btn-sm btn-icon ml-5',
+					titleAttr: 'Ambil Data RIPH',
+					action: function (e, dt, node, config) {
+						window.location.href = '{{ route('2024.user.pull.index') }}';
+					}
+				},
 			]
 		});
 
@@ -404,7 +386,6 @@ td {
 					${progressContent}`;
 			}
 		}
-
 	});
 </script>
 @endsection

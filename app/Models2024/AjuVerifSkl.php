@@ -13,13 +13,12 @@ class AjuVerifSkl extends Model
 
 	protected $fillable = [
 		'npwp',
-		'commitment_id',
 		'no_ijin',
-		'no_pengajuan',
+		'tcode',
 		'status',
 
-
 		//file upload
+		'report_url',
 		'baskls', //berita acara hasil pemeriksaan realisasi produksi
 		'ndhpskl', //nota dinas hasil pemeriksaan realisasi tanam
 
@@ -31,11 +30,40 @@ class AjuVerifSkl extends Model
 		'recomend_by',
 		'recomend_at',
 		'recomend_note',
+		'draft_url', //untuk di ttd
 
 		'approved_by',
 		'approved_at',
+		'no_skl',
 		'published_at',
+		'skl_url', //skl sudah ttd
 	];
+	public function NewRequest(): int
+	{
+		$completedNoIjin = Completed::pluck('no_ijin')->toArray();
+		return self::where('status', '0')
+			->whereNotIn('no_ijin', $completedNoIjin)
+			->count();
+	}
+
+	public function inProcess(): int
+	{
+		$completedNoIjin = Completed::pluck('no_ijin')->toArray();
+		return self::whereBetween('status', [0, 3])
+			->whereNotIn('no_ijin', $completedNoIjin)
+			->count();
+	}
+
+
+
+	public static function newPengajuanCount(): int
+	{
+		return self::where('status', '0')->count();
+	}
+	public static function getNewPengajuan()
+	{
+		return self::where('status', '0')->get();
+	}
 
 	public function commitment()
 	{
@@ -47,33 +75,18 @@ class AjuVerifSkl extends Model
 		return $this->belongsTo(DataUser::class, 'npwp', 'npwp_company');
 	}
 
-	public static function newPengajuanCount(): int
-	{
-		return self::where('status', '1')->count();
-	}
-
-	public function proceedVerif(): int
-	{
-		return self::whereIn('status', ['2', '3'])->count();
-	}
-
-	public function NewRequest(): int
-	{
-		return self::where('status', '1')->count();
-	}
-
-	public static function getNewPengajuan()
-	{
-		return self::where('status', '1')->get();
-	}
-
-	public function skl()
-	{
-		return $this->hasOne(Skl::class, 'pengajuan_id', 'id');
-	}
-
 	public function verifikator()
 	{
 		return $this->belongsTo(User::class, 'check_by', 'id');
+	}
+
+	public function recomendby()
+	{
+		return $this->belongsTo(User::class, 'recomend_by', 'id');
+	}
+
+	public function direktur()
+	{
+		return $this->belongsTo(User::class, 'approved_by', 'id');
 	}
 }

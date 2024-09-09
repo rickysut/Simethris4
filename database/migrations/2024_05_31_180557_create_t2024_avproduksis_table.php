@@ -15,10 +15,9 @@ return new class extends Migration
 	{
 		Schema::create('t2024_avproduksis', function (Blueprint $table) {
 			$table->bigIncrements('id');
+			$table->string('tcode')->nullable();
 			$table->string('npwp');
-			$table->unsignedBigInteger('commitment_id');
 			$table->string('no_ijin');
-			$table->string('no_pengajuan')->nullable();
 			$table->string('status')->nullable(); //
 			$table->text('note')->nullable();
 
@@ -28,6 +27,7 @@ return new class extends Migration
 
 			$table->bigInteger('check_by')->nullable();
 			$table->date('verif_at')->nullable();
+			$table->text('report_url')->nullable();
 			$table->string('metode')->nullable();
 			$table->timestamps();
 			$table->softDeletes();

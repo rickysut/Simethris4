@@ -19,25 +19,19 @@
 		@php($msgs = \App\Models\QaTopic::unreadMsg())
 
 		@if (Auth::user()->roles[0]->title == 'Admin' || Auth::user()->roles[0]->title == 'Pejabat' || Auth::user()->roles[0]->title == 'Verifikator')
-			{{-- tanam --}}
-			@php($cntAjuVerifTanam = \App\Models\AjuVerifTanam::newPengajuanCount())
-			@php($getAjuVerifTanam = \App\Models\AjuVerifTanam::getNewPengajuan())
-			{{-- produksi --}}
-			@php($cntAjuVerifProduksi = \App\Models\AjuVerifProduksi::newPengajuanCount())
-			@php($getAjuVerifProduksi = \App\Models\AjuVerifProduksi::getNewPengajuan())
+			@php($cntAjuVerifikasi = \App\Models2024\AjuVerifikasi::newPengajuanCount())
+			@php($getAjuVerifikasi = \App\Models2024\AjuVerifikasi::getNewPengajuan())
 			{{-- skl --}}
-			@php($cntAjuVerifSkl = \App\Models\AjuVerifSkl::newPengajuanCount())
-			@php($getAjuVerifSkl = \App\Models\AjuVerifSkl::getNewPengajuan())
-			@php($cntpengajuan = $cntAjuVerifTanam + $cntAjuVerifProduksi + (Auth::user()->roles[0]->title == 'Admin' ? $cntAjuVerifSkl : 0))
+			@php($cntAjuVerifSkl = \App\Models2024\AjuVerifSkl::newPengajuanCount())
+			@php($getAjuVerifSkl = \App\Models2024\AjuVerifSkl::getNewPengajuan())
+			@php($cntpengajuan = $cntAjuVerifikasi + (Auth::user()->roles[0]->title == 'Admin' ? $cntAjuVerifSkl : 0))
 			{{-- rekomendasi --}}
 			@php($cntRecomendations = \App\Models\Skl::newPengajuanCount())
 			@php($getRecomendations = \App\Models\Skl::getNewPengajuan())
 
 		@else
-			@php($cntAjuVerifTanam = 0)
-			@php($cntAjuVerifTanam = null)
-			@php($cntAjuVerifProduksi = 0)
-			@php($getAjuVerifProduksi = null)
+			@php($cntAjuVerifikasi = 0)
+			@php($cntAjuVerifikasi = null)
 			@php($cntAjuVerifSkl = 0)
 			@php($getAjuVerifSkl = null)
 			@php($cntRecomendations = 0)
@@ -246,7 +240,7 @@
 				</div>
 			</div>
 			<div class="col-lg-6">
-				@if (Auth::user()->roles[0]->title == 'Admin' || Auth::user()->roles[0]->title == 'Verifikator')
+				@if (Auth::user()->roles[0]->title == 'Admin')
 					<div id="panel-2" class="panel">
 						<div class="panel-hdr">
 							<h2>
@@ -267,9 +261,9 @@
 						<div class="panel-container collapse">
 							<div class="panel-content p-0">
 								<ul class="notification">
-									@foreach ($getAjuVerifTanam as $item)
+									@foreach ($getAjuVerifikasi as $item)
 										<li>
-											<a href="{{ route('verification.tanam.check', [$item->id]) }}"  class="d-flex align-items-center show-child-on-hover">
+											<a href="{{ route('2024.admin.pengajuan.assignment', [(preg_replace('/[^a-zA-Z0-9]/', '', $item->no_ijin)), $item->tcode]) }}"  class="d-flex align-items-center show-child-on-hover">
 												<span class="mr-2">
 													@if (!empty($item->data_user->logo))
 														<img src="{{ Storage::disk('public')->url($item->data_user->logo) }}"
@@ -283,30 +277,7 @@
 													<span class="name">{{ $item->datauser->company_name }} <span
 														class="badge badge-success fw-n position-absolute pos-top pos-right mt-1">NEW</span></span>
 													<span class="msg-a fs-sm">
-														<span class="badge badge-success">Verifikasi Tanam</span>
-													</span>
-													<span class="fs-nano text-muted mt-1">{{ $item->created_at->diffForHumans() }}</span>
-												</span>
-											</a>
-										</li>
-									@endforeach
-									@foreach ($getAjuVerifProduksi as $item)
-										<li>
-											<a href="{{ route('verification.produksi.check', [$item->id]) }}"  class="d-flex align-items-center show-child-on-hover">
-												<span class="mr-2">
-													@if (!empty($item->data_user->logo))
-														<img src="{{ Storage::disk('public')->url($item->data_user->logo) }}"
-															class="profile-image rounded-circle" alt="">
-													@else
-														<img src="{{ asset('/img/avatars/farmer.png') }}"
-															class="profile-image rounded-circle" alt="">
-													@endif
-												</span>
-												<span class="d-flex flex-column flex-1">
-													<span class="name">{{ $item->datauser->company_name }} <span
-														class="badge badge-warning fw-n position-absolute pos-top pos-right mt-1">NEW</span></span>
-													<span class="msg-a fs-sm ">
-														<span class="badge badge-warning">Verifikasi Produksi</span>
+														<span class="badge badge-{{ $item->kind === 'TANAM' ? 'success' : 'warning' }}">{{$item->kind}}</span>
 													</span>
 													<span class="fs-nano text-muted mt-1">{{ $item->created_at->diffForHumans() }}</span>
 												</span>
@@ -443,9 +414,9 @@
 								</span>
 							</h2>
 							<div class="panel-toolbar">
-								@if ($cntAjuVerifTanam > 0 || $cntAjuVerifProduksi > 0 || $cntAjuVerifSkl > 0)
-									<a href="javascript:void(0);" class="mr-1 btn btn-danger btn-xs waves-effect waves-themed" data-action="panel-collapse" data-toggle="tooltip" data-offset="0,10" data-original-title="Terdapat {{$cntAjuVerifTanam + $cntAjuVerifProduksi + $cntAjuVerifSkl}} Pengajuan Verifikasi yang perlu ditindaklanjut oleh para Verifikator.">
-										{{$cntAjuVerifTanam + $cntAjuVerifProduksi + $cntAjuVerifSkl}}
+								@if ($cntAjuVerifikasi > 0 || $cntAjuVerifSkl > 0)
+									<a href="javascript:void(0);" class="mr-1 btn btn-danger btn-xs waves-effect waves-themed" data-action="panel-collapse" data-toggle="tooltip" data-offset="0,10" data-original-title="Terdapat {{$cntAjuVerifikasi + $cntAjuVerifSkl}} Pengajuan Verifikasi yang perlu ditindaklanjut oleh para Verifikator.">
+										{{$cntAjuVerifikasi + $cntAjuVerifSkl}}
 									</a>
 								@else
 								@endif
@@ -456,14 +427,8 @@
 								<ul class="notification">
 									<li>
 										<span class="d-flex align-items-center justify-content-between show-child-on-hover">
-											<span>Tanam</span>
-											<span>{{$cntAjuVerifTanam}} ajuan</span>
-										</span>
-									</li>
-									<li>
-										<span class="d-flex align-items-center justify-content-between show-child-on-hover">
-											<span>Produksi</span>
-											<span>{{$cntAjuVerifProduksi}} ajuan</span>
+											<span>Verifikasi</span>
+											<span>{{$cntAjuVerifikasi}} ajuan</span>
 										</span>
 									</li>
 									<li>

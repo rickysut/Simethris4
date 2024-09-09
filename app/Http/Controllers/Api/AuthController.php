@@ -10,7 +10,8 @@ use Illuminate\Http\Request;
 class AuthController extends Controller
 {
     /**
-     * 
+     *
+	 * Get Token
      * @OA\Post(
      *      path="/getToken",
      *      operationId="getToken",
@@ -31,24 +32,24 @@ class AuthController extends Controller
      *          response=200,
      *          description="OK",
      *          @OA\JsonContent()
-     *          
+     *
      *      ),
      *      @OA\Response(
-     *          response=422, 
+     *          response=422,
      *          description="The provided credentials are incorrect."
      *      ),
      *  )
-     */   
+     */
     public function getToken(Request $request)
     {
         $request->validate([
             'username' => 'required',
             'password' => 'required'
         ]);
-        
+
         $credentials = request(['username', 'password']);
         if (!auth()->attempt($credentials)) {
-            
+
             return response()->json([
                 'message' => 'The given data was invalid.',
                 'errors' => [

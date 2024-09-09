@@ -18,7 +18,7 @@
 										<th>Pelaku Usaha</th>
 										<th>No. RIPH</th>
 										<th>Diajukan pada</th>
-										<th>Verifikator</th>
+										{{-- <th>Verifikator</th>  --}}
 										<th>Status</th>
 										<th>Tindakan</th>
 									</tr>
@@ -39,7 +39,7 @@
 	@parent
 	<script>
 		$(document).ready(function() {
-		//initialize datatable dataPengajuan
+			//initialize datatable dataPengajuan
 			$('#avtanamTable').dataTable({
 				responsive: true,
 				lengthChange: false,
@@ -47,52 +47,54 @@
 				processing: true,
 				serverSide: true,
 				dom:
-					"<'row mb-3'<'col-sm-12 col-md-6 d-flex align-items-center justify-content-start'f><'col-sm-12 col-md-6 d-flex align-items-center justify-content-end'B>>" +
+					"<'row mb-3'<'col-sm-12 col-md-6 d-flex align-items-center justify-content-start'f><'col-sm-12 col-md-6 d-flex align-items-center justify-content-end'<'toolbar'>B>>" +
 					"<'row'<'col-sm-12'tr>>" +
 					"<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
 				ajax: {
 					url: "{{ route('2024.datafeeder.getRequestVerifTanam') }}",
 					type: "GET",
-					dataSrc: "data"
+					dataSrc: "data",
+					data: function (d) {
+						d.status = $('#selectStatus').val(); // Send status filter value
+					}
 				},
 				columns: [
 					{data: 'periode'},
 					{data: 'perusahaan'},
 					{data: 'no_ijin'},
-					{data: 'created_at'},
-					{data: 'verifikator'},
+					{
+						data: 'created_at',
+						render: function(data, type, row) {
+							if (data) {
+								var date = new Date(data);
+								var options = { year: 'numeric', month: 'long', day: 'numeric' };
+								return new Intl.DateTimeFormat('id-ID', options).format(date);
+							}
+							return ''; // Jika data kosong, kembalikan string kosong
+						}
+					},
+					// {data: 'verifikator'},
 					{
 						data: 'status',
 						render: function (data, type, row) {
-
-							var status1 = data == 1 ? 'btn-warning' : 'btn-default';
-							var status1Icon = data == 1 ? 'fa-exclamation-circle' : 'fa-check';
-
-							var status2 = (data >= 2 && data <= 5) ? 'btn-success' : 'btn-default';
-							var status2Icon = (data >= 2 && data <= 5) ? 'fa-check' : 'fa-hourglass';
-
-							var status3 = (data >= 3 && data <= 5) ? 'btn-success' : 'btn-default';
-							var status3Icon = (data >= 3 && data <= 5) ? 'fa-check' : 'fa-hourglass';
-
-							var status4 = (data == 4) ? 'btn-success' : (data == 5) ? 'btn-danger' : 'btn-default';
-							var status4Icon = (data == 4) ? 'fa-check' : (data == 5) ? 'fa-ban' : 'fa-hourglass';
-
-							return `
-								<div class="btn-group btn-group-toggle" role="group">
-									<label class="btn ${status1} btn-xs" data-toggle="tooltip" data-original-title="Verifikasi diajukan">
-										1 <i class="fa ${status1Icon}"></i>
-									</label>
-									<label class="btn ${status2} btn-xs" data-toggle="tooltip" data-original-title="Verifikasi dalam proses">
-										2 <i class="fa ${status2Icon}"></i>
-									</label>
-									<label class="btn ${status3} btn-xs" data-toggle="tooltip" data-original-title="Verifikasi tahap akhir">
-										3 <i class="fa ${status3Icon}"></i>
-									</label>
-									<label class="btn ${status4} btn-xs" data-toggle="tooltip" data-original-title="Verifikasi selesai">
-										4 <i class="fa ${status4Icon}"></i>
-									</label>
-								</div>
-							`;
+							switch (data){
+								case '1':
+									return createProgressBar("Tahap 1", 5, "text-success", "bg-success-50");
+								case '2':
+									return createProgressBar("Tahap 2", 10, "text-success", "bg-success-100");
+								case '3':
+									return createProgressBar("Tahap 3", 15, "text-success", "bg-success-200");
+								case '4':
+									return createProgressBar("Tahap 4", 25, "text-success", "bg-success-300");
+								case '5':
+									return createProgressBar("Tahap 5", 75, "text-success", "bg-success-400");
+								case '6':
+									return createProgressBar("Tahap Akhir", 100, "text-success", "bg-success-500");
+								case '7':
+									return createProgressBar("Tahap Akhir", 100, "text-danger", "bg-danger-500");
+								default:
+									return "Status tidak diketahui";
+							}
 						}
 					},
 					{
@@ -101,9 +103,9 @@
 							var noIjin = data;
 							var tcode = row.tcode;
 							var status = row.status;
-							var viewStat = '{{ route("2024.verifikator.tanam.result", ":noIjin") }}'.replace(':noIjin', noIjin);
+							var viewStat = '{{ route("2024.verifikator.tanam.result", [":noIjin", ":tcode"]) }}'.replace(':noIjin', noIjin).replace(':tcode', tcode);
 							var checkStat = '{{ route("2024.verifikator.tanam.check", [":noIjin", ":tcode"]) }}'.replace(':noIjin', noIjin).replace(':tcode', tcode);
-							if(status === '4'){
+							if(status > 5){
 								return `
 									<a href='`+ viewStat +`' data-toggle="tooltip" title="Lihat hasil" class="mr-1 btn btn-xs btn-icon btn-info">
 										<i class="fal fa-file-search"></i>
@@ -139,7 +141,7 @@
 						extend: 'pdfHtml5',
 						text: '<i class="fa fa-file-pdf"></i>',
 						titleAttr: 'Generate PDF',
-						className: 'btn-outline-danger btn-sm btn-icon mr-1'
+						className: 'ml-2 btn-outline-danger btn-sm btn-icon mr-1'
 					},
 					{
 						extend: 'excelHtml5',
@@ -153,8 +155,54 @@
 						titleAttr: 'Print Table',
 						className: 'btn-outline-primary btn-sm btn-icon mr-1'
 					}
-				]
+				],
+				initComplete: function() {
+					$("div.toolbar").html(`
+						<select class="custom-select form-control" id="selectStatus">
+							<option selected>status...</option>
+							<option value="1">Semua</option>
+							<option value="2">Dalam Verifikasi</option>
+							<option value="3">Selesai</option>
+						</select>
+					`);
+				}
 			});
+
+			// Tambahkan event listener untuk select option
+			$(document).on('change', '#selectStatus', function() {
+				$('#avtanamTable').DataTable().ajax.reload();
+			});
+
+			function createProgressBar(label, widthPercentage, textColorClass, backgroundClass, showLink = false, link = '') {
+				let progressContent = `
+					<div class="progress progress-sm mb-3">
+						<div class="progress-bar ${backgroundClass}" role="progressbar" style="width: ${widthPercentage}%;"
+							aria-valuenow="${widthPercentage}" aria-valuemin="0" aria-valuemax="100"></div>
+					</div>`;
+
+				if (showLink) {
+					return `
+						<div class="d-flex ${textColorClass}">
+							${label}
+							<span class="d-inline-block ml-auto mb-1">
+								<a href="${link}" class="btn btn-icon btn-xs ${textColorClass === 'text-success' ? 'btn-success' : 'btn-danger'}">
+									<i class="fal ${textColorClass === 'text-success' ? 'fa-check' : 'fa-ban'}"></i>
+								</a>
+							</span>
+						</div>
+						${progressContent}`;
+				} else {
+					return `
+						<div class="d-flex ${textColorClass}">
+							${label}
+							<span class="d-inline-block ml-auto mb-1">
+								<i class='fas fa-hourglass ${textColorClass}'></i>
+							</span>
+						</div>
+						${progressContent}`;
+				}
+			}
+
 		});
 	</script>
 @endsection

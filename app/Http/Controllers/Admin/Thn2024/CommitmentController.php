@@ -24,6 +24,7 @@ use App\Models2024\Skl;
 use App\Models2024\PullRiph;
 use App\Models2024\Pks;
 use App\Models2024\MasterPoktan;
+use App\Models2024\UserFile;
 use App\Models\UserDocs;
 use App\Models\Varietas;
 use App\Models\PenangkarRiph;
@@ -84,13 +85,29 @@ class CommitmentController extends Controller
 		$npwp = Auth::user()->data_user->npwp_company;
 		$commitment = PullRiph::select('id', 'npwp', 'no_ijin', 'status', 'periodetahun')
 			->where('npwp', $npwp)
-			->where('no_ijin',$noIjin)->first();
+			->where('no_ijin', $noIjin)->first();
 
 		$poktans = Pks::where('no_ijin', $noIjin)
-			->groupBy('poktan_id')
+			->groupBy('kode_poktan')
 			->get();
 
-		$docs = UserDocs::where('no_ijin', $commitment->no_ijin)->first();
+		$docs = UserFile::where('no_ijin', $commitment->no_ijin)->whereIn(
+			'kind',
+			[
+				'sptjmtanam',
+				'sptjmproduksi',
+				'spvt',
+				'rta',
+				'sphtanam',
+				'logbook',
+				'spvp',
+				'rpo',
+				'formLa',
+				'sphproduksi',
+				'spskl'
+			]
+		)->get();
+
 		$penangkars = PenangkarRiph::where('npwp', $npwp)
 			->when(isset($commitment->no_ijin), function ($query) use ($commitment) {
 				return $query->where('no_ijin', $commitment->no_ijin);
@@ -105,10 +122,13 @@ class CommitmentController extends Controller
 		} else {
 			$disabled = true; // input di-disable
 		}
-		return view('t2024.commitment.realisasi', compact('module_name', 'page_title', 'page_heading', 'heading_class', 'commitment', 'noIjin','penangkars', 'docs', 'npwp', 'varietass', 'disabled', 'poktans', 'ijin'));
+
+		// return $docs;
+
+		return view('t2024.commitment.realisasi', compact('module_name', 'page_title', 'page_heading', 'heading_class', 'commitment', 'noIjin', 'penangkars', 'docs', 'npwp', 'varietass', 'disabled', 'poktans', 'ijin'));
 	}
 
-	public function findmarker (Request $request)
+	public function findmarker(Request $request)
 	{
 		$module_name = 'Verifikasi';
 		$page_title = 'Simulator Spatial';
@@ -142,7 +162,7 @@ class CommitmentController extends Controller
 		return view('t2024.commitment.simulator', compact('module_name', 'page_title', 'page_heading', 'heading_class', 'mapkey', 'ijins', 'myLocus'));
 	}
 
-	public function realisasimobile (Request $request, $noIjin, $spatial)
+	public function realisasimobile(Request $request, $noIjin, $spatial)
 	{
 		$spatial = $spatial;
 		$module_name = 'Verifikasi';
@@ -194,7 +214,7 @@ class CommitmentController extends Controller
 
 		try {
 			$npwp_company = Auth::user()->data_user->npwp_company;
-			$pks = Pks::where('tcode', $id)->first();
+			$pks = Pks::where('id', $id)->first();
 			$commitment = PullRiph::where('no_ijin', $pks->no_ijin)->first();
 			$noIjin = str_replace(['/', '.'], '', $commitment->no_ijin);
 
@@ -210,13 +230,26 @@ class CommitmentController extends Controller
 				$request->validate([
 					'berkas_pks' => 'mimes:pdf|max:2048',
 				]);
-				$filename = 'pks_' . $filenpwp . '_' . $noIjin . '_' . $pks->poktan_id . '_' . time() . '.' . $file->extension();
-				$path = 'uploads/' . $filenpwp . '/' . $commitment->periodetahun;
-				$file->storeAs($path, $filename, 'public');
-				if (Storage::disk('public')->exists($path . '/' . $filename)) {
-					$pks->berkas_pks = $filename;
+				$filename = 'pks_' . $noIjin . '_' . time() . '.' . $file->extension();
+				$directory = 'uploads/' . $filenpwp . '/' . $commitment->periodetahun . '/' . $noIjin;
+
+				$file->storeAs($directory, $filename, 'public');
+
+				if (Storage::disk('public')->exists($directory . '/' . $filename)) {
+					$path = url($directory . '/' . $filename);
+					$pks->berkas_pks = $path;
+					$userFile = UserFile::updateOrCreate(
+						[
+							'kind' => 'pks',
+							'no_ijin' => $pks->no_ijin,
+							'file_code' => $pks->kode_poktan,
+						],
+						[
+							'file_url' => $path,
+						]
+					);
 				} else {
-					return redirect()->back()->with('error', "Gagal mengunggah berkas. Error: " . $e->getMessage());
+					return redirect()->back()->with('error', "Gagal mengunggah berkas.");
 				}
 			}
 
@@ -231,7 +264,6 @@ class CommitmentController extends Controller
 		}
 	}
 
-
 	public function storeUserDocs(Request $request, $ijin)
 	{
 		$noIjin = substr($ijin, 0, 4) . '/' .
@@ -241,14 +273,9 @@ class CommitmentController extends Controller
 			substr($ijin, 10, 2) . '/' .
 			substr($ijin, 12, 4);
 
-		// dd($noIjin);
-
 		$commitment = PullRiph::where('no_ijin', $noIjin)->first();
 		$realnpwp = $commitment->npwp;
 		$npwp = str_replace(['.', '-'], '', $realnpwp);
-		$userFiles = [];
-
-		// dd($npwp);
 
 		try {
 			DB::beginTransaction();
@@ -259,23 +286,17 @@ class CommitmentController extends Controller
 				'spvt',
 				'rta',
 				'sphtanam',
-				'logbooktanam',
 				'spvp',
 				'rpo',
 				'formLa',
 				'sphproduksi',
-				'logbookproduksi',
 				'spskl'
-				// Tambahkan field-file lainnya di sini
 			];
-
-			// Validasi MIME type
 			$rules = [];
 			$messages = [];
 			foreach ($fileFields as $field) {
-				$rules[$field] = 'mimetypes:application/pdf|max:2048'; // Hanya izinkan file PDF
+				$rules[$field] = 'mimetypes:application/pdf|max:2048';
 
-				// Periksa apakah file ada dalam permintaan sebelum menambahkan pesan kustom
 				if ($request->hasFile($field)) {
 					$messages[$field . '.mimetypes'] = 'Berkas ' . $request->file($field)->getClientOriginalName() . ' harus memiliki tipe MIME application/pdf.';
 				}
@@ -284,35 +305,38 @@ class CommitmentController extends Controller
 			// Lakukan validasi
 			$request->validate($rules, $messages);
 
-			// Jika validasi berhasil, lanjutkan dengan proses penyimpanan file
 			foreach ($fileFields as $field) {
 				if ($request->hasFile($field)) {
 					$file = $request->file($field);
 
 					$fileExtension = $file->extension();
 					$file_name = $field . '_' . $ijin . '_' . time() . '.' . $fileExtension;
-					$file_path = $file->storeAs('uploads/' . $npwp . '/' . $commitment->periodetahun, $file_name, 'public');
-					$userFiles[$field] = $file_name;
+					// $file_path = $file->storeAs('uploads/' . $npwp . '/' . $commitment->periodetahun, $file_name, 'public');
+					$path = 'uploads/' . $npwp . '/' . $commitment->periodetahun . '/' . $ijin;
+					$file->storeAs($path, $file_name, 'public');
+					$fullPath = url($path . '/' . $file_name);
+					// $fullPath = url('storage/' . $file_path);
+
+					$userFiles = [
+						'file_url' => $fullPath,
+						'file_code' => $file_name
+					];
+
+					// Panggil updateOrCreate di dalam loop untuk setiap file yang ditemukan
+					UserFile::updateOrCreate(
+						[
+							'kind' => $field,
+							'no_ijin' => $noIjin
+						],
+						$userFiles // Menggabungkan data form dan file dalam satu array
+					);
 				}
 			}
 
-			$data = UserDocs::updateOrCreate(
-				[
-					'npwp' => $realnpwp,
-					'commitment_id' => $commitment->id,
-					'no_ijin' => $noIjin
-				],
-				array_merge($request->all(), $userFiles) // Menggabungkan data form dan file dalam satu array
-			);
 			DB::commit();
-
-			// Flash message sukses
 			return redirect()->back()->with('success', 'Berkas berhasil diunggah.');
 		} catch (\Exception $e) {
-			// Rollback transaksi jika ada kesalahan
 			DB::rollBack();
-
-			// Flash message kesalahan
 			return redirect()->back()->with('error', 'Terjadi kesalahan saat mengunggah berkas: ' . $e->getMessage());
 		}
 	}

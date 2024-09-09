@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class MasterPoktan extends Model
 {
-	use HasFactory, SoftDeletes,Auditable;
+	use HasFactory, SoftDeletes, Auditable;
 
 	public $table = 't2024_master_poktans';
 
@@ -27,7 +27,6 @@ class MasterPoktan extends Model
 	protected $fillable = [
 		'id',
 		'kode_poktan',
-		'kode_register',
 		'alamat',
 		'provinsi_id',
 		'kabupaten_id',
@@ -41,12 +40,12 @@ class MasterPoktan extends Model
 
 	public function pks()
 	{
-		return $this->belongsTo(Pks::class, 'id', 'poktan_id');
+		return $this->hasMany(Pks::class, 'kode_poktan', 'kode_poktan');
 	}
 
 	public function anggota()
 	{
-		return $this->hasMany(MasterAnggota::class, 'kode_poktan');
+		return $this->hasMany(MasterAnggota::class, 'kode_poktan', 'kode_poktan');
 	}
 
 	public function provinsi()

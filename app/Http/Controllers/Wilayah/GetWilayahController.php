@@ -9,6 +9,7 @@ use App\Models\MasterProvinsi;
 use App\Models\MasterKabupaten;
 use App\Models\MasterKecamatan;
 use App\Models\MasterDesa;
+use Illuminate\Support\Facades\Http;
 
 class GetWilayahController extends Controller
 {
@@ -20,72 +21,100 @@ class GetWilayahController extends Controller
 	 */
 	public function getAllProvinsi()
 	{
-		$provinsis = MasterProvinsi::orderBy('provinsi_id', 'asc')->get();
+		// Ambil data dari API BPS
+		$responseProvinsi = Http::get('https://sig.bps.go.id/rest-bridging/getwilayah?level=provinsi&parent=0');
+		$provincesJson = $responseProvinsi->json();
 
-		$result = collect($provinsis)->map(function ($provinsi) {
+		// Ambil data lokal dari database termasuk yang telah dihapus (soft-deleted)
+		$localProvinces = MasterProvinsi::select('provinsi_id', 'nama')->get()->toArray();
+
+		// Ubah data API BPS menjadi format yang bisa dibandingkan
+		$foreignProvinces = collect($provincesJson)->map(function ($province) {
 			return [
-				'provinsi_id' => $provinsi['provinsi_id'],
-				'nama' => $provinsi['nama'],
+				'provinsi_id' => $province['kode_bps'],
+				'nama' => $province['nama_bps'],
 			];
-		});
+		})->sortBy('provinsi_id')->values()->all();
 
-		return response()->json($result);
+		// Sort data lokal untuk memastikan perbandingan yang akurat
+		$localProvinces = collect($localProvinces)->sortBy('provinsi_id')->values()->all();
+
+		$provinces = collect($provincesJson)->map(function ($province) {
+			return [
+				'provinsi_id' => $province['kode_bps'],
+				'nama' => $province['nama_bps'],
+			];
+		})->sortBy('nama')->values()->all();
+
+		// Bandingkan kedua set data
+		$status = $foreignProvinces == $localProvinces ? 'clear' : 'Need Update';
+
+		return response()->json([
+			'status' => $status,
+			'data' => $provinces,
+		]);
 	}
 
 	public function getKabupatenByProvinsi($provinsiId)
 	{
-		$kabupatens = MasterKabupaten::orderBy('kabupaten_id', 'asc')->get();
-		$result = [];
+		$responseKabupaten = Http::get("https://sig.bps.go.id/rest-bridging/getwilayah?level=kabupaten&parent=$provinsiId");
+		$kabupatensJson = $responseKabupaten->json();
 
-		foreach ($kabupatens as $kabupaten) {
-			if ($kabupaten['provinsi_id'] == $provinsiId) {
-				$result[] = [
-					'provinsi_id' => $kabupaten['provinsi_id'] ?? null,
-					'kabupaten_id' => $kabupaten['kabupaten_id'] ?? null,
-					'nama_kab' => $kabupaten['nama_kab'] ?? null,
-				];
-			}
-		}
+		$kabupatens = collect($kabupatensJson)->map(function ($kabupaten) use ($provinsiId) {
+			return [
+				'provinsi_id' => $provinsiId,
+				'kabupaten_id' => $kabupaten['kode_bps'],
+				'nama_kab' => $kabupaten['nama_bps'],
+			];
+		})->sortBy('nama_kab')->values()->all();
 
-		return response()->json($result);
+		return response()->json([
+			'data' => $kabupatens,
+		]);
 	}
-
 
 	public function getKecamatanByKabupaten($kabupatenId)
 	{
-		$kecamatans = MasterKecamatan::orderBy('kecamatan_id', 'asc')->get();
-		$result = [];
+		$responseKecamatan = Http::get("https://sig.bps.go.id/rest-bridging/getwilayah?level=kecamatan&parent=$kabupatenId");
+		$kecamatansJson = $responseKecamatan->json();
 
-		foreach ($kecamatans as $kecamatan) {
-			if ($kecamatan['kabupaten_id'] == $kabupatenId) {
-				$result[] = [
-					'kabupaten_id' => $kecamatan['kabupaten_id'],
-					'kecamatan_id' => $kecamatan['kecamatan_id'],
-					'nama_kecamatan' => $kecamatan['nama_kecamatan'],
-				];
-			}
-		}
-		return response()->json($result);
+		$kecamatans = collect($kecamatansJson)->map(function ($kecamatan) use ($kabupatenId) {
+			return [
+				'kabupaten_id' => $kabupatenId,
+				'kecamatan_id' => $kecamatan['kode_bps'],
+				'nama_kecamatan' => $kecamatan['nama_bps'],
+			];
+		})->sortBy('nama_kecamatan')->values()->all();
+
+		return response()->json([
+			'data' => $kecamatans,
+		]);
 	}
 
 	public function getDesaBykecamatan($kecamatanId)
 	{
-		$desas = MasterDesa::orderBy('kelurahan_id', 'asc')
-			->where('kecamatan_id', $kecamatanId)
-			->get();
-		$result = [];
+		$responseDesa = Http::get("https://sig.bps.go.id/rest-bridging/getwilayah?level=desa&parent=$kecamatanId");
+		$desaJson = $responseDesa->json();
 
-		foreach ($desas as $desa) {
-			if ($desa['kecamatan_id'] == $kecamatanId) {
-				$result[] = [
-					'kecamatan_id' => $desa['kecamatan_id'],
-					'kelurahan_id' => $desa['kelurahan_id'],
-					'nama_desa' => $desa['nama_desa'],
-				];
-			}
-		}
+		$kelurahans = collect($desaJson)->map(function ($kelurahan) use ($kecamatanId) {
+			return [
+				'kecamatan_id' => $kecamatanId,
+				'kelurahan_id' => $kelurahan['kode_bps'],
+				'nama_desa' => $kelurahan['nama_bps'],
+			];
+		})->sortBy('nama_desa')->values()->all();
 
-		return response()->json($result);
+		return response()->json([
+			'data' => $kelurahans,
+		]);
+
+
+		$kelurahans  = MasterDesa::select('kecamatan_id', 'kelurahan_id','nama_desa')
+		->where('kecamatan_id',$kecamatanId)
+		->orderBy('nama_desa', 'ASC')->get();
+		return response()->json([
+			'data' => $kelurahans,
+		]);
 	}
 
 	public function getDesaById($id)

@@ -8,6 +8,7 @@ use App\Models2024\MasterAnggota;
 use App\Models2024\MasterPoktan;
 use App\Models2024\MasterSpatial;
 use App\Models2024\PullRiph;
+use App\Models\MasterKabupaten;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -23,10 +24,67 @@ class SpatialController extends Controller
 	{
 		$module_name = 'Spatial';
 		$page_title = 'Data Spatial';
-		$page_heading = 'Daftar Spatial Wajib Tanam';
+		$page_heading = 'Peta Lahan Wajib Tanam Produksi Bawang Putih';
 		$heading_class = 'bi bi-globe-asia-australia';
 
-		return view('t2024.spatial.index', compact('module_name', 'page_title', 'page_heading', 'heading_class'));
+		$ijins = PullRiph::select('no_ijin')->get();
+
+		$kabupatens = MasterSpatial::distinct()->pluck('kabupaten_id');
+
+		//output array kabupaten
+		$indexKabupaten = MasterKabupaten::whereIn('kabupaten_id', $kabupatens)
+			->select('kabupaten_id', 'nama_kab')
+			->get()
+			->toArray();
+
+		$mapkey = ForeignApi::find(1);
+
+		// Hitung total luas, jumlah lahan, luas dan jumlah lahan aktif/tidak aktif secara bersamaan
+		$summary = MasterSpatial::selectRaw(
+			'SUM(luas_lahan) AS total_luas,
+         COUNT(*) AS total_lahan,
+         SUM(CASE WHEN status = 0 THEN luas_lahan ELSE 0 END) AS total_luas_aktif,
+         SUM(CASE WHEN status = 0 THEN 1 ELSE 0 END) AS total_lahan_aktif'
+		)->first();
+
+		// Menghitung luas dan jumlah lahan tidak aktif
+		$totalLuas = $summary->total_luas;
+		$totalLahan = $summary->total_lahan;
+		$totalLuasAktif = $summary->total_luas_aktif;
+		$totalLahanAktif = $summary->total_lahan_aktif;
+		$totalLuasNonAktif = $totalLuas - $totalLuasAktif;
+		$totalLahanNonAktif = $totalLahan - $totalLahanAktif;
+
+		$data = [
+			'totalLuas' => $totalLuas,
+			'totalLahan' => $totalLahan,
+			'totalLuasAktif' => $totalLuasAktif,
+			'totalLahanAktif' => $totalLahanAktif,
+			'totalLuasNonAktif' => $totalLuasNonAktif,
+			'totalLahanNonAktif' => $totalLahanNonAktif,
+		];
+
+		return view('t2024.spatial.index', compact('module_name', 'page_title', 'page_heading', 'heading_class', 'mapkey', 'ijins', 'indexKabupaten', 'data'));
+	}
+
+
+	public function spatialList()
+	{
+		$module_name = 'Spatial';
+		$page_title = 'Data Spatial';
+		$page_heading = 'Daftar Lahan Wajib Tanam Produksi Bawang Putih';
+		$heading_class = 'bi bi-globe-asia-australia';
+
+		$ijins = PullRiph::select('no_ijin')->get();
+
+		$kabupatens = MasterSpatial::distinct()->pluck('kabupaten_id');
+
+		//output array kabupaten
+		$indexKabupaten = MasterKabupaten::whereIn('kabupaten_id', $kabupatens)->select('kabupaten_id', 'nama_kab')->get()->toArray();
+
+		$mapkey = ForeignApi::find(1);
+
+		return view('t2024.spatial.spatialList', compact('module_name', 'page_title', 'page_heading', 'heading_class', 'mapkey', 'ijins', 'indexKabupaten'));
 	}
 
 	/**
@@ -51,7 +109,7 @@ class SpatialController extends Controller
 
 		try {
 			$request->validate([
-				'kml_url' => 'required|file|mimes:kml,xml,application/vnd.google-earth.kml+xml|max:2048', // Maksimum ukuran file 2MB
+				'kml_url' => 'required|file|mimes:kml,xml,application/vnd.google-earth.kml+xml|max:2048',
 			]);
 
 			if ($request->hasFile('kml_url')) {
@@ -65,15 +123,18 @@ class SpatialController extends Controller
 				throw new \Exception('File not found');
 			}
 
-			$poktanKode = 'poktan_' . time();
+			$kelurahanId = $request->input('kelurahan_id');
+			$namaKelompok = $request->input('poktan_name');
+			$hashedKodePoktan = md5($kelurahanId . $namaKelompok);
+			$kodePoktan = 'poktan_' . $hashedKodePoktan;
 
-			MasterPoktan:: updateOrCreate(
+			$masterPoktan = MasterPoktan::updateOrCreate(
 				[
 					'kelurahan_id' => $request->input('kelurahan_id'),
 					'nama_kelompok' => $request->input('poktan_name'),
 				],
 				[
-					'kode_poktan' => $poktanKode,
+					'kode_poktan' => $kodePoktan,
 					'provinsi_id' => $request->input('provinsi_id'),
 					'kabupaten_id' => $request->input('kabupaten_id'),
 					'kecamatan_id' => $request->input('kecamatan_id'),
@@ -86,7 +147,7 @@ class SpatialController extends Controller
 					'ktp_petani' => $request->input('ktp_petani'),
 				],
 				[
-					'kode_poktan' => $poktanKode,
+					'kode_poktan' => $masterPoktan->kode_poktan,
 					'nama_petani' => $request->input('nama_petani'),
 					'provinsi_id' => $request->input('provinsi_id'),
 					'kabupaten_id' => $request->input('kabupaten_id'),
@@ -98,7 +159,11 @@ class SpatialController extends Controller
 			MasterSpatial::updateOrCreate(
 				['kode_spatial' => $request->input('kode_spatial')],
 				[
-					// 'komoditas' => $request->input('komoditas'),
+					'kode_poktan' => $masterPoktan->kode_poktan,
+					'ktp_petani' => $request->input('ktp_petani'),
+					'nama_petani' => $request->input('nama_petani'),
+					'latitude' => $request->input('latitude'),
+					'longitude' => $request->input('longitude'),
 					'ktp_petani' => $request->input('ktp_petani'),
 					'nama_petani' => $request->input('nama_petani'),
 					'latitude' => $request->input('latitude'),
@@ -111,10 +176,7 @@ class SpatialController extends Controller
 					'kabupaten_id' => $request->input('kabupaten_id'),
 					'kecamatan_id' => $request->input('kecamatan_id'),
 					'kelurahan_id' => $request->input('kelurahan_id'),
-					'status' => 1,
-					// 'nama_petugas' => $request->input('nama_petugas'),
-					// 'tgl_peta' => $request->input('tgl_peta'),
-					// 'tgl_tanam' => $request->input('tgl_tanam'),
+					'status' => 0,
 					'kml_url' => $filePath,
 				]
 			);
@@ -182,7 +244,7 @@ class SpatialController extends Controller
 		]);
 
 		$spatial = MasterSpatial::where('kode_spatial', $kodeSpatial)->first();
-
+		// dd($kodeSpatial);
 		if ($spatial) {
 			$spatial->status = $validated['status'];
 			$spatial->save();
@@ -193,7 +255,42 @@ class SpatialController extends Controller
 		}
 	}
 
-	public function simulatorJarak (Request $request)
+	public function batchUpdateStatus(Request $request)
+	{
+		// Validasi input
+		$validated = $request->validate([
+			'status' => 'required|integer',
+			'kode_spatial' => 'required|array',
+			'kode_spatial.*' => 'required|string', // atau sesuaikan dengan tipe data kode_spatial Anda
+		]);
+
+		$status = $validated['status'];
+		$kodeSpatialList = $validated['kode_spatial'];
+
+		DB::beginTransaction();
+
+		try {
+			foreach ($kodeSpatialList as $kodeSpatial) {
+				// Lakukan update status untuk setiap kode_spatial
+				$spatial = MasterSpatial::where('kode_spatial', $kodeSpatial)->first();
+
+				if ($spatial) {
+					$spatial->status = $status;
+					$spatial->save();
+				}
+			}
+
+			DB::commit();
+
+			return response()->json(['success' => true]);
+		} catch (\Exception $e) {
+			DB::rollback();
+			return response()->json(['success' => false, 'message' => 'Failed to update spatial data.', 'error' => $e->getMessage()], 500);
+		}
+	}
+
+
+	public function simulatorJarak(Request $request)
 	{
 		$module_name = 'Spatial';
 		$page_title = 'Simulator Spatial';
@@ -212,8 +309,8 @@ class SpatialController extends Controller
 		//cek role
 		//abort jika fail,, return response dengan json
 		$validated = $request->validate([
-            'status' => 'required|integer'
-        ]);
+			'status' => 'required|integer'
+		]);
 
 
 

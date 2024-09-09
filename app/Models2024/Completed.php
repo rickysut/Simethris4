@@ -45,6 +45,6 @@ class Completed extends Model
 
 	public function skl()
 	{
-		return $this->belongsTo(Skl::class, 'no_skl', 'no_skl');
+		return $this->belongsTo(AjuVerifSkl::class, 'no_skl', 'no_skl');
 	}
 }

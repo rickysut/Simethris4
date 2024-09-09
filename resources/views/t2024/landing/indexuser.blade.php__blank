@@ -1,0 +1,2 @@
+@extends('t2024.velzonLayouts.admin')
+@section('content')

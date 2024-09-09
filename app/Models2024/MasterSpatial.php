@@ -10,6 +10,7 @@ use App\Models\MasterProvinsi;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Crypt;
 
 class MasterSpatial extends Model
 {
@@ -24,8 +25,10 @@ class MasterSpatial extends Model
 	];
 
 	public $fillable = [
+		'origin',
 		'komoditas',
 		'kode_spatial',
+		'kode_poktan',
 		'ktp_petani',
 		'nama_petani',
 		'latitude',
@@ -34,18 +37,31 @@ class MasterSpatial extends Model
 		'altitude',
 		'imagery',
 		'luas_lahan',
-		'nama_lahan',
 		'catatan',
 		'provinsi_id',
 		'kabupaten_id',
 		'kecamatan_id',
 		'kelurahan_id',
 		'kml_url',
-		'nama_petugas',
-		'tgl_peta',
-		'tgl_tanam',
 		'status',
 	];
+
+	// // Accessor untuk mendekripsi ktp_petani
+    // public function getKtpPetaniAttribute($value)
+    // {
+    //     return Crypt::decryptString($value);
+    // }
+
+    // // Mutator untuk mengenkripsi ktp_petani
+    // public function setKtpPetaniAttribute($value)
+    // {
+    //     $this->attributes['ktp_petani'] = Crypt::encryptString($value);
+    // }
+
+	public function masterpoktan()
+	{
+		return $this->belongsTo(MasterPoktan::class, 'kode_poktan', 'kode_poktan');
+	}
 
 	public function anggota()
 	{

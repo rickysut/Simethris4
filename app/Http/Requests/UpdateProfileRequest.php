@@ -39,8 +39,6 @@ class UpdateProfileRequest extends FormRequest
             'npwp_company' => ['required', 'string', 'max:255'],
             'nib_company' => ['required', 'string', 'max:255'],
             'address_company' => ['required', 'string'],
-            'provinsi' => ['required'],
-            'kabupaten' => ['required'],
             'kecamatan' => ['required'],
             'desa' => ['required'],
             'kodepos' => ['required','string' , 'min:5'],

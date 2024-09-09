@@ -15,7 +15,7 @@
 						Data <span class="fw-300"><i>Informasi</i></span>
 					</h2>
 					<div class="panel-toolbar">
-						<a href="{{route('2024.user.commitment.realisasi', $commitment->id)}}" class="btn btn-info btn-xs">
+						<a href="{{route('2024.user.commitment.realisasi', $ijin)}}" class="btn btn-info btn-xs">
 							<i class="fal fa-undo mr-1"></i>Kembali
 						</a>
 					</div>
@@ -59,7 +59,7 @@
 							<thead class="thead-themed">
 								<th>Kode Lokasi</th>
 								<th>Pelaksana</th>
-								<th>Realisasi Tanam</th>
+								<th>Realisasi Tanam (m2)</th>
 								<th>Tanggal</th>
 								<th>Realisasi Panen</th>
 								<th>Tanggal</th>
@@ -73,12 +73,12 @@
 									<th class="text-right" colspan="7">TOTAL REALISASI</th>
 								</tr>
 								<tr>
-									<th class="text-right" colspan="6">Realisasi Luas Tanam: </th>
-									<th class="text-right" id="totalRealisasiLuas"> ha</th>
+									<th class="text-right" colspan="5">Realisasi Luas Tanam: </th>
+									<th class="text-right" id="totalRealisasiLuas" colspan="2"> ha</th>
 								</tr>
 								<tr>
-									<th class="text-right" colspan="6">Realisasi Volume Panen</th>
-									<th class="text-right" id="totalRealisasiProduksi"> ton</th>
+									<th class="text-right" colspan="5">Realisasi Volume Panen</th>
+									<th class="text-right" id="totalRealisasiProduksi" colspan="2"> ton</th>
 								</tr>
 							</tfoot>
 						</table>
@@ -99,7 +99,7 @@
 		$(document).ready(function() {
 			var noIjin = '{{$commitment->no_ijin}}';
 			var formattedNoIjin = noIjin.replace(/[\/.]/g, '');
-			var poktanId = '{{$pks->poktan_id}}';
+			var poktanId = '{{$pks->kode_poktan}}';
 			var ijin = '{{$ijin}}';
 
 			$('#tblLokasi').dataTable(
@@ -123,57 +123,95 @@
 					dataFilter: function(data){
 						var json = JSON.parse(data);
 						// Update the span with id=totalRealisasiProduksi
-						$('#totalRealisasiProduksi').text(json.totalRealisasiProduksi + ' ton');
-						var luasInHectares = json.totalRealisasiLuas / 10000; // Convert square meters to hectares
+						var luasInHectares = json.totalRealisasiLuas; // Convert square meters to hectares
+						var volOutput = json.totalRealisasiProduksi/1000; // Convert square meters to hectares
 						var formattedLuas = luasInHectares.toLocaleString('id-ID', { maximumFractionDigits: 4 });
+						var formattedVolOutput = volOutput.toLocaleString('id-ID', { maximumFractionDigits: 2 });
 
 						// Update totalRealisasiLuas span
-						$('#totalRealisasiLuas').text(formattedLuas + ' ha');
+						$('#totalRealisasiLuas').text(formattedLuas + ' m2');
+						$('#totalRealisasiProduksi').text(formattedVolOutput + ' ton');
 						return data;
 					}
 				},
-
 				columns: [
 					{
 						data: 'kode_spatial',
 						render: function (data, type, row) {
-							return data;
+							var origin = row.origin;
+							if (row.origin === 'local'){
+								return data + `<sup class="badge badge-xs badge-danger ml-2">Tambahan</sup> `
+							}else{
+								return data;
+							}
 						}
 					},
 					{
 						data: 'ktp_petani',
 						name: 'nama_petani',
 						render: function (data, type, row) {
-							return row.nama_petani + ' / ' + data;
+							return row.spatial_petani + ' / ' + data;
 						}
 					},
-					{ data: 'luas_tanam'},
-					{ data: 'tgl_tanam' },
-
-					{ data: 'volume_panen'},
-					{ data: 'tgl_panen' },
 					{
-						data: 'kode_spatial',
+						data: 'luas_tanam',
+						render: function(data, type, row) {
+							var formattedData = parseFloat(data).toLocaleString('id-ID');
+							return formattedData + ' m2';
+						}
+					},
+					{
+						data: 'tgl_tanam',
 						render: function(data, type, row) {
 							if (data) {
-								if(data){
-									return `<a href="{{route('2024.user.commitment.addrealisasi', ['noIjin' => ':ijin', 'spatial' => ':spatial'])}}" title="Isi/ubah data realisasi" class="btn btn-outline-primary btn-icon btn-xs" >
-											<i class="fa fa-edit"></i>
-										</a>
-										<a href="" title="Logbook Kegiatan" class="btn btn-outline-info btn-icon btn-xs" >
-											<i class="fal fa-book"></i>
-										</a>
-										`.replace(':ijin', ijin).replace(':spatial', data);
-								}else{
-									return `<a href="" title="isi data tanam" class="btn btn-outline-warning btn-icon btn-xs" >
-										<i class="fa fa-map"></i>
-									</a>`;
-								}
-							} else {
-								return ``;
+								var parts = data.split('-'); // Split the date string into [day, month, year]
+								var date = new Date(parts[2], parts[1] - 1, parts[0]); // Create a new Date object
+								var options = { year: 'numeric', month: 'long', day: 'numeric' };
+								return new Intl.DateTimeFormat('id-ID', options).format(date);
 							}
+							return '';
 						}
 					},
+					{ data: 'volume_panen'},
+					{
+						data: 'tgl_panen',
+						render: function(data, type, row) {
+							if (data) {
+								var parts = data.split('-'); // Split the date string into [day, month, year]
+								var date = new Date(parts[2], parts[1] - 1, parts[0]); // Create a new Date object
+								var options = { year: 'numeric', month: 'long', day: 'numeric' };
+								return new Intl.DateTimeFormat('id-ID', options).format(date);
+							}
+							return '';
+						}
+
+					},
+					{
+						data: 'tcode',
+						render: function(data, type, row) {
+							// Base edit button
+							let buttons = `
+								<a href="{{ route('2024.user.commitment.addrealisasi', ['noIjin' => ':ijin', 'spatial' => ':spatial']) }}" title="Isi/ubah data realisasi" class="btn btn-outline-primary btn-icon btn-xs">
+									<i class="fa fa-edit"></i>
+								</a>
+							`.replace(':ijin', ijin).replace(':spatial', data);
+
+							// Add delete button if origin is 'local'
+							if (row.origin === 'local') {
+								buttons += `
+									<form action="{{ route('2024.user.commitment.deleteOriginLocalRealisasi', ['spatial' => ':spatial']) }}" method="POST" style="display:inline;">
+										@csrf
+										@method('DELETE')
+										<button title="hapus data" class="btn btn-danger btn-icon btn-xs" type="button" onclick="confirmDelete(this)">
+											<i class="fal fa-trash"></i>
+										</button>
+									</form>
+								`.replace(':spatial', data);
+							}
+							return buttons;
+						}
+					}
+
 				],
 				columnDefs: [
 					{
@@ -214,6 +252,15 @@
 				]
 			});
 		});
+		function confirmDelete(button) {
+			// Show confirmation dialog
+			if (confirm('Apakah Anda yakin ingin menghapus data ini?')) {
+				// Find the form related to this button
+				let form = button.closest('form');
+				// Submit the form
+				form.submit();
+			}
+		}
 	</script>
 @endsection
 

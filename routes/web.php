@@ -421,6 +421,7 @@ Route::group(['prefix' => '2024', 'as' => '2024.', 'namespace' => 'Admin', 'midd
 	Route::group(['namespace' => 'Thn2024'], function () {
 
 		Route::group(['prefix' => 'datafeeder', 'as' => 'datafeeder.'], function () {
+			Route::get('/getAllSkls', 'DataFeederController@getAllSkls')->name('getAllSkls');
 			Route::get('/getAllMyCommitment', 'DataFeederController@getAllMyCommitment')->name('getAllMyCommitment');
 			Route::get('/getPksById/{id}', 'DataFeederController@getPksById')->name('getPksById');
 			Route::get('/getPksByIjin/{noIjin}', 'DataFeederController@getPksByIjin')->name('getPksByIjin');
@@ -436,19 +437,40 @@ Route::group(['prefix' => '2024', 'as' => '2024.', 'namespace' => 'Admin', 'midd
 			Route::get('/{kecId}/getAllCpclByKec', 'DataFeederController@getAllCpclByKec')->name('getAllCpclByKec');
 			Route::get('/{nik}/getCpclByNik', 'DataFeederController@getCpclByNik')->name('getCpclByNik');
 			Route::get('/getDataPengajuan/{noIjin}', 'DataFeederController@getDataPengajuan')->name('getDataPengajuan');
+			Route::get('/getRequestVerif', 'DataFeederController@getRequestVerif')->name('getRequestVerif');
+			Route::get('/getRequestSkl', 'DataFeederController@getRequestSkl')->name('getRequestSkl');
+			Route::get('/getRequestVerifTanam', 'DataFeederController@getRequestVerifTanam')->name('getRequestVerifTanam');
+			Route::get('/getRequestVerifProduksi', 'DataFeederController@getRequestVerifProduksi')->name('getRequestVerifProduksi');
 			Route::get('/getVerifTanamHistory/{noIjin}', 'DataFeederController@getVerifTanamHistory')->name('getVerifTanamHistory');
 			Route::get('/getVerifProdHistory/{noIjin}', 'DataFeederController@getVerifProdHistory')->name('getVerifProdHistory');
 			Route::get('/getVerifSklHistory/{noIjin}', 'DataFeederController@getVerifSklHistory')->name('getVerifSklHistory');
-			Route::get('/getRequestVerifTanam', 'DataFeederController@getRequestVerifTanam')->name('getRequestVerifTanam');
+			Route::get('/getLocationSampling/{noIjin}', 'DataFeederController@getLocationSampling')->name('getLocationSampling');
 			Route::get('/getVerifTanamByIjin/{noIjin}', 'DataFeederController@getVerifTanamByIjin')->name('getVerifTanamByIjin');
+			Route::get('/getVerifProduksiByIjin/{noIjin}', 'DataFeederController@getVerifProduksiByIjin')->name('getVerifProduksiByIjin');
 			Route::get('/getspatial', 'DataFeederController@getspatial')->name('getspatial');
 			Route::post('/responseGetLocByRad', 'DataFeederController@responseGetLocByRad')->name('responseGetLocByRad');
 
+			//wilayah provinsi s.d desa
+			Route::get('/getAllProvinsi', 'DataFeederController@getAllProvinsi')->name('getAllProvinsi');
+			Route::get('/getKabByProv/{prov}', 'DataFeederController@getKabByProv')->name('getKabByProv');
+			Route::get('/getKecByKab/{kab}', 'DataFeederController@getKecByKab')->name('getKecByKab');
+			Route::get('/getKelByKec/{kec}', 'DataFeederController@getKelByKec')->name('getKelByKec');
+
 			Route::get('/getLocDataByIjinBySpatial/{noIjin}/{spatial}', 'DataFeederController@getLocDataByIjinBySpatial')->name('getLocDataByIjinBySpatial');
 			Route::post('/postLocDataByIjinBySpatial', 'DataFeederController@postLocDataByIjinBySpatial')->name('postLocDataByIjinBySpatial');
+			Route::get('/responseGetLocationInKabupaten', 'DataFeederController@responseGetLocationInKabupaten')->name('responseGetLocationInKabupaten');
+			Route::post('/responseGetSpatialDetail', 'DataFeederController@responseGetSpatialDetail')->name('responseGetSpatialDetail');
+			Route::get('/responseGetSpatialMoreDetail/{spatial}', 'DataFeederController@responseGetSpatialMoreDetail')->name('responseGetSpatialMoreDetail');
+			Route::get('/getInvalidNik', 'DataFeederController@getInvalidNik')->name('getInvalidNik');
+
+			Route::get('/postLocDataByIjinBySpatial', 'DataFeederController@postLocDataByIjinBySpatial')->name('postLocDataByIjinBySpatial');
+
+			//Logbook generator
+			Route::get('/logbookReport/{noIjin}', 'LogbookController@index')->name('logbookReport');
+			Route::get('/generateLogbook/{noIjin}', 'LogbookController@generateLogbook')->name('generateLogbook');
 
 			//ini jangan dijalankan lagi
-			Route::get('/updateOrCreateDesa', 'DataFeederController@updateOrCreateDesa')->name('updateOrCreateDesa');
+			Route::get('/filemanagement', 'DataFeederController@filemanagement')->name('filemanagement');
 		});
 
 		//route untuk adminisrator
@@ -457,16 +479,50 @@ Route::group(['prefix' => '2024', 'as' => '2024.', 'namespace' => 'Admin', 'midd
 
 			//halaman pengajuan verifikasi dari importir
 			Route::group(['prefix' => 'pengajuan', 'as' => 'pengajuan.'], function () {
-				Route::get('/', 'VerifTanamController@indexpengajuan');
-				Route::get('/penugasan/{noIjin}/{tcode}', 'VerifTanamController@assignment')->name('assignment');
-				Route::post('/storeAssignment/{noIjin}/{tcode}', 'VerifTanamController@storeAssignment')->name('storeAssignment');
-				Route::delete('/delete/{tcode}/assignment', 'VerifTanamController@deleteAssignment')->name('deleteAssignment');
+				//route daftar pengajuan dan assignment.
+				Route::get('/', 'PengajuanController@indexpengajuan');
+				Route::get('/penugasan/{noIjin}/{tcode}', 'PengajuanController@assignment')->name('assignment');
+				Route::post('/storeAssignment/{noIjin}/{tcode}', 'PengajuanController@storeAssignment')->name('storeAssignment');
+				Route::post('/reAssignment/{noIjin}/{tcode}', 'PengajuanController@reAssignment')->name('reAssignment');
+				Route::delete('/delete/{tcode}/assignment', 'PengajuanController@deleteAssignment')->name('deleteAssignment');
+				Route::group(['prefix' => 'tanam', 'as' => 'tanam.'], function () {
+					Route::post('/penugasan/saveSelectedLocations', 'VerifTanamController@saveSelectedLocations')->name('saveSelectedLocations');
+					Route::get('/', 'VerifTanamController@indexpengajuan');
+				});
+			});
+			//pengajuan SKL
+			Route::group(['prefix' => 'permohonan', 'as' => 'permohonan.'], function () {
+				Route::group(['prefix' => 'skl', 'as' => 'skl.'], function () {
+					Route::get('/', 'VerifSklController@index')->name('index');
+					Route::get('/{noIjin}/{tcode}', 'VerifSklController@check')->name('check');
+					Route::post('/{noIjin}/{tcode}', 'VerifSklController@storeVerifSkl')->name('storeVerifSkl');
+					Route::post('/return/{noIjin}/{tcode}', 'VerifSklController@returnVerif')->name('returnVerif');
+					Route::post('/draft/{noIjin}/{tcode}', 'VerifSklController@draftSkl')->name('draftSkl');
+
+					Route::get('/generateRepReqSkl/{noIjin}/{tcode}', 'VerifSklController@generateRepReqSkl')->name('generateRepReqSkl');
+				});
+			});
+
+			Route::group(['prefix' => 'skl', 'as' => 'skl.'], function () {
+				Route::get('/', 'SklController@index')->name('index');
+				Route::post('/upload/{noIjin}/{tcode}', 'VerifSklController@uploadSkl')->name('uploadSkl');
+				Route::post('/upload/{noIjin}/{tcode}', 'VerifSklController@uploadSkl')->name('uploadSkl');
+				Route::post('/publish/{noIjin}/{tcode}', 'VerifSklController@publishSkl')->name('publishSkl');
 			});
 		});
 
 		//route untuk pejabat
 		Route::group(['prefix' => 'pejabat', 'as' => 'pejabat.'], function () {
 			Route::get('/', 'HomeController@index')->name('home');
+
+			Route::group(['prefix' => 'skl', 'as' => 'skl.'], function () {
+				Route::get('/', 'HomeController@index')->name('index');
+				Route::group(['prefix' => 'rekomendasi', 'as' => 'rekomendasi.'], function () {
+					Route::get('/', 'PejabatController@index')->name('index');
+					Route::get('/check/{noIjin}/{tcode}', 'PejabatController@approvalForm')->name('check');
+					Route::post('/approval/{noIjin}/{tcode}', 'PejabatController@approvalStatus')->name('approvalStatus');
+				});
+			});
 		});
 
 		//route untuk verifikator
@@ -481,13 +537,38 @@ Route::group(['prefix' => '2024', 'as' => '2024.', 'namespace' => 'Admin', 'midd
 
 			Route::group(['prefix' => 'tanam', 'as' => 'tanam.'], function () {
 				Route::get('/', 'VerifTanamController@index')->name('home');
-				Route::get('/check/{noIjin}/{tcode}', 'VerifTanamController@check')->name('check');
+				Route::get('/check/berkas/{noIjin}/{tcode}', 'VerifTanamController@check')->name('check');
+				Route::get('/check/pks/{noIjin}/{tcode}', 'VerifTanamController@checkpks')->name('checkpks');
+				Route::get('/check/timeline/{noIjin}/{tcode}', 'VerifTanamController@checktimeline')->name('checktimeline');
+				Route::get('/check/lokasi/{noIjin}/{tcode}', 'VerifTanamController@checkdaftarlokasi')->name('checkdaftarlokasi');
+				Route::get('/check/final/{noIjin}/{tcode}', 'VerifTanamController@checkfinal')->name('checkfinal');
 				Route::post('/saveCheckBerkas/{noIjin}', 'VerifTanamController@saveCheckBerkas')->name('saveCheckBerkas');
-				Route::post('/verifPksStore/{tcode}', 'VerifTanamController@verifPksStore')->name('verifPksStore');
+				Route::post('/verifPksStore/{noIjin}/{kodePoktan}', 'VerifTanamController@verifPksStore')->name('verifPksStore');
 				Route::post('/markStatus/{noIjin}/{tcode}/{status}', 'VerifTanamController@markStatus')->name('markStatus');
-				Route::post('/storelokasicheck/{noIjin}/{spatial}', 'VerifTanamController@storelokasicheck')->name('storelokasicheck');
-				Route::post('/check/{noIjin}/store', 'VerifTanamController@store')->name('store');
-				Route::get('/result/{noIjin}', 'VerifTanamController@check')->name('result');
+				Route::post('/storelokasicheck/{noIjin}/{tcode}', 'VerifTanamController@storelokasicheck')->name('storelokasicheck');
+				Route::get('/check/{noIjin}/{verifikasi}/{tcode}', 'VerifTanamController@verifLokasiByIjinBySpatial')->name('verifLokasiByIjinBySpatial');
+				Route::post('/storePhaseCheck/{noIjin}/{spatial}', 'VerifTanamController@storePhaseCheck')->name('storePhaseCheck');
+				Route::post('/storeFinalCheck/{noIjin}/{tcode}', 'VerifTanamController@storeFinalCheck')->name('storeFinalCheck');
+				Route::get('/result/{noIjin}/{tcode}', 'VerifTanamController@result')->name('result');
+				Route::get('/generateReport/{noIjin}/{tcode}', 'VerifTanamController@generateReport')->name('generateReport');
+			});
+
+			Route::group(['prefix' => 'produksi', 'as' => 'produksi.'], function () {
+				Route::get('/', 'VerifProduksiController@index')->name('home');
+				Route::get('/check/berkas/{noIjin}/{tcode}', 'VerifProduksiController@check')->name('check');
+				Route::get('/check/pks/{noIjin}/{tcode}', 'VerifProduksiController@checkpks')->name('checkpks');
+				Route::get('/check/timeline/{noIjin}/{tcode}', 'VerifProduksiController@checktimeline')->name('checktimeline');
+				Route::get('/check/lokasi/{noIjin}/{tcode}', 'VerifProduksiController@checkdaftarlokasi')->name('checkdaftarlokasi');
+				Route::get('/check/final/{noIjin}/{tcode}', 'VerifProduksiController@checkfinal')->name('checkfinal');
+				Route::post('/saveCheckBerkas/{noIjin}', 'VerifProduksiController@saveCheckBerkas')->name('saveCheckBerkas');
+				Route::post('/verifPksStore/{noIjin}/{kodePoktan}', 'VerifProduksiController@verifPksStore')->name('verifPksStore');
+				Route::post('/markStatus/{noIjin}/{tcode}/{status}', 'VerifProduksiController@markStatus')->name('markStatus');
+				Route::post('/storelokasicheck/{noIjin}/{tcode}', 'VerifProduksiController@storelokasicheck')->name('storelokasicheck');
+				Route::get('/check/{noIjin}/{verifikasi}/{tcode}', 'VerifProduksiController@verifLokasiByIjinBySpatial')->name('verifLokasiByIjinBySpatial');
+				Route::post('/storePhaseCheck/{noIjin}/{spatial}', 'VerifProduksiController@storePhaseCheck')->name('storePhaseCheck');
+				Route::post('/storeFinalCheck/{noIjin}/{tcode}', 'VerifProduksiController@storeFinalCheck')->name('storeFinalCheck');
+				Route::get('/result/{noIjin}/{tcode}', 'VerifProduksiController@result')->name('result');
+				Route::get('/generateReport/{noIjin}/{tcode}', 'VerifProduksiController@generateReport')->name('generateReport');
 			});
 		});
 
@@ -503,6 +584,7 @@ Route::group(['prefix' => '2024', 'as' => '2024.', 'namespace' => 'Admin', 'midd
 			//pullriph
 			Route::group(['prefix' => 'pull', 'as' => 'pull.'], function () {
 				Route::get('/', 'PullRiphController@index')->name('index');
+				Route::get('/checkYear', 'PullRiphController@checkYear')->name('checkYear');
 				Route::get('/getriph', 'PullRiphController@pull')->name('getriph');
 				Route::post('/store', 'PullRiphController@store')->name('store');
 			});
@@ -526,28 +608,29 @@ Route::group(['prefix' => '2024', 'as' => '2024.', 'namespace' => 'Admin', 'midd
 				Route::get('addrealisasi/{noIjin}/{spatial}', 'PksController@addrealisasi')->name('addrealisasi');
 				Route::post('storefoto/{noIjin}/{spatial}', 'PksController@storeFoto')->name('storefoto');
 				Route::post('storerealisasi/{noIjin}/{spatial}', 'PksController@storerealisasi')->name('storerealisasi');
+				Route::delete('deleteOriginLocalRealisasi/{spatial}', 'PksController@deleteOriginLocalRealisasi')->name('deleteOriginLocalRealisasi');
 
-				// Route::get('{id}/penangkar', 'PenangkarRiphController@mitra')->name('penangkar');
-				// Route::post('{id}/penangkar/store', 'PenangkarRiphController@store')->name('penangkar.store');
 				Route::delete('/commitmentmd', 'CommitmentController@massDestroy')->name('massDestroy');
 
-				//pengajuan verifikasi tanam
+				//form pengajuan verifikasi
 				Route::get('{noIjin}/formavt', 'AjuVerifTanamController@index')->name('formavt');
-				Route::post('{noIjin}/formavt/store', 'AjuVerifTanamController@submitPengajuan')->name('formavt.submitPengajuan');
-
-				//Pengajuan verifikasi produksi
 				Route::get('{noIjin}/formavp', 'AjuVerifProdController@index')->name('formavp');
-				Route::post('{noIjin}/formavp/store', 'AjuVerifProdController@submitPengajuan')->name('formavp.submitPengajuan');
-
-				//pengajuan penerbitan skl
 				Route::get('{noIjin}/formavskl', 'AjuVerifSKLController@index')->name('formavskl');
-				Route::post('{noIjin}/formavskl/store', 'AjuVerifSKLController@submitPengajuan')->name('formavskl.submitPengajuan');
 
-				//daftar anggota & lokasi by pks
-				// Route::get('/', 'CommitmentController@index')->name('index');
+				Route::post('{noIjin}/pengajuan/store', 'PengajuanController@submitPengajuan')->name('submitPengajuan');
+				Route::post('{noIjin}/permohonan/store', 'AjuVerifSKLController@submitPengajuanSkl')->name('submitPengajuanSkl');
+				Route::post('{noIjin}/permohonan/update', 'AjuVerifSKLController@reSubmitPengajuanSkl')->name('reSubmitPengajuanSkl');
+				Route::get('{noIjin}/permohonan/generateRepReqSkl', 'AjuVerifSKLController@generateRepReqSkl')->name('generateRepReqSkl');
 			});
 
-			//pks
+			Route::group(['prefix' => 'skl', 'as' => 'skl.'], function () {
+				Route::get('/skl', 'SklController@mySkls')->name('mySkls');
+			});
+
+
+			//berkas file management
+			Route::group(['prefix' => 'files', 'as' => 'files.'], function () {
+			});
 
 		});
 
@@ -555,11 +638,21 @@ Route::group(['prefix' => '2024', 'as' => '2024.', 'namespace' => 'Admin', 'midd
 		Route::group(['prefix' => 'spatial', 'as' => 'spatial.'], function () {
 			Route::get('/', 'HomeController@index')->name('home');
 			Route::get('/list', 'SpatialController@index')->name('index');
+			Route::get('/spatialList', 'SpatialController@spatialList')->name('spatialList');
 			Route::get('/createsingle', 'SpatialController@createsingle')->name('createsingle');
 			Route::post('/storesingle', 'SpatialController@storesingle')->name('storesingle');
 			Route::get('/{id}/show', 'SpatialController@show')->name('edit');
 			Route::post('/updatesingle', 'SpatialController@updatesingle')->name('updatesingle');
 			Route::post('/updateStatus/{kodeSpatial}', 'SpatialController@updateStatus')->name('updateStatus');
+			Route::post('/batchUpdateStatus', 'SpatialController@batchUpdateStatus')->name('batchUpdateStatus');
+
+			Route::get('/master-wilayah', 'MasterWilayahController@index')->name('wilayah');
+			Route::get('/master-wilayah/updateFromBPS', 'MasterWilayahController@updateFromBPS')->name('updateFromBPS');
+			Route::get('/master-wilayah/updateProvinsiFromBPS', 'MasterWilayahController@updateProvinsiFromBPS')->name('updateProvinsiFromBPS');
+			Route::get('/master-wilayah/updateKabupatenFromBPS/{provinsiId}', 'MasterWilayahController@updateKabupatenFromBPS')->name('updateKabupatenFromBPS');
+			Route::get('/master-wilayah/updateKecamatanFromBPS/{provinsiId}', 'MasterWilayahController@updateKecamatanFromBPS')->name('updateKecamatanFromBPS');
+			Route::get('/master-wilayah/updateDesaFromBPS/{provinsiId}', 'MasterWilayahController@updateDesaFromBPS')->name('updateDesaFromBPS');
+			Route::get('/master-wilayah/updateAllDesaFromBPS', 'MasterWilayahController@updateAllDesaFromBPS')->name('updateAllDesaFromBPS');
 
 			Route::get('/simulator', 'SpatialController@simulatorJarak')->name('simulatorJarak');
 		});
