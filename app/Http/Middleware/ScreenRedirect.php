@@ -20,6 +20,11 @@ class ScreenRedirect
                     return redirect()->route('2024.verifikator.mobile');
                 }
             }
+            if ($userRole === '	Spatial Administrator') {
+                if ($screenSize === 'mobile') {
+                    return redirect()->route('2024.spatial.mobile');
+                }
+            }
         }
 
         return $next($request);

@@ -2243,6 +2243,16 @@ class DataFeederController extends Controller
 		return response()->json($spatials);
 	}
 
+	public function responseGetLocationByKode(Request $request)
+	{
+		$kodeSpatial = $request->query('kode_spatial');
+
+		// Misalnya ambil data dari database
+		$spatials = MasterSpatial::where('kode_spatial', $kodeSpatial)->get();
+
+		return response()->json($spatials);
+	}
+
 
 	public function responseGetSpatialDetail(Request $request)
 	{

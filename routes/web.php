@@ -459,6 +459,7 @@ Route::group(['prefix' => '2024', 'as' => '2024.', 'namespace' => 'Admin', 'midd
 			Route::get('/getLocDataByIjinBySpatial/{noIjin}/{spatial}', 'DataFeederController@getLocDataByIjinBySpatial')->name('getLocDataByIjinBySpatial');
 			Route::post('/postLocDataByIjinBySpatial', 'DataFeederController@postLocDataByIjinBySpatial')->name('postLocDataByIjinBySpatial');
 			Route::get('/responseGetLocationInKabupaten', 'DataFeederController@responseGetLocationInKabupaten')->name('responseGetLocationInKabupaten');
+			Route::get('/responseGetLocationByKode', 'DataFeederController@responseGetLocationByKode')->name('responseGetLocationByKode');
 			Route::post('/responseGetSpatialDetail', 'DataFeederController@responseGetSpatialDetail')->name('responseGetSpatialDetail');
 			Route::get('/responseGetSpatialMoreDetail/{spatial}', 'DataFeederController@responseGetSpatialMoreDetail')->name('responseGetSpatialMoreDetail');
 			Route::get('/getInvalidNik', 'DataFeederController@getInvalidNik')->name('getInvalidNik');
@@ -636,7 +637,7 @@ Route::group(['prefix' => '2024', 'as' => '2024.', 'namespace' => 'Admin', 'midd
 
 		//route untuk tim spatial
 		Route::group(['prefix' => 'spatial', 'as' => 'spatial.'], function () {
-			Route::get('/', 'HomeController@index')->name('home');
+			Route::get('/', 'HomeController@indexMobile')->name('home');
 			Route::get('/list', 'SpatialController@index')->name('index');
 			Route::get('/spatialList', 'SpatialController@spatialList')->name('spatialList');
 			Route::get('/createsingle', 'SpatialController@createsingle')->name('createsingle');

@@ -45,16 +45,16 @@
 									</div>
 								@endforeach
 								<div class="custom-control custom-checkbox">
-									<input type="checkbox" class="custom-control-input kabupaten-checkbox" id="" name="">
-									<label class="custom-control-label" for="">BIMA</label>
+									<input type="checkbox" class="custom-control-input kabupaten-checkbox" id="BIMA" name="">
+									<label class="custom-control-label" for="BIMA">BIMA</label>
 								</div>
 								<div class="custom-control custom-checkbox">
-									<input type="checkbox" class="custom-control-input kabupaten-checkbox" id="" name="">
-									<label class="custom-control-label" for="">LOMBOK TIMUR</label>
+									<input type="checkbox" class="custom-control-input kabupaten-checkbox" id="LOTIM" name="">
+									<label class="custom-control-label" for="LOTIM">LOMBOK TIMUR</label>
 								</div>
 								<div class="custom-control custom-checkbox">
-									<input type="checkbox" class="custom-control-input kabupaten-checkbox" id="" name="">
-									<label class="custom-control-label" for="">MAGELANG</label>
+									<input type="checkbox" class="custom-control-input kabupaten-checkbox" id="MAGELANG" name="">
+									<label class="custom-control-label" for="MAGELANG">MAGELANG</label>
 								</div>
 							</div>
 						</div>
@@ -84,6 +84,32 @@
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Modal -->
+	<div class="modal fade" id="locateMyLocationModal" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Cari Lokasi</h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+				</div>
+
+				<div class="modal-body">
+					<div class="form-group">
+						<label for="">Cari</label>
+						<input type="text" name="locateKode" id="locateKodeLokasi" class="form-control" aria-describedby="helpId" placeholder="contoh: KDL_000001">
+						<small id="helpId" class="text-muted">Cari lokasi berdasarkan Kode Lokasi</small>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+					<button type="button" class="btn btn-primary" id="submitLocateKode">Cari</button>
 				</div>
 			</div>
 		</div>
@@ -194,6 +220,7 @@
 			// Update map data after toggling all checkboxes
 			updateMapData();
 		});
+
 		attachCheckboxListeners();
 
         initMap();
@@ -215,7 +242,7 @@
 	let markerCluster;
 	// const markerCluster = new markerClusterer.MarkerClusterer({ markers, map });
 
-    function buttonModal(){
+    function filterKab(){
         var controlDiv = document.createElement('div');
 
         var button = document.createElement('button');
@@ -233,7 +260,7 @@
         controlDiv.appendChild(button);
 
         var icon = document.createElement('i');
-        icon.className = 'fas fa-search';
+        icon.className = 'fal fa-ballot-check';
         icon.style.fontSize = '18px';
         icon.style.margin = '10px';
         button.appendChild(icon);
@@ -250,9 +277,43 @@
         map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(controlDiv);
     }
 
-    function buttonSpatialList(){
+    function locateMyLocation(){
 		var controlDiv = document.createElement('div');
+		var button = document.createElement('button');
+		button.style.backgroundColor = '#fff';
+		button.style.border = 'none';
+		button.style.outline = 'none';
+		button.style.width = '40px';
+		button.style.height = '40px';
+		button.style.borderRadius = '2px';
+		button.style.boxShadow = '0 2px 6px rgba(0,0,0,.3)';
+		button.style.cursor = 'pointer';
+		button.style.marginRight = '10px';
+		button.style.marginBottom = '10px';
+		button.style.padding = '0';
+		button.title = 'Cari Lokasi';
+		controlDiv.appendChild(button);
 
+		var icon = document.createElement('i');
+		icon.className = 'fa fa-search';
+		icon.style.fontSize = '18px';
+		icon.style.margin = '10px';
+		button.appendChild(icon);
+
+		google.maps.event.addListener(map, 'dragend', function() {
+			icon.style.color = '#000';
+		});
+
+		button.addEventListener('click', function() {
+            $('#locateMyLocationModal').modal('show');
+        });
+
+		controlDiv.index = 3;
+		map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(controlDiv); // Changed position
+	}
+
+    function SpatialList(){
+		var controlDiv = document.createElement('div');
 		var button = document.createElement('button');
 		button.style.backgroundColor = '#fff';
 		button.style.border = 'none';
@@ -283,13 +344,13 @@
 			window.location.href = "{{ route('2024.spatial.spatialList') }}";
 		});
 
-		controlDiv.index = 3;
+		controlDiv.index = 4;
 		map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(controlDiv); // Changed position
 	}
 
     function initMap() {
         map = new google.maps.Map(document.getElementById('myMap'), {
-            mapTypeId: google.maps.MapTypeId.SATELLITE,
+            mapTypeId: google.maps.MapTypeId.HYBRID,
             center: initialCenter,
             zoom: initialZoom,
             mapTypeControl: false,
@@ -305,8 +366,9 @@
             ]
         });
 
-        buttonModal();
-        buttonSpatialList();
+        SpatialList();
+        filterKab();
+        locateMyLocation();
         attachCheckboxListeners();
 
 		google.maps.event.addListener(map, 'bounds_changed', function() {
@@ -343,7 +405,7 @@
 		}
 	}
 
-    function fetchSpatialData(kabupatenIds) {
+	function fetchSpatialData(kabupatenIds) {
 		const bounds = map.getBounds();
 		const viewport = bounds ? {
 			north: bounds.getNorthEast().lat(),
@@ -402,6 +464,30 @@
 				}
 			});
 			markersArray.push(marker);
+
+			// if (spatial.polygon) {
+			// 	let polygonCoords;
+			// 	try {
+			// 		polygonCoords = JSON.parse(spatial.polygon).map(coord => new google.maps.LatLng(coord.lat, coord.lng));
+			// 	} catch (error) {
+			// 		console.error('Error parsing polygon JSON:', error);
+			// 		return;
+			// 	}
+
+			// 	if (polygonCoords.length > 0) {
+			// 		const polygon = new google.maps.Polygon({
+			// 			paths: polygonCoords,
+			// 			strokeColor: markerColor,
+			// 			strokeOpacity: 0.8,
+			// 			strokeWeight: 2,
+			// 			fillColor: markerColor,
+			// 			fillOpacity: 0.0
+			// 		});
+
+			// 		polygon.setMap(map);
+			// 		polygonsArray.push(polygon);
+			// 	}
+			// }
 
 			marker.addListener('click', function() {
 				clearMapPolygons();
@@ -519,6 +605,35 @@
 			.filter(chk => chk.checked)
 			.map(chk => chk.id);
 	}
+
+	document.getElementById('submitLocateKode').addEventListener('click', function() {
+		const kodeSpatial = document.getElementById('locateKodeLokasi').value;
+
+		if (!kodeSpatial) {
+			alert('Silakan masukkan kode lokasi.');
+			return;
+		}
+
+		const url = `{{ route('2024.datafeeder.responseGetLocationByKode') }}?kode_spatial=${kodeSpatial}`;
+
+		fetch(url, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+				'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+			}
+		})
+		.then(response => response.json())
+		.then(data => {
+			if (data.length > 0) {
+				plotMarkersOnMap(data);
+				$('#locateMyLocationModal').modal('hide');
+			} else {
+				alert('Lokasi tidak ditemukan untuk kode lokasi yang diberikan.');
+			}
+		})
+		.catch(error => console.error('Error fetching location data:', error));
+	});
 
 	function openDetailModal(kode_spatial) {
 		const modalUrl = `{{ route('2024.datafeeder.responseGetSpatialMoreDetail', ['spatial' => '__spatial__']) }}`.replace('__spatial__', kode_spatial);
