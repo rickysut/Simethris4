@@ -241,8 +241,16 @@ class VerifSklController extends Controller
 
 			'wajibTanam' => $commitment->luas_wajib_tanam * 10000,
 			'wajibProduksi' => $commitment->volume_produksi,
+
+			'wajibTanamSkl' => $commitment->luas_wajib_tanam,
+			'wajibProduksiSkl' => $commitment->volume_produksi,
+
 			'realisasiTanam' => $commitment->lokasi->sum('luas_tanam'),
 			'realisasiProduksi' => $commitment->lokasi->sum('volume'),
+
+			'realisasiTanamSkl' => $commitment->lokasi->sum('luas_tanam')/10000,
+			'realisasiProduksiSkl' => $commitment->lokasi->sum('volume'),
+
 			'countAnggota' => $commitment->lokasi->groupBy('ktp_petani')->count(),
 			'countPoktan' => $commitment->lokasi->groupBy('kode_poktan')->count(),
 			'countPks' => $pks->where('berkas_pks', '!=', null)->count(),
@@ -410,8 +418,8 @@ class VerifSklController extends Controller
 			[
 				'no_skl' => $Skl->no_skl,
 				'published_date' => $Skl->published_at,
-				'luas_tanam' => $commitment->lokasi->sum('luas_tanam'),
-				'volume' => $commitment->lokasi->sum('volume'),
+				'luas_tanam' => $commitment->lokasi->sum('luas_tanam') / 10000,
+				'volume' => $commitment->lokasi->sum('volume') / 1000,
 				'status' => 'LUNAS',
 				'skl_upload' => $Skl->skl_url,
 				'url' => $Skl->skl_url,

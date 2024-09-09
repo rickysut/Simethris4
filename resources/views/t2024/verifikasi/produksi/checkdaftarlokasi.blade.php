@@ -116,9 +116,9 @@
 				success: function(response) {
 					$('#companytitle').text(response.data.perusahaan);
 					$('#no_ijin').text(response.data.no_ijin);
-					$('#tgl_ijin').text(response.data.tgl_ijin);
-					$('#tgl_akhir').text(response.data.tgl_akhir);
-					$('#created_at').text(response.data.created_at);
+					$('#tgl_ijin').text(formatDate(response.data.tgl_ijin));
+					$('#tgl_akhir').text(formatDate(response.data.tgl_akhir));
+					$('#created_at').text(formatDate(response.data.created_at));
 					$('#jml_anggota').text(response.data.countAnggota + ' orang');
 
 					if (response.data.status > 3) {
@@ -137,15 +137,15 @@
 								{
 									data: 'luas_lahan',
 									render: function(data, type, row) {
-										var luasHa = data ? data / 10000 : 0;
-										return luasHa + ' ha';
+										var formattedData = parseFloat(data).toLocaleString('id-ID');
+										return formattedData + ' m2';
 									}
 								},
 								{
 									data: 'luas_tanam',
 									render: function(data, type, row) {
-										var luasHa = data ? data / 10000 : 0;
-										return luasHa + ' ha';
+										var formattedData = parseFloat(data).toLocaleString('id-ID');
+										return formattedData + ' m2';
 									}
 								},
 								{data: 'nama_kelompok'},

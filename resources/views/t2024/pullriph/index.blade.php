@@ -45,9 +45,20 @@
 							</div>
 						</div>
 
-						<a class="btn btn-sm btn-primary btn-block text-white"  id="btnexec" >
-							<i class="fas fa-sync"></i> Tarik Sekarang
-						</a>
+						<div class="d-flex justify-content-end align-items-center">
+							<div class="col-md-6">
+								<a href="{{ route('2024.user.commitment.index') }}" class="btn btn-sm btn-info btn-block text-white">
+									<i class="fas fa-arrow-left"></i>
+									Kembali
+								</a>
+							</div>
+							<div class="col-md-6">
+								<a class="btn btn-sm btn-primary btn-block ml-1 text-white"  id="btnexec" >
+									<i class="fas fa-sync"></i>
+									CARI DATA
+								</a>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -55,206 +66,204 @@
 			<div class="row justify-content-center collapse" id="collapseData">
 				<div class="col-md-8 order-md-2 mb-4">
 					<p class="lead">Berikut adalah data yang diperoleh dari aplikasi SIAP RIPH berdasarkan informasi yang Anda berikan.</p>
-						<h5 class="d-flex justify-content-between align-items-center mb-3">
-							<span class="text-muted">RESULT</span>
-							<span>
-								Sync Status: <span id="keterangan"  class="badge badge-success badge-pill">wait..</span>
-							</span>
-							<input type="hidden" id="h-keterangan" name="keterangan">
-						</h5>
+					<h5 class="d-flex justify-content-between align-items-center mb-3">
+						<span class="text-muted">HASIL</span>
+						<span>
+							Status: <span id="keterangan"  class="badge-pill">wait..</span>
+						</span>
+						<input type="hidden" id="h-keterangan" name="keterangan">
+					</h5>
 
-						<ul class="list-group mb-3 notification">
-							<li>
-								<a href="#" class="d-flex align-items-center">
-									<span class="d-flex flex-column flex-1 ml-1">
-										<span class="name">
-											<h6>Perusahaan/Lembaga </h6>
-											<span id="nama" class="fw-500 position-absolute pos-top pos-right mt-1" id="nama_perusahaan">
-											</span>
-											<input type="hidden" id="h-nama" name="nama">
+					<ul class="list-group mb-3 notification">
+						<li>
+							<a href="#" class="d-flex align-items-center">
+								<span class="d-flex flex-column flex-1 ml-1">
+									<span class="name">
+										<h6>Perusahaan/Lembaga </h6>
+										<span id="nama" class="fw-500 position-absolute pos-top pos-right mt-1" id="nama_perusahaan">
 										</span>
-										<footer class="blockquote-footer text-left">
-											<cite title="Source Title">Pemegang Rekomendasi Import Produk Hortikultura</cite>
-										</footer>
+										<input type="hidden" id="h-nama" name="nama">
 									</span>
-								</a>
-							</li>
-							<li>
-								<a href="#" class="d-flex align-items-center">
-									<span class="d-flex flex-column flex-1 ml-1">
-										<span class="name">
-											<h6>NPWP </h6>
-											<span id="npwpout"  class="fw-500 position-absolute pos-top pos-right mt-1">
-											</span>
-											<input type="hidden" id="h-npwpout" name="npwp" >
+									<footer class="blockquote-footer text-left">
+										<cite title="Source Title">Pemegang Rekomendasi Import Produk Hortikultura</cite>
+									</footer>
+								</span>
+							</a>
+						</li>
+						<li>
+							<a href="#" class="d-flex align-items-center">
+								<span class="d-flex flex-column flex-1 ml-1">
+									<span class="name">
+										<h6>NPWP </h6>
+										<span id="npwpout"  class="fw-500 position-absolute pos-top pos-right mt-1">
 										</span>
-										<footer class="blockquote-footer text-left">
-											<cite title="Source Title">Nomor Pokok Wajib Pajak</cite>
-										</footer>
+										<input type="hidden" id="h-npwpout" name="npwp" >
 									</span>
-								</a>
-							</li>
-							<li>
-								<a href="#" class="d-flex align-items-center">
-									<span class="d-flex flex-column flex-1 ml-1">
-										<span class="name">
-											<h6>Nomor RIPH </h6>
-											<span id="no_ijin"  class="fw-500 position-absolute pos-top pos-right mt-1">
-											</span>
-											<input type="hidden" id="h-no_ijin" name="no_ijin" >
+									<footer class="blockquote-footer text-left">
+										<cite title="Source Title">Nomor Pokok Wajib Pajak</cite>
+									</footer>
+								</span>
+							</a>
+						</li>
+						<li>
+							<a href="#" class="d-flex align-items-center">
+								<span class="d-flex flex-column flex-1 ml-1">
+									<span class="name">
+										<h6>Nomor RIPH </h6>
+										<span id="no_ijin"  class="fw-500 position-absolute pos-top pos-right mt-1">
+										</span>
+										<input type="hidden" id="h-no_ijin" name="no_ijin" >
 
-										</span>
-										<footer class="blockquote-footer text-left">
-											<cite title="Source Title">Persetujuan Rekomendasi Import Produk Hortikultura</cite>
-										</footer>
 									</span>
-								</a>
-							</li>
-							<li>
-								<a href="#" class="d-flex align-items-center">
-									<span class="d-flex flex-column flex-1 ml-1">
-										<span class="name">
-											<h6>Periode/Tahun Anggaran </h6>
-											<span id="periodetahun"  class="fw-500 position-absolute pos-top pos-right mt-1">
-
-											</span>
-											<input type="hidden" id="h-periodetahun"name="periodetahun" >
+									<footer class="blockquote-footer text-left">
+										<cite title="Source Title">Persetujuan Rekomendasi Import Produk Hortikultura</cite>
+									</footer>
+								</span>
+							</a>
+						</li>
+						<li>
+							<a href="#" class="d-flex align-items-center">
+								<span class="d-flex flex-column flex-1 ml-1">
+									<span class="name">
+										<h6>Periode/Tahun Anggaran </h6>
+										<span id="periodetahun"  class="fw-500 position-absolute pos-top pos-right mt-1">
 
 										</span>
-										<footer class="blockquote-footer text-left">
-											<cite title="Source Title">Tahun Terbit</cite>
-										</footer>
+										<input type="hidden" id="h-periodetahun"name="periodetahun" >
+
 									</span>
-								</a>
-							</li>
-							<li>
-								<a href="#" class="d-flex align-items-center">
-									<span class="d-flex flex-column flex-1 ml-1">
-										<span class="name">
-											<h6>Tanggal Terbit </h6>
-											<span id="tgl_ijin" class="fw-500 position-absolute pos-top pos-right mt-1">
-											</span>
-											<input type="hidden" id="h-tgl_ijin" name="tgl_ijin" >
+									<footer class="blockquote-footer text-left">
+										<cite title="Source Title">Tahun Terbit</cite>
+									</footer>
+								</span>
+							</a>
+						</li>
+						<li>
+							<a href="#" class="d-flex align-items-center">
+								<span class="d-flex flex-column flex-1 ml-1">
+									<span class="name">
+										<h6>Tanggal Terbit </h6>
+										<span id="tgl_ijin" class="fw-500 position-absolute pos-top pos-right mt-1">
+										</span>
+										<input type="hidden" id="h-tgl_ijin" name="tgl_ijin" >
+
+									</span>
+									<footer class="blockquote-footer text-left">
+										<cite title="Source Title">Tanggal diterbitkannya Persetujuan RIPH</cite>
+									</footer>
+								</span>
+							</a>
+						</li>
+						<li>
+							<a href="#" class="d-flex align-items-center">
+								<span class="d-flex flex-column flex-1 ml-1">
+									<span class="name">
+										<h6>Tanggal berakhir </h6>
+										<span id="tgl_akhir" class="fw-500 position-absolute pos-top pos-right mt-1">
 
 										</span>
-										<footer class="blockquote-footer text-left">
-											<cite title="Source Title">Tanggal diterbitkannya Persetujuan RIPH</cite>
-										</footer>
-									</span>
-								</a>
-							</li>
-							<li>
-								<a href="#" class="d-flex align-items-center">
-									<span class="d-flex flex-column flex-1 ml-1">
-										<span class="name">
-											<h6>Tanggal berakhir </h6>
-											<span id="tgl_akhir" class="fw-500 position-absolute pos-top pos-right mt-1">
+										<input type="hidden" id="h-tgl_akhir" name="tgl_akhir" >
 
-											</span>
-											<input type="hidden" id="h-tgl_akhir" name="tgl_akhir" >
+									</span>
+									<footer class="blockquote-footer text-left">
+										<cite title="Source Title">Tanggal berakhirnya masa berlaku RIPH</cite>
+									</footer>
+								</span>
+							</a>
+						</li>
+						<li>
+							<a href="#" class="d-flex align-items-center">
+								<span class="d-flex flex-column flex-1 ml-1">
+									<span class="name">
+										<h6>Komoditas </h6>
+										<span id="no_hs" class="fw-500 position-absolute pos-top pos-right mt-1">
 
 										</span>
-										<footer class="blockquote-footer text-left">
-											<cite title="Source Title">Tanggal berakhirnya masa berlaku RIPH</cite>
-										</footer>
-									</span>
-								</a>
-							</li>
-							<li>
-								<a href="#" class="d-flex align-items-center">
-									<span class="d-flex flex-column flex-1 ml-1">
-										<span class="name">
-											<h6>Komoditas </h6>
-											<span id="no_hs" class="fw-500 position-absolute pos-top pos-right mt-1">
+										<input type="hidden" id="h-no_hs" name="no_hs" >
 
-											</span>
-											<input type="hidden" id="h-no_hs" name="no_hs" >
+									</span>
+									<footer class="blockquote-footer text-left">
+										<cite title="Source Title">Komoditas import pada RIPH</cite>
+									</footer>
+								</span>
+							</a>
+						</li>
+						<li>
+							<a href="#" class="d-flex align-items-center">
+								<span class="d-flex flex-column flex-1 ml-1">
+									<span class="name">
+										<h6>Volume RIPH (ton)</h6>
+										<span id="volume_riph"  class="fw-500 position-absolute pos-top pos-right mt-1">
 
 										</span>
-										<footer class="blockquote-footer text-left">
-											<cite title="Source Title">Komoditas import pada RIPH</cite>
-										</footer>
-									</span>
-								</a>
-							</li>
-							<li>
-								<a href="#" class="d-flex align-items-center">
-									<span class="d-flex flex-column flex-1 ml-1">
-										<span class="name">
-											<h6>Volume RIPH (ton)</h6>
-											<span id="volume_riph"  class="fw-500 position-absolute pos-top pos-right mt-1">
+										<input type="hidden" id="h-volume_riph" name="volume_riph" >
 
-											</span>
-											<input type="hidden" id="h-volume_riph" name="volume_riph" >
+									</span>
+									<footer class="blockquote-footer text-left">
+										<cite title="Source Title">Total Volume import yang tertera pada Persetujuan RIPH</cite>
+									</footer>
+								</span>
+							</a>
+						</li>
+						<li>
+							<a href="#" class="d-flex align-items-center">
+								<span class="d-flex flex-column flex-1 ml-1">
+									<span class="name">
+										<h6>Volume Wajib Produksi (ton)</h6>
+										<span id="volume_produksi" class="fw-500 position-absolute pos-top pos-right mt-1">
 
 										</span>
-										<footer class="blockquote-footer text-left">
-											<cite title="Source Title">Total Volume import yang tertera pada Persetujuan RIPH</cite>
-										</footer>
-									</span>
-								</a>
-							</li>
-							<li>
-								<a href="#" class="d-flex align-items-center">
-									<span class="d-flex flex-column flex-1 ml-1">
-										<span class="name">
-											<h6>Volume Wajib Produksi (ton)</h6>
-											<span id="volume_produksi" class="fw-500 position-absolute pos-top pos-right mt-1">
+										<input type="hidden" id="h-volume_produksi" name="volume_produksi"  >
 
-											</span>
-											<input type="hidden" id="h-volume_produksi" name="volume_produksi"  >
+									</span>
+									<footer class="blockquote-footer text-left">
+										<cite title="Source Title">Total kewajiban produksi yang harus dipenuhi.</cite>
+									</footer>
+								</span>
+							</a>
+						</li>
+						<li>
+							<a href="#" class="d-flex align-items-center">
+								<span class="d-flex flex-column flex-1 ml-1">
+									<span class="name">
+										<h6>Komitmen Wajib Tanam (ha)</h6>
+										<span id="luas_wajib_tanam"  class="fw-500 position-absolute pos-top pos-right mt-1">
 
 										</span>
-										<footer class="blockquote-footer text-left">
-											<cite title="Source Title">Total kewajiban produksi yang harus dipenuhi.</cite>
-										</footer>
-									</span>
-								</a>
-							</li>
-							<li>
-								<a href="#" class="d-flex align-items-center">
-									<span class="d-flex flex-column flex-1 ml-1">
-										<span class="name">
-											<h6>Komitmen Wajib Tanam (ha)</h6>
-											<span id="luas_wajib_tanam"  class="fw-500 position-absolute pos-top pos-right mt-1">
+										<input type="hidden" id="h-luas_wajib_tanam" name="luas_wajib_tanam"  >
 
-											</span>
-											<input type="hidden" id="h-luas_wajib_tanam" name="luas_wajib_tanam"  >
-
-										</span>
-										<footer class="blockquote-footer text-left">
-											<cite title="Source Title">Total kewajiban luas tanam yang harus dipenuhi.</cite>
-										</footer>
 									</span>
-								</a>
-							</li>
-							<li>
-								<input type="" id="h-stok_mandiri" name="stok_mandiri" hidden>
-								<input type="" id="h-pupuk_organik" name="pupuk_organik" hidden>
-								<input type="" id="h-npk" name="npk" hidden>
-								<input type="" id="h-dolomit" name="dolomit" hidden>
-								<input type="" id="h-za" name="za" hidden>
-								<input type="" id="h-mulsa" name="mulsa" hidden>
-							</li>
-						</ul>
-						<hr class="mb-4">
-						<span class="text-bold text-secondary">Kami menyatakan:</span>
-						<div class="form-group ">
-							<div class="custom-control custom-checkbox">
-								<input type="checkbox" class="custom-control-input" id="correct-riph" name="correct" required>
-								<label class="custom-control-label text-danger" for="correct-riph">Data tersebut di atas adalah benar data RIPH dari Perusahaan/Lembaga kami.</label>
-							</div>
-							<div class="custom-control custom-checkbox">
-								<input type="checkbox" class="custom-control-input" id="responsible" name="responsible" required>
-								<label class="custom-control-label text-danger" for="responsible">Bertanggungjawab sepenuhnya atas informasi dan data yang kami sampaikan.</label>
-							</div>
+									<footer class="blockquote-footer text-left">
+										<cite title="Source Title">Total kewajiban luas tanam yang harus dipenuhi.</cite>
+									</footer>
+								</span>
+							</a>
+						</li>
+						<li>
+							<input type="" id="h-stok_mandiri" name="stok_mandiri" hidden>
+							<input type="" id="h-pupuk_organik" name="pupuk_organik" hidden>
+							<input type="" id="h-npk" name="npk" hidden>
+							<input type="" id="h-dolomit" name="dolomit" hidden>
+							<input type="" id="h-za" name="za" hidden>
+							<input type="" id="h-mulsa" name="mulsa" hidden>
+						</li>
+					</ul>
+					<hr class="mb-4">
+					<span class="text-bold text-secondary">Kami menyatakan <span class="text-danger small">(wajib dicentang)</span>: </span>
+					<div class="form-group ">
+						<div class="custom-control custom-checkbox">
+							<input type="checkbox" class="custom-control-input" id="correct-riph" name="correct" required>
+							<label class="custom-control-label" for="correct-riph">Data tersebut di atas adalah benar data RIPH dari Perusahaan/Lembaga kami.</label>
 						</div>
-
-						<a id="submitbtn" class="btn btn-sm btn-primary text-white" role="button" type="submit">
-							<i class="fal fa-upload text-align-center  mr-1"></i> Simpan untuk pelaporan
-						</a>
-						<hr class="mb-4">
-
+						<div class="custom-control custom-checkbox">
+							<input type="checkbox" class="custom-control-input" id="responsible" name="responsible" required>
+							<label class="custom-control-label" for="responsible">Bertanggungjawab sepenuhnya atas informasi dan data yang kami sampaikan.</label>
+						</div>
+					</div>
+					<a id="submitbtn" class="btn btn-sm btn-primary text-white" role="button" type="submit">
+						<i class="fal fa-upload text-align-center  mr-1"></i> Simpan untuk pelaporan
+					</a>
+					<hr class="mb-4">
 				</div>
 			</div>
 		</form>
@@ -288,24 +297,6 @@
 
 	$(document).ready(function()
 	{
-		var $validator = $("#dataForm").validate({
-			rules: {
-				correct: {
-					required: true
-				},
-				responsible: {
-					required: true
-				}
-			},
-			messages:{
-				correct: {
-					required: "!"
-				},
-				responsible: {
-					required: "!"
-				}
-			}
-		})
 
 		$(":input").inputmask();
 		$("#btnexec").on('click', function(){
@@ -370,11 +361,13 @@
 
 								var keteranganElement = $('#keterangan');
 								keteranganElement.text(response.keterangan);
-								keteranganElement.removeClass('badge badge-success badge-danger');
-								if (response.keterangan === 'Success') {
+								keteranganElement.removeClass('badge badge-success');
+								if (response.keterangan === 'SUCCESS') {
 									keteranganElement.addClass('badge badge-success badge-pill');
+									keteranganElement.text('DATA DITEMUKAN');
 								} else {
 									keteranganElement.addClass('badge badge-danger badge-pill');
+									keteranganElement.text('DATA TIDAK DITEMUKAN');
 								}
 								$('#h-keterangan').val(response.keterangan);
 
@@ -487,6 +480,31 @@
 			});
 		})
 
+		var $validator = $("#dataForm").validate({
+			rules: {
+				correct: {
+					required: true
+				},
+				responsible: {
+					required: true
+				}
+			},
+			messages:{
+				correct: {
+					required: ""
+				},
+				responsible: {
+					required: ""
+				}
+			},
+			highlight: function(element) {
+				$(element).closest('.form-group').find('label[for="' + element.id + '"]').addClass('text-danger');
+			},
+			unhighlight: function(element) {
+				$(element).closest('.form-group').find('label[for="' + element.id + '"]').removeClass('text-danger');
+			}
+		});
+
 		$("#submitbtn").click(function(event) {
 			var $valid = $("#dataForm").valid();
 			if (!$valid) {
@@ -497,6 +515,5 @@
 		});
 	});
 </script>
-
 
 @endsection

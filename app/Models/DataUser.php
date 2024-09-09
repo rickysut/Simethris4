@@ -10,64 +10,81 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class DataUser extends Model
 {
-    use SoftDeletes;
-    use Auditable;
-    use HasFactory;
-    use \Awobaz\Compoships\Compoships;
-    
-    public $table = 'data_users';
+	use SoftDeletes;
+	use Auditable;
+	use HasFactory;
+	use \Awobaz\Compoships\Compoships;
 
-    protected $dates = [
-        'created_at',
-        'updated_at',
-        'deleted_at',
-    ];
+	public $table = 'data_users';
 
-    protected $fillable = [
-        'user_id',
-        'name',
-        'mobile_phone',
-        'fix_phone',
-        'company_name',
-        'pic_name',
-        'jabatan',
-        'npwp_company',
-        'nib_company',
-        'address_company',
-        'provinsi',
-        'kabupaten',
-        'kecamatan',
-        'desa',
-        'kodepos',
-        'fax',
-        'ktp',
-        'ktp_image',
-        'assignment',
-        'avatar',
-        'logo',
-        'email_company',
-        'created_at',
-        'updated_at',
-        'deleted_at',
-    ];
+	protected $dates = [
+		'created_at',
+		'updated_at',
+		'deleted_at',
+	];
 
-    protected function serializeDate(DateTimeInterface $date)
-    {
-        return $date->format('Y-m-d H:i:s');
-    }
+	protected $fillable = [
+		'user_id',
+		'name',
+		'mobile_phone',
+		'fix_phone',
+		'company_name',
+		'pic_name',
+		'jabatan',
+		'npwp_company',
+		'nib_company',
+		'address_company',
+		'provinsi',
+		'kabupaten',
+		'kecamatan',
+		'desa',
+		'kodepos',
+		'fax',
+		'ktp',
+		'ktp_image',
+		'assignment',
+		'avatar',
+		'logo',
+		'email_company',
+		'created_at',
+		'updated_at',
+		'deleted_at',
+	];
 
-    public function pullRiph()
-    {
-        return $this->hasMany(PullRiph::class, 'npwp', 'npwp_company');
-    }
+	protected function serializeDate(DateTimeInterface $date)
+	{
+		return $date->format('Y-m-d H:i:s');
+	}
 
-    public function pengajuan()
-    {
-        return $this->hasMany(Pengajuan::class, 'npwp', 'npwp_company');
-    }
+	public function pullRiph()
+	{
+		return $this->hasMany(PullRiph::class, 'npwp', 'npwp_company');
+	}
 
-    public function oldskl()
-    {
-        return $this->hasMany(SklOlder::class, 'npwp', 'npwp_company');
-    }
+	public function pengajuan()
+	{
+		return $this->hasMany(Pengajuan::class, 'npwp', 'npwp_company');
+	}
+
+	public function oldskl()
+	{
+		return $this->hasMany(SklOlder::class, 'npwp', 'npwp_company');
+	}
+
+	public function myprovinsi()
+	{
+		return $this->belongsTo(MasterProvinsi::class, 'provinsi', 'provinsi_id');
+	}
+	public function mykabupaten()
+	{
+		return $this->belongsTo(MasterKabupaten::class, 'kabupaten', 'kabupaten_id');
+	}
+	public function mykecamatan()
+	{
+		return $this->belongsTo(MasterKecamatan::class, 'kecamatan', 'kecamatan_id');
+	}
+	public function mydesa()
+	{
+		return $this->belongsTo(MasterDesa::class, 'desa', 'kelurahan_id');
+	}
 }

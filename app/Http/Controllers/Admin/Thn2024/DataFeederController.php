@@ -15,6 +15,10 @@ use App\Models2024\Pks;
 use App\Models2024\PullRiph;
 use App\Models2024\UserFile;
 use App\Models\MasterDesa;
+use App\Models\MasterKabupaten;
+use App\Models\MasterKecamatan;
+use App\Models\MasterProvinsi;
+use App\Models\MasterProvinsis;
 use App\Models\UserDocs;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -832,21 +836,33 @@ class DataFeederController extends Controller
 		$length = $request->input('length', 100);
 		$searchValue = $request->input('search.value', '');
 
-		$data = MasterSpatial::with([
+		$query = MasterSpatial::with([
 			'provinsi:provinsi_id,nama',
 			'kabupaten:kabupaten_id,nama_kab',
 			'jadwal:kode_spatial,awal_masa,akhir_masa',
 			'anggota:ktp_petani,nama_petani',
-		])->get();
+		]);
 
-		$totalLuas = $data->sum('luas_lahan');
-		$totalLahan = $data->count();
-		$totalLuasAktif = $data->where('status', 0)->sum('luas_lahan');
-		$totalLahanAktif = $data->where('status', 0)->count();
-		$totalLuasNonAktif = $totalLuas - $totalLuasAktif;
-		$totalLahanNonAktif = $totalLahan - $totalLahanAktif;
+		if ($searchValue) {
+			$query = $query->where(function ($q) use ($searchValue) {
+				$q->where('kode_spatial', 'like', "%$searchValue%")
+					->orWhere('ktp_petani', 'like', "%$searchValue%")
+					->orWhereHas('anggota', function ($q) use ($searchValue) {
+						$q->where('nama_petani', 'like', "%$searchValue%");
+					})
+					->orWhereHas('provinsi', function ($q) use ($searchValue) {
+						$q->where('nama', 'like', "%$searchValue%");
+					})
+					->orWhereHas('kabupaten', function ($q) use ($searchValue) {
+						$q->where('nama_kab', 'like', "%$searchValue%");
+					});
+			});
+		}
 
-		$query = $data->map(function ($item) {
+		$totalRecords = MasterSpatial::count(); // Total jumlah data tanpa filter
+		$filteredRecords = $query->count(); // Total jumlah data setelah filter
+
+		$spatials = $query->offset($start)->limit($length)->get()->map(function ($item) {
 			return [
 				'id' => $item->id,
 				'kode_spatial' => $item->kode_spatial,
@@ -867,38 +883,7 @@ class DataFeederController extends Controller
 			];
 		});
 
-		if ($searchValue) {
-			$query = $query->filter(function ($item) use ($searchValue) {
-				return strpos(strtolower($item['kode_spatial']), strtolower($searchValue)) !== false ||
-					strpos(strtolower($item['ktp_petani']), strtolower($searchValue)) !== false ||
-					strpos(strtolower($item['nama_anggota']), strtolower($searchValue)) !== false ||
-					strpos(strtolower($item['nama_provinsi']), strtolower($searchValue)) !== false ||
-					strpos(strtolower($item['nama_kabupaten']), strtolower($searchValue)) !== false ||
-					strpos(strtolower($item['nama_kecamatan']), strtolower($searchValue)) !== false ||
-					strpos(strtolower($item['nama_desa']), strtolower($searchValue)) !== false;
-			});
-		}
-
-		if ($request->has('order')) {
-			$orderColumn = $request->input('order')[0]['column'];
-			$orderDirection = $request->input('order')[0]['dir'];
-			$columnName = $request->input('columns')[$orderColumn]['data'];
-
-			$query = $query->sortBy($columnName, SORT_REGULAR, $orderDirection == 'desc');
-		}
-
-		$totalRecords = $data->count();
-		$filteredRecords = $query->count();
-
-		$spatials = $query->slice($start, $length)->values();
-
 		return response()->json([
-			'totalLuas' => $totalLuas,
-			'totalLahan' => $totalLahan,
-			'totalLahanAktif' => $totalLahanAktif,
-			'totalLuasAktif' => $totalLuasAktif,
-			'totalLuasNonAktif' => $totalLuasNonAktif,
-			'totalLahanNonAktif' => $totalLahanNonAktif,
 			'draw' => $draw,
 			'recordsTotal' => $totalRecords,
 			'recordsFiltered' => $filteredRecords,
@@ -2221,20 +2206,43 @@ class DataFeederController extends Controller
 	//response saat android meminta data lokasi kabupaten
 	public function responseGetLocationInKabupaten(Request $request)
 	{
-		$request->validate([
-			'kabupaten_id' => 'required|array',
-			'kabupaten_id.*' => 'string',  // Each kabupaten_id should be a string
-		]);
+		// Ambil parameter dari URL
+		$kabupatenIds = $request->query('kabupaten_id', []);
+		$viewport = $request->query('viewport', null);
 
-		$kabupatens = $request->input('kabupaten_id');
+		// Validasi bahwa kabupaten_id adalah array
+		if (!is_array($kabupatenIds)) {
+			return response()->json(['error' => 'Invalid kabupaten_id format'], 400);
+		}
 
-		$spatials = MasterSpatial::whereIn('kabupaten_id', $kabupatens)->get(['kabupaten_id', 'provinsi_id', 'kode_spatial', 'latitude', 'longitude', 'status']);
+		// Dekode viewport jika disediakan
+		$viewport = is_string($viewport) ? json_decode($viewport, true) : null;
 
-		// Return the spatial data as JSON
+		// Buat instance query builder
+		$spatialsQuery = MasterSpatial::query();
+
+		if (!empty($kabupatenIds)) {
+			// Filter berdasarkan ID kabupaten
+			$spatialsQuery->whereIn('kabupaten_id', $kabupatenIds);
+
+			if ($viewport) {
+				// Jika viewport disediakan, filter berdasarkan area viewport
+				$spatialsQuery->whereRaw('CAST(latitude AS DECIMAL(10, 6)) BETWEEN ? AND ?', [$viewport['south'], $viewport['north']])
+					->whereRaw('CAST(longitude AS DECIMAL(10, 6)) BETWEEN ? AND ?', [$viewport['west'], $viewport['east']]);
+			}
+		} else if ($viewport) {
+			// Jika hanya viewport yang disediakan, gunakan viewport tanpa filter kabupaten
+			$spatialsQuery->whereRaw('CAST(latitude AS DECIMAL(10, 6)) BETWEEN ? AND ?', [$viewport['south'], $viewport['north']])
+				->whereRaw('CAST(longitude AS DECIMAL(10, 6)) BETWEEN ? AND ?', [$viewport['west'], $viewport['east']]);
+		}
+
+		// Dapatkan hasil query
+		$spatials = $spatialsQuery->get();
+
+		// Kembalikan hasil sebagai JSON
 		return response()->json($spatials);
-		//MasterSpatials berisi kabupaten_id, provinsi_id, kode_spatial, latitude, longitude, dan beberapa field lain
-
 	}
+
 
 	public function responseGetSpatialDetail(Request $request)
 	{
@@ -2275,21 +2283,21 @@ class DataFeederController extends Controller
 	{
 		//informasi lahan
 		$lahan = MasterSpatial::where('kode_spatial', $spatial)
-        ->with([
-            'provinsi' => function($query) {
-                $query->select('provinsi_id', 'nama');
-            },
-            'kabupaten' => function($query) {
-                $query->select('kabupaten_id', 'nama_kab');
-            },
-            'kecamatan' => function($query) {
-                $query->select('kecamatan_id', 'nama_kecamatan');
-            },
-            'desa' => function($query) {
-                $query->select('kelurahan_id', 'nama_desa');
-            }
-        ])
-        ->first();
+			->with([
+				'provinsi' => function ($query) {
+					$query->select('provinsi_id', 'nama');
+				},
+				'kabupaten' => function ($query) {
+					$query->select('kabupaten_id', 'nama_kab');
+				},
+				'kecamatan' => function ($query) {
+					$query->select('kecamatan_id', 'nama_kecamatan');
+				},
+				'desa' => function ($query) {
+					$query->select('kelurahan_id', 'nama_desa');
+				}
+			])
+			->first();
 		//informasi kelompok tani
 		$poktan = MasterPoktan::where('kode_poktan', $lahan->kode_poktan)->first();
 		$lokasi = Lokasi::where('kode_spatial', $spatial)->first();
@@ -2673,5 +2681,29 @@ class DataFeederController extends Controller
 			'recordsFiltered' => $filteredRecords,
 			'data' => $data,
 		]);
+	}
+
+	/**
+	 * Get Data Wilayah
+	*/
+	public function getAllProvinsi ()
+	{
+		$data = MasterProvinsi::select('provinsi_id', 'nama')->get();
+		return response()->json(['data' => $data,]);
+	}
+	public function getKabByProv ($prov)
+	{
+		$data = MasterKabupaten::select('provinsi_id','kabupaten_id', 'nama_kab')->where('provinsi_id', $prov)->get();
+		return response()->json(['data' => $data,]);
+	}
+	public function getKecByKab ($kab)
+	{
+		$data = MasterKecamatan::select('kabupaten_id','kecamatan_id', 'nama_kecamatan')->where('kabupaten_id', $kab)->get();
+		return response()->json(['data' => $data,]);
+	}
+	public function getKelByKec ($kec)
+	{
+		$data = MasterDesa::select('kecamatan_id','kelurahan_id', 'nama_desa')->where('kecamatan_id', $kec)->get();
+		return response()->json(['data' => $data,]);
 	}
 }

@@ -7,10 +7,10 @@
 		<div class="col-7">
 			<ul class="list-group list-group-flush mt-2">
 				<li class="d-flex justify-content-between list-group-item">
-					<span class=text-muted>Realisasi Tanam (m2)</span>
+					<span class=text-muted>Realisasi Tanam</span>
 					<span class=fw-semibold>
-							<span class="{{ $payload['realisasiTanam'] < $payload['wajibTanam'] ? 'text-danger' : '' }}">{{ number_format((float)$payload['realisasiTanam'], 0, ',', '.') }}</span>
-							/ {{ number_format((float)$payload['wajibTanam'] * 10000, 0, ',', '.') }}
+							<span class="{{ $payload['realisasiTanam'] < $payload['wajibTanam'] ? 'text-danger' : '' }}">{{ number_format((float)$payload['realisasiTanam'], 0, ',', '.') }} m2 </span>
+							/ {{ number_format((float)$payload['wajibTanam'] * 10000, 0, ',', '.') }} m2
 					</span>
 				</li>
 				<li class="d-flex justify-content-between list-group-item">
@@ -108,11 +108,11 @@
 			<ul class="list-group list-group-flush mt-2">
 				<li class="d-flex justify-content-between list-group-item">
 					<span class=text-muted>Tanggal Pengajuan</span>
-					<span class="fw-semibold">{{ \Carbon\Carbon::parse($payload['avtDate'])->locale('id')->translatedFormat('F j, Y') }}</span>
+					<span class="fw-semibold">{{ \Carbon\Carbon::parse($payload['avtDate'])->locale('id')->translatedFormat('j F Y') }}</span>
 				</li>
 				<li class="d-flex justify-content-between list-group-item">
 					<span class=text-muted>Tanggal Verifikasi</span>
-					<span class="fw-semibold">{{ \Carbon\Carbon::parse($payload['avtVerifAt'])->locale('id')->translatedFormat('F j, Y') }}</span>
+					<span class="fw-semibold">{{ \Carbon\Carbon::parse($payload['avtVerifAt'])->locale('id')->translatedFormat('j F Y') }}</span>
 				</li>
 				<li class="d-flex justify-content-between list-group-item">
 					<span class=text-muted>Metode Verifikasi</span>
@@ -144,9 +144,9 @@
 					@foreach ($payload['failPks'] as $pks)
 						<tr>
 							<td>{{$pks->no_perjanjian ? $pks->no_perjanjian : 'Tidak Ada'}}</td>
-							<td>{{$pks->tgl_perjanjian_start ? $pks->tgl_perjanjian_start : 'Tidak Ada'}}</td>
+							<td>{{$pks->tgl_perjanjian_start ? \Carbon\Carbon::parse($pks->tgl_perjanjian_start)->locale('id')->translatedFormat('j F Y') : 'Tidak Ada'}}</td>
 							<td>{{$pks->nama_poktan}}</td>
-							<td>{{ \Carbon\Carbon::parse($pks->verif_at)->locale('id')->translatedFormat('F j, Y') }}</td>
+							<td>{{ \Carbon\Carbon::parse($pks->verif_at)->locale('id')->translatedFormat('j F Y') }}</td>
 						</tr>
 					@endforeach
 				</tbody>
@@ -166,7 +166,6 @@
 						<th>Pengelola</th>
 						<th>Tanggal Tanam</th>
 						<th>Tanggal Panen</th>
-						<th>Tanggal Verifikasi</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -174,9 +173,8 @@
 						<tr>
 							<td>{{$timeline->kode_spatial}}</td>
 							<td>{{$timeline->ktp_petani}} - {{$timeline->masteranggota->nama_petani}}</td>
-							<td class="text-end">{{$timeline->tgl_tanam ? $timeline->tgl_tanam : 'tidak ada'}}</td>
-							<td class="text-end">{{$timeline->tgl_panen ? $timeline->tgl_panen : 'tidak ada'}}</td>
-							<td class="text-end">{{$timeline->verif_t_at}}</td>
+							<td class="text-end">{{$timeline->tgl_tanam ? \Carbon\Carbon::parse($timeline->tgl_tanam)->locale('id')->translatedFormat('j F Y') : 'tidak ada'}}</td>
+							<td class="text-end">{{$timeline->tgl_panen ? \Carbon\Carbon::parse($timeline->tgl_panen)->locale('id')->translatedFormat('j F Y') : 'tidak ada'}}</td>
 						</tr>
 					@endforeach
 				</tbody>

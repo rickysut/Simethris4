@@ -62,7 +62,17 @@
 					{data: 'periode'},
 					{data: 'perusahaan'},
 					{data: 'no_ijin'},
-					{data: 'created_at'},
+					{
+						data: 'created_at',
+						render: function(data, type, row) {
+							if (data) {
+								var date = new Date(data);
+								var options = { year: 'numeric', month: 'long', day: 'numeric' };
+								return new Intl.DateTimeFormat('id-ID', options).format(date);
+							}
+							return ''; // Jika data kosong, kembalikan string kosong
+						}
+					},
 					// {data: 'verifikator'},
 					{
 						data: 'status',

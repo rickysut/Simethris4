@@ -450,9 +450,15 @@ Route::group(['prefix' => '2024', 'as' => '2024.', 'namespace' => 'Admin', 'midd
 			Route::get('/getspatial', 'DataFeederController@getspatial')->name('getspatial');
 			Route::post('/responseGetLocByRad', 'DataFeederController@responseGetLocByRad')->name('responseGetLocByRad');
 
+			//wilayah provinsi s.d desa
+			Route::get('/getAllProvinsi', 'DataFeederController@getAllProvinsi')->name('getAllProvinsi');
+			Route::get('/getKabByProv/{prov}', 'DataFeederController@getKabByProv')->name('getKabByProv');
+			Route::get('/getKecByKab/{kab}', 'DataFeederController@getKecByKab')->name('getKecByKab');
+			Route::get('/getKelByKec/{kec}', 'DataFeederController@getKelByKec')->name('getKelByKec');
+
 			Route::get('/getLocDataByIjinBySpatial/{noIjin}/{spatial}', 'DataFeederController@getLocDataByIjinBySpatial')->name('getLocDataByIjinBySpatial');
 			Route::post('/postLocDataByIjinBySpatial', 'DataFeederController@postLocDataByIjinBySpatial')->name('postLocDataByIjinBySpatial');
-			Route::post('/responseGetLocationInKabupaten', 'DataFeederController@responseGetLocationInKabupaten')->name('responseGetLocationInKabupaten');
+			Route::get('/responseGetLocationInKabupaten', 'DataFeederController@responseGetLocationInKabupaten')->name('responseGetLocationInKabupaten');
 			Route::post('/responseGetSpatialDetail', 'DataFeederController@responseGetSpatialDetail')->name('responseGetSpatialDetail');
 			Route::get('/responseGetSpatialMoreDetail/{spatial}', 'DataFeederController@responseGetSpatialMoreDetail')->name('responseGetSpatialMoreDetail');
 			Route::get('/getInvalidNik', 'DataFeederController@getInvalidNik')->name('getInvalidNik');
@@ -632,6 +638,7 @@ Route::group(['prefix' => '2024', 'as' => '2024.', 'namespace' => 'Admin', 'midd
 		Route::group(['prefix' => 'spatial', 'as' => 'spatial.'], function () {
 			Route::get('/', 'HomeController@index')->name('home');
 			Route::get('/list', 'SpatialController@index')->name('index');
+			Route::get('/spatialList', 'SpatialController@spatialList')->name('spatialList');
 			Route::get('/createsingle', 'SpatialController@createsingle')->name('createsingle');
 			Route::post('/storesingle', 'SpatialController@storesingle')->name('storesingle');
 			Route::get('/{id}/show', 'SpatialController@show')->name('edit');

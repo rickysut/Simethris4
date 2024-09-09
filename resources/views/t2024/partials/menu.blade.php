@@ -76,7 +76,7 @@
 
 			@can('landing_access')
 				<li class="c-sidebar-nav-item {{ request()->is('admin') ? 'active' : '' }}">
-					<a href="{{ route('admin.home') }}" class="c-sidebar-nav-link"
+					<a href="{{ route('2024.admin.home') }}" class="c-sidebar-nav-link"
 						data-filter-tags="home beranda landing informasi berita pesan">
 						<i class="c-sidebar-nav-icon fal fa-home-alt">
 						</i>
@@ -159,19 +159,9 @@
 			{{-- user_task_access --}}
 			@can('user_task_access')
 				<li class="nav-title">Pelaporan Realisasi</li>
-				@can('pull_access')
-					<li class="c-sidebar-nav-item {{ request()->is('2024/user/pull') ? 'active' : '' }}">
-						<a href="{{ route('2024.user.pull.index') }}"
-							data-filter-tags="sinkronisasi sync tarik data siap riph">
-							<i class="fa-fw fal fa-sync-alt c-sidebar-nav-icon">
-							</i>
-							{{ trans('cruds.pullSync.title_lang') }}
-						</a>
-					</li>
-				@endcan
 				@can('commitment_access')
 					@if (Auth::user()->roles[0]->title == 'User')
-						<li class="c-sidebar-nav-item {{ request()->is('2024/user/commitment*') ? 'active' : '' }}">
+						<li class="c-sidebar-nav-item {{ request()->is('2024/user/commitment*') || request()->is('2024/user/pull')  ? 'active' : '' }}">
 							<a href="{{ route('2024.user.commitment.index') }}"
 								data-filter-tags="daftar komitmen riph index">
 								<i class="fa-fw fal fa-ballot c-sidebar-nav-icon"></i>
@@ -200,11 +190,11 @@
 
 				@can('permohonan_access')
 					<li class="c-sidebar-nav-item {{ request()->is('skl/arsip') ? 'active' : '' }}">
-						<a href="{{route('admin.task.skl.arsip')}}"
+						<a href="{{route('2024.user.skl.mySkls')}}"
 							data-filter-tags="daftar skl terbit">
 							<i class="fal fa-file-certificate c-sidebar-nav-icon"></i>
 							<span class="nav-link-text text-wrap">
-								Daftar SKL Terbit
+								Daftar SKL Terbits
 							</span>
 							@php
 								$newSkl = new \App\Models\SklReads();
@@ -672,7 +662,7 @@
 				</li>
 
 				<li class="nav-title" data-i18n="nav.administation">DATA SPATIAL</li>
-				<li class="c-sidebar-nav-item {{ request()->is('2024/spatial/list') ? 'active' : '' }}">
+				<li class="c-sidebar-nav-item {{ request()->is('2024/spatial/*') ? 'active' : '' }}">
 					<a href="{{route('2024.spatial.index')}}" title="Coming soon!"
 					data-filter-tags="data spatial spasial">
 						<i class="fal fa-map"></i>

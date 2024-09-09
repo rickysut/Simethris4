@@ -134,7 +134,6 @@
 						return data;
 					}
 				},
-
 				columns: [
 					{
 						data: 'kode_spatial',
@@ -154,11 +153,39 @@
 							return row.spatial_petani + ' / ' + data;
 						}
 					},
-					{ data: 'luas_tanam'},
-					{ data: 'tgl_tanam' },
-
+					{
+						data: 'luas_tanam',
+						render: function(data, type, row) {
+							var formattedData = parseFloat(data).toLocaleString('id-ID');
+							return formattedData + ' m2';
+						}
+					},
+					{
+						data: 'tgl_tanam',
+						render: function(data, type, row) {
+							if (data) {
+								var parts = data.split('-'); // Split the date string into [day, month, year]
+								var date = new Date(parts[2], parts[1] - 1, parts[0]); // Create a new Date object
+								var options = { year: 'numeric', month: 'long', day: 'numeric' };
+								return new Intl.DateTimeFormat('id-ID', options).format(date);
+							}
+							return '';
+						}
+					},
 					{ data: 'volume_panen'},
-					{ data: 'tgl_panen' },
+					{
+						data: 'tgl_panen',
+						render: function(data, type, row) {
+							if (data) {
+								var parts = data.split('-'); // Split the date string into [day, month, year]
+								var date = new Date(parts[2], parts[1] - 1, parts[0]); // Create a new Date object
+								var options = { year: 'numeric', month: 'long', day: 'numeric' };
+								return new Intl.DateTimeFormat('id-ID', options).format(date);
+							}
+							return '';
+						}
+
+					},
 					{
 						data: 'tcode',
 						render: function(data, type, row) {

@@ -3,56 +3,56 @@
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>
     async function updateAllDesa() {
-        try {
-            // Ambil list provinsiIds
-            const response = await axios.get('/2024/spatial/master-wilayah/updateAllDesaFromBPS');
-            const provinsiIds = response.data.provinsiIds;
+		try {
+			const response = await axios.get('/2024/spatial/master-wilayah/updateAllDesaFromBPS');
+			const provinsiIds = response.data.provinsiIds;
+			if (!provinsiIds.length) {
+				alert('Tidak ada provinsi untuk diperbarui.');
+				return;
+			}
 
-            if (!provinsiIds.length) {
-                alert('Tidak ada provinsi untuk diperbarui.');
-                return;
-            }
+			let progressElement = document.getElementById('progress');
+			let progressBarElement = document.getElementById('progressBar');
+			let statusElement = document.getElementById('status');
+			let waitTimeElement = document.getElementById('waitTime');
 
-            let progressElement = document.getElementById('progress');
-            let statusElement = document.getElementById('status');
-            let waitTimeElement = document.getElementById('waitTime');
+			for (let i = 0; i < provinsiIds.length; i++) {
+				let provinsiId = provinsiIds[i];
+				statusElement.innerText = `Memperbarui provinsi ID ${provinsiId}...`;
 
-            for (let i = 0; i < provinsiIds.length; i++) {
-                let provinsiId = provinsiIds[i];
+				let updateResponse = await axios.get(`/2024/spatial/master-wilayah/updateDesaFromBPS/${provinsiId}`);
+				let updateResult = updateResponse.data;
 
-                statusElement.innerText = `Memperbarui provinsi ID ${provinsiId}...`;
+				if (updateResult.success) {
+					statusElement.innerText = `Sukses: ${updateResult.message}`;
+				} else {
+					statusElement.innerText = `Gagal: ${updateResult.message}`;
+				}
 
-                let updateResponse = await axios.get(`/2024/spatial/master-wilayah/updateDesaFromBPS/${provinsiId}`);
-                let updateResult = updateResponse.data;
+				let progress = Math.round(((i + 1) / provinsiIds.length) * 100);
+				progressElement.innerText = `Progress: ${progress}%`;
+				progressBarElement.style.width = `${progress}%`;
+				progressBarElement.setAttribute('aria-valuenow', progress);
 
-                if (updateResult.success) {
-                    statusElement.innerText = `Sukses: ${updateResult.message}`;
-                } else {
-                    statusElement.innerText = `Gagal: ${updateResult.message}`;
-                }
+				if (i < provinsiIds.length - 1) {
+					let waitTime = 60;
+					while (waitTime > 0) {
+						waitTimeElement.innerText = `Menunggu ${waitTime} detik sebelum melanjutkan...`;
+						await new Promise(resolve => setTimeout(resolve, 1000));
+						waitTime--;
+					}
+					waitTimeElement.innerText = 'Menunggu selesai. Melanjutkan...';
+				}
+			}
 
-                // Update progress
-                let progress = Math.round(((i + 1) / provinsiIds.length) * 100);
-                progressElement.innerText = `Progress: ${progress}%`;
-
-                // Jeda 1 menit dengan tampilan waktu sisa
-                if (i < provinsiIds.length - 1) {
-                    let waitTime = 60; // waktu tunggu dalam detik
-                    while (waitTime > 0) {
-                        waitTimeElement.innerText = `Menunggu ${waitTime} detik sebelum melanjutkan...`;
-                        await new Promise(resolve => setTimeout(resolve, 1000));
-                        waitTime--;
-                    }
-                    waitTimeElement.innerText = 'Menunggu selesai. Melanjutkan...';
-                }
-            }
-
-            statusElement.innerText = 'Proses pembaruan selesai.';
-        } catch (error) {
-            console.error('Terjadi kesalahan:', error);
-            alert('Terjadi kesalahan saat memperbarui data.');
-        }
-    }
+			statusElement.innerText = 'Proses pembaruan selesai.';
+			progressBarElement.classList.remove('bg-success');
+			progressBarElement.classList.add('bg-primary');
+		} catch (error) {
+			console.error('Terjadi kesalahan:', error);
+			alert('Terjadi kesalahan saat memperbarui data.');
+		}
+	}
 </script>
 
 {{-- @include('t2024.partials.breadcrumb') --}}
@@ -68,12 +68,17 @@
 					</h2>
 				</div>
 				<div class="panel-container show">
-					<div class="panel-content" hidden>
-						<h1>Pembaruan Data Desa</h1>
-						<button onclick="updateAllDesa()">Mulai Pembaruan</button>
-						<div id="progress">Progress: 0%</div>
+					<div class="panel-content">
+						<h3>Pembaruan Data Desa</h3>
+						<button onclick="updateAllDesa()" class="btnUpdateDesa" id="btnUpdateDesa">Mulai Pembaruan</button>
 						<div id="status">Status: </div>
-						<div id="waitTime">Menunggu...</div>
+						<div class="progress">
+							<div id="progressBar" class="progress-bar bg-success" role="progressbar" style="width: 0" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+						</div>
+						<div class="d-flex justify-content-between">
+							<div id="progress">Progress: 0%</div>
+							<div id="waitTime">Menunggu...</div>
+						</div>
 					</div>
 					<div class="panel-content">
 						<div class="row justify-content-between">
@@ -218,40 +223,30 @@
 			],
 			buttons: [
 				{
-					extend: 'pdfHtml5',
-					text: '<i class="fa fa-file-pdf"></i>',
-					title: 'Daftar Wilayah',
-					titleAttr: 'Generate PDF',
-					className: 'btn-outline-danger btn-sm btn-icon mr-1',
-					exportOptions: {
-						columns: [0, 1]
-					}
-				},
-				{
-					extend: 'excelHtml5',
-					text: '<i class="fa fa-file-excel"></i>',
-					title: 'Daftar Wilayah',
-					titleAttr: 'Generate Excel',
-					className: 'btn-outline-success btn-sm btn-icon mr-1',
-					exportOptions: {
-						columns: [0, 1]
-					}
-				},
-				{
-					extend: 'print',
-					text: '<i class="fa fa-print"></i>',
-					title: 'Daftar Wilayah',
-					titleAttr: 'Print Table',
-					className: 'btn-outline-primary btn-sm btn-icon mr-2',
-					exportOptions: {
-						columns: [0, 1]
-					}
-				},
-				{
-					text: '<i class="fa fa-undo"></i> Update Provinsi',
+					text: '<small>Prov</small>',
 					title: 'Synchronize Provinsi dengan Data BPS',
 					titleAttr: 'Synchronize Provinsi dengan Data BPS',
-					className: 'btn-warning btn-sm btnUpdateProv',
+					className: 'btn-outline-success btn-icon btn-sm btnUpdateProv ',
+				},
+				{
+					text: '<i class="fal fa-plus mr-1"></i> Peta Baru',
+					className: 'btn btn-xs btn-primary',
+					extend: 'collection',
+					buttons: [
+						{
+							text: 'Impor Peta Tunggal',
+							action: function (e, dt, node, config) {
+								window.location.href = '{{ route('2024.spatial.createsingle') }}';
+							}
+						},
+						{
+							text: 'Impor Peta Jamak',
+							action: function (e, dt, node, config) {
+								$('#modalMultiUpload').modal('show');
+							}
+						}
+					],
+					dropup: true // Optional: if you want to drop up
 				},
 			]
 		});

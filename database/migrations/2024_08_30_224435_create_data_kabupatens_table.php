@@ -15,8 +15,8 @@ return new class extends Migration
     {
         Schema::create('data_kabupatens', function (Blueprint $table) {
             $table->id();
-            $table->string('provinsi_id');
-            $table->string('kabupaten_id');
+            $table->string('provinsi_id',2);
+            $table->string('kabupaten_id',4);
             $table->text('kode_dagri')->nullable();
             $table->text('nama_kab');
             $table->text('lat')->nullable();

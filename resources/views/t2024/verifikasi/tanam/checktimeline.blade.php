@@ -46,10 +46,8 @@
 										<th style="width: 15%">Lokasi</th>
 										<th>Awal PKS</th>
 										<th>Akhir PKS</th>
-										<th>Awal Tanam</th>
-										<th>Akhir Tanam</th>
-										<th>Awal Panen</th>
-										<th>Akhir Panen</th>
+										<th>Tgl Tanam</th>
+										<th>Tgl Panen</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -97,9 +95,9 @@
 				success: function(response) {
 					$('#companytitle').text(response.data.perusahaan);
 					$('#no_ijin').text(response.data.no_ijin);
-					$('#tgl_ijin').text(response.data.tgl_ijin);
-					$('#tgl_akhir').text(response.data.tgl_akhir);
-					$('#created_at').text(response.data.created_at);
+					$('#tgl_ijin').text(formatDate(response.data.tgl_ijin));
+					$('#tgl_akhir').text(formatDate(response.data.tgl_akhir));
+					$('#created_at').text(formatDate(response.data.created_at));
 					$('#jml_anggota').text(response.data.countAnggota + ' orang');
 					if (response.data.status > 2) {
 						$('#timeLine').dataTable({
@@ -162,26 +160,6 @@
 									}
 								},
 								{
-									data: 'akhir_tanam',
-									render: function(data, type, row) {
-										var ijinStart = new Date(row.mulai_ijin);
-										var ijinEnd = new Date(row.akhir_ijin);
-										var pksStart = new Date(row.awal_pks);
-										var pksEnd = new Date(row.akhir_pks);
-
-										if (!data) {
-											return '<span class="text-danger"></span>';
-										}
-
-										var akhirTanam = new Date(data);
-										var options = { year: 'numeric', month: 'long', day: 'numeric' };
-										var formattedAkhirTanam = akhirTanam.toLocaleDateString('id-ID', options);
-										var textClass = (akhirTanam >= ijinStart && akhirTanam <= ijinEnd || akhirTanam >= pksStart && akhirTanam <= pksEnd) ? 'text-success' : 'text-danger';
-
-										return `<span class="${textClass}">${formattedAkhirTanam}</span>`;
-									}
-								},
-								{
 									data: 'awal_panen',
 									render: function(data, type, row) {
 										var akhirTanam = new Date(row.akhir_tanam);
@@ -197,24 +175,6 @@
 
 										return `<span class="${textClass}">${formattedAwalPanen}</span>`;
 									}
-								},
-								{
-									data: 'akhir_panen',
-									render: function(data, type, row) {
-										var akhirTanam = new Date(row.akhir_tanam);
-										var awalPanen = new Date(row.awal_panen);
-
-										if (!data) {
-											return '<span class="text-danger"></span>';
-										}
-
-										var akhirPanen = new Date(data);
-										var options = { year: 'numeric', month: 'long', day: 'numeric' };
-										var formattedAkhirPanen = akhirPanen.toLocaleDateString('id-ID', options);
-										var textClass = (akhirTanam && awalPanen && akhirPanen >= awalPanen) ? 'text-success' : 'text-danger';
-
-										return `<span class="${textClass}">${formattedAkhirPanen}</span>`;
-									}
 								}
 							],
 						});
@@ -227,7 +187,7 @@
 						$('#countPks').html('<span class="text-danger">' + kemitraan + '</span>');
 					}
 
-					var realisasitanam = response.data.sumLuasTanam + ' / ' + response.data.sumLuas + ' ha';
+					var realisasitanam = response.data.sumLuasTanam + ' / ' + response.data.sumLuas + ' m2';
 					if (response.data.sumLuasTanam / response.data.sumLuas < 1){
 						$('#luas_tanam').html('<span class="text-danger">' + realisasitanam + '</span>');
 					}else{

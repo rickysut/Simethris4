@@ -38,16 +38,9 @@ class SklController extends Controller
 
 		$myNpwp = Auth::user()->data_user->npwp_company;
 
-		$draw = $request->input('draw', 1);
-		$start = $request->input('start', 0);
-		$length = $request->input('length', 10);
-		$searchValue = $request->input('search.value', '');
-		$order = $request->input('order', []);
-		$columns = $request->input('columns', []);
-
-		$data = Completed::where('npwp_company', $myNpwp)
+		$data = Completed::where('npwp', $myNpwp)
 		->with(['datauser:id,npwp_company,company_name'])->get();
 
-		return view('t2024.skl.index', compact('module_name', 'page_title', 'page_heading', 'heading_class','data'));
+		return view('t2024.skl.mySkl', compact('module_name', 'page_title', 'page_heading', 'heading_class','data'));
 	}
 }

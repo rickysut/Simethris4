@@ -12,7 +12,7 @@
 {{-- @include('t2024.partials.breadcrumb') --}}
 @include('t2024.partials.subheader')
 @include('t2024.partials.sysalert')
-@can('spatial_data_access')
+{{-- @can('spatial_data_access') --}}
 	<section class="mb-3">
 		<div class="row">
 			<div class="col">
@@ -26,14 +26,18 @@
 									<th>No. RIPH</th>
 									<th>Periode</th>
 									<th>Terbit</th>
+									<th>Tindakan</th>
 								</thead>
 								<tbody>
 									@foreach($data as $skl)
 										<tr>
-											<td></td>
-											<td></td>
-											<td></td>
-											<td></td>
+											<td>{{$skl->no_skl}}</td>
+											<td>{{$skl->no_ijin}}</td>
+											<td>{{$skl->periodetahun}}</td>
+											<td>{{$skl->published_date}}</td>
+											<td>
+												<a href="{{$skl->url}}" download="">Unduh</a>
+											</td>
 										</tr>
 									@endforeach
 								</tbody>
@@ -44,7 +48,7 @@
 			</div>
 		</div>
 	</section>
-@endcan
+{{-- @endcan --}}
 
 @endsection
 

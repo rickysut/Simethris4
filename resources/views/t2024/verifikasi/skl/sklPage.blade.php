@@ -100,9 +100,9 @@
 					<dt class="col-sm-9">
 						<dl class="row">
 							<dd class="col-sm-3">Komitmen</dd>
-							<dt class="col-sm-9">: {{ number_format((float)$payload['wajibTanam'], 2, ',', '.') }} ha;</dt>
+							<dt class="col-sm-9">: {{ number_format((float)$payload['wajibTanamSkl'], 2, ',', '.') }} ha;</dt>
 							<dd class="col-sm-3">Realisasi</dd>
-							<dt class="col-sm-9">:  {{ number_format((float)$payload['realisasiTanam'], 2, ',', '.') }} ha;</dt>
+							<dt class="col-sm-9">:  {{ number_format((float)$payload['realisasiTanamSkl'], 2, ',', '.') }} ha;</dt>
 							<dd class="col-sm-3">Verifikasi</dd>
 							<dt class="col-sm-9">: SESUAI.</dt>
 						</dl>
@@ -111,9 +111,9 @@
 					<dt class="col-sm-9">
 						<dl class="row">
 							<dd class="col-sm-3">Komitmen</dd>
-							<dt class="col-sm-9">:  {{ number_format((float)$payload['wajibProduksi'], 0, ',', '.') }} ton;</dt>
+							<dt class="col-sm-9">:  {{ number_format((float)$payload['wajibProduksiSkl'], 0, ',', '.') }} ton;</dt>
 							<dd class="col-sm-3">Realisasi</dd>
-							<dt class="col-sm-9">:  {{ number_format((float)$payload['realisasiProduksi'], 0, ',', '.') }} ton;</dt>
+							<dt class="col-sm-9">:  {{ number_format((float)$payload['realisasiProduksiSkl'], 0, ',', '.') }} ton;</dt>
 							<dd class="col-sm-3">Verifikasi</dd>
 							<dt class="col-sm-9">: SESUAI.</dt>
 						</dl>

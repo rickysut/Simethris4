@@ -165,40 +165,54 @@ class PullRiphController extends Controller
 
 	// 		if ($riph) {
 	// 			if (!isset($dtjson->riph->wajib_tanam->lokasi) || empty($dtjson->riph->wajib_tanam->lokasi)) {
-	// 				return redirect()->back()->with('error', 'Gagal menyimpan. Data Lokasi tidak lengkap.');
+	// 				return redirect()->back()->with('error', 'Failed to save. Location data is incomplete.');
 	// 			}
 
-	// 			// ambil existing record sebagai pembanding
-	// 			$existingLokasiRecords = Lokasi::where('npwp', $stnpwp)->where('no_ijin', $noijin)->pluck('kode_spatial')->toArray();
+	// 			$existingLokasiRecords = Lokasi::withTrashed()->where('npwp', $stnpwp)->where('no_ijin', $noijin)->pluck('kode_spatial')->toArray();
 	// 			$newLokasiRecords = [];
 
-	// 			// periksa jika data adalah array atau object
 	// 			if (is_array($dtjson->riph->wajib_tanam->lokasi)) {
 	// 				foreach ($dtjson->riph->wajib_tanam->lokasi as $lokasi) {
 	// 					$kodeSpatial = trim($lokasi->kode_spatial, ' ');
 	// 					$newLokasiRecords[] = $kodeSpatial;
 	// 				}
 	// 			} else {
-	// 				foreach ($dtjson->riph->wajib_tanam->lokasi as $kode_spatial) {
-	// 					$newLokasiRecords[] = trim($kode_spatial, ' ');
-	// 				}
+	// 				$kode_spatial = trim($dtjson->riph->wajib_tanam->lokasi->kode_spatial, ' ');
+	// 				$newLokasiRecords[] = $kode_spatial;
 	// 			}
 
-	// 			// cari record yang mau di hapus
+	// 			$recordsToReactivate = array_intersect($existingLokasiRecords, $newLokasiRecords);
 	// 			$recordsToDelete = array_diff($existingLokasiRecords, $newLokasiRecords);
+	// 			$recordsToAdd = array_diff($newLokasiRecords, $existingLokasiRecords);
 
-	// 			// hapus record yang tidak diperlukan
 	// 			if (!empty($recordsToDelete)) {
-	// 				Lokasi::where('npwp', $stnpwp)->where('no_ijin', $noijin)->whereIn('kode_spatial', $recordsToDelete)->delete();
+	// 				Lokasi::where('origin', 'foreign')->where('npwp', $stnpwp)->where('no_ijin', $noijin)->whereIn('kode_spatial', $recordsToDelete)->delete();
 	// 			}
 
-	// 			// Handling record baru (create) dan yang sudah ada (update)
+	// 			if (!empty($recordsToReactivate)) {
+	// 				Lokasi::withTrashed()->where('origin', 'foreign')->where('npwp', $stnpwp)->where('no_ijin', $noijin)->whereIn('kode_spatial', $recordsToReactivate)->restore();
+	// 			}
+
 	// 			$masterSpatials = MasterSpatial::whereIn('kode_spatial', $newLokasiRecords)->get();
 	// 			$poktanGroups = $masterSpatials->groupBy('kode_poktan');
 
-	// 			foreach ($poktanGroups as $kode_poktan => $spatials) {
-	// 				$nama_poktan = $spatials->first()->masterpoktan->nama_kelompok ?? '';
-	// 				Pks::updateOrCreate(
+	// 			$existingPksRecords = Pks::where('npwp', $stnpwp)->where('no_ijin', $noijin)->pluck('kode_poktan')->toArray();
+	// 			$newPksRecords = $poktanGroups->keys()->toArray();
+	// 			$pksToReactivate = array_intersect($existingPksRecords, $newPksRecords);
+	// 			$pksToDelete = array_diff($existingPksRecords, $newPksRecords);
+	// 			$pksToAdd = array_diff($newPksRecords, $existingPksRecords);
+
+	// 			if (!empty($pksToDelete)) {
+	// 				Pks::where('npwp', $stnpwp)->where('no_ijin', $noijin)->whereIn('kode_poktan', $pksToDelete)->delete();
+	// 			}
+
+	// 			if (!empty($pksToReactivate)) {
+	// 				Pks::withTrashed()->where('npwp', $stnpwp)->where('no_ijin', $noijin)->whereIn('kode_poktan', $pksToReactivate)->restore();
+	// 			}
+
+	// 			foreach ($pksToAdd as $kode_poktan) {
+	// 				$nama_poktan = $poktanGroups[$kode_poktan]->first()->masterpoktan->nama_kelompok ?? '';
+	// 				Pks::withTrashed()->updateOrCreate(
 	// 					[
 	// 						'npwp' => $stnpwp,
 	// 						'no_ijin' => $noijin,
@@ -206,22 +220,31 @@ class PullRiphController extends Controller
 	// 					],
 	// 					[
 	// 						'nama_poktan' => $nama_poktan,
+	// 						'deleted_at' => null
 	// 					]
 	// 				);
 	// 			}
 
 	// 			foreach ($newLokasiRecords as $kodeSpatial) {
 	// 				$masterSpatial = $masterSpatials->where('kode_spatial', $kodeSpatial)->first();
+	// 				// \Log::info('Updating or creating:', [
+	// 				// 	'origin' => 1,
+	// 				// 	'npwp' => $stnpwp,
+	// 				// 	'no_ijin' => $noijin,
+	// 				// 	'kode_spatial' => $kodeSpatial,
+	// 				// ]);
 	// 				Lokasi::updateOrCreate(
 	// 					[
 	// 						'npwp' => $stnpwp,
 	// 						'no_ijin' => $noijin,
 	// 						'kode_spatial' => $kodeSpatial,
+	// 						'origin' => 'foreign',
 	// 					],
 	// 					[
 	// 						'kode_poktan' => $masterSpatial->kode_poktan ?? '',
 	// 						'ktp_petani' => $masterSpatial->ktp_petani ?? '',
 	// 						'luas_lahan' => $masterSpatial->luas_lahan ?? '',
+	// 						'deleted_at' => null,
 	// 					]
 	// 				);
 	// 			}
@@ -232,10 +255,10 @@ class PullRiphController extends Controller
 	// 		DB::rollback();
 	// 		$errorMessage = $e->getMessage();
 	// 		Log::error("Error: $errorMessage. Code: " . $e->getCode() . ". Trace: " . $e->getTraceAsString());
-	// 		return redirect()->back()->with('error', 'Pull Store Method. Please Contact Administrator for this error: (' . $errorMessage . ')');
+	// 		return redirect()->back()->with('error', 'Error in store method. Please contact administrator: (' . $errorMessage . ')');
 	// 	}
 
-	// 	return redirect()->route('2024.user.commitment.index')->with('success', 'Sukses menyimpan data dan dapat Anda lihat pada daftar di bawah ini.');
+	// 	return redirect()->route('2024.user.commitment.index')->with('success', 'Data saved successfully and can be viewed in the list below.');
 	// }
 
 	//ini simulator
@@ -246,7 +269,6 @@ class PullRiphController extends Controller
 			// Simulate SOAP API response using local JSON file
 			$jsonFilePath = storage_path('app/public/uploads/0217PP240D032023.json');
 			$datariph = file_get_contents($jsonFilePath);
-			$dtjson = json_decode($datariph);
 
 			// Set file path for storage
 			$stnpwp = $request->get('npwp');
@@ -264,6 +286,7 @@ class PullRiphController extends Controller
 		$user = Auth::user();
 		DB::beginTransaction();
 		try {
+			$dtjson = json_decode($datariph);
 			// Update or create PullRiph record
 			$riph = PullRiph::updateOrCreate(
 				[

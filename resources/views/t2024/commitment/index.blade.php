@@ -88,41 +88,6 @@ td {
 						`;
 					}
 				},
-				// { data: 'periodetahun'},
-				// { data: 'tgl_terbit'},
-				// {
-				// 	data: 'volume',
-				// 	render: function (data, type, row) {
-				// 		var formattedVolume = new Intl.NumberFormat('id-ID').format(data);
-				// 		return formattedVolume;
-				// 	}
-				// },
-				// {
-				// 	data: 'wajib_produksi',
-				// 	render: function (data, type, row) {
-				// 		var wajibLuas = row.wajib_tanam; // bagi /1000 Mengonversi meter persegi ke ribuan hektar
-				// 		var formattedLuas = new Intl.NumberFormat('id-ID', { maximumFractionDigits: 3 }).format(wajibLuas);
-				// 		var formattedProd = new Intl.NumberFormat('id-ID', { maximumFractionDigits: 2 }).format(data);
-				// 		return `
-				// 			<div class="row">
-				// 				<div class="col-3">
-				// 					Tanam
-				// 				</div>
-				// 				<div class="col-9 text-right">
-				// 					`+ formattedLuas +` ha
-				// 				</div>
-				// 			</div>
-				// 			<div class="row">
-				// 				<div class="col-3">
-				// 					Produksi
-				// 				</div>
-				// 				<div class="col-9 text-right">
-				// 					`+ formattedProd +` ha ton
-				// 				</div>
-				// 			</div>
-				// 		`;
-				// 	}
-				// },
 				{
 					data: 'noIjin',
 					render: function (data, type, row) {
@@ -296,17 +261,11 @@ td {
 				},
 			],
 			dom:
-				"<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6 d-flex align-items-center justify-content-end'>>" + // Move the select element to the left of the datatable buttons
+				"<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6 d-flex align-items-center justify-content-end'>>" +
 				"<'row mb-3'<'col-sm-12 col-md-6 d-flex align-items-center justify-content-start'f><'col-sm-12 col-md-6 d-flex align-items-center justify-content-end'B>>" +
 				"<'row'<'col-sm-12'tr>>" +
 				"<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
 			buttons: [
-				/*{
-					extend:    'colvis',
-					text:      'Column Visibility',
-					titleAttr: 'Col visibility',
-					className: 'mr-sm-3'
-				},*/
 				{
 					extend: 'pdfHtml5',
 					text: '<i class="fa fa-file-pdf"></i>',
@@ -369,7 +328,15 @@ td {
 					exportOptions: {
 						columns: [0, 1, 2, 3, 4]
 					},
-				}
+				},
+				{
+					text: '<i class="fa fa-plus"></i>',
+					className: 'btn-info btn-sm btn-icon ml-5',
+					titleAttr: 'Ambil Data RIPH',
+					action: function (e, dt, node, config) {
+						window.location.href = '{{ route('2024.user.pull.index') }}';
+					}
+				},
 			]
 		});
 

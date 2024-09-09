@@ -116,9 +116,9 @@
 				success: function(response) {
 					$('#companytitle').text(response.data.perusahaan);
 					$('#no_ijin').text(response.data.no_ijin);
-					$('#tgl_ijin').text(response.data.tgl_ijin);
-					$('#tgl_akhir').text(response.data.tgl_akhir);
-					$('#created_at').text(response.data.created_at);
+					$('#tgl_ijin').text(formatDate(response.data.tgl_ijin));
+					$('#tgl_akhir').text(formatDate(response.data.tgl_akhir));
+					$('#created_at').text(formatDate(response.data.created_at));
 					$('#jml_anggota').text(response.data.countAnggota + ' orang');
 
 					if (response.data.status > 3) {
@@ -137,15 +137,15 @@
 								{
 									data: 'luas_lahan',
 									render: function(data, type, row) {
-										var luasHa = data ? data / 10000 : 0;
-										return luasHa + ' ha';
+										var formattedData = parseFloat(data).toLocaleString('id-ID');
+										return formattedData + ' m2';
 									}
 								},
 								{
 									data: 'luas_tanam',
 									render: function(data, type, row) {
-										var luasHa = data ? data / 10000 : 0;
-										return luasHa + ' ha';
+										var formattedData = parseFloat(data).toLocaleString('id-ID');
+										return formattedData + ' m2';
 									}
 								},
 								{data: 'nama_kelompok'},
@@ -198,7 +198,7 @@
 						$('#countPks').html('<span class="text-danger">' + kemitraan + '</span>');
 					}
 
-					var realisasitanam = response.data.sumLuasTanam + ' / ' + response.data.sumLuas + ' ha';
+					var realisasitanam = response.data.sumLuasTanam + ' / ' + response.data.sumLuas + ' m2';
 					if (response.data.sumLuasTanam / response.data.sumLuas < 1){
 						$('#luas_tanam').html('<span class="text-danger">' + realisasitanam + '</span>');
 					}else{
@@ -216,7 +216,6 @@
 					$('#companyLogo').css('background-image', 'url(' + logoUrl + ')');
 				}
 			});
-
 		});
 	</script>
 @endsection

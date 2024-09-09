@@ -38,7 +38,7 @@
 				</div>
 
 
-				<div class="panel-container collapse">
+				<div class="panel-container show">
 					<div id="myMap" cl style="height: 370px; width: 100%;"></div>
 					<div class="panel-content">
 						<ul class="list-group">
@@ -430,7 +430,7 @@
 														<input class="form-control" id="pupuk1Date" type="date" name="pupuk1Date" value="{{$data['lokasi']->pupuk1Date}}">
 													</div>
 													<div class="form-group">
-														<label class="form-label" for="organik1">Pupuk Organik (kg)</label>
+														<label class="form-label" for="organik1">Pupuk Organik (ton)</label>
 														<input class="form-control" id="organik1" type="number" step="0,1" name="organik1" value="{{$data['lokasi']->organik1}}">
 													</div>
 													<div class="form-group">
@@ -519,7 +519,7 @@
 														<input class="form-control" id="pupuk2Date" type="date" name="pupuk2Date" value="{{$data['lokasi']->pupuk2Date}}">
 													</div>
 													<div class="form-group">
-														<label class="form-label" for="organik2">Pupuk Organik (kg)</label>
+														<label class="form-label" for="organik2">Pupuk Organik (ton)</label>
 														<input class="form-control" id="organik2" type="number" step="0,1" name="organik2" value="{{$data['lokasi']->organik2}}">
 													</div>
 													<div class="form-group">
@@ -608,7 +608,7 @@
 														<input class="form-control" id="pupuk3Date" type="date" name="pupuk3Date" value="{{$data['lokasi']->pupuk3Date}}">
 													</div>
 													<div class="form-group">
-														<label class="form-label" for="organik3">Pupuk Organik (kg)</label>
+														<label class="form-label" for="organik3">Pupuk Organik (ton)</label>
 														<input class="form-control" id="organik3" type="number" step="0,1" name="organik3" value="{{$data['lokasi']->organik3}}">
 													</div>
 													<div class="form-group">
@@ -770,7 +770,7 @@
 														<input class="form-control" id="prodDate" type="date" name="prodDate" value="{{$data['lokasi']->tgl_panen}}">
 													</div>
 													<div class="form-group">
-														<label class="form-label" for="prodVol">Volume Panen</label>
+														<label class="form-label" for="prodVol">Volume Panen (kg)</label>
 														<input class="form-control" id="prodVol" type="number" step="1" name="prodVol" value="{{$data['lokasi']->volume}}">
 													</div>
 													<div class="form-group">
@@ -843,11 +843,11 @@
 														</button>
 													</div>
 													<div class="form-group">
-														<label class="form-label" for="distStored">Untuk Benih</label>
+														<label class="form-label" for="distStored">Untuk Benih (kg)</label>
 														<input class="form-control" id="distStored" type="number" step="1" name="distStored" value="{{$data['lokasi']->vol_benih}}" onkeyup="updateFields()" disabled>
 													</div>
 													<div class="form-group">
-														<label class="form-label" for="distSale">Untuk Dijual</label>
+														<label class="form-label" for="distSale">Untuk Dijual (kg)</label>
 														<input class="form-control" id="distSale" type="number" step="1" name="distSale" value="{{$data['lokasi']->vol_jual}}" readonly>
 													</div>
 													<div class="form-group">

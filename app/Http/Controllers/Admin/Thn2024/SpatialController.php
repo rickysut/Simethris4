@@ -32,11 +32,59 @@ class SpatialController extends Controller
 		$kabupatens = MasterSpatial::distinct()->pluck('kabupaten_id');
 
 		//output array kabupaten
-		$indexKabupaten = MasterKabupaten::whereIn('kabupaten_id', $kabupatens)->select('kabupaten_id','nama_kab')->get()->toArray();
+		$indexKabupaten = MasterKabupaten::whereIn('kabupaten_id', $kabupatens)
+			->select('kabupaten_id', 'nama_kab')
+			->get()
+			->toArray();
 
 		$mapkey = ForeignApi::find(1);
 
-		return view('t2024.spatial.index', compact('module_name', 'page_title', 'page_heading', 'heading_class' , 'mapkey', 'ijins', 'indexKabupaten'));
+		// Hitung total luas, jumlah lahan, luas dan jumlah lahan aktif/tidak aktif secara bersamaan
+		$summary = MasterSpatial::selectRaw(
+			'SUM(luas_lahan) AS total_luas,
+         COUNT(*) AS total_lahan,
+         SUM(CASE WHEN status = 0 THEN luas_lahan ELSE 0 END) AS total_luas_aktif,
+         SUM(CASE WHEN status = 0 THEN 1 ELSE 0 END) AS total_lahan_aktif'
+		)->first();
+
+		// Menghitung luas dan jumlah lahan tidak aktif
+		$totalLuas = $summary->total_luas;
+		$totalLahan = $summary->total_lahan;
+		$totalLuasAktif = $summary->total_luas_aktif;
+		$totalLahanAktif = $summary->total_lahan_aktif;
+		$totalLuasNonAktif = $totalLuas - $totalLuasAktif;
+		$totalLahanNonAktif = $totalLahan - $totalLahanAktif;
+
+		$data = [
+			'totalLuas' => $totalLuas,
+			'totalLahan' => $totalLahan,
+			'totalLuasAktif' => $totalLuasAktif,
+			'totalLahanAktif' => $totalLahanAktif,
+			'totalLuasNonAktif' => $totalLuasNonAktif,
+			'totalLahanNonAktif' => $totalLahanNonAktif,
+		];
+
+		return view('t2024.spatial.index', compact('module_name', 'page_title', 'page_heading', 'heading_class', 'mapkey', 'ijins', 'indexKabupaten', 'data'));
+	}
+
+
+	public function spatialList()
+	{
+		$module_name = 'Spatial';
+		$page_title = 'Data Spatial';
+		$page_heading = 'Daftar Lahan Wajib Tanam Produksi Bawang Putih';
+		$heading_class = 'bi bi-globe-asia-australia';
+
+		$ijins = PullRiph::select('no_ijin')->get();
+
+		$kabupatens = MasterSpatial::distinct()->pluck('kabupaten_id');
+
+		//output array kabupaten
+		$indexKabupaten = MasterKabupaten::whereIn('kabupaten_id', $kabupatens)->select('kabupaten_id', 'nama_kab')->get()->toArray();
+
+		$mapkey = ForeignApi::find(1);
+
+		return view('t2024.spatial.spatialList', compact('module_name', 'page_title', 'page_heading', 'heading_class', 'mapkey', 'ijins', 'indexKabupaten'));
 	}
 
 	/**
@@ -208,38 +256,38 @@ class SpatialController extends Controller
 	}
 
 	public function batchUpdateStatus(Request $request)
-    {
-        // Validasi input
-        $validated = $request->validate([
-            'status' => 'required|integer',
-            'kode_spatial' => 'required|array',
-            'kode_spatial.*' => 'required|string', // atau sesuaikan dengan tipe data kode_spatial Anda
-        ]);
+	{
+		// Validasi input
+		$validated = $request->validate([
+			'status' => 'required|integer',
+			'kode_spatial' => 'required|array',
+			'kode_spatial.*' => 'required|string', // atau sesuaikan dengan tipe data kode_spatial Anda
+		]);
 
-        $status = $validated['status'];
-        $kodeSpatialList = $validated['kode_spatial'];
+		$status = $validated['status'];
+		$kodeSpatialList = $validated['kode_spatial'];
 
-        DB::beginTransaction();
+		DB::beginTransaction();
 
-        try {
-            foreach ($kodeSpatialList as $kodeSpatial) {
-                // Lakukan update status untuk setiap kode_spatial
-                $spatial = MasterSpatial::where('kode_spatial', $kodeSpatial)->first();
+		try {
+			foreach ($kodeSpatialList as $kodeSpatial) {
+				// Lakukan update status untuk setiap kode_spatial
+				$spatial = MasterSpatial::where('kode_spatial', $kodeSpatial)->first();
 
-                if ($spatial) {
-                    $spatial->status = $status;
-                    $spatial->save();
-                }
-            }
+				if ($spatial) {
+					$spatial->status = $status;
+					$spatial->save();
+				}
+			}
 
-            DB::commit();
+			DB::commit();
 
-            return response()->json(['success' => true]);
-        } catch (\Exception $e) {
-            DB::rollback();
-            return response()->json(['success' => false, 'message' => 'Failed to update spatial data.', 'error' => $e->getMessage()], 500);
-        }
-    }
+			return response()->json(['success' => true]);
+		} catch (\Exception $e) {
+			DB::rollback();
+			return response()->json(['success' => false, 'message' => 'Failed to update spatial data.', 'error' => $e->getMessage()], 500);
+		}
+	}
 
 
 	public function simulatorJarak(Request $request)

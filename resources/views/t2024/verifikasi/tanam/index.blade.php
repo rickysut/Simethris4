@@ -14,11 +14,11 @@
 							<table id="avtanamTable" class="table table-sm table-bordered table-striped w-100">
 								<thead>
 									<tr>
-										<th>Periodes</th>
+										<th>Periode</th>
 										<th>Pelaku Usaha</th>
 										<th>No. RIPH</th>
 										<th>Diajukan pada</th>
-										{{-- <th>Verifikator</th> --}}
+										{{-- <th>Verifikator</th>  --}}
 										<th>Status</th>
 										<th>Tindakan</th>
 									</tr>
@@ -39,7 +39,7 @@
 	@parent
 	<script>
 		$(document).ready(function() {
-		//initialize datatable dataPengajuan
+			//initialize datatable dataPengajuan
 			$('#avtanamTable').dataTable({
 				responsive: true,
 				lengthChange: false,
@@ -62,7 +62,17 @@
 					{data: 'periode'},
 					{data: 'perusahaan'},
 					{data: 'no_ijin'},
-					{data: 'created_at'},
+					{
+						data: 'created_at',
+						render: function(data, type, row) {
+							if (data) {
+								var date = new Date(data);
+								var options = { year: 'numeric', month: 'long', day: 'numeric' };
+								return new Intl.DateTimeFormat('id-ID', options).format(date);
+							}
+							return ''; // Jika data kosong, kembalikan string kosong
+						}
+					},
 					// {data: 'verifikator'},
 					{
 						data: 'status',

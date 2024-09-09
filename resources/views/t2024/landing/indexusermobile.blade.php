@@ -33,13 +33,13 @@
 					<a href="{{route('2024.verifikator.mobile.findmarker')}}" class="btn android-button btn-outline-warning">
 						<img src="{{ asset('logoicon.png') }}" alt="" style="width: 4rem; height: 4rem;">
 					</a>
-					<span>Verifikasi</span>
+					<span>Simulasi</span>
 				</span>
 				<span class="d-inline-flex flex-column justify-content-center ">
 					<a href="javascript:void(0)" class="android-button btn-default">
-						<img src="{{ asset('favicon.png') }}" alt="" style="width: 4rem; height: 4rem; filter: grayscale(100%)">
+						<img src="{{ asset('favicon.png') }}" alt="" style="width: 4rem; height: 4rem;">
 					</a>
-					<span>Sample</span>
+					<span>Verifikasi</span>
 				</span>
 				<span class="d-inline-flex flex-column justify-content-center">
 					<a href="javascript:void(0)" class="android-button btn-default">

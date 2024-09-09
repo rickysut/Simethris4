@@ -114,11 +114,11 @@
 			<ul class="list-group list-group-flush mt-2">
 				<li class="d-flex justify-content-between list-group-item">
 					<span class=text-muted>Tanggal Pengajuan</span>
-					<span class="fw-semibold">{{ \Carbon\Carbon::parse($payload['avtDate'])->locale('id')->translatedFormat('F j, Y') }}</span>
+					<span class="fw-semibold">{{ \Carbon\Carbon::parse($payload['avtDate'])->locale('id')->translatedFormat('j F Y') }}</span>
 				</li>
 				<li class="d-flex justify-content-between list-group-item">
 					<span class=text-muted>Tanggal Verifikasi</span>
-					<span class="fw-semibold">{{ \Carbon\Carbon::parse($payload['avtVerifAt'])->locale('id')->translatedFormat('F j, Y') }}</span>
+					<span class="fw-semibold">{{ \Carbon\Carbon::parse($payload['avtVerifAt'])->locale('id')->translatedFormat('j F Y') }}</span>
 				</li>
 				<li class="d-flex justify-content-between list-group-item">
 					<span class=text-muted>Metode Verifikasi</span>
@@ -146,11 +146,11 @@
 			<ul class="list-group list-group-flush mt-2">
 				<li class="d-flex justify-content-between list-group-item">
 					<span class=text-muted>Tanggal Pengajuan</span>
-					<span class="fw-semibold">{{ \Carbon\Carbon::parse($payload['avpDate'])->locale('id')->translatedFormat('F j, Y') }}</span>
+					<span class="fw-semibold">{{ \Carbon\Carbon::parse($payload['avpDate'])->locale('id')->translatedFormat('j F Y') }}</span>
 				</li>
 				<li class="d-flex justify-content-between list-group-item">
 					<span class=text-muted>Tanggal Verifikasi</span>
-					<span class="fw-semibold">{{ \Carbon\Carbon::parse($payload['avpVerifAt'])->locale('id')->translatedFormat('F j, Y') }}</span>
+					<span class="fw-semibold">{{ \Carbon\Carbon::parse($payload['avpVerifAt'])->locale('id')->translatedFormat('j F Y') }}</span>
 				</li>
 				<li class="d-flex justify-content-between list-group-item">
 					<span class=text-muted>Metode Verifikasi</span>
@@ -180,11 +180,11 @@
 				<ul class="list-group list-group-flush mt-2">
 					<li class="d-flex justify-content-between list-group-item">
 						<span class=text-muted>Tanggal Pengajuan</span>
-						<span class="fw-semibold">{{ \Carbon\Carbon::parse($payload['avsklDate'])->locale('id')->translatedFormat('F j, Y') }}</span>
+						<span class="fw-semibold">{{ \Carbon\Carbon::parse($payload['avsklDate'])->locale('id')->translatedFormat('j F Y') }}</span>
 					</li>
 					<li class="d-flex justify-content-between list-group-item">
 						<span class=text-muted>Tanggal Verifikasi</span>
-						<span class="fw-semibold">{{ \Carbon\Carbon::parse($payload['avsklVerifAt'])->locale('id')->translatedFormat('F j, Y') }}</span>
+						<span class="fw-semibold">{{ \Carbon\Carbon::parse($payload['avsklVerifAt'])->locale('id')->translatedFormat('j F Y') }}</span>
 					</li>
 					<li class="d-flex justify-content-between list-group-item">
 						<span class=text-muted>Catatan Verifikasi</span>
@@ -214,7 +214,7 @@
 				<ul class="list-group list-group-flush mt-2">
 					<li class="d-flex justify-content-between list-group-item">
 						<span class=text-muted>Tanggal direkomendasikan</span>
-						<span class="fw-semibold">{{ \Carbon\Carbon::parse($payload['avsklRecomendAt'])->locale('id')->translatedFormat('F j, Y') }}</span>
+						<span class="fw-semibold">{{ \Carbon\Carbon::parse($payload['avsklRecomendAt'])->locale('id')->translatedFormat('j F Y') }}</span>
 					</li>
 					<li class="d-flex justify-content-between list-group-item">
 						<span class=text-muted>Catatan Rekomendasi</span>
@@ -223,13 +223,13 @@
 					@if($payload['avsklApprovedAt'])
 					<li class="d-flex justify-content-between list-group-item">
 						<span class=text-muted>Tanggal Disetujui</span>
-						<span class="fw-semibold">{{ \Carbon\Carbon::parse($payload['avsklApprovedAt'])->locale('id')->translatedFormat('F j, Y') }}</span>
+						<span class="fw-semibold">{{ \Carbon\Carbon::parse($payload['avsklApprovedAt'])->locale('id')->translatedFormat('j F Y') }}</span>
 					</li>
 					@endif
 					@if($payload['avsklPublishedAt'])
 					<li class="d-flex justify-content-between list-group-item">
 						<span class=text-muted>Tanggal Diterbitkan</span>
-						<span class="fw-semibold">{{ \Carbon\Carbon::parse($payload['avsklPublishedAt'])->locale('id')->translatedFormat('F j, Y') }}</span>
+						<span class="fw-semibold">{{ \Carbon\Carbon::parse($payload['avsklPublishedAt'])->locale('id')->translatedFormat('j F Y') }}</span>
 					</li>
 					@endif
 				</ul>
@@ -252,22 +252,30 @@
 					@foreach ($payload['ajuTanam'] as $history)
 					<tr>
 						<td>{{$history->kind}}</td>
-						<td>{{$history->created_at}}</td>
-						<td>{{$history->verif_at}}</td>
+						<td>
+							{{ \Carbon\Carbon::parse($history->created_at)->locale('id')->translatedFormat('j F Y') }}
+						</td>
+						<td>
+							{{ \Carbon\Carbon::parse($history->verif_at)->locale('id')->translatedFormat('j F Y') }}
+						</td>
 						<td>
 							<i class="bi bi-{{ $history->status == 6 ? 'check-square-fill text-success' : 'x-square-fill text-danger' }}"></i>
 						</td>
 					</tr>
 					@endforeach
 					@foreach ($payload['ajuProduksi'] as $history)
-					<tr>
-						<td>{{$history->kind}}</td>
-						<td>{{$history->created_at}}</td>
-						<td>{{$history->verif_at}}</td>
-						<td>
-							<i class="bi bi-{{ $history->status == 6 ? 'check-square-fill text-success' : 'x-square-fill text-danger' }}"></i>
-						</td>
-					</tr>
+						<tr>
+							<td>{{$history->kind}}</td>
+							<td>
+								{{ \Carbon\Carbon::parse($history->created_at)->locale('id')->translatedFormat('j F Y') }}
+							</td>
+							<td>
+								{{ \Carbon\Carbon::parse($history->verif_at)->locale('id')->translatedFormat('j F Y') }}
+							</td>
+							<td>
+								<i class="bi bi-{{ $history->status == 6 ? 'check-square-fill text-success' : 'x-square-fill text-danger' }}"></i>
+							</td>
+						</tr>
 					@endforeach
 				</tbody>
 			</table>
