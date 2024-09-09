@@ -499,6 +499,25 @@
 					<p id="gpstatus"></p>
 				</div>
 			</div>
+			@can('spatial_data_access')
+				<div class="row">
+					<div class="col-12 text-center">
+						<h3>Menu Verifikasi</h3>
+						<span class="d-inline-flex flex-column justify-content-center ">
+							<a href="{{route('2024.spatial.index')}}" class="btn android-button btn-outline-warning">
+								<img src="{{ asset('logoicon.png') }}" alt="" style="width: 4rem; height: 4rem;">
+							</a>
+							<span>Peta Lahan</span>
+						</span>
+						<span class="d-inline-flex flex-column justify-content-center ">
+							<a href="{{ route('2024.verifikator.produksi.home') }}" class="btn android-button btn-outline-warning">
+								<img src="{{ asset('logoicon.png') }}" alt="" style="width: 4rem; height: 4rem;">
+							</a>
+							<span>Data Spatial</span>
+						</span>
+					</div>
+				</div>
+			@endcan
 			@can('verificator_task_access')
 				<div class="row">
 					<div class="col-12 text-center">
