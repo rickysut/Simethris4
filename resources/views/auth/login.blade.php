@@ -63,7 +63,7 @@
 			<div class="mt-4">
 				<div class="p-4">
 
-					<form  id="js-loginmob" novalidate="" method="POST" action="{{ route('mobile.login') }}">
+					<form  id="js-login" novalidate="" method="POST" action="{{ route('mobile.login') }}">
 						@csrf
 						<div class="form-group">
 							<label class="form-label text-white" for="username">Username</label>
