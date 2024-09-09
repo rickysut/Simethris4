@@ -12,9 +12,6 @@ use Illuminate\Support\Str;
 
 class SpatialController extends Controller
 {
-	/**
-	 * Get Lokasi Tanam
-	 */
 	public function getLokasiTanam(Request $request)
 	{
 		// About information
