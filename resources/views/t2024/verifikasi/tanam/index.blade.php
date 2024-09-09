@@ -1,4 +1,11 @@
 @extends('t2024.layouts.admin')
+@section('styles')
+<style>
+	.hoverpanel:hover {
+		background: #f2f2f242;
+	}
+</style>
+@endsection
 @section('content')
 {{-- @include('t2024.partials.breadcrumb') --}}
 @section('content')
@@ -11,16 +18,10 @@
 				<div class="panel" id="panel-1">
 					<div class="panel-container show">
 						<div class="panel-content">
-							<table id="avtanamTable" class="table table-sm table-bordered table-striped w-100">
+							<table id="avtanamTable" class="table table-sm w-100">
 								<thead>
 									<tr>
-										<th>Periode</th>
-										<th>Pelaku Usaha</th>
 										<th>No. RIPH</th>
-										<th>Diajukan pada</th>
-										{{-- <th>Verifikator</th>  --}}
-										<th>Status</th>
-										<th>Tindakan</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -59,78 +60,14 @@
 					}
 				},
 				columns: [
-					{data: 'periode'},
-					{data: 'perusahaan'},
-					{data: 'no_ijin'},
-					{
-						data: 'created_at',
-						render: function(data, type, row) {
-							if (data) {
-								var date = new Date(data);
-								var options = { year: 'numeric', month: 'long', day: 'numeric' };
-								return new Intl.DateTimeFormat('id-ID', options).format(date);
-							}
-							return ''; // Jika data kosong, kembalikan string kosong
-						}
-					},
-					// {data: 'verifikator'},
-					{
-						data: 'status',
-						render: function (data, type, row) {
-							switch (data){
-								case '1':
-									return createProgressBar("Tahap 1", 5, "text-success", "bg-success-50");
-								case '2':
-									return createProgressBar("Tahap 2", 10, "text-success", "bg-success-100");
-								case '3':
-									return createProgressBar("Tahap 3", 15, "text-success", "bg-success-200");
-								case '4':
-									return createProgressBar("Tahap 4", 25, "text-success", "bg-success-300");
-								case '5':
-									return createProgressBar("Tahap 5", 75, "text-success", "bg-success-400");
-								case '6':
-									return createProgressBar("Tahap Akhir", 100, "text-success", "bg-success-500");
-								case '7':
-									return createProgressBar("Tahap Akhir", 100, "text-danger", "bg-danger-500");
-								default:
-									return "Status tidak diketahui";
-							}
-						}
-					},
 					{
 						data: 'ijin',
-						render: function (data, type, row) {
-							var noIjin = data;
-							var tcode = row.tcode;
-							var status = row.status;
-							var viewStat = '{{ route("2024.verifikator.tanam.result", [":noIjin", ":tcode"]) }}'.replace(':noIjin', noIjin).replace(':tcode', tcode);
-							var checkStat = '{{ route("2024.verifikator.tanam.check", [":noIjin", ":tcode"]) }}'.replace(':noIjin', noIjin).replace(':tcode', tcode);
-							if(status > 5){
-								return `
-									<a href='`+ viewStat +`' data-toggle="tooltip" title="Lihat hasil" class="mr-1 btn btn-xs btn-icon btn-info">
-										<i class="fal fa-file-search"></i>
-									</a>
-								`;
-							}else{
-								return `
-									<a href='`+ checkStat +`' data-toggle="tooltip" title="Verifikasi" class="mr-1 btn btn-xs btn-icon btn-primary">
-										<i class="fal fa-file-search"></i>
-									</a>
-								`;
-							}
+						render: function(data, type, row){
+							return getPanelHtml(row);
 						}
-					},
+					}
 				],
 				columnDefs: [
-					{
-						targets: [3, 4], // Indeks untuk kolom tanggal
-						render: function (data, type, row) {
-							if (type === 'display' || type === 'filter') {
-								return data ? moment(data).format('DD-MM-YYYY') : '-';
-							}
-							return data;
-						}
-					},
 					{
 						targets: '_all',
 						className: 'text-center'
@@ -167,41 +104,141 @@
 					`);
 				}
 			});
+			function getProgressBarHtml(status) {
+				switch (status) {
+					case '1': return createProgressBar("Tahap 1", 5, "text-success", "bg-success-50");
+					case '2': return createProgressBar("Tahap 2", 10, "text-success", "bg-success-100");
+					case '3': return createProgressBar("Tahap 3", 15, "text-success", "bg-success-200");
+					case '4': return createProgressBar("Tahap 4", 25, "text-success", "bg-success-300");
+					case '5': return createProgressBar("Tahap 5", 75, "text-success", "bg-success-400");
+					case '6': return createProgressBar("Tahap Akhir", 100, "text-success", "bg-success-500");
+					case '7': return createProgressBar("Tahap Akhir", 100, "text-danger", "bg-danger-500");
+					default: return "Status tidak diketahui";
+				}
+			}
+
+// Fungsi untuk menghasilkan HTML panel berdasarkan data baris
+			function getPanelHtml(row) {
+				var company = row.perusahaan;
+				var no_ijin = row.no_ijin;
+				var status = row.status;
+				var tcode = row.tcode;
+				var periode = row.periode;
+				var createdAt = row.created_at;
+				var formattedcreatedAt = new Date(createdAt).toLocaleDateString('en-ID', {
+					year: 'numeric', // Display the full year
+					month: 'long',   // Display the full name of the month
+					day: 'numeric'   // Display the day of the month
+				});
+
+				var viewStat = '{{ route("2024.verifikator.tanam.result", [":noIjin", ":tcode"]) }}'.replace(':noIjin', row.ijin).replace(':tcode', tcode);
+				var checkStat = '{{ route("2024.verifikator.tanam.check", [":noIjin", ":tcode"]) }}'.replace(':noIjin', row.ijin).replace(':tcode', tcode);
+
+				var buttonHtml = (status > 5) ?
+					`<a href='${viewStat}' data-toggle="tooltip" title="Lihat hasil" class="mr-1 btn btn-xs btn-icon btn-info">
+						<i class="fal fa-file-search"></i>
+					</a>` :
+					`<a href='${checkStat}' data-toggle="tooltip" title="Verifikasi" class="mr-1 btn btn-xs btn-icon btn-primary">
+						<i class="fal fa-file-search"></i>
+					</a>`;
+
+				var progressBarHtml = getProgressBarHtml(status);
+
+				return `
+					<div class="panel" id="panel-${no_ijin}">
+						<div class="panel-hdr">
+							<h2>
+								<span class="text-truncate text-truncate-sm">
+									${company}
+								<span>
+							</h2>
+							<div class="panel-toolbar">
+								${progressBarHtml}
+							</div>
+						</div>
+						<div class="panel-container show">
+							<div class="panel-content">
+								<div class="d-flex flex-row px-3 pt-3 pb-2">
+									<span class="status status-danger">
+										@if (!empty(Auth::user()->data_user->avatar))
+											<img class="profile-image rounded-circle d-inline-block" src="{{ asset('storage/' . Auth::user()->data_user->avatar) }}" alt="img">
+										@else
+											<img class="profile-image rounded-circle d-inline-block" src="{{ asset('/img/avatars/farmer.png') }}" alt="img">
+										@endif
+									</span>
+									<div class="ml-3 text-left">
+										<span class="d-block" title="${no_ijin}">
+											<span class="text-muted mr-2">
+												No. Ijin:
+											</span>
+											<span class="fw-700">
+												${no_ijin}
+											</span>
+										</span>
+										<span class="d-block" title="${createdAt}">
+											<span class="text-muted mr-2">
+												Periode:
+											</span>
+											<span class="fw-700">
+												${periode}
+											</span>
+										</span>
+										<span class="d-block" title="${formattedcreatedAt}">
+											<span class="text-muted mr-2">
+												Tangal pengajuan:
+											</span>
+											<span class="fw-700">
+												${formattedcreatedAt}
+											</span>
+										</span>
+										<a href="javascript:void(0);" class="d-block fw-700 text-dark"></a>
+										<a href="javascript:void(0);" title="${no_ijin}" class="d-block fw-700 text-dark">${no_ijin}</a>
+										<div class="d-flex mt-3 flex-wrap">
+											${buttonHtml}
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				`;
+			}
+
+// Fungsi untuk membuat progress bar
+function createProgressBar(label, widthPercentage, textColorClass, backgroundClass, showLink = false, link = '') {
+	let progressContent = `
+		<div class="progress progress-md width-sm mb-3">
+			<div class="progress-bar ${backgroundClass} " role="progressbar" style="width: ${widthPercentage}%;" aria-valuenow="${widthPercentage}" aria-valuemin="0" aria-valuemax="1">${widthPercentage}%</div>
+		</div>`;
+
+	if (showLink) {
+		return `
+			<div class="d-flex ${textColorClass}">
+				${label}
+				<span class="d-inline-block ml-auto mb-1">
+					<a href="${link}" class="btn btn-icon btn-xs ${textColorClass === 'text-success' ? 'btn-success' : 'btn-danger'}">
+						<i class="fal ${textColorClass === 'text-success' ? 'fa-check' : 'fa-ban'}"></i>
+					</a>
+				</span>
+			</div>
+			${progressContent}`;
+	} else {
+		return `
+			<div class="d-flex ${textColorClass}">
+				${label}
+				<span class="d-inline-block ml-auto mb-1">
+					<i class='fas fa-hourglass ${textColorClass}'></i>
+				</span>
+			</div>
+			${progressContent}`;
+	}
+}
 
 			// Tambahkan event listener untuk select option
 			$(document).on('change', '#selectStatus', function() {
 				$('#avtanamTable').DataTable().ajax.reload();
 			});
 
-			function createProgressBar(label, widthPercentage, textColorClass, backgroundClass, showLink = false, link = '') {
-				let progressContent = `
-					<div class="progress progress-sm mb-3">
-						<div class="progress-bar ${backgroundClass}" role="progressbar" style="width: ${widthPercentage}%;"
-							aria-valuenow="${widthPercentage}" aria-valuemin="0" aria-valuemax="100"></div>
-					</div>`;
-
-				if (showLink) {
-					return `
-						<div class="d-flex ${textColorClass}">
-							${label}
-							<span class="d-inline-block ml-auto mb-1">
-								<a href="${link}" class="btn btn-icon btn-xs ${textColorClass === 'text-success' ? 'btn-success' : 'btn-danger'}">
-									<i class="fal ${textColorClass === 'text-success' ? 'fa-check' : 'fa-ban'}"></i>
-								</a>
-							</span>
-						</div>
-						${progressContent}`;
-				} else {
-					return `
-						<div class="d-flex ${textColorClass}">
-							${label}
-							<span class="d-inline-block ml-auto mb-1">
-								<i class='fas fa-hourglass ${textColorClass}'></i>
-							</span>
-						</div>
-						${progressContent}`;
-				}
-			}
 
 		});
 	</script>

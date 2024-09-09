@@ -66,7 +66,7 @@
 					<form  id="js-login" novalidate="" method="POST" action="{{ route('mobile.login') }}">
 						@csrf
 						<div class="form-group">
-							<label class="form-label text-white" for="username">Username</label>
+							<label class="form-label text-white" for="username">Usernames</label>
 							<div class="input-group" data-toggle="tooltip" title data-original-title="Your Username" data-title="Nama Pengguna (username)" data-intro="Type your username here" data-step="3">
 								<div class="input-group-prepend">
 									<div class="input-group-text">
