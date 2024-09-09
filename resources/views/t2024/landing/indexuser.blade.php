@@ -502,23 +502,24 @@
 			@can('verificator_task_access')
 				<div class="row">
 					<div class="col-12 text-center">
-						<span class="d-inline-flex flex-column justify-content-center">
-							<a href="{{route('2024.verifikator.mobile.findmarker')}}" class="btn android-button btn-outline-warning">
+						<h3>Menu Verifikasi</h3>
+						<span class="d-inline-flex flex-column justify-content-center ">
+							<a href="{{ route('2024.verifikator.tanam.home') }}" class="btn android-button btn-outline-warning">
 								<img src="{{ asset('logoicon.png') }}" alt="" style="width: 4rem; height: 4rem;">
 							</a>
-							<span>Verifikasi</span>
+							<span>Tanam</span>
 						</span>
 						<span class="d-inline-flex flex-column justify-content-center ">
-							<a href="javascript:void(0)" class="android-button btn-default">
-								<img src="{{ asset('favicon.png') }}" alt="" style="width: 4rem; height: 4rem; filter: grayscale(100%)">
+							<a href="{{ route('2024.verifikator.produksi.home') }}" class="btn android-button btn-outline-warning">
+								<img src="{{ asset('logoicon.png') }}" alt="" style="width: 4rem; height: 4rem;">
 							</a>
-							<span>Sample</span>
+							<span>Produksi</span>
 						</span>
 						<span class="d-inline-flex flex-column justify-content-center">
-							<a href="javascript:void(0)" class="android-button btn-default">
+							<a href="{{route('2024.verifikator.mobile.findmarker')}}" class="android-button btn-outline-warning">
 								<img src="{{ asset('favicon.png') }}" alt="" style="width: 4rem; height: 4rem; filter: grayscale(100%)">
 							</a>
-							<span>Sample</span>
+							<span>Simulasi Jarak</span>
 						</span>
 					</div>
 				</div>

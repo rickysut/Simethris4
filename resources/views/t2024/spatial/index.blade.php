@@ -32,9 +32,9 @@
 					</button>
 				</div>
 				<div class="modal-body">
-					<button type="button" id="select-all-btn" class="btn btn-sm btn-outline-primary mb-2">
+					{{-- <button type="button" id="select-all-btn" class="btn btn-sm btn-outline-primary mb-2">
 						<i class="fal fa-square"></i> <span>Pilih semua</span>
-					</button>
+					</button> --}}
 					<div class="panel shadow-0">
 						<div class="panel-container">
 							<div class="panel-content custom-scroll"  style="max-height: 400px; overflow-y: auto;">
@@ -44,6 +44,18 @@
 										<label class="custom-control-label" for="{{ $locus['kabupaten_id'] }}">{{ $locus['nama_kab'] }}</label>
 									</div>
 								@endforeach
+								<div class="custom-control custom-checkbox">
+									<input type="checkbox" class="custom-control-input kabupaten-checkbox" id="" name="">
+									<label class="custom-control-label" for="">BIMA</label>
+								</div>
+								<div class="custom-control custom-checkbox">
+									<input type="checkbox" class="custom-control-input kabupaten-checkbox" id="" name="">
+									<label class="custom-control-label" for="">LOMBOK TIMUR</label>
+								</div>
+								<div class="custom-control custom-checkbox">
+									<input type="checkbox" class="custom-control-input kabupaten-checkbox" id="" name="">
+									<label class="custom-control-label" for="">MAGELANG</label>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -418,7 +430,7 @@
 								strokeOpacity: 0.8,
 								strokeWeight: 2,
 								fillColor: markerColor,
-								fillOpacity: 0.35
+								fillOpacity: 0.0
 							});
 
 							polygon.setMap(map);
