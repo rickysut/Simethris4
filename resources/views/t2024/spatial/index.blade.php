@@ -44,18 +44,6 @@
 										<label class="custom-control-label" for="{{ $locus['kabupaten_id'] }}">{{ $locus['nama_kab'] }}</label>
 									</div>
 								@endforeach
-								<div class="custom-control custom-checkbox">
-									<input type="checkbox" class="custom-control-input kabupaten-checkbox" id="BIMA" name="">
-									<label class="custom-control-label" for="BIMA">BIMA</label>
-								</div>
-								<div class="custom-control custom-checkbox">
-									<input type="checkbox" class="custom-control-input kabupaten-checkbox" id="LOTIM" name="">
-									<label class="custom-control-label" for="LOTIM">LOMBOK TIMUR</label>
-								</div>
-								<div class="custom-control custom-checkbox">
-									<input type="checkbox" class="custom-control-input kabupaten-checkbox" id="MAGELANG" name="">
-									<label class="custom-control-label" for="MAGELANG">MAGELANG</label>
-								</div>
 							</div>
 						</div>
 					</div>
