@@ -266,6 +266,30 @@ class PullRiphController extends Controller
 	{
 		$filepath = '';
 		try {
+				// 		$options = array(
+				// 			'soap_version' => SOAP_1_1,
+				// 			'exceptions' => true,
+				// 			'trace' => 1,
+				// 			'cache_wsdl' => WSDL_CACHE_MEMORY,
+				// 			'connection_timeout' => 25,
+				// 			'style' => SOAP_RPC,
+				// 			'use' => SOAP_ENCODED,
+				// 		);
+
+				// 		$client = new \SoapClient('https://riph.pertanian.go.id/api.php/simethris?wsdl', $options);
+				// 		$stnpwp = $request->get('npwp');
+				// 		$npwp = str_replace(['.', '-'], '', $stnpwp);
+				// 		$noijin = $request->get('no_ijin');
+				// 		$fijin = str_replace(['.', '/'], '', $noijin);
+				// 		$parameter = array(
+				// 			'user' => 'simethris',
+				// 			'pass' => 'wsriphsimethris',
+				// 			'npwp' => $npwp,
+				// 			'nomor' => $request->get('no_ijin')
+				// 		);
+				// 		$response = $client->__soapCall('get_riph', $parameter);
+				// 		$datariph = json_encode((array)simplexml_load_string($response));
+
 			// Simulate SOAP API response using local JSON file
 			$jsonFilePath = storage_path('app/public/uploads/0217PP240D032023.json');
 			$datariph = file_get_contents($jsonFilePath);
