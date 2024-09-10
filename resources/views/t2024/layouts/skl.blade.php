@@ -26,7 +26,7 @@
 
 
         <link rel="stylesheet" media="screen, print" href="{{ asset('css/smartadmin/miscellaneous/reactions/reactions.css') }}">
-		
+
         <!-- You can add your own stylesheet here to override any styles that comes before it
 		<link rel="stylesheet" media="screen, print" href="css/your_styles.css">-->
         <link rel="stylesheet" media="screen, print" href="{{ asset('css/smartadmin/datagrid/datatables/datatables.bundle.css') }}">
@@ -44,7 +44,7 @@
         <link rel="stylesheet" media="screen, print" href="{{ asset('css/smartadmin/fa-regular.css') }}">
         <link rel="stylesheet" media="screen, print" href="{{ asset('css/smartadmin/fa-solid.css') }}">
         <link rel="stylesheet" media="screen, print" href="{{ asset('css/smartadmin/fa-brands.css') }}">
-		
+
 
 		<!-- coreui -->
 		<link href="{{ asset('css/ajax/all.css') }}" rel="stylesheet" />
@@ -54,12 +54,12 @@
 
 		<link href="{{ asset('css/toastr.css') }}" rel="stylesheet" />
 
-		
+
 		<meta name="csrf-token" content="{{ csrf_token() }}">
 		@yield('styles')
 	</head>
 
-	<body class="mod-bg-2 mod-nav-link blur">  {{-- mod-skin-dark --}}
+	<body class="mod-bg-2 mod-pace-custom mod-nav-link blur">  {{-- mod-skin-dark --}}
 		<script src="{{ asset('js/smartadmin/pagesetting.js') }}"></script>
 		<!-- begin page wrapper -->
 		<div class="page-wrapper">
@@ -79,7 +79,7 @@
 							<button type="button" class="close" data-dismiss="alert" aria-label="Close">
 								<span aria-hidden="true"><i class="fal fa-times-circle"></i></span>
 							</button>
-							<strong>{{ session('message') }}.</strong> 
+							<strong>{{ session('message') }}.</strong>
 						</div>
 						@endif
 						<!-- end alert pesan -->
@@ -102,7 +102,7 @@
 					</main>
 					<div class="page-content-overlay" data-action="toggle" data-class="mobile-nav-on"></div>
 					<!-- end page content -->
-						
+
 					<!-- begin page footer -->
 					{{-- @include('partials.footer') --}}
 					<!-- end page footer -->
@@ -121,12 +121,12 @@
 		<!-- end quick menu -->
 		{{-- base app script --}}
 		<script src="{{ asset('js/app.js') }}"></script>
-		
+
 		<!-- Smartadmin core -->
-		
-		
+
+
 		<script src="{{ asset('js/vendors.bundle.js') }}"></script>
-		
+
         <script src="{{ asset('js/app.bundle.js?v=1.1') }}"></script>
 		<!-- Smartadmin plugin -->
 		<script src="{{ asset('js/smartadmin/datagrid/datatables/datatables.bundle.js') }}"></script>
@@ -149,7 +149,7 @@
 		<script src="{{ asset('js/smartadmin/statistics/easypiechart/easypiechart.bundle.js') }}"></script>
 		<script src="{{ asset('js/smartadmin/statistics/sparkline/sparkline.bundle.js') }}"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.10/jquery.mask.js"></script>
-		
+
 
 		<script src="{{ asset('js/toastr.js') }}"></script>
 
@@ -158,15 +158,15 @@
 		<script src="{{ asset('js/main.js?v=1.0.2') }}"></script>
 		<script src="{{ asset('js/pdfmake/pdfmake.min.js') }}"></script>
 		<script src="{{ asset('js/pdfmake/vfs_fonts.js') }}"></script>
-		<script src="{{ asset('js/jszip/jszip.min.js') }}"></script> 
-		
+		<script src="{{ asset('js/jszip/jszip.min.js') }}"></script>
+
 		<!-- search bar -->
 		<script type="text/javascript">
-			
+
 
 			console.log("Init Language");
 			if (!$.i18n) {
-				initApp.loadScript("/js/i18n/i18n.js", 
+				initApp.loadScript("/js/i18n/i18n.js",
 					function activateLang () {
 						$.i18n.init({
 							resGetPath: '/media/data/__lng__.json',
@@ -178,23 +178,23 @@
 							$('[data-lang]').removeClass('active');
 							$('[data-lang="{{ app()->getLocale() }}"]').addClass('active');
 							console.log("Init language to: " + "{{ app()->getLocale() }}");
-						});								
-						
+						});
+
 					}
 
 				);
-				
+
 			} else {
 				i18n.setLng('{{ app()->getLocale() }}', function(){
 					$('[data-i18n]').i18n();
 					$('[data-lang]').removeClass('active');
-					$('[data-lang="{{ app()->getLocale() }}"]').addClass('active');	
+					$('[data-lang="{{ app()->getLocale() }}"]').addClass('active');
 					console.log("setting language to: " + "{{ app()->getLocale() }}");
 				});
-				
+
 			}
-			
-			
+
+
 		$(document).ready(function() {
 		  $('.searchable-field').select2({
 			minimumInputLength: 3,
@@ -265,7 +265,7 @@
 			window.location = url;
 		  });
 
-		  
+
 		});
 		</script>
 		@yield('scripts')
