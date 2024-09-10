@@ -510,19 +510,19 @@
 						</span>
 						<span class="d-inline-flex flex-column justify-content-center">
 							<a href="{{ route('2024.spatial.wilayah') }}" class="btn android-button btn-outline-warning">
-								<img src="{{ asset('img\avatars\wilayah.png') }}" alt="" style="width: 4rem; height: 4rem;">
+								<img src="{{ asset('img/avatars/wilayah.png') }}" alt="" style="width: 4rem; height: 4rem;">
 							</a>
 							<span>Data Wilayah</span>
 						</span>
 						<span class="d-inline-flex flex-column justify-content-center">
 							<a href="{{ route('2024.cpcl.poktan.index') }}" class="btn android-button btn-outline-warning">
-								<img src="{{ asset('img\avatars\poktan.png') }}" alt="" style="width: 4rem; height: 4rem;">
+								<img src="{{ asset('img/avatars/poktan.png') }}" alt="" style="width: 4rem; height: 4rem;">
 							</a>
 							<span>Poktan</span>
 						</span>
 						<span class="d-inline-flex flex-column justify-content-center">
 							<a href="{{ route('2024.cpcl.anggota.index') }}" class="btn android-button btn-outline-warning">
-								<img src="{{ asset('img\avatars\farmer.png') }}" alt="" style="width: 4rem; height: 4rem;">
+								<img src="{{ asset('img/avatars/farmer.png') }}" alt="" style="width: 4rem; height: 4rem;">
 							</a>
 							<span>Anggota</span>
 						</span>
