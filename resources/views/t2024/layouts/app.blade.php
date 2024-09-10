@@ -55,7 +55,7 @@
     <link rel="stylesheet" href="{{ asset('css/app.css') }}" />
 </head>
 
-<body class="">
+<body class="mod-pace-custom">
     <div class="page-wrapper">
         <div class="page-inner bg-brand-gradient">
             <div class="page-content-wrapper bg-transparent m-0">
