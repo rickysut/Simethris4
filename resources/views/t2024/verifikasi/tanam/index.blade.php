@@ -21,7 +21,7 @@
 							<table id="avtanamTable" class="table table-sm w-100">
 								<thead>
 									<tr>
-										<th>No. RIPH</th>
+										<th>Daftar Tugas</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -48,7 +48,7 @@
 				processing: true,
 				serverSide: true,
 				dom:
-					"<'row mb-3'<'col-sm-12 col-md-6 d-flex align-items-center justify-content-start'f><'col-sm-12 col-md-6 d-flex align-items-center justify-content-end'<'toolbar'>B>>" +
+					"<'row mb-3'<'col-sm-6 col-md-6 d-flex align-items-center justify-content-start'f><'col-sm-6 col-md-6 d-flex align-items-center justify-content-end'<'toolbar'>>>" +
 					"<'row'<'col-sm-12'tr>>" +
 					"<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
 				ajax: {
@@ -74,24 +74,24 @@
 					}
 				],
 				buttons: [
-					{
-						extend: 'pdfHtml5',
-						text: '<i class="fa fa-file-pdf"></i>',
-						titleAttr: 'Generate PDF',
-						className: 'ml-2 btn-outline-danger btn-sm btn-icon mr-1'
-					},
-					{
-						extend: 'excelHtml5',
-						text: '<i class="fa fa-file-excel"></i>',
-						titleAttr: 'Generate Excel',
-						className: 'btn-outline-success btn-sm btn-icon mr-1'
-					},
-					{
-						extend: 'print',
-						text: '<i class="fa fa-print"></i>',
-						titleAttr: 'Print Table',
-						className: 'btn-outline-primary btn-sm btn-icon mr-1'
-					}
+					// {
+					// 	extend: 'pdfHtml5',
+					// 	text: '<i class="fa fa-file-pdf"></i>',
+					// 	titleAttr: 'Generate PDF',
+					// 	className: 'ml-2 btn-outline-danger btn-sm btn-icon mr-1'
+					// },
+					// {
+					// 	extend: 'excelHtml5',
+					// 	text: '<i class="fa fa-file-excel"></i>',
+					// 	titleAttr: 'Generate Excel',
+					// 	className: 'btn-outline-success btn-sm btn-icon mr-1'
+					// },
+					// {
+					// 	extend: 'print',
+					// 	text: '<i class="fa fa-print"></i>',
+					// 	titleAttr: 'Print Table',
+					// 	className: 'btn-outline-primary btn-sm btn-icon mr-1'
+					// }
 				],
 				initComplete: function() {
 					$("div.toolbar").html(`
@@ -153,7 +153,6 @@
 								<span>
 							</h2>
 							<div class="panel-toolbar">
-								${progressBarHtml}
 							</div>
 						</div>
 						<div class="panel-container show">
@@ -191,8 +190,8 @@
 												${formattedcreatedAt}
 											</span>
 										</span>
-										<a href="javascript:void(0);" class="d-block fw-700 text-dark"></a>
-										<a href="javascript:void(0);" title="${no_ijin}" class="d-block fw-700 text-dark">${no_ijin}</a>
+
+								${progressBarHtml}
 										<div class="d-flex mt-3 flex-wrap">
 											${buttonHtml}
 										</div>

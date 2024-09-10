@@ -494,7 +494,7 @@
 				<div class="col text-center">
 					<h2 class="display-4">Hallo, <span class="fw-700">{{ Auth::user()->name }} </span></h2>
 					<h4 class="">
-						<p class="text-muted">Selamat Datang di Simethris Mobile</p>
+						<p class="text-muted">Selamat Datang di Simethris Mobiles</p>
 					</h4>
 					<p id="gpstatus"></p>
 				</div>
@@ -502,18 +502,29 @@
 			@can('spatial_data_access')
 				<div class="row">
 					<div class="col-12 text-center">
-						<h3>Menu Verifikasi</h3>
 						<span class="d-inline-flex flex-column justify-content-center ">
 							<a href="{{route('2024.spatial.index')}}" class="btn android-button btn-outline-warning">
 								<img src="{{ asset('logoicon.png') }}" alt="" style="width: 4rem; height: 4rem;">
 							</a>
-							<span>Peta Lahan</span>
+							<span>Peta Spatial</span>
 						</span>
-						<span class="d-inline-flex flex-column justify-content-center ">
-							<a href="{{ route('2024.verifikator.produksi.home') }}" class="btn android-button btn-outline-warning">
-								<img src="{{ asset('logoicon.png') }}" alt="" style="width: 4rem; height: 4rem;">
+						<span class="d-inline-flex flex-column justify-content-center">
+							<a href="{{ route('2024.spatial.wilayah') }}" class="btn android-button btn-outline-warning">
+								<img src="{{ asset('img\avatars\wilayah.png') }}" alt="" style="width: 4rem; height: 4rem;">
 							</a>
-							<span>Data Spatial</span>
+							<span>Data Wilayah</span>
+						</span>
+						<span class="d-inline-flex flex-column justify-content-center">
+							<a href="{{ route('2024.cpcl.poktan.index') }}" class="btn android-button btn-outline-warning">
+								<img src="{{ asset('img\avatars\poktan.png') }}" alt="" style="width: 4rem; height: 4rem;">
+							</a>
+							<span>Poktan</span>
+						</span>
+						<span class="d-inline-flex flex-column justify-content-center">
+							<a href="{{ route('2024.cpcl.anggota.index') }}" class="btn android-button btn-outline-warning">
+								<img src="{{ asset('img\avatars\farmer.png') }}" alt="" style="width: 4rem; height: 4rem;">
+							</a>
+							<span>Anggota</span>
 						</span>
 					</div>
 				</div>
@@ -546,23 +557,23 @@
 			@can('user_task_access')
 				<div class="row">
 					<div class="col-12 text-center">
-						<span class="d-inline-flex flex-column justify-content-center">
-							<a href="{{route('2024.user.mobile.findmarker')}}" class="btn android-button btn-outline-warning">
-								<img src="{{ asset('logoicon.png') }}" alt="" style="width: 4rem; height: 4rem;">
-							</a>
-							<span>Realisasi Tanam</span>
-						</span>
 						<span class="d-inline-flex flex-column justify-content-center ">
-							<a href="javascript:void(0)" class="android-button btn-default">
-								<img src="{{ asset('favicon.png') }}" alt="" style="width: 4rem; height: 4rem; filter: grayscale(100%)">
+							<a href="{{route('2024.user.commitment.index')}}" class="android-button btn-outline-warning">
+								<img src="{{ asset('img/riph.png') }}" alt="" style="width: 4rem; height: 4rem;">
 							</a>
-							<span>Sample</span>
+							<span>Komitmen</span>
 						</span>
 						<span class="d-inline-flex flex-column justify-content-center">
-							<a href="javascript:void(0)" class="android-button btn-default">
-								<img src="{{ asset('favicon.png') }}" alt="" style="width: 4rem; height: 4rem; filter: grayscale(100%)">
+							<a href="{{route('2024.user.skl.mySkls')}}" class="android-button btn-outline-warning">
+								<img src="{{ asset('img/medal.png') }}" alt="" style="width: 4rem; height: 4rem;">
 							</a>
-							<span>Sample</span>
+							<span>Awards</span>
+						</span>
+						<span class="d-inline-flex flex-column justify-content-center">
+							<a href="{{route('2024.user.mobile.findmarker')}}" class="btn android-button btn-default">
+								<img src="{{ asset('logoicon.png') }}" alt="" style="width: 4rem; height: 4rem; filter: grayscale(100%)">
+							</a>
+							<span>Tanam</span>
 						</span>
 					</div>
 				</div>

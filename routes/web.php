@@ -637,7 +637,7 @@ Route::group(['prefix' => '2024', 'as' => '2024.', 'namespace' => 'Admin', 'midd
 
 		//route untuk tim spatial
 		Route::group(['prefix' => 'spatial', 'as' => 'spatial.'], function () {
-			Route::get('/', 'HomeController@indexMobile')->name('home');
+			Route::get('/', 'HomeController@index')->name('home');
 			Route::get('/list', 'SpatialController@index')->name('index');
 			Route::get('/spatialList', 'SpatialController@spatialList')->name('spatialList');
 			Route::get('/createsingle', 'SpatialController@createsingle')->name('createsingle');
