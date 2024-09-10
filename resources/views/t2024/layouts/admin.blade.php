@@ -66,7 +66,7 @@
 		@yield('styles')
 	</head>
 
-	<body class="mod-bg-2 mod-nav-link header-function-fixed footer-function-fixed blur">  {{-- mod-skin-dark --}}
+	<body class="mod-bg-2 mod-pace-custom mod-nav-link header-function-fixed footer-function-fixed blur">  {{-- mod-skin-dark --}}
 		<script src="{{ asset('js/smartadmin/pagesetting.js') }}"></script>
 		<!-- begin page wrapper -->
 		<div class="page-wrapper">

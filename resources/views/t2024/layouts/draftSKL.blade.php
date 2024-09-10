@@ -68,7 +68,7 @@
 		@yield('styles')
 	</head>
 
-	<body>  {{-- mod-skin-dark --}}
+	<body class="mod-pace-custom">  {{-- mod-skin-dark --}}
 		<script src="{{ asset('js/smartadmin/pagesetting.js') }}"></script>
 		<!-- begin page wrapper -->
 		<div class="page-wrapper alt">
