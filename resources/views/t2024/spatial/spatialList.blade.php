@@ -397,10 +397,10 @@
 		}
 	});
 
-	window.addEventListener('beforeunload', function (e) {
-		e.preventDefault();
-		e.returnValue = ''; // Ini akan menampilkan peringatan di browser
-	});
+	// window.addEventListener('beforeunload', function (e) {
+	// 	e.preventDefault();
+	// 	e.returnValue = ''; // Ini akan menampilkan peringatan di browser
+	// });
 
 	function processFiles(files) {
 		let index = 0;
@@ -424,10 +424,10 @@
 				// Semua file berhasil diunggah
 				alert('Semua file telah berhasil diunggah.');
 				enableElementsAfterUpload();
-				window.removeEventListener('beforeunload', function (e) {
-					e.preventDefault();
-					e.returnValue = '';
-				});
+				// window.removeEventListener('beforeunload', function (e) {
+				// 	e.preventDefault();
+				// 	e.returnValue = '';
+				// });
 				location.reload(); // Refresh halaman setelah konfirmasi
 			}
 		}
