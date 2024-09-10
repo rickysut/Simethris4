@@ -528,8 +528,7 @@ Route::group(['prefix' => '2024', 'as' => '2024.', 'namespace' => 'Admin', 'midd
 
 		//route untuk verifikator
 		Route::group(['prefix' => 'verifikator', 'as' => 'verifikator.'], function () {
-			Route::get('/', 'HomeController@index')->name('home')->middleware('screen.redirect');
-			Route::get('/mobile', 'HomeController@indexMobile')->name('mobile');
+			Route::get('/', 'HomeController@index')->name('home');
 
 			Route::group(['prefix' => 'mobile', 'as' => 'mobile.'], function () {
 				Route::get('/markers', 'VerifTanamController@findmarker')->name('findmarker');

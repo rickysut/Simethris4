@@ -17,7 +17,7 @@ class ScreenRedirect
 
             if ($userRole === 'Verifikator') {
                 if ($screenSize === 'mobile') {
-                    return redirect()->route('2024.verifikator.mobile');
+                    return redirect()->route('2024.admin');
                 }
             }
         }
