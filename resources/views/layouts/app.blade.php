@@ -92,7 +92,7 @@
                     </div>
                 </div>
 
-                <div class="flex-1" style="background: url(img/simet-bawang-pagi.webp) no-repeat center top fixed; background-size: cover;">
+                <div class="flex-1" style="background: url(/img/simet-bawang-pagi.webp) no-repeat center top fixed; background-size: cover;">
                     <div class="container py-4 py-lg-5 my-lg-5 px-4 px-sm-0">
                         @yield('content')
                     </div>
