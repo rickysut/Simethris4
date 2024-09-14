@@ -33,7 +33,8 @@ return new class extends Migration
 			$table->string('kecamatan_id', 7)->nullable(); //contoh: 1101010
 			$table->string('kelurahan_id', 10)->nullable(); //contoh: 1101010003
 			$table->string('kml_url');
-			$table->tinyInteger('status')->default(1)->nullable();
+			$table->tinyInteger('is_active')->default(1)->nullable();
+			$table->tinyInteger('status')->default(0)->nullable();
             $table->timestamps();
 			$table->softDeletes();
         });

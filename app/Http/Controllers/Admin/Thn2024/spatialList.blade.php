@@ -173,26 +173,6 @@
 	<div class="row">
 		<div class="col">
 			<div class="panel" id="panel-1">
-				<div class="panel-container show">
-					<div class="panel-content d-flex justify-content-between align-items-start">
-						<div>
-							<h4 class="fw-600">KDL_000001</h4>
-						</div>
-						<div class="d-inline-flex flex-column">
-							<div class="custom-control custom-checkbox">
-								<input type="checkbox" class="custom-control-input" id="defaultChecked" checked="">
-								<label class="custom-control-label" for="defaultChecked">Checked</label>
-							</div>
-							<div class="custom-control custom-checkbox">
-								<input type="checkbox" class="custom-control-input" id="defaultChecked" checked="">
-								<label class="custom-control-label" for="defaultChecked">Checked</label>
-							</div>
-						</div>
-					</div>
-					<div class="card-footer">Footer</div>
-				</div>
-			</div>
-			<div class="panel" id="panel-1">
 				<div class="panel-hdr">
 					<h2>
 						Tabel <span class="fw-300"><i>Spatial</i></span>
@@ -261,13 +241,12 @@
 				<div class="panel-container show">
 					<div class="panel-content">
 						<!-- datatable start -->
-						<table id="tblSpatial" class="table table-hover table-sm table-striped w-100">
+						<table id="tblSpatial" class="table table-bordered table-hover table-sm table-striped w-100">
 							<thead class="thead-themed">
 								<th>Kode Lokasi</th>
 								<th>Pengelola</th>
 								<th>Luas</th>
 								<th>Wilayah</th>
-								<th>Status</th>
 								<th>Tindakan</th>
 							</thead>
 							<tbody>
@@ -325,19 +304,17 @@
 						return row.nama_kabupaten;
 					}
 				},
-				{ data: null, },
 				{
 					data: 'status',
 					render: function(data, type, row) {
 						var kdSpatial = row.kode_spatial;
 						var kode = kdSpatial.replace(/[^a-zA-Z0-9]/g, '');
-						var checked = data == 1 ? 'checked' : '';
-
 						var url = "{{ route('2024.spatial.edit', ':kode') }}";
 						var kmlFile = row.kml_url;
 						var kmlPath = `{{ asset('storage') }}/${kmlFile}`;
 						url = url.replace(':kode', kode);
 
+						var checked = data == 1 ? 'checked' : '';
 
 						var actionBtn = `
 							<div class="justify-content-center fs-sm d-flex align-items-center">
@@ -379,10 +356,7 @@
 					titleAttr: 'Print Table',
 					className: 'btn-outline-primary btn-sm btn-icon mr-1'
 				}
-			],
-			drawCallback: function(settings) {
-				$('#tblSpatial thead').hide();
-			}
+			]
 		});
 
 		$('#idKab, #status_lahan, #status_mitra').change(function() {

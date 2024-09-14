@@ -49,8 +49,9 @@ class SpatialController extends Controller
 			'kecamatan_id',
 			'kelurahan_id',
 			'luas_lahan',
-			'status'
-		);
+			'status',
+			'is_active'
+		)->where('is_active', 1);
 
 		if (!is_null($s)) {
 			$query->where('status', $s);
@@ -95,6 +96,7 @@ class SpatialController extends Controller
 
 		// Return the paginated data along with the "about" information
 		return response()->json([
+			'Status' => 'SUCCESS',
 			'Tentang' => $about,
 			'data_spatial' => $formattedSpatials,
 			'pagination' => [

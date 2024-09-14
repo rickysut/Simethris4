@@ -26,12 +26,13 @@
 									</thead>
 									<tbody>
 										@foreach ($completeds as $completed)
-											@php
+											{{-- @php
 												$sklRead = \App\Models\SklReads::where('skl_id', $completed->skl->id)
 													->where('user_id', Auth::id())
 													->first();
-											@endphp
-											<tr  style="{{ !$sklRead ? 'background-color: rgba(255, 166, 0, 0.37)' : '' }}">
+											@endphp --}}
+											<tr  >
+												{{-- style="{{ !$sklRead ? 'background-color: rgba(255, 166, 0, 0.37)' : '' }}" --}}
 												<td>{{$completed->no_skl}}</td>
 												@if (Auth::user()->roleaccess === 1)
 													<td>{{$completed->datauser->company_name}}</td>
@@ -42,17 +43,21 @@
 												<td class="text-center">{{ date('d-m-Y', strtotime($completed->created_at)) }}</td>
 												<td class="text-center d-flex justify-content-center">
 													@if (Auth::user()->roles[0]->title == 'Admin' ||  Auth::user()->roles[0]->title == 'Verifikator')
-													<a href="{{route('verification.skl.verifSklShow', $completed->skl->pengajuan_id)}}" class="btn btn-icon btn-info btn-xs mr-1" title="Lihat Hasil Verifikasi">
-														<i class="fal fa-file-search"></i>
-													</a>
+														<a href="" class="btn btn-icon btn-info btn-xs mr-1" title="Lihat Hasil Verifikasi">
+															<i class="fal fa-file-search"></i>
+															{{-- {{route('verification.skl.verifSklShow', $completed->skl->pengajuan_id)}} --}}
+														</a>
 													@endif
 													@if (Auth::user()->roles[0]->title == 'User')
-													<a href="{{route('admin.task.pengajuan.skl.show', $completed->commitment->id)}}" class="btn btn-xs btn-info btn-icon mr-1" data-toggle="tooltip" title data-original-title="SKL sudah Terbit. Klik untuk melihat Ringkasan Verifikasi.">
-														<i class="fal fa-file-certificate"></i>
-													</a>
+														<a href="" class="btn btn-xs btn-info btn-icon mr-1" data-toggle="tooltip" title data-original-title="SKL sudah Terbit. Klik untuk melihat Ringkasan Verifikasi.">
+															{{-- <i class="fal fa-file-certificate"></i> --}}
+															{{-- {{route('admin.task.pengajuan.skl.show', $completed->commitment->id)}} --}}
+														</a>
 													@endif
-													<a href="{{ $completed->url }}" class="btn btn-icon btn-success btn-xs mr-1" title="Lihat SKL" onClick="markAsRead({{ $completed->skl->id }})" target="_blank">
+													<a href="" class="btn btn-icon btn-success btn-xs mr-1" title="Lihat SKL" target="_blank">
 														<i class="fal fa-file-certificate"></i>
+														{{-- {{ $completed->url }}
+														onClick="markAsRead({{ $completed->skl->id }})"  --}}
 													</a>
 												</td>
 											</tr>
