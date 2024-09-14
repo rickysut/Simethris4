@@ -43,6 +43,7 @@ class MasterSpatial extends Model
 		'kecamatan_id',
 		'kelurahan_id',
 		'kml_url',
+		'is_active',
 		'status',
 	];
 

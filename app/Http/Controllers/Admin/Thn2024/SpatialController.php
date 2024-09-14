@@ -91,7 +91,11 @@ class SpatialController extends Controller
 		$kabupatens = MasterSpatial::distinct()->pluck('kabupaten_id');
 
 		//output array kabupaten
-		$indexKabupaten = MasterKabupaten::whereIn('kabupaten_id', $kabupatens)->select('kabupaten_id', 'nama_kab')->get()->toArray();
+		$indexKabupaten = MasterKabupaten::whereIn('kabupaten_id', $kabupatens)
+			->select('kabupaten_id', 'nama_kab')
+			->orderBy('nama_kab', 'asc')  // Mengurutkan berdasarkan nama_kab dari A-Z
+			->get()
+			->toArray();
 
 		$mapkey = ForeignApi::find(1);
 
