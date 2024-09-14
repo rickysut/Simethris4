@@ -15,6 +15,18 @@
 		-webkit-box-orient: vertical;
 		overflow: hidden;
 	}
+	.alias-box {
+            width: 5rem;
+            height: 5rem;
+            background-color: #00000012; /* Warna latar belakang kotak */
+            color: rgb(127, 127, 127); /* Warna teks */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px; /* Ukuran font */
+            border-radius: 4px; /* Sudut melengkung (opsional) */
+            text-align: center;
+        }
 </style>
 @endsection
 @section('content')
@@ -173,33 +185,13 @@
 	<div class="row">
 		<div class="col">
 			<div class="panel" id="panel-1">
-				<div class="panel-container show">
-					<div class="panel-content d-flex justify-content-between align-items-start">
-						<div>
-							<h4 class="fw-600">KDL_000001</h4>
-						</div>
-						<div class="d-inline-flex flex-column">
-							<div class="custom-control custom-checkbox">
-								<input type="checkbox" class="custom-control-input" id="defaultChecked" checked="">
-								<label class="custom-control-label" for="defaultChecked">Checked</label>
-							</div>
-							<div class="custom-control custom-checkbox">
-								<input type="checkbox" class="custom-control-input" id="defaultChecked" checked="">
-								<label class="custom-control-label" for="defaultChecked">Checked</label>
-							</div>
-						</div>
-					</div>
-					<div class="card-footer">Footer</div>
-				</div>
-			</div>
-			<div class="panel" id="panel-1">
 				<div class="panel-hdr">
 					<h2>
-						Tabel <span class="fw-300"><i>Spatial</i></span>
+						Daftar <span class="fw-300"><i>Lahan</i></span>
 					</h2>
 					<div class="panel-toolbar">
 						<div class="btn-group">
-							<button type="button" class="btn btn-xs btn-primary waves-effect waves-themed">
+							<button type="button" class="btn btn-sm btn-primary waves-effect waves-themed">
 								<i class="fal fa-plus mr-1"></i>
 								Peta Baru
 							</button>
@@ -256,27 +248,35 @@
 								<small id="helpMitra" class="text-muted">saring data sesuai status kemitraan</small>
 							</div>
 						</div>
-					</div>
-				</div>
-				<div class="panel-container show">
-					<div class="panel-content">
-						<!-- datatable start -->
-						<table id="tblSpatial" class="table table-hover table-sm table-striped w-100">
-							<thead class="thead-themed">
-								<th>Kode Lokasi</th>
-								<th>Pengelola</th>
-								<th>Luas</th>
-								<th>Wilayah</th>
-								<th>Status</th>
-								<th>Tindakan</th>
-							</thead>
-							<tbody>
-
-							</tbody>
-						</table>
+						<div class="row">
+							<div class="form-group col-12">
+								<label class="form-label">Cari data</label>
+								<div class="input-group bg-white shadow-inset-2">
+									<div class="input-group-prepend">
+										<span class="input-group-text bg-transparent border-right-0 py-1 px-3 text-success">
+											<i class="fal fa-search"></i>
+										</span>
+									</div>
+									<input type="text" name="searchValue" id="searchValue" aria-describedby="searchValue" class="form-control border-left-0 bg-transparent pl-0" placeholder="kata kunci...">
+									<div class="input-group-append">
+										<button class="btn btn-default waves-effect waves-themed" type="button">Temukan</button>
+									</div>
+								</div>
+								<small id="searchValue" class="text-muted">Temukan data berdasarkan Kode Lokasi, Kabupaten, Nama Pengelola/Petani</small>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
+						<!-- datatable start -->
+			<table id="tblSpatial" class="table table-sm table-light w-100 mb-5">
+				<thead class="thead-themed">
+					<th>Kode Lokasi</th>
+				</thead>
+				<tbody>
+
+				</tbody>
+			</table>
 		</div>
 	</div>
 @endcan
@@ -294,9 +294,31 @@
 		$('#tblSpatial').dataTable({
 			responsive: true,
 			lengthChange: false,
-			ordering: true,
 			processing: true,
 			serverSide: true,
+			language: {
+				"processing": "Sedang memproses...",
+				"lengthMenu": "Tampilkan _MENU_ entri",
+				"zeroRecords": "Tidak ditemukan data yang sesuai",
+				"info": "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
+				"infoEmpty": "Menampilkan 0 sampai 0 dari 0 entri",
+				"infoFiltered": "(disaring dari _MAX_ entri keseluruhan)",
+				"search": "Cari:",
+				"paginate": {
+					"first": "Pertama",
+					"last": "Terakhir",
+					"next": "Berikutnya",
+					"previous": "Sebelumnya"
+				},
+				"emptyTable": "Tidak ada data di dalam tabel",
+				"loadingRecords": "Sedang memuat...",
+				"thousands": ".",
+				"decimal": ",",
+				"aria": {
+					"sortAscending": ": aktifkan untuk mengurutkan kolom naik",
+					"sortDescending": ": aktifkan untuk mengurutkan kolom turun"
+				}
+			},
 			ajax: {
 				url: "{{ route('2024.datafeeder.getAllSpatials') }}",
 				type: "GET",
@@ -304,58 +326,103 @@
 					d.kabupaten_id = $('#idKab').val();
 					d.status_lahan = $('#status_lahan').val();
 					d.status_mitra = $('#status_mitra').val();
+					d.searchValue = $('#searchValue').val();
 					console.log('intip: ', d);
 				},
 			},
 			dom:
-				"<'row mb-3'<'col-sm-12 col-md-6 d-flex align-items-center justify-content-start'f><'col-sm-12 col-md-6 d-flex align-items-center justify-content-end'>>" +
+				"<'row mb-3'<'col-sm-12 col-md-6 d-flex align-items-center justify-content-start'><'col-sm-12 col-md-6 d-flex align-items-center justify-content-end'>>" +
 				"<'row'<'col-sm-12'tr>>" +
-				"<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
-			"columnDefs": [
-				{ "targets": [2, 3], "className": "text-right" },
-				{ "targets": [4], "className": "text-center" },
-			],
+				"<'row mb-5'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+
 			columns: [
-				{ data: 'kode_spatial' },
-				{ data: 'nama_anggota' },
-				{ data: 'luas_lahan' },
 				{
-					data: 'kabupaten_id',
-					render: function (data, type, row) {
-						return row.nama_kabupaten;
-					}
-				},
-				{ data: null, },
-				{
-					data: 'status',
+					data: 'kode_spatial',
 					render: function(data, type, row) {
 						var kdSpatial = row.kode_spatial;
+						var anggota = row.nama_anggota;
+						var anggotaSuffix = '??';
+
+						// Check if anggota is null or an empty string
+						if (anggota && anggota.trim() !== '') {
+							// Split the 'anggota' string into words
+							var words = anggota.split(' ');
+
+							if (words.length === 1) {
+								// If there is only one word, take the first 2 characters
+								anggotaSuffix = words[0].substring(0, 2);
+							} else if (words.length >= 2) {
+								// If there are 2 or more words, take the first character of the first two words
+								var firstWord = words[0];
+								var secondWord = words[1];
+								anggotaSuffix = firstWord.charAt(0) + secondWord.charAt(0);
+							}
+						}
+						var rawLuas = row.luas_lahan;
+						var luas = rawLuas.toLocaleString('en-ID') + ' m2';
+						var kabId = row.kabupaten_id;
+						var namaKab = row.nama_kabupaten;
 						var kode = kdSpatial.replace(/[^a-zA-Z0-9]/g, '');
-						var checked = data == 1 ? 'checked' : '';
+						var statusCheck = row.status == 1 ? 'checked' : '';
+						var activeCheck = row.active == 1 ? 'checked' : '';
 
 						var url = "{{ route('2024.spatial.edit', ':kode') }}";
 						var kmlFile = row.kml_url;
 						var kmlPath = `{{ asset('storage') }}/${kmlFile}`;
 						url = url.replace(':kode', kode);
 
-
-						var actionBtn = `
-							<div class="justify-content-center fs-sm d-flex align-items-center">
-								<a href="${url}" class="btn btn-icon btn-xs btn-default waves-effect waves-themed" data-toggle="tooltip" data-offset="0,10" data-original-title="Lihat Peta">
-									<i class="fal fa-edit"></i>
-								</a>
-								<a href="${kmlPath}" class="btn btn-icon btn-xs btn-default waves-effect waves-themed ml-1" title="unduh kml" download>
-									<i class="fal fa-download"></i>
-								</a>
-								<div class="custom-control custom-switch ml-1">
-									<input type="checkbox" class="custom-control-input form-control-sm status-switch" id="customSwitch_${kode}" ${checked} data-kode="${kdSpatial}">
-									<label class="custom-control-label" for="customSwitch_${kode}"><span class="sr-only">Open - Close</span></label>
+						var listCard = `
+							<div class="panel" id="panel-1">
+								<div class="panel-container show">
+									<div class="panel-content">
+										<div class="d-flex flex-row pb-3 pt-2  border-top-0 border-left-0 border-right-0">
+                                            <div class="d-inline-block align-middle mr-3">
+                                                <div class="alias-box">
+													<span class="display-4 fw-700">${anggotaSuffix}</span>
+												</div>
+                                            </div>
+                                            <h5 class="mb-0 flex-1 text-dark fw-700 text-lg">
+                                               	${kdSpatial}
+                                                <small class="m-0 l-h-n">
+                                                    <div >
+														<div class="form-group mb-1 mt-2">
+															<span class="uppercase">${anggota}</span>
+														</div>
+														<div class="form-group mb-1"><span>${luas}</span>
+														</div>
+														<div class="form-group mb-1"><span class="uppercase">${namaKab}</span>
+														</div>
+												</div>
+                                                </small>
+                                            </h5>
+                                            <span>
+                                                <div class="d-inline-flex flex-column">
+													<div class="custom-control custom-checkbox">
+														<input type="checkbox" class="custom-control-input form-control-sm active-switch" id="activeCheck_${kode}" ${activeCheck} data-kode="${kdSpatial}">
+														<label class="custom-control-label" for="activeCheck_${kode}">Aktif</label>
+													</div>
+													<div class="custom-control custom-checkbox">
+														<input type="checkbox" class="custom-control-input form-control-sm status-switch" id="customSwitch_${kode}" ${statusCheck} data-kode="${kdSpatial}">
+														<label class="custom-control-label" for="customSwitch_${kode}"><span>Bermitra</span></label>
+													</div>
+												</div>
+                                            </span>
+                                        </div>
+									</div>
+									<div class="card-footer text-right">
+										<a href="${url}" class="btn btn-sm btn-info waves-effect waves-themed" data-toggle="tooltip" data-offset="0,010" title data-original-title="Lihat Peta">
+											<i class="fal fa-edit"></i> Lihat/Perbarui Peta
+										</a>
+										<a href="${kmlPath}" class="btn btn-sm btn-success waves-effect waves-themed ml-1" data-toggle="tooltip" data-offset="0,010" data-original-title="Unduh peta" download>
+											<i class="fal fa-download"></i> Unduh Peta
+										</a>
+									</div>
 								</div>
 							</div>
-						`;
-						return actionBtn;
+							`;
+						return listCard;
 					}
-				},
+				}
 			],
 			buttons: [
 				{
@@ -385,7 +452,7 @@
 			}
 		});
 
-		$('#idKab, #status_lahan, #status_mitra').change(function() {
+		$('#searchValue, #idKab, #status_lahan, #status_mitra').change(function() {
 			console.log('Kabupaten ID:', $('#idKab').val());  // Logging nilai kabupaten_id
 			console.log('Status Lahan:', $('#status_lahan').val());  // Logging nilai status_lahan
 			console.log('Status Mitra:', $('#status_mitra').val());  // Logging nilai status_mitra
@@ -396,6 +463,7 @@
 	$(document).on('change', '.status-switch', function() {
 		var kode = $(this).data('kode');
 		var status = $(this).is(':checked') ? 1 : 0;
+
 		$.ajax({
 			url: "{{ route('2024.spatial.updateStatus', ':kode') }}".replace(':kode', kode),
 			method: 'POST',
@@ -404,9 +472,62 @@
 				status: status
 			},
 			success: function(response) {
-				if(response.success) {
+				if (response.success) {
 					$('#tblSpatial').DataTable().ajax.reload();
 					var action = status ? 'Bermitra' : 'Tersedia';
+					var message = `Lokasi ${kode} ${action}`;
+					Swal.fire({
+						icon: 'success',
+						title: 'Status Kemitraan',
+						text: message,
+						timer: 2000,
+						showConfirmButton: false
+					});
+				} else {
+					$('#tblSpatial').DataTable().ajax.reload();
+					Swal.fire({
+						icon: 'error',
+						title: 'Error',
+						text: response.message || 'Failed to update status.',
+						showConfirmButton: true
+					});
+				}
+			},
+			error: function(xhr) {
+				var errorMessage = 'Error updating status.';
+				if (xhr.responseJSON && xhr.responseJSON.message) {
+					errorMessage = xhr.responseJSON.message;
+				}
+				$('#tblSpatial').DataTable().ajax.reload();
+				Swal.fire({
+					icon: 'error',
+					title: 'Error',
+					text: errorMessage,
+					showConfirmButton: true
+				});
+			}
+		});
+	});
+
+	$(document).on('change', '.active-switch', function() {
+		var kode = $(this).data('kode');
+		var activeStatus = $(this).is(':checked') ? 1 : 0;
+
+		console.log('Switch clicked for kode:', kode);
+		console.log('New status:', activeStatus);
+
+		$.ajax({
+			url: "{{ route('2024.spatial.updateActive', ':kode') }}".replace(':kode', kode),
+			method: 'POST',
+			data: {
+				_token: '{{ csrf_token() }}',
+				activeStatus: activeStatus
+			},
+			success: function(response) {
+				if(response.success) {
+					// If the request was successful, update the DataTable and show a success message
+					$('#tblSpatial').DataTable().ajax.reload();
+					var action = activeStatus ? 'Diaktifkan' : 'Diblokir';
 					var message = `Lokasi ${kode} ${action}`;
 					Swal.fire({
 						icon: 'success',
@@ -416,14 +537,31 @@
 						showConfirmButton: false
 					});
 				} else {
-					alert('Failed to update status.');
+					// If the request was not successful, check the response message
+					$('#tblSpatial').DataTable().ajax.reload();
+					Swal.fire({
+						icon: 'error',
+						title: 'Gagal Mengubah Status',
+						text: response.message || 'Failed to update status.',
+						timer: 3000,
+						showConfirmButton: false
+					});
 				}
 			},
-			error: function() {
-				alert('Error updating status.');
+			error: function(xhr) {
+				// On error, display an alert with the error message
+				$('#tblSpatial').DataTable().ajax.reload();
+				Swal.fire({
+					icon: 'error',
+					title: 'Kesalahan',
+					text: xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'Error updating status.',
+					timer: 3000,
+					showConfirmButton: false
+				});
 			}
 		});
 	});
+
 </script>
 
 {{-- peta --}}

@@ -837,7 +837,7 @@ class DataFeederController extends Controller
 		$draw = $request->input('draw', 1);
 		$start = $request->input('start', 0);
 		$length = $request->input('length', 10);
-		$searchValue = $request->input('search.value', '');
+		$searchValue = $request->input('searchValue', '');
 		$kabupatenId = $request->input('kabupaten_id');
 		$statusLahan = $request->input('status_lahan');
 		$statusMitra = $request->input('status_mitra');
@@ -904,8 +904,8 @@ class DataFeederController extends Controller
 				'kml_url' => $item->kml_url,
 				'kabupaten_id' => $item->kabupaten_id,
 				'nama_kabupaten' => $item->kabupaten ? $item->kabupaten->nama_kab : null,
-				'active' => $item->is_active ? $item->is_active : null,
-				'status' => $item->status ? $item->status : null,
+				'active' => $item->is_active,
+				'status' => $item->status,
 			];
 		});
 
@@ -916,7 +916,6 @@ class DataFeederController extends Controller
 			'data' => $spatials,
 		]);
 	}
-
 
 	public function getAllPoktan(Request $request)
 	{
@@ -2269,6 +2268,69 @@ class DataFeederController extends Controller
 		// Kembalikan hasil sebagai JSON
 		return response()->json($spatials);
 	}
+
+	public function responseGetLocationInKabupatenSummary(Request $request)
+	{
+		$kabupatenIds = $request->query('kabupaten_id', []);
+
+		// Handle case where kabupatenIds is empty
+		if (empty($kabupatenIds)) {
+			// If kabupatenIds is empty, get all records
+			$summary = MasterSpatial::selectRaw(
+				'SUM(luas_lahan) AS total_luas,
+            COUNT(*) AS total_lahan,
+            SUM(CASE WHEN is_active = 1 THEN luas_lahan ELSE 0 END) AS total_lahan_aktif,
+            SUM(CASE WHEN is_active = 1 THEN 1 ELSE 0 END) AS jml_lahan_aktif,
+            SUM(CASE WHEN status = 1 AND is_active = 1 THEN luas_lahan ELSE 0 END) AS total_lahan_mitra,
+            SUM(CASE WHEN status = 1 AND is_active = 1 THEN 1 ELSE 0 END) AS jml_lahan_mitra'
+			)->first();
+		} else {
+			// If kabupatenIds is not empty, filter by kabupatenIds
+			$summary = MasterSpatial::whereIn('kabupaten_id', $kabupatenIds)->selectRaw(
+				'SUM(luas_lahan) AS total_luas,
+            COUNT(*) AS total_lahan,
+            SUM(CASE WHEN is_active = 1 THEN luas_lahan ELSE 0 END) AS total_lahan_aktif,
+            SUM(CASE WHEN is_active = 1 THEN 1 ELSE 0 END) AS jml_lahan_aktif,
+            SUM(CASE WHEN status = 1 AND is_active = 1 THEN luas_lahan ELSE 0 END) AS total_lahan_mitra,
+            SUM(CASE WHEN status = 1 AND is_active = 1 THEN 1 ELSE 0 END) AS jml_lahan_mitra'
+			)->first();
+		}
+
+		// Handle case where no records are found
+		if (!$summary) {
+			return response()->json(['error' => 'No data found'], 404);
+		}
+
+		// Extract values
+		$totalLuas = $summary->total_luas;
+		$jmlLahan = $summary->total_lahan;
+
+		$totalLahanAktif = $summary->total_lahan_aktif;
+		$jmlLahanAktif = $summary->jml_lahan_aktif;
+
+		$totalLahanMitra = $summary->total_lahan_mitra;
+		$jmlLahanMitra = $summary->jml_lahan_mitra;
+
+		$luasTersedia = $totalLahanAktif - $totalLahanMitra;
+		$jmlTersedia = $jmlLahanAktif - $jmlLahanMitra;
+
+		$data = [
+			'totalLuas' => $totalLuas,
+			'jmlLahan' => $jmlLahan,
+			'totalLahanAktif' => $totalLahanAktif,
+			'jmlLahanAktif' => (int) $jmlLahanAktif,
+			'prosenAktif' => floor($totalLahanAktif / $totalLuas * 100),
+			'totalLahanMitra' => $totalLahanMitra,
+			'jmlLahanMitra' => (int) $jmlLahanMitra, // Cast to integer
+			'prosenMitra' => $totalLahanAktif > 0 ? floor($totalLahanMitra / $totalLahanAktif * 100) : 0,
+			'luasTersedia' => $luasTersedia,
+			'jmlTersedia' => $jmlTersedia,
+			'prosenTersedia' => $totalLahanAktif > 0 ? floor($luasTersedia / $totalLahanAktif * 100) : 0,
+		];
+
+		return response()->json($data);
+	}
+
 
 	public function responseGetLocationByKode(Request $request)
 	{
