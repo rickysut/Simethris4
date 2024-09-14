@@ -111,55 +111,90 @@
 						<div class="panel-content p-0">
 							<div id="myMap" style="height:500px; width: 100%;"></div>
 							<div class="row row-grid no-gutters">
-								<div class="col-sm-12 col-md-4">
+								<div class="col-sm-12 col-md-6">
 									<div class="px-3 py-2 d-flex align-items-center m-2">
-										<span class="d-inline-block ml-2 text-muted">
-											<i class="fal fa-globe-asia color-info-500 mr-1"></i>
-											Total Lahan Wajib Tanam
-										</span>
+										<div class="js-easy-pie-chart color-primary-500 position-relative d-inline-flex align-items-center justify-content-center" data-percent="100" data-piesize="" data-linewidth="5" data-linecap="butt">
+											<div class="d-flex flex-column align-items-center justify-content-center position-absolute pos-left pos-right pos-top pos-bottom fw-300 fs-lg">
+												<span class="js-percent d-block text-dark"></span>
+											</div>
+										</div>
+										<span class="d-inline-block fs-lg ml-2 text-muted">Total Lahan</span>
 										<div class="ml-auto d-inline-flex align-items-center">
 											<div class="d-inline-flex flex-column ml-2 text-right fw-500">
 												<span class="d-inline-block">
-													<span id="totalLuas">{{ number_format($data['totalLuas'] / 10000, 3, ',', '.') }}</span> ha
+													<span id="totalLuas"></span> ha
 												</span>
 												<span class="d-inline-block">
-													<span id="totalLahan">{{$data['totalLahan']}}</span> titik
+													<span id="jmlLahan"></span> titik
 												</span>
 											</div>
 										</div>
 									</div>
 								</div>
-								<div class="col-sm-12 col-md-4">
+								<div class="col-sm-12 col-md-6">
 									<div class="px-3 py-2 d-flex align-items-center m-2">
-										<span class="d-inline-block ml-2 text-muted">
-											<i class="fal fa-lock-open-alt color-success-500 mr-1"></i>
-											Lahan Tersedia
+										<div class="js-easy-pie-chart color-info-500 position-relative d-inline-flex align-items-center justify-content-center" id="pieChartAktif" data-percent="" data-piesize="50" data-linewidth="5" data-linecap="butt">
+											<div class="d-flex flex-column align-items-center justify-content-center position-absolute pos-left pos-right pos-top pos-bottom fw-300 fs-lg">
+												<span class="js-percent d-block text-dark"></span>
+											</div>
+										</div>
+										<span class="d-inline-block fs-lg ml-2 text-muted">
+											Lahan Aktif
 										</span>
 										<div class="ml-auto d-inline-flex align-items-center">
 											<div class="d-inline-flex flex-column ml-2 text-right fw-500">
 												<span class="d-inline-block">
-													<span id="totalLuasAktif">{{ number_format($data['totalLuasAktif'] / 10000, 3, ',', '.') }}</span> ha
+													<span id="totalLahanAktif"></span> ha
 												</span>
 												<span class="d-inline-block">
-													<span id="totalLahanAktif">{{$data['totalLahanAktif']}}</span> titik
+													<span id="jmlLahanAktif"></span> titik
 												</span>
 											</div>
 										</div>
 									</div>
 								</div>
-								<div class="col-sm-12 col-md-4">
+								<div class="col-sm-12 col-md-6">
 									<div class="px-3 py-2 d-flex align-items-center m-2">
-										<span class="d-inline-block ml-2 text-muted">
-											<i class="fal fa-lock color-warning-500 mr-1"></i>
+										<div class="js-easy-pie-chart color-warning-500 position-relative d-inline-flex align-items-center justify-content-center" id="pieChartMitra" data-percent="" data-piesize="50" data-linewidth="5" data-linecap="butt">
+											<div class="d-flex flex-column align-items-center justify-content-center position-absolute pos-left pos-right pos-top pos-bottom fw-300 fs-lg">
+												<span class="js-percent d-block text-dark"></span>
+											</div>
+										</div>
+										<span class="d-inline-block fs-lg ml-2 text-muted">
 											Lahan Bermitra
 										</span>
 										<div class="ml-auto d-inline-flex align-items-center">
 											<div class="d-inline-flex flex-column ml-2 text-right fw-500">
 												<span class="d-inline-block">
-													<span id="totalLuasNonAktif">{{ number_format($data['totalLuasNonAktif'] / 10000, 3, ',', '.') }}</span> ha
+													<span id="totalLahanMitra"></span> ha
 												</span>
 												<span class="d-inline-block">
-													<span id="totalLahanNonAktif">{{$data['totalLahanNonAktif']}}</span> titik
+													<span id="jmlLahanMitra"></span> titik
+												</span>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="col-sm-12 col-md-6">
+									<div class="px-3 py-2 d-flex align-items-center m-2">
+										<div class="js-easy-pie-chart color-success-500 position-relative d-inline-flex align-items-center justify-content-center" id="pieChartTersedia" data-percent="" data-piesize="50" data-linewidth="5" data-linecap="butt">
+											<div class="d-flex flex-column align-items-center justify-content-center position-absolute pos-left pos-right pos-top pos-bottom fw-300 fs-lg">
+												<span class="js-percent d-block text-dark"></span>
+											</div>
+										</div>
+										<span class="d-inline-block fs-lg ml-2 text-muted">
+											{{-- <i class="fas fa-power-off color-success-500 mr-1"></i> --}}
+											Lahan Tersedia
+										</span>
+										<div class="ml-auto d-inline-flex align-items-center">
+											<div class="d-inline-flex flex-column ml-2 text-right fw-500">
+												<span class="d-inline-block">
+													<span id="luasTersedia">{{ number_format($data['luasTersedia'] / 10000, 3, ',', '.') }}</span> ha
+												</span>
+												<span class="d-inline-block">
+													<span id="jmlTersedia">
+														{{ number_format($data['jmlTersedia'], 0, ',', '.') }}
+													</span> titik
 												</span>
 											</div>
 										</div>
@@ -211,7 +246,10 @@
 
 		attachCheckboxListeners();
 
+		fetchSummaryData()
+
         initMap();
+
 
         $('#default-example-modal-sm-center').on('shown.bs.modal', function () {
             $(".select2-placeholder-multiple").select2({
@@ -221,6 +259,67 @@
             });
         });
     });
+
+	function formatNumber(value, divisor = 1, decimalPlaces = 0) {
+    // Divide the number and format with specified decimal places
+		return new Intl.NumberFormat('id-ID', {
+			minimumFractionDigits: decimalPlaces,
+			maximumFractionDigits: decimalPlaces
+		}).format(value / divisor);
+	}
+
+	function fetchSummaryData() {
+		const baseUrl = '{{ route('2024.datafeeder.responseGetLocationInKabupatenSummary') }}';
+		const selectedKabupaten = Array.from(document.querySelectorAll('.kabupaten-checkbox:checked'))
+			.map(chk => chk.id);
+
+		const url = new URL(baseUrl, window.location.origin);
+		selectedKabupaten.forEach(id => url.searchParams.append('kabupaten_id[]', id));
+
+		fetch(url, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+				'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+			}
+		})
+		.then(response => response.json())
+		.then(data => {
+			// Update text content
+			document.getElementById('totalLuas').textContent = formatNumber(data.totalLuas, 10000, 4);
+			document.getElementById('jmlLahan').textContent = formatNumber(data.jmlLahan);
+			document.getElementById('totalLahanAktif').textContent = formatNumber(data.totalLahanAktif, 10000, 4);
+			document.getElementById('jmlLahanAktif').textContent = formatNumber(data.jmlLahanAktif);
+			document.getElementById('totalLahanMitra').textContent = formatNumber(data.totalLahanMitra, 10000, 4);
+			document.getElementById('jmlLahanMitra').textContent = formatNumber(data.jmlLahanMitra);
+			document.getElementById('luasTersedia').textContent = formatNumber(data.luasTersedia, 10000, 4);
+			document.getElementById('jmlTersedia').textContent = formatNumber(data.jmlTersedia);
+
+			updatePieChart('pieChartAktif', data.prosenAktif);
+			updatePieChart('pieChartMitra', data.prosenMitra);
+			updatePieChart('pieChartTersedia', data.prosenTersedia);
+		})
+		.catch(error => console.error('Error fetching summary data:', error));
+	}
+
+	function updatePieChart(chartId, percentage) {
+		const pieChart = document.getElementById(chartId);
+		if (pieChart) {
+			pieChart.setAttribute('data-percent', percentage.toFixed(0));
+
+			const chartInstance = $(pieChart).data('easyPieChart');
+			if (chartInstance) {
+				chartInstance.update(percentage);
+			} else {
+				$(pieChart).easyPieChart({
+					lineCap: 'butt',
+					lineWidth: 5,
+					size: 50,
+					barColor: $(pieChart).data('color') || '#000',
+				});
+			}
+		}
+	}
 
     let map;
     var initialCenter = { lat: -2.5489, lng: 118.0149 };
@@ -384,12 +483,16 @@
 
 		if (selectedKabupaten.length > 0) {
 			fetchSpatialData(selectedKabupaten);
+			fetchSummaryData(); // Fetch summary data as well
 		} else {
 			clearMapMarkers();
 			clearMapPolygons();
 			clearMapCluster();
 			map.setZoom(initialZoom);
 			map.setCenter(initialCenter);
+
+			// Clear summary data
+			fetchSummaryData();
 		}
 	}
 
@@ -845,7 +948,6 @@
         });
     }
 </script>
-
 
 @endsection
 

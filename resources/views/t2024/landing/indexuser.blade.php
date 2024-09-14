@@ -509,6 +509,12 @@
 							<span>Peta Spatial</span>
 						</span>
 						<span class="d-inline-flex flex-column justify-content-center">
+							<a href="{{ route('2024.spatial.spatialList') }}" class="btn android-button btn-outline-warning">
+								<img src="{{ asset('/img/avatars/tabular.png') }}" alt="" style="width: 4rem; height: 4rem;">
+							</a>
+							<span>Tabel Lokasi</span>
+						</span>
+						<span class="d-inline-flex flex-column justify-content-center">
 							<a href="{{ route('2024.spatial.wilayah') }}" class="btn android-button btn-outline-warning">
 								<img src="{{ asset('/img/avatars/wilayah.png') }}" alt="" style="width: 4rem; height: 4rem;">
 							</a>
