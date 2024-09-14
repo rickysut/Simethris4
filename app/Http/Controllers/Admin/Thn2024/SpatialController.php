@@ -39,40 +39,29 @@ class SpatialController extends Controller
 
 		$mapkey = ForeignApi::find(1);
 
+		// Hitung total luas, jumlah lahan, luas dan jumlah lahan aktif/tidak aktif secara bersamaan
 		$summary = MasterSpatial::selectRaw(
 			'SUM(luas_lahan) AS total_luas,
-			COUNT(*) AS total_lahan,
-
-			SUM(CASE WHEN is_active = 1 THEN luas_lahan ELSE 0 END) AS total_lahan_aktif,
-			SUM(CASE WHEN is_active = 1 THEN 1 ELSE 0 END) AS jml_lahan_aktif,
-
-			SUM(CASE WHEN status = 1 AND is_active = 1 THEN luas_lahan ELSE 0 END) AS total_lahan_mitra,
-			SUM(CASE WHEN status = 1 AND is_active = 1 THEN 1 ELSE 0 END) AS jml_lahan_mitra'
+         COUNT(*) AS total_lahan,
+         SUM(CASE WHEN status = 0 THEN luas_lahan ELSE 0 END) AS total_luas_aktif,
+         SUM(CASE WHEN status = 0 THEN 1 ELSE 0 END) AS total_lahan_aktif'
 		)->first();
 
 		// Menghitung luas dan jumlah lahan tidak aktif
 		$totalLuas = $summary->total_luas;
-		$jmlLahan = $summary->total_lahan;
-
+		$totalLahan = $summary->total_lahan;
+		$totalLuasAktif = $summary->total_luas_aktif;
 		$totalLahanAktif = $summary->total_lahan_aktif;
-		$jmlLahanAktif = $summary->jml_lahan_aktif;
-
-		$totalLahanMitra = $summary->total_lahan_mitra;
-		$jmlLahanMitra = $summary->jml_lahan_mitra;
-
-		// Menghitung luas dan jumlah lahan tersedia
-		$luasTersedia = $totalLahanAktif - $totalLahanMitra;
-		$jmlTersedia = $jmlLahanAktif - $jmlLahanMitra;
+		$totalLuasNonAktif = $totalLuas - $totalLuasAktif;
+		$totalLahanNonAktif = $totalLahan - $totalLahanAktif;
 
 		$data = [
 			'totalLuas' => $totalLuas,
-			'jmlLahan' => $jmlLahan,
+			'totalLahan' => $totalLahan,
+			'totalLuasAktif' => $totalLuasAktif,
 			'totalLahanAktif' => $totalLahanAktif,
-			'jmlLahanAktif' => $jmlLahanAktif,
-			'totalLahanMitra' => $totalLahanMitra,
-			'jmlLahanMitra' => $jmlLahanMitra,
-			'luasTersedia' => $luasTersedia,
-			'jmlTersedia' => $jmlTersedia,
+			'totalLuasNonAktif' => $totalLuasNonAktif,
+			'totalLahanNonAktif' => $totalLahanNonAktif,
 		];
 
 		return view('t2024.spatial.index', compact('module_name', 'page_title', 'page_heading', 'heading_class', 'mapkey', 'ijins', 'indexKabupaten', 'data'));
@@ -254,83 +243,19 @@ class SpatialController extends Controller
 
 	public function updateStatus(Request $request, $kodeSpatial)
 	{
-		// Validate the request data
 		$validated = $request->validate([
 			'status' => 'required|integer',
 		]);
 
-		try {
-			// Find the spatial record by kode_spatial
-			$spatial = MasterSpatial::where('kode_spatial', $kodeSpatial)->first();
-
-			if (!$spatial) {
-				return response()->json([
-					'success' => false,
-					'message' => 'Spatial data not found.'
-				], 404);
-			}
-
-			// Check if is_active is set to 1
-			if ($spatial->is_active !== 1) {
-				return response()->json([
-					'success' => false,
-					'message' => 'Status Lahan harus diaktifkan terlebih dahulu.'
-				], 400);
-			}
-
-			// Update the status
+		$spatial = MasterSpatial::where('kode_spatial', $kodeSpatial)->first();
+		// dd($kodeSpatial);
+		if ($spatial) {
 			$spatial->status = $validated['status'];
 			$spatial->save();
 
 			return response()->json(['success' => true]);
-		} catch (\Exception $e) {
-			// Handle any unexpected errors
-			return response()->json([
-				'success' => false,
-				'message' => 'An error occurred: ' . $e->getMessage()
-			], 500);
-		}
-	}
-
-
-	public function updateActive(Request $request, $kodeSpatial)
-	{
-		// Validate the request data
-		$validated = $request->validate([
-			'activeStatus' => 'required|integer',
-		]);
-
-		try {
-			// Find the spatial record by kode_spatial
-			$spatial = MasterSpatial::where('kode_spatial', $kodeSpatial)->first();
-
-			if (!$spatial) {
-				return response()->json([
-					'success' => false,
-					'message' => 'Spatial data not found.'
-				], 404);
-			}
-
-			// Check if status is 1
-			if ($spatial->status === 1) {
-				return response()->json([
-					'success' => false,
-					'message' => 'Lahan berstatus Bermitra, tidak dapat di blokir.'
-				], 400);
-			}
-
-			// Update the is_active status
-			$spatial->is_active = $validated['activeStatus'];
-			$spatial->save();
-
-			return response()->json(['success' => true]);
-
-		} catch (\Exception $e) {
-			// Handle any unexpected errors
-			return response()->json([
-				'success' => false,
-				'message' => 'An error occurred: ' . $e->getMessage()
-			], 500);
+		} else {
+			return response()->json(['success' => false, 'message' => 'Spatial data not found.'], 404);
 		}
 	}
 
