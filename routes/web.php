@@ -459,6 +459,7 @@ Route::group(['prefix' => '2024', 'as' => '2024.', 'namespace' => 'Admin', 'midd
 			Route::get('/getLocDataByIjinBySpatial/{noIjin}/{spatial}', 'DataFeederController@getLocDataByIjinBySpatial')->name('getLocDataByIjinBySpatial');
 			Route::post('/postLocDataByIjinBySpatial', 'DataFeederController@postLocDataByIjinBySpatial')->name('postLocDataByIjinBySpatial');
 			Route::get('/responseGetLocationInKabupaten', 'DataFeederController@responseGetLocationInKabupaten')->name('responseGetLocationInKabupaten');
+			Route::get('/responseGetLocationInKabupatenSummary', 'DataFeederController@responseGetLocationInKabupatenSummary')->name('responseGetLocationInKabupatenSummary');
 			Route::get('/responseGetLocationByKode', 'DataFeederController@responseGetLocationByKode')->name('responseGetLocationByKode');
 			Route::post('/responseGetSpatialDetail', 'DataFeederController@responseGetSpatialDetail')->name('responseGetSpatialDetail');
 			Route::get('/responseGetSpatialMoreDetail/{spatial}', 'DataFeederController@responseGetSpatialMoreDetail')->name('responseGetSpatialMoreDetail');
@@ -644,6 +645,7 @@ Route::group(['prefix' => '2024', 'as' => '2024.', 'namespace' => 'Admin', 'midd
 			Route::get('/{id}/show', 'SpatialController@show')->name('edit');
 			Route::post('/updatesingle', 'SpatialController@updatesingle')->name('updatesingle');
 			Route::post('/updateStatus/{kodeSpatial}', 'SpatialController@updateStatus')->name('updateStatus');
+			Route::post('/updateActive/{kodeSpatial}', 'SpatialController@updateActive')->name('updateActive');
 			Route::post('/batchUpdateStatus', 'SpatialController@batchUpdateStatus')->name('batchUpdateStatus');
 
 			Route::get('/master-wilayah', 'MasterWilayahController@index')->name('wilayah');
