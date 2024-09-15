@@ -185,26 +185,6 @@
 	<div class="row">
 		<div class="col">
 			<div class="panel" id="panel-1">
-				<div class="panel-container show">
-					<div class="panel-content d-flex justify-content-between align-items-start">
-						<div>
-							<h4 class="fw-600">KDL_000001</h4>
-						</div>
-						<div class="d-inline-flex flex-column">
-							<div class="custom-control custom-checkbox">
-								<input type="checkbox" class="custom-control-input" id="defaultChecked" checked="">
-								<label class="custom-control-label" for="defaultChecked">Checked</label>
-							</div>
-							<div class="custom-control custom-checkbox">
-								<input type="checkbox" class="custom-control-input" id="defaultChecked" checked="">
-								<label class="custom-control-label" for="defaultChecked">Checked</label>
-							</div>
-						</div>
-					</div>
-					<div class="card-footer">Footer</div>
-				</div>
-			</div>
-			<div class="panel" id="panel-1">
 				<div class="panel-hdr">
 					<h2>
 						Daftar <span class="fw-300"><i>Lahan</i></span>
@@ -268,44 +248,6 @@
 								<small id="helpMitra" class="text-muted">saring data sesuai status kemitraan</small>
 							</div>
 						</div>
-					</div>
-				</div>
-				<div class="panel-container show">
-					<div class="panel-content">
-						<h4 class="text-muted">Pencarian Data</h4>
-						<div class="row">
-							<div class="form-group col-md-6">
-								<label for="idKab">Kabupaten</label>
-								<select name="idKab" id="idKab" class="custom-select form-control" aria-describedby="helpKab">
-									<option value="" hidden>pilih kabupaten</option>
-									<option value="" >Semua kabupaten</option>
-									@foreach ($indexKabupaten as $kabupaten)
-									<option value="{{$kabupaten['kabupaten_id']}}">{{$kabupaten['kabupaten_id']}} - {{$kabupaten['nama_kab']}}</option>
-									@endforeach
-								</select>
-								<small id="helpKab" class="text-muted">saring data sesuai kabupaten dipilih</small>
-							</div>
-							<div class="form-group col-md-3">
-								<label for="status_lahan">Status Lahan</label>
-								<select name="status_lahan" id="status_lahan" class="custom-select form-control" aria-describedby="helpStatus">
-									<option value="" hidden>pilih status</option>
-									<option value="" >Semua status</option>
-									<option value="1">Aktif</option>
-									<option value="0">Tidak Aktif</option>
-								</select>
-								<small id="helpStatus" class="text-muted">saring data sesuai status lahan</small>
-							</div>
-							<div class="form-group col-md-3">
-								<label for="status_mitra">Status Kemitraan</label>
-								<select name="status_mitra" id="status_mitra" class="custom-select form-control" aria-describedby="helpMitra">
-									<option value="" hidden>pilih status</option>
-									<option value="" >Semua status</option>
-									<option value="1">Bermitra</option>
-									<option value="0">Tanpa mitra</option>
-								</select>
-								<small id="helpMitra" class="text-muted">saring data sesuai status kemitraan</small>
-							</div>
-						</div>
 						<div class="row">
 							<div class="form-group col-12">
 								<label class="form-label">Cari data</label>
@@ -327,16 +269,11 @@
 				</div>
 			</div>
 						<!-- datatable start -->
-						<table id="tblSpatial" class="table table-hover table-sm table-striped w-100">
-							<thead class="thead-themed">
-								<th>Kode Lokasi</th>
-								<th>Pengelola</th>
-								<th>Luas</th>
-								<th>Wilayah</th>
-								<th>Status</th>
-								<th>Tindakan</th>
-							</thead>
-							<tbody>
+			<table id="tblSpatial" class="table table-sm table-light w-100 mb-5">
+				<thead class="thead-themed">
+					<th>Kode Lokasi</th>
+				</thead>
+				<tbody>
 
 				</tbody>
 			</table>
@@ -359,6 +296,29 @@
 			lengthChange: false,
 			processing: true,
 			serverSide: true,
+			language: {
+				"processing": "Sedang memproses...",
+				"lengthMenu": "Tampilkan _MENU_ entri",
+				"zeroRecords": "Tidak ditemukan data yang sesuai",
+				"info": "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
+				"infoEmpty": "Menampilkan 0 sampai 0 dari 0 entri",
+				"infoFiltered": "(disaring dari _MAX_ entri keseluruhan)",
+				"search": "Cari:",
+				"paginate": {
+					"first": "Pertama",
+					"last": "Terakhir",
+					"next": "Berikutnya",
+					"previous": "Sebelumnya"
+				},
+				"emptyTable": "Tidak ada data di dalam tabel",
+				"loadingRecords": "Sedang memuat...",
+				"thousands": ".",
+				"decimal": ",",
+				"aria": {
+					"sortAscending": ": aktifkan untuk mengurutkan kolom naik",
+					"sortDescending": ": aktifkan untuk mengurutkan kolom turun"
+				}
+			},
 			ajax: {
 				url: "{{ route('2024.datafeeder.getAllSpatials') }}",
 				type: "GET",
@@ -366,30 +326,18 @@
 					d.kabupaten_id = $('#idKab').val();
 					d.status_lahan = $('#status_lahan').val();
 					d.status_mitra = $('#status_mitra').val();
+					d.searchValue = $('#searchValue').val();
 					console.log('intip: ', d);
 				},
 			},
 			dom:
-				"<'row mb-3'<'col-sm-12 col-md-6 d-flex align-items-center justify-content-start'f><'col-sm-12 col-md-6 d-flex align-items-center justify-content-end'>>" +
+				"<'row mb-3'<'col-sm-12 col-md-6 d-flex align-items-center justify-content-start'><'col-sm-12 col-md-6 d-flex align-items-center justify-content-end'>>" +
 				"<'row'<'col-sm-12'tr>>" +
-				"<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
-			"columnDefs": [
-				{ "targets": [2, 3], "className": "text-right" },
-				{ "targets": [4], "className": "text-center" },
-			],
+				"<'row mb-5'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+
 			columns: [
-				{ data: 'kode_spatial' },
-				{ data: 'nama_anggota' },
-				{ data: 'luas_lahan' },
 				{
-					data: 'kabupaten_id',
-					render: function (data, type, row) {
-						return row.nama_kabupaten;
-					}
-				},
-				{ data: null, },
-				{
-					data: 'status',
+					data: 'kode_spatial',
 					render: function(data, type, row) {
 						var kdSpatial = row.kode_spatial;
 						var anggota = row.nama_anggota;
@@ -415,25 +363,60 @@
 						var kabId = row.kabupaten_id;
 						var namaKab = row.nama_kabupaten;
 						var kode = kdSpatial.replace(/[^a-zA-Z0-9]/g, '');
-						var checked = data == 1 ? 'checked' : '';
+						var statusCheck = row.status == 1 ? 'checked' : '';
+						var activeCheck = row.active == 1 ? 'checked' : '';
 
 						var url = "{{ route('2024.spatial.edit', ':kode') }}";
 						var kmlFile = row.kml_url;
 						var kmlPath = `{{ asset('storage') }}/${kmlFile}`;
 						url = url.replace(':kode', kode);
 
-
-						var actionBtn = `
-							<div class="justify-content-center fs-sm d-flex align-items-center">
-								<a href="${url}" class="btn btn-icon btn-xs btn-default waves-effect waves-themed" data-toggle="tooltip" data-offset="0,10" data-original-title="Lihat Peta">
-									<i class="fal fa-edit"></i>
-								</a>
-								<a href="${kmlPath}" class="btn btn-icon btn-xs btn-default waves-effect waves-themed ml-1" title="unduh kml" download>
-									<i class="fal fa-download"></i>
-								</a>
-								<div class="custom-control custom-switch ml-1">
-									<input type="checkbox" class="custom-control-input form-control-sm status-switch" id="customSwitch_${kode}" ${checked} data-kode="${kdSpatial}">
-									<label class="custom-control-label" for="customSwitch_${kode}"><span class="sr-only">Open - Close</span></label>
+						var listCard = `
+							<div class="panel" id="panel-1">
+								<div class="panel-container show">
+									<div class="panel-content">
+										<div class="d-flex flex-row pb-3 pt-2  border-top-0 border-left-0 border-right-0">
+                                            <div class="d-inline-block align-middle mr-3">
+                                                <div class="alias-box">
+													<span class="display-4 fw-700">${anggotaSuffix}</span>
+												</div>
+                                            </div>
+                                            <h5 class="mb-0 flex-1 text-dark fw-700 text-lg">
+                                               	${kdSpatial}
+                                                <small class="m-0 l-h-n">
+                                                    <div >
+														<div class="form-group mb-1 mt-2">
+															<span class="uppercase">${anggota}</span>
+														</div>
+														<div class="form-group mb-1"><span>${luas}</span>
+														</div>
+														<div class="form-group mb-1"><span class="uppercase">${namaKab}</span>
+														</div>
+												</div>
+                                                </small>
+                                            </h5>
+                                            <span>
+                                                <div class="d-inline-flex flex-column">
+													<div class="custom-control custom-checkbox">
+														<input type="checkbox" class="custom-control-input form-control-sm active-switch" id="activeCheck_${kode}" ${activeCheck} data-kode="${kdSpatial}">
+														<label class="custom-control-label" for="activeCheck_${kode}">Aktif</label>
+													</div>
+													<div class="custom-control custom-checkbox">
+														<input type="checkbox" class="custom-control-input form-control-sm status-switch" id="customSwitch_${kode}" ${statusCheck} data-kode="${kdSpatial}">
+														<label class="custom-control-label" for="customSwitch_${kode}"><span>Bermitra</span></label>
+													</div>
+												</div>
+                                            </span>
+                                        </div>
+									</div>
+									<div class="card-footer text-right">
+										<a href="${url}" class="btn btn-sm btn-info waves-effect waves-themed" data-toggle="tooltip" data-offset="0,010" title data-original-title="Lihat Peta">
+											<i class="fal fa-edit"></i> Lihat/Perbarui Peta
+										</a>
+										<a href="${kmlPath}" class="btn btn-sm btn-success waves-effect waves-themed ml-1" data-toggle="tooltip" data-offset="0,010" data-original-title="Unduh peta" download>
+											<i class="fal fa-download"></i> Unduh Peta
+										</a>
+									</div>
 								</div>
 							</div>
 							`;
@@ -469,7 +452,7 @@
 			}
 		});
 
-		$('#idKab, #status_lahan, #status_mitra').change(function() {
+		$('#searchValue, #idKab, #status_lahan, #status_mitra').change(function() {
 			console.log('Kabupaten ID:', $('#idKab').val());  // Logging nilai kabupaten_id
 			console.log('Status Lahan:', $('#status_lahan').val());  // Logging nilai status_lahan
 			console.log('Status Mitra:', $('#status_mitra').val());  // Logging nilai status_mitra
