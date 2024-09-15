@@ -40,19 +40,19 @@ class SpatialController extends Controller
 			$l = $validated['l'] ?? null;
 			$k = $validated['k'] ?? null;
 
-		// Build the query
-		$query = MasterSpatial::select(
-			'kode_spatial',
-			'ktp_petani',
-			'nama_petani',
-			'provinsi_id',
-			'kabupaten_id',
-			'kecamatan_id',
-			'kelurahan_id',
-			'luas_lahan',
-			'status',
-			'is_active'
-		)->where('is_active', 1);
+			// Build the query
+			$query = MasterSpatial::select(
+				'kode_spatial',
+				'ktp_petani',
+				'nama_petani',
+				'provinsi_id',
+				'kabupaten_id',
+				'kecamatan_id',
+				'kelurahan_id',
+				'luas_lahan',
+				'status',
+				'is_active'
+			)->where('is_active', 1);
 
 			if (!is_null($s)) {
 				$query->where('status', $s);
@@ -95,20 +95,39 @@ class SpatialController extends Controller
 				];
 			});
 
-		// Return the paginated data along with the "about" information
-		return response()->json([
-			'Status' => 'SUCCESS',
-			'Tentang' => $about,
-			'data_spatial' => $formattedSpatials,
-			'pagination' => [
-				'total' => $spatials->total(),
-				'per_page' => $spatials->perPage(),
-				'current_page' => $spatials->currentPage(),
-				'last_page' => $spatials->lastPage(),
-				'next_page_url' => $spatials->nextPageUrl(),
-				'prev_page_url' => $spatials->previousPageUrl(),
-			]
-		]);
+			// Return the paginated data along with the "about" information
+			return response()->json([
+				'success' => true,
+				'Status' => 'SUCCESS',
+				'Tentang' => $about,
+				'data_spatial' => $formattedSpatials,
+				'pagination' => [
+					'total' => $spatials->total(),
+					'per_page' => $spatials->perPage(),
+					'current_page' => $spatials->currentPage(),
+					'last_page' => $spatials->lastPage(),
+					'next_page_url' => $spatials->nextPageUrl(),
+					'prev_page_url' => $spatials->previousPageUrl(),
+				]
+			]);
+		}catch (\Exception $e) {
+			return response()->json([
+				'success' => false,
+				'error' => $e->getMessage(),
+				'message' => 'Failed to update spatial data.',
+				'Status' => 'FAIL',
+				'Tentang' => $about,
+				'data_spatial' => [],
+				'pagination' => [
+					'total' => 0,
+					'per_page' => null,
+					'current_page' => null,
+					'last_page' => null,
+					'next_page_url' => null,
+					'prev_page_url' => null,
+				]
+			]);
+		}
 	}
 
 
