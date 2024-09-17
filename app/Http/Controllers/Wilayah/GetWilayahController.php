@@ -26,34 +26,46 @@ class GetWilayahController extends Controller
 		$provincesJson = $responseProvinsi->json();
 
 		// Ambil data lokal dari database termasuk yang telah dihapus (soft-deleted)
-		$localProvinces = MasterProvinsi::select('provinsi_id', 'nama')->get()->toArray();
+		$localProvinces = MasterProvinsi::select('provinsi_id', 'nama', 'kode_dagri')->get()->toArray();
 
 		// Ubah data API BPS menjadi format yang bisa dibandingkan
 		$foreignProvinces = collect($provincesJson)->map(function ($province) {
 			return [
 				'provinsi_id' => $province['kode_bps'],
 				'nama' => $province['nama_bps'],
+				'kode_dagri' => $province['kode_dagri'],
 			];
-		})->sortBy('provinsi_id')->values()->all();
+		})->sortBy('provinsi_id')->values()->toArray();
 
 		// Sort data lokal untuk memastikan perbandingan yang akurat
-		$localProvinces = collect($localProvinces)->sortBy('provinsi_id')->values()->all();
+		$localProvinces = collect($localProvinces)->sortBy('provinsi_id')->values()->toArray();
 
-		$provinces = collect($provincesJson)->map(function ($province) {
-			return [
-				'provinsi_id' => $province['kode_bps'],
-				'nama' => $province['nama_bps'],
-			];
-		})->sortBy('nama')->values()->all();
+		// Menggunakan array_udiff_assoc untuk membandingkan array
+		$inApiNotInLocal = array_udiff_assoc(
+			$foreignProvinces,
+			$localProvinces,
+			function ($a, $b) {
+				return strcmp(json_encode($a), json_encode($b));
+			}
+		);
+
+		$inLocalNotInApi = array_udiff_assoc(
+			$localProvinces,
+			$foreignProvinces,
+			function ($a, $b) {
+				return strcmp(json_encode($a), json_encode($b));
+			}
+		);
 
 		// Bandingkan kedua set data
-		$status = $foreignProvinces == $localProvinces ? 'clear' : 'Need Update';
+		$status = (count($inApiNotInLocal) > 0 || count($inLocalNotInApi) > 0) ? 'Need Update' : 'clear';
 
 		return response()->json([
 			'status' => $status,
-			'data' => $provinces,
+			'data' => $foreignProvinces,
 		]);
 	}
+
 
 	public function getKabupatenByProvinsi($provinsiId)
 	{
@@ -109,9 +121,9 @@ class GetWilayahController extends Controller
 		]);
 
 
-		$kelurahans  = MasterDesa::select('kecamatan_id', 'kelurahan_id','nama_desa')
-		->where('kecamatan_id',$kecamatanId)
-		->orderBy('nama_desa', 'ASC')->get();
+		$kelurahans  = MasterDesa::select('kecamatan_id', 'kelurahan_id', 'nama_desa')
+			->where('kecamatan_id', $kecamatanId)
+			->orderBy('nama_desa', 'ASC')->get();
 		return response()->json([
 			'data' => $kelurahans,
 		]);

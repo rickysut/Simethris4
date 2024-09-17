@@ -1,3 +1,4 @@
+{{-- t2024.logbook.index --}}
 <!DOCTYPE html>
 <html lang="en" class="root-text-sm">
 
@@ -11,6 +12,9 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+	{{-- <script src="https://maps.googleapis.com/maps/api/js?key={{ isset($mapkey) ? $mapkey->key : 'Default Key' }}&libraries=drawing,geometry&callback=initMap" async defer></script> --}}
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
 	<style>
 		.table-sm th,
 		.table-sm td {
@@ -19,6 +23,15 @@
 		.root-text-sm{
 			font-size: 15px;
 		}
+
+		.container.page-cover {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			height: 100vh;
+			width: 100%;
+		}
+
 		.pagebreak {
 			page-break-before: always
 		}
@@ -35,13 +48,41 @@
 <body>
 	<div class="main small">
 		{{-- <a href="{{route('2024.verifikator.tanam.generateLogbook', $payload['ijin'])}}">Generate PDF</a> --}}
+		<div class="container page-cover">
+			<div class="row justify-content-between align-items-start">
+				<!-- Left Grid: Logo & Text -->
+				<div class="col-12 d-flex align-items-start justify-content-center">
+					<img src="https://simethris4.test/img/favicon.png" class="mx-2 mt-1 profile-image rounded-circle" style="width: 50px; height:50px" alt="Rijaludin Akbar">
+					{{-- <i class="bi bi-ui-checks-grid text-secondary display-4 me-3"></i> --}}
+					<div class="logo-text">
+						<h1 class="mb-0 fw-bold">LOGBOOK PENANAMAN</h1>
+						<p class="mb-3 h5 text-muted">Pelaksanaan Realisasi Wajib Tanam-Produksi Bawang Putih.</p>
+						<div>
+							<div class="d-flex">
+								<div class="col-4"><span class="text-secondary">Perusahaan: </span></div>
+								<div class="col-8"><span class="fw-bold">{{$payload['company']}}</span></div>
+							</div>
+							<div class="d-flex">
+								<div class="col-4"><span class="text-secondary">Nomor Ijin (RIPH): </span></div>
+								<div class="col-8"><span class="fw-bold">{{$payload['noIjin']}}</span></div>
+							</div>
+							<div class="d-flex">
+								<div class="col-4"><span class="text-secondary">Periode: </span></div>
+								<div class="col-8"><span class="fw-bold">{{$payload['periode']}}</span></div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<hr>
+		</div>
 		@foreach($payload['lokasis'] as $lokasi)
 			<div class="pagebreak"></div>
 			<div class="px-5 py-3">
 				<div class="row justify-content-center align-items-start mb-4">
 					<div class="col-md-7">
 						<div class="logo-text text-center">
-							<h6 class="mb-0 fw-bold">PENCATATAN KEGIATAN BUDIDAYA BAWANG PUTIH</h6>
+							<h6 class="mb-0 fw-bold">CATATAN KEGIATAN BUDIDAYA BAWANG PUTIH</h6>
 							<p class="mb-0">Realisasi Wajib Tanam-Produksi Bawang Putih</p>
 						</div>
 					</div>
@@ -57,6 +98,9 @@
 						<input type="hidden" id="latitude-{{ $lokasi->spatial->kode_spatial }}" value="{{ $lokasi->spatial->latitude }}">
 						<input type="hidden" id="longitude-{{ $lokasi->spatial->kode_spatial }}" value="{{ $lokasi->spatial->longitude }}">
 						<input type="hidden" id="polygon-{{ $lokasi->spatial->kode_spatial }}" value="{{ $lokasi->spatial->polygon }}">
+						{{-- <img src="https://maps.googleapis.com/maps/api/staticmap?center={{ $lokasi->spatial->latitude }},{{ $lokasi->spatial->longitude }}&zoom=18&size=600x300&maptype=satellite&key={{ $mapkey->key }}" alt="Map for location {{ $lokasi->kode_spatial }}" style="height: 300px; width: 100%;"> --}}
+						{{-- <img src="{{ asset('storage/uploads/' . $npwp . '/' . $periode . '/' . $payload['noIjin'] . '/map_' . $lokasi->kode_spatial . '.png') }}" alt="Map for location {{ $lokasi->kode_spatial }}"> --}}
+
 						<div hidden id="myMap-{{$lokasi->kode_spatial}}" style="height: 300px; width: 100%;"></div>
 					</div>
 					<div class="col-md-6">
@@ -74,7 +118,7 @@
 							</li>
 							<li class="list-group-item d-flex justify-content-start">
 								<span class="col-md-4 text-muted">Longitude</span>
-								<span class="col-md-8 ml-auto">: {{$lokasi->spatial->latitude}}</span>
+								<span class="col-md-8 ml-auto">: {{$lokasi->spatial->longitude}}</span>
 							</li>
 							<li class="list-group-item d-flex justify-content-start">
 								<span class="col-md-4 text-muted">Luas lahan</span>

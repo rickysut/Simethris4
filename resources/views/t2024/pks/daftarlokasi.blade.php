@@ -59,9 +59,9 @@
 							<thead class="thead-themed">
 								<th>Kode Lokasi</th>
 								<th>Pelaksana</th>
-								<th>Realisasi Tanam (m2)</th>
+								<th>Tanam (m2)</th>
 								<th>Tanggal</th>
-								<th>Realisasi Panen</th>
+								<th>Panen</th>
 								<th>Tanggal</th>
 								<th>Tindakan</th>
 							</thead>
@@ -111,6 +111,28 @@
 				ordering: true,
 				processing: true,
 				serverSide: true,
+				language: {
+					"processing": "Sedang memproses...",
+					"lengthMenu": "Tampilkan _MENU_ entri",
+					"zeroRecords": "Tidak ditemukan data yang sesuai",
+					"info": "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
+					"infoEmpty": "Menampilkan 0 sampai 0 dari 0 entri",
+					"infoFiltered": "(disaring dari _MAX_ entri keseluruhan)",
+					"paginate": {
+						"first": "Pertama",
+						"last": "Terakhir",
+						"next": "Berikutnya",
+						"previous": "Sebelumnya"
+					},
+					"emptyTable": "Tidak ada data di dalam tabel",
+					"loadingRecords": "Sedang memuat...",
+					"thousands": ".",
+					"decimal": ",",
+					"aria": {
+						"sortAscending": ": aktifkan untuk mengurutkan kolom naik",
+						"sortDescending": ": aktifkan untuk mengurutkan kolom turun"
+					}
+				},
 				order: [[0, 'asc']],
 				dom:
 					"<'row mb-3'<'col-sm-12 col-md-6 d-flex align-items-center justify-content-start'f><'col-sm-12 col-md-6 d-flex align-items-center justify-content-end'B>>" +
@@ -156,8 +178,11 @@
 					{
 						data: 'luas_tanam',
 						render: function(data, type, row) {
-							var formattedData = parseFloat(data).toLocaleString('id-ID');
-							return formattedData + ' m2';
+							if (data) {
+								var formattedData = parseFloat(data).toLocaleString('id-ID');
+								return formattedData + ' m2';
+							}
+							return '';
 						}
 					},
 					{
@@ -172,7 +197,18 @@
 							return '';
 						}
 					},
-					{ data: 'volume_panen'},
+					{
+						data: 'volume_panen',
+						render: function(data, type, row) {
+							if (data) {
+								// Convert kg to tons and format to 4 decimal places
+								var tons = parseFloat(data) / 1000;
+								var formattedData = tons.toLocaleString('id-ID', { minimumFractionDigits: 1, maximumFractionDigits: 3 });
+								return formattedData + ' ton';
+							}
+							return '';
+						}
+					},
 					{
 						data: 'tgl_panen',
 						render: function(data, type, row) {
@@ -249,7 +285,13 @@
 						titleAttr: 'Print Table',
 						className: 'btn-outline-primary btn-sm btn-icon mr-1'
 					}
-				]
+				],
+				rowCallback: function(row, data) {
+					$(row).css('cursor', 'pointer');
+					$(row).on('click', function() {
+
+					});
+				}
 			});
 		});
 		function confirmDelete(button) {

@@ -262,16 +262,37 @@
 										<button class="btn btn-default waves-effect waves-themed" type="button">Temukan</button>
 									</div>
 								</div>
-								<small id="searchValue" class="text-muted">Temukan data berdasarkan Kode Lokasi, Kabupaten, Nama Pengelola/Petani</small>
+								<small for="searchValue" class="text-muted">Temukan data berdasarkan Kode Lokasi, Kabupaten, Nama Pengelola/Petani</small>
+							</div>
+						</div>
+						<div class="d-flex justify-content-between align-items-center">
+							<div></div>
+							<div class="ml-auto">
+								<button id="printSpatial" class="btn btn-primary">
+									<span id="spinner" class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>
+    								<span id="buttonText">Cetak Daftar</span>
+								</button>
 							</div>
 						</div>
 					</div>
 				</div>
 			</div>
-						<!-- datatable start -->
+			<div hidden>
+				<table id="filesNotProcessedTable" class="table table-bordered">
+					<thead>
+						<tr>
+							<th>Nama File</th>
+							<th>Alasan</th>
+						</tr>
+					</thead>
+					<tbody>
+						<!-- Data akan dimasukkan di sini -->
+					</tbody>
+				</table>
+			</div>
 			<table id="tblSpatial" class="table table-sm table-light w-100 mb-5">
 				<thead class="thead-themed">
-					<th>Kode Lokasi</th>
+					<th></th>
 				</thead>
 				<tbody>
 
@@ -291,6 +312,90 @@
 {{-- data --}}
 <script>
 	$(document).ready(function(){
+
+		$('#printSpatial').on('click', function() {
+			// Get the values from the form inputs or elements
+			const kabupatenId = $('#idKab').val();
+			const statusLahan = $('#status_lahan').val();
+			const statusMitra = $('#status_mitra').val();
+
+			// Create the URL with query parameters
+			const url = `{{ route('2024.spatial.renderPrintAllSpatials') }}?kabupaten_id=${kabupatenId}&status_lahan=${statusLahan}&status_mitra=${statusMitra}`;
+
+			// Show spinner and change button text
+			$('#spinner').show();
+			$('#buttonText').text('Mempersiapkan Unduhan');
+
+			// Use AJAX to request the PDF
+			$.ajax({
+				url: url,
+				method: 'GET',
+				xhrFields: {
+					responseType: 'blob'  // Important for binary file handling
+				},
+				success: function(data, status, xhr) {
+					// Create a URL for the blob and initiate download
+					const blob = new Blob([data], { type: 'application/pdf' });
+					const link = document.createElement('a');
+					link.href = window.URL.createObjectURL(blob);
+					link.download = 'daftar_spatials.pdf';  // Specify the filename
+					document.body.appendChild(link);
+					link.click();
+					document.body.removeChild(link);
+
+					// Show success message with Swal.fire
+					Swal.fire({
+						icon: 'success',
+						title: 'Unduhan Selesai',
+						text: 'Berkas PDF berhasil dibuat dan diunduh. Periksa direktori unduhan di perangkat Anda.'
+					});
+				},
+				error: function(xhr, status, error) {
+					// Show error message with Swal.fire
+					Swal.fire({
+						icon: 'error',
+						title: 'Gagal Mengunduh',
+						text: 'Terjadi kesalahan saat mengunduh file: ' + error
+					});
+				},
+				complete: function() {
+					// Hide spinner and revert button text
+					$('#spinner').hide();
+					$('#buttonText').text('Cetak Daftar');
+				}
+			});
+		});
+
+		$('#filesNotProcessedTable').dataTable({
+			dom:
+				"<'row mb-3'<'col-sm-12 col-md-6 d-flex align-items-center justify-content-start'><'col-sm-12 col-md-6 d-flex align-items-center justify-content-end'B>>" +
+				"<'row'<'col-sm-12'tr>>" +
+				"<'row mb-5'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+			buttons: [
+				{
+					extend: 'pdfHtml5',
+					text: '<i class="fa fa-file-pdf"></i>',
+					title: 'Daftar Lahan Wajib Tanam Produksi Bawang Putih',
+					titleAttr: 'Generate PDF',
+					className: 'btn-outline-danger btn-sm btn-icon mr-1'
+				},
+				{
+					extend: 'excelHtml5',
+					text: '<i class="fa fa-file-excel"></i>',
+					title: 'Daftar Lahan Wajib Tanam Produksi Bawang Putih',
+					titleAttr: 'Generate Excel',
+					className: 'btn-outline-success btn-sm btn-icon mr-1'
+				},
+				{
+					extend: 'print',
+					text: '<i class="fa fa-print"></i>',
+					title: 'Daftar Lahan Wajib Tanam Produksi Bawang Putih',
+					titleAttr: 'Print Table',
+					className: 'btn-outline-primary btn-sm btn-icon mr-1'
+				}
+			],
+		});
+
 		$('#tblSpatial').dataTable({
 			responsive: true,
 			lengthChange: false,
@@ -583,8 +688,21 @@
 		}
 	});
 </script>
-
 <script>
+	// window.addEventListener('beforeunload', function (e) {
+	// 	e.preventDefault();
+	// 	e.returnValue = ''; // Ini akan menampilkan peringatan di browser
+	// });
+
+	// window.removeEventListener('beforeunload', function (e) {
+	// 	e.preventDefault();
+	// 	e.returnValue = '';
+	// });
+</script>
+<script>
+	//penampung data file
+	var filesNotProcessed = [];
+
 	document.getElementById('uploadBtn').addEventListener('click', function () {
 		let kmlFiles = document.getElementById('kml_file').files;
 		if (kmlFiles.length > 0) {
@@ -594,11 +712,6 @@
 			alert('Pilih setidaknya satu file.');
 		}
 	});
-
-	// window.addEventListener('beforeunload', function (e) {
-	// 	e.preventDefault();
-	// 	e.returnValue = ''; // Ini akan menampilkan peringatan di browser
-	// });
 
 	function processFiles(files) {
 		let index = 0;
@@ -611,22 +724,27 @@
 		function processNextFile() {
 			if (index < totalFiles) {
 				let file = files[index];
-				kml_parser(file, () => {
-					uploadFile(file, () => {
+				kml_parser(file, (success) => {
+					if (success) {
+						uploadFile(file, () => {
+							index++;
+							updateProgress(index, totalFiles);
+							processNextFile();
+						});
+					} else {
+						filesNotProcessed.push(file.name);
 						index++;
 						updateProgress(index, totalFiles);
 						processNextFile();
-					});
+					}
 				});
 			} else {
-				// Semua file berhasil diunggah
-				alert('Semua file telah berhasil diunggah.');
+				// Semua file telah diproses
 				enableElementsAfterUpload();
-				// window.removeEventListener('beforeunload', function (e) {
-				// 	e.preventDefault();
-				// 	e.returnValue = '';
-				// });
-				location.reload(); // Refresh halaman setelah konfirmasi
+				//tutup modal modalMultiUpload
+				closeModalAndShowAlert();
+				// Optional: Refresh halaman setelah konfirmasi
+				// location.reload();
 			}
 		}
 
@@ -654,26 +772,46 @@
 
 			const placemark = kmlXml.getElementsByTagName("Placemark")[0];
 			if (placemark) {
-				const id_lahan = placemark.querySelector("SimpleData[name='ID_LAHAN']").textContent;
-				const nikPetani = placemark.querySelector("SimpleData[name='NIK']").textContent;
-				const petani = placemark.querySelector("SimpleData[name='PETANI']").textContent;
-				const luas = placemark.querySelector("SimpleData[name='LUAS_LAHAN']").textContent;
-				const x = parseFloat(placemark.querySelector("SimpleData[name='LATITUDE']").textContent);
-				const y = parseFloat(placemark.querySelector("SimpleData[name='LONGITUDE']").textContent);
-				const altitude = parseFloat(placemark.querySelector("SimpleData[name='ALTITUDE']").textContent);
-				const desa_id = placemark.querySelector("SimpleData[name='ID_DESA']").textContent;
-				const poktanName = placemark.querySelector("SimpleData[name='POKTAN']").textContent;
+				// Ambil data dari KML
+				const id_lahan = placemark.querySelector("SimpleData[name='ID_LAHAN']")?.textContent;
+				const nikPetani = placemark.querySelector("SimpleData[name='NIK']")?.textContent;
+				const petani = placemark.querySelector("SimpleData[name='PETANI']")?.textContent;
+				const luas = placemark.querySelector("SimpleData[name='LUAS_LAHAN']")?.textContent;
+				const x = parseFloat(placemark.querySelector("SimpleData[name='LATITUDE']")?.textContent);
+				const y = parseFloat(placemark.querySelector("SimpleData[name='LONGITUDE']")?.textContent);
+				const altitude = parseFloat(placemark.querySelector("SimpleData[name='ALTITUDE']")?.textContent);
+				const desa_id = placemark.querySelector("SimpleData[name='ID_DESA']")?.textContent;
+				const poktanName = placemark.querySelector("SimpleData[name='POKTAN']")?.textContent;
+
+				// Track missing fields
+				let missingFields = [];
+				if (!id_lahan) missingFields.push('ID_LAHAN');
+				if (!nikPetani) missingFields.push('NIK');
+				if (!petani) missingFields.push('PETANI');
+				if (!luas) missingFields.push('LUAS_LAHAN');
+				if (isNaN(x)) missingFields.push('LATITUDE');
+				if (isNaN(y)) missingFields.push('LONGITUDE');
+				if (isNaN(altitude)) missingFields.push('ALTITUDE');
+				if (!desa_id) missingFields.push('ID_DESA');
+				if (!poktanName) missingFields.push('POKTAN');
+
+				if (missingFields.length > 0) {
+					// File is not processed due to missing or invalid fields
+					filesNotProcessed.push(`${kmlFile.name}: Missing/Invalid fields - ${missingFields.join(', ')}`);
+					callback(false); // Data tidak lengkap
+					return;
+				}
 
 				const kecamatan_id = desa_id.substring(0, 7);
 				const kabupaten_id = desa_id.substring(0, 4);
 				const provinsi_id = desa_id.substring(0, 2);
 
 				// Extract Polygon coordinates
-				const coordinates = placemark.querySelector("Polygon > outerBoundaryIs > LinearRing > coordinates").textContent.trim();
-				const polygonArray = coordinates.split(' ').map(coord => {
+				const coordinates = placemark.querySelector("Polygon > outerBoundaryIs > LinearRing > coordinates")?.textContent.trim();
+				const polygonArray = coordinates?.split(' ').map(coord => {
 					const [lng, lat] = coord.split(',').map(Number);
 					return { lat, lng };
-				});
+				}) || [];
 
 				// Isi form dengan data yang diekstrak
 				document.getElementById("kode_spatial").value = id_lahan;
@@ -690,10 +828,11 @@
 				document.getElementById("provinsi_id").value = provinsi_id;
 				document.getElementById("polygon").value = JSON.stringify(polygonArray);
 
-				callback();
+				callback(true); // Data lengkap
 			} else {
-				alert("Tidak ditemukan data Placemark dalam file KML.");
-				callback();
+				// No Placemark found in KML
+				filesNotProcessed.push(`${kmlFile.name}: Tidak ditemukan data Placemark dalam file KML.`);
+				callback(false); // Data tidak lengkap
 			}
 		};
 
@@ -701,65 +840,136 @@
 	}
 
 	function uploadFile(kmlFile, callback) {
-		let formData = new FormData();
-		formData.append('kml_url', kmlFile);
-		formData.append('kode_spatial', document.getElementById('kode_spatial').value);
-		formData.append('latitude', document.getElementById('latitude').value);
-		formData.append('longitude', document.getElementById('longitude').value);
-		formData.append('polygon', document.getElementById('polygon').value);
-		formData.append('altitude', document.getElementById('altitude').value);
-		formData.append('luas_lahan', document.getElementById('luas_lahan').value);
-		formData.append('poktan_name', document.getElementById('poktan_name').value);
-		formData.append('ktp_petani', document.getElementById('ktp_petani').value);
-		formData.append('nama_petani', document.getElementById('nama_petani').value);
-		formData.append('provinsi_id', document.getElementById('provinsi_id').value);
-		formData.append('kabupaten_id', document.getElementById('kabupaten_id').value);
-		formData.append('kecamatan_id', document.getElementById('kecamatan_id').value);
-		formData.append('kelurahan_id', document.getElementById('kelurahan_id').value);
+        let formData = new FormData();
+        formData.append('kml_url', kmlFile);
+        formData.append('kode_spatial', document.getElementById('kode_spatial').value);
+        formData.append('latitude', document.getElementById('latitude').value);
+        formData.append('longitude', document.getElementById('longitude').value);
+        formData.append('polygon', document.getElementById('polygon').value);
+        formData.append('altitude', document.getElementById('altitude').value);
+        formData.append('luas_lahan', document.getElementById('luas_lahan').value);
+        formData.append('poktan_name', document.getElementById('poktan_name').value);
+        formData.append('ktp_petani', document.getElementById('ktp_petani').value);
+        formData.append('nama_petani', document.getElementById('nama_petani').value);
+        formData.append('provinsi_id', document.getElementById('provinsi_id').value);
+        formData.append('kabupaten_id', document.getElementById('kabupaten_id').value);
+        formData.append('kecamatan_id', document.getElementById('kecamatan_id').value);
+        formData.append('kelurahan_id', document.getElementById('kelurahan_id').value);
 
-		// Tampilkan progress bar
-		document.getElementById('progressContainer').style.display = 'block';
+        // Tampilkan progress bar
+        document.getElementById('progressContainer').style.display = 'block';
 
-		let xhr = new XMLHttpRequest();
-		xhr.open('POST', '{{ route("2024.spatial.storesingle") }}', true); // Ganti dengan rute Anda
-		xhr.setRequestHeader('X-CSRF-TOKEN', '{{ csrf_token() }}'); // Sertakan token CSRF
+        let xhr = new XMLHttpRequest();
+        xhr.open('POST', '{{ route("2024.spatial.storesingle") }}', true); // Ganti dengan rute Anda
+        xhr.setRequestHeader('X-CSRF-TOKEN', '{{ csrf_token() }}'); // Sertakan token CSRF
 
-		xhr.upload.onprogress = function (event) {
-			if (event.lengthComputable) {
-				let percentComplete = Math.round((event.loaded / event.total) * 100);
-				document.getElementById('progressBar').style.width = percentComplete + '%';
-				document.getElementById('progressText').textContent = percentComplete + '%';
+        xhr.upload.onprogress = function (event) {
+            if (event.lengthComputable) {
+                let percentComplete = Math.round((event.loaded / event.total) * 100);
+                document.getElementById('progressBar').style.width = percentComplete + '%';
+                document.getElementById('progressText').textContent = percentComplete + '%';
+            }
+        };
+
+        xhr.onload = function () {
+            if (xhr.status === 200) {
+                callback();
+            } else {
+                alert('Gagal mengunggah file: ' + kmlFile.name);
+                callback();
+            }
+        };
+
+        xhr.send(formData);
+    }
+
+	function displayFilesNotProcessed() {
+		// Get the table and tbody elements
+		const table = document.getElementById('filesNotProcessedTable');
+		const tbody = table.querySelector('tbody');
+
+		// Clear any existing rows in the tbody
+		tbody.innerHTML = '';
+
+		// Populate the table with the filesNotProcessed array
+		filesNotProcessed.forEach(fileName => {
+			const row = document.createElement('tr');
+
+			const nameCell = document.createElement('td');
+			nameCell.textContent = fileName;
+			row.appendChild(nameCell);
+
+			const reasonCell = document.createElement('td');
+			reasonCell.textContent = 'File tidak lengkap atau gagal diproses'; // Add a reason or message
+			row.appendChild(reasonCell);
+
+			tbody.appendChild(row);
+		});
+
+		// Display the table
+		table.style.display = 'table';
+	}
+
+	function closeModalAndShowAlert() {
+		$('#modalMultiUpload').modal('hide');
+
+		// Show the Swalfire alert
+		showSwalAlert();
+	}
+
+	function showSwalAlert() {
+		const message = filesNotProcessed.length > 0
+			? `Beberapa file tidak diproses. Laporan akan disimpan dalam berkas .txt setelah Anda menekan tombol OK.`
+			: `Semua file telah berhasil diproses.`;
+
+		Swal.fire({
+			title: 'Proses Selesai',
+			text: message,
+			icon: filesNotProcessed.length > 0 ? 'warning' : 'success',
+			confirmButtonText: 'OK',
+			allowOutsideClick: false,
+		}).then(() => {
+			if (filesNotProcessed.length > 0) {
+				saveFilesNotProcessedToFile();
+				location.reload();
 			}
-		};
-
-		xhr.onload = function () {
-			if (xhr.status === 200) {
-				callback();
-			} else {
-				alert('Gagal mengunggah file: ' + kmlFile.name);
-				callback();
-			}
-		};
-
-		xhr.send(formData);
+		});
 	}
 
-	function disableElementsDuringUpload() {
-		document.getElementById('uploadBtn').disabled = true;
-		document.getElementById('closeBtn').disabled = true;
-		document.getElementById('closeModal').disabled = true;
+	function saveFilesNotProcessedToFile() {
+		const blob = new Blob([filesNotProcessed.join('\n')], { type: 'text/plain' });
+		const url = URL.createObjectURL(blob);
 
-		document.getElementById('kml_file').disabled = true;
+		const a = document.createElement('a');
+		a.href = url;
+		a.download = 'files_not_processed.txt';
+		document.body.appendChild(a);
+		a.click();
+		document.body.removeChild(a);
+
+		// Revoke the object URL to free up memory
+		URL.revokeObjectURL(url);
 	}
 
-	function enableElementsAfterUpload() {
-		document.getElementById('uploadBtn').disabled = false;
-		document.getElementById('closeBtn').disabled = false;
-		document.getElementById('closeModal').disabled = false;
 
-		document.getElementById('kml_file').disabled = false;
-	}
+    function disableElementsDuringUpload() {
+        document.getElementById('uploadBtn').disabled = true;
+        document.getElementById('closeBtn').disabled = true;
+        document.getElementById('closeModal').disabled = true;
+
+        document.getElementById('kml_file').disabled = true;
+    }
+
+    function enableElementsAfterUpload() {
+        document.getElementById('uploadBtn').disabled = false;
+        document.getElementById('closeBtn').disabled = false;
+        document.getElementById('closeModal').disabled = false;
+
+        document.getElementById('kml_file').disabled = false;
+    }
 </script>
+
+
 
 
 @endsection

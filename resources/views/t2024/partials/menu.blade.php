@@ -645,35 +645,33 @@
 
 
 			@can('spatial_data_access')
-				<li class="nav-title" data-i18n="nav.administation">DATA CPCL</li>
+				<li class="nav-title text-uppercase" data-i18n="nav.administation">MASTER DATA</li>
+				<li class="c-sidebar-nav-item {{ request()->is('2024/spatial/master-wilayah') ? 'active' : '' }}">
+					<a href="{{route('2024.spatial.wilayah')}}" title="Coming soon!"
+					data-filter-tags="data wilayah provinsi kabupaten kecamatan desa kelurahan">
+						<i class="fal fa-globe-asia"></i>
+						<span class="nav-link-text">Wilayah</span>
+					</a>
+				</li>
 				<li class="c-sidebar-nav-item {{ request()->is('2024/cpcl/poktan*') ? 'active' : '' }}">
 					<a href="{{route('2024.cpcl.poktan.index')}}" title="Coming soon!"
 					data-filter-tags="data kelompok tani">
 						<i class="fal fa-users"></i>
-						<span class="nav-link-text">Daftar Kelompok Tani</span>
+						<span class="nav-link-text">Kelompok Tani</span>
 					</a>
 				</li>
 				<li class="c-sidebar-nav-item {{ request()->is('2024/cpcl/anggota*') ? 'active' : '' }}">
 					<a href="{{route('2024.cpcl.anggota.index')}}" title="Coming soon!"
 					data-filter-tags="data cpcl anggota">
 						<i class="fal fa-user"></i>
-						<span class="nav-link-text">Daftar Anggota Poktan</span>
+						<span class="nav-link-text">Anggota Poktan</span>
 					</a>
 				</li>
-
-				<li class="nav-title" data-i18n="nav.administation">DATA SPATIAL</li>
-				<li class="c-sidebar-nav-item {{ request()->is('2024/spatial/*') ? 'active' : '' }}">
+				<li class="c-sidebar-nav-item {{ request()->is('2024/spatial/list') || request()->is('2024/spatial/spatialList') || request()->is('2024/spatial/createsingle') ? 'active' : '' }}">
 					<a href="{{route('2024.spatial.index')}}" title="Coming soon!"
 					data-filter-tags="data spatial spasial">
 						<i class="fal fa-map"></i>
-						<span class="nav-link-text">Daftar Lokasi</span>
-					</a>
-				</li>
-				<li class="c-sidebar-nav-item {{ request()->is('2024/spatial/simulator') ? 'active' : '' }}">
-					<a href="{{route('2024.spatial.simulatorJarak')}}" title="Coming soon!"
-					data-filter-tags="simulator spatial spasial">
-						<i class="fal fa-map"></i>
-						<span class="nav-link-text">Simulator</span>
+						<span class="nav-link-text">Lokasi/Spatial</span>
 					</a>
 				</li>
 				{{-- <li class="c-sidebar-nav-item">
@@ -683,12 +681,12 @@
 						<span class="nav-link-text">Peta Lokasi Baru</span>
 					</a>
 				</li> --}}
-				<li class="nav-title" data-i18n="nav.administation">DATA WILAYAH</li>
-				<li class="c-sidebar-nav-item {{ request()->is('2024/spatial/wilayah*') ? 'active' : '' }}">
-					<a href="{{route('2024.spatial.wilayah')}}" title="Coming soon!"
-					data-filter-tags="data wilayah provinsi kabupaten kecamatan desa kelurahan">
-						<i class="fal fa-globe-asia"></i>
-						<span class="nav-link-text">Daftar Wilayah</span>
+				<li class="nav-title" data-i18n="nav.administation">SIMULATOR</li>
+				<li class="c-sidebar-nav-item {{ request()->is('2024/spatial/simulator') ? 'active' : '' }}">
+					<a href="{{route('2024.spatial.simulatorJarak')}}" title="Coming soon!"
+					data-filter-tags="simulator spatial spasial">
+						<i class="fal fa-map"></i>
+						<span class="nav-link-text">Simulator</span>
 					</a>
 				</li>
 			@endcan

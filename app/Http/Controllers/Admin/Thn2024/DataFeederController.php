@@ -837,7 +837,7 @@ class DataFeederController extends Controller
 		$draw = $request->input('draw', 1);
 		$start = $request->input('start', 0);
 		$length = $request->input('length', 10);
-		$searchValue = $request->input('search.value', '');
+		$searchValue = $request->input('searchValue', '');
 		$kabupatenId = $request->input('kabupaten_id');
 		$statusLahan = $request->input('status_lahan');
 		$statusMitra = $request->input('status_mitra');
@@ -916,7 +916,6 @@ class DataFeederController extends Controller
 			'data' => $spatials,
 		]);
 	}
-
 
 	public function getAllPoktan(Request $request)
 	{

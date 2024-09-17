@@ -648,6 +648,10 @@ Route::group(['prefix' => '2024', 'as' => '2024.', 'namespace' => 'Admin', 'midd
 			Route::post('/updateActive/{kodeSpatial}', 'SpatialController@updateActive')->name('updateActive');
 			Route::post('/batchUpdateStatus', 'SpatialController@batchUpdateStatus')->name('batchUpdateStatus');
 
+			//print daftar spatial
+			Route::get('/renderPrintAllSpatials', 'SpatialController@renderPrintAllSpatials')->name('renderPrintAllSpatials');
+
+
 			Route::get('/master-wilayah', 'MasterWilayahController@index')->name('wilayah');
 			Route::get('/master-wilayah/updateFromBPS', 'MasterWilayahController@updateFromBPS')->name('updateFromBPS');
 			Route::get('/master-wilayah/updateProvinsiFromBPS', 'MasterWilayahController@updateProvinsiFromBPS')->name('updateProvinsiFromBPS');

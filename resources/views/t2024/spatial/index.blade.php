@@ -189,12 +189,10 @@
 										<div class="ml-auto d-inline-flex align-items-center">
 											<div class="d-inline-flex flex-column ml-2 text-right fw-500">
 												<span class="d-inline-block">
-													<span id="luasTersedia">{{ number_format($data['luasTersedia'] / 10000, 3, ',', '.') }}</span> ha
+													<span id="luasTersedia"></span> ha
 												</span>
 												<span class="d-inline-block">
-													<span id="jmlTersedia">
-														{{ number_format($data['jmlTersedia'], 0, ',', '.') }}
-													</span> titik
+													<span id="jmlTersedia"></span> titik
 												</span>
 											</div>
 										</div>

@@ -261,7 +261,9 @@
 						</div>
 					</div>
 					<a id="submitbtn" class="btn btn-sm btn-primary text-white" role="button" type="submit">
-						<i class="fal fa-upload text-align-center  mr-1"></i> Simpan untuk pelaporan
+						<span class="mr-1"><i class="fal fa-upload text-align-center"></i></span>
+						<span id="buttonText">Simpan untuk pelaporan</span>
+						<span id="spinner" class="spinner-border spinner-border-sm ml-2" style="display: none;"></span>
 					</a>
 					<hr class="mb-4">
 				</div>
