@@ -40,7 +40,6 @@
 								<div class="col-md-6">
 									<label class="form-label" for="id_provinsi">Provinsi <span class="text-danger">*</span></label>
 									<select id="id_provinsi" name="id_provinsi" class="form-control w-100 @error('id_provinsi') is-invalid @enderror" required>
-										<option value="" hidden></option>
 										<option value="{{$poktan->provinsi_id}}" selected>{{$poktan->provinsi->nama}}</option>
 									</select>
 									<span class="help-block" id="help-provinsi"></span>
@@ -48,7 +47,6 @@
 								<div class="col-md-6">
 									<label class="form-label" for="id_kabupaten">Kabupaten <span class="text-danger">*</span></label>
 									<select id="id_kabupaten" name="id_kabupaten" class="form-control w-100 @error('id_kabupaten') is-invalid @enderror" required>
-										<option value="" hidden></option>
 										<option value="{{$poktan->kabupaten_id}}" selected>{{$poktan->kabupaten->nama_kab}}</option>
 									</select>
 									<div class="help-block" id="help-kabupaten"></div>
@@ -58,7 +56,6 @@
 								<div class="col-md-6">
 									<label class="form-label" for="id_kecamatan">Kecamatan <span class="text-danger">*</span></label>
 									<select id="id_kecamatan" name="id_kecamatan" class="form-control @error('id_kecamatan') is-invalid @enderror" required>
-										<option value="" hidden></option>
 										<option value="{{$poktan->kecamatan_id}}" selected>{{$poktan->kecamatan->nama_kecamatan}}</option>
 									</select>
 									<div class="help-block" id="help-kecamatan"></div>
@@ -66,7 +63,6 @@
 								<div class="col-md-6">
 									<label class="form-label" for="id_kelurahan">Desa/Kelurahan <span class="text-danger">*</span></label>
 									<select id="id_kelurahan" name="id_kelurahan" class="form-control @error('id_kelurahan') is-invalid @enderror" required>
-										<option value="" hidden></option>
 										<option value="{{$poktan->kelurahan_id}}" selected>{{$poktan->desa->nama_desa}}</option>
 									</select>
 									<div class="help-block" id="help-desa"></div>
@@ -124,95 +120,147 @@
 			placeholder: "-- pilih desa"
 		});
 
-		$.get('{{ route("wilayah.getAllProvinsi") }}', function (data) {
-			$.each(data, function (key, value) {
-				var option = $('<option>', {
-					value: value.provinsi_id,
-					text: value.nama
+		$.get('/2024/datafeeder/getAllProvinsi', function(response) {
+			var data = response.data;
+
+			if (data && data.length) {
+				$.each(data, function(index, value) {
+					var option = $('<option>', {
+						value: value.provinsi_id,
+						text: value.nama
+					});
+
+					if ('{{ $poktan->provinsi }}' == value.provinsi_id) {
+						option.attr('selected', 'selected');
+					}
+
+					provinsiSelect.append(option);
 				});
 
-				if ('{{ old("id_provinsi") }}' == value.provinsi_id) {
-					option.attr('selected', 'selected');
+				// Memuat kabupaten jika provinsi sudah dipilih
+				var initialProvinsiId = provinsiSelect.val();
+				if (initialProvinsiId) {
+					// loadKabupaten(initialProvinsiId);
 				}
-
-				provinsiSelect.append(option);
-			});
+			} else {
+				provinsiSelect.append($('<option>', { value: '', text: 'Data provinsi tidak tersedia' }));
+			}
 		});
 
-		provinsiSelect.change(function () {
+		function loadKabupaten(provinsiId) {
+			kabupatenSelect.empty().append($('<option>', { value: '', text: '-- Pilih Kabupaten --' }));
+			kecamatanSelect.empty().append($('<option>', { value: '', text: '-- Pilih Kecamatan --' }));
+			desaSelect.empty().append($('<option>', { value: '', text: '-- Pilih Desa --' }));
+
+			if (provinsiId) {
+				$.get('/2024/datafeeder/getKabByProv/' + provinsiId, function(response) {
+					var data = response.data;
+
+					if (data && data.length) {
+						$.each(data, function(index, value) {
+							var option = $('<option>', {
+								value: value.kabupaten_id,
+								text: value.nama_kab
+							});
+
+							if ('{{ $poktan->kabupaten }}' == value.kabupaten_id) {
+								option.attr('selected', 'selected');
+							}
+
+							kabupatenSelect.append(option);
+						});
+
+						// Memuat kecamatan jika kabupaten sudah dipilih
+						var initialKabupatenId = kabupatenSelect.val();
+						if (initialKabupatenId) {
+							loadKecamatan(initialKabupatenId);
+						}
+					} else {
+						kabupatenSelect.append($('<option>', { value: '', text: 'Data kabupaten tidak tersedia' }));
+					}
+				});
+			}
+		}
+
+		// Fungsi untuk memuat kecamatan berdasarkan kabupaten
+		function loadKecamatan(kabupatenId) {
+			kecamatanSelect.empty().append($('<option>', { value: '', text: '-- Pilih Kecamatan --' }));
+			desaSelect.empty().append($('<option>', { value: '', text: '-- Pilih Desa --' }));
+
+			if (kabupatenId) {
+				$.get('/2024/datafeeder/getKecByKab/' + kabupatenId, function(response) {
+					var data = response.data;
+
+					if (data && data.length) {
+						$.each(data, function(index, value) {
+							var option = $('<option>', {
+								value: value.kecamatan_id,
+								text: value.nama_kecamatan
+							});
+
+							if ('{{ $poktan->kecamatan }}' == value.kecamatan_id) {
+								option.attr('selected', 'selected');
+							}
+
+							kecamatanSelect.append(option);
+						});
+
+						// Memuat desa jika kecamatan sudah dipilih
+						var initialKecamatanId = kecamatanSelect.val();
+						if (initialKecamatanId) {
+							loadDesa(initialKecamatanId);
+						}
+					} else {
+						kecamatanSelect.append($('<option>', { value: '', text: 'Data kecamatan tidak tersedia' }));
+					}
+				});
+			}
+		}
+
+		// Fungsi untuk memuat desa berdasarkan kecamatan
+		function loadDesa(kecamatanId) {
+			desaSelect.empty().append($('<option>', { value: '', text: '-- Pilih Desa --' }));
+
+			if (kecamatanId) {
+				$.get('/2024/datafeeder/getKelByKec/' + kecamatanId, function(response) {
+					var data = response.data;
+
+					if (data && data.length) {
+						$.each(data, function(index, value) {
+							var option = $('<option>', {
+								value: value.kelurahan_id,
+								text: value.nama_desa
+							});
+
+							if ('{{ $poktan->desa }}' == value.kelurahan_id) {
+								option.attr('selected', 'selected');
+							}
+
+							desaSelect.append(option);
+						});
+					} else {
+						desaSelect.append($('<option>', { value: '', text: 'Data desa tidak tersedia' }));
+					}
+				});
+			}
+		}
+
+		// Event listener untuk perubahan pada elemen <select> provinsi
+		provinsiSelect.change(function() {
 			var selectedProvinsiId = provinsiSelect.val();
-
-			kabupatenSelect.empty();
-			kecamatanSelect.empty();
-			desaSelect.empty();
-			kabupatenSelect.append($('<option>', {
-				value: '',
-				text: '-- pilih kabupaten'
-			}));
-			kecamatanSelect.append($('<option>', {
-				value: '',
-				text: '-- pilih kecamatan'
-			}));
-			desaSelect.append($('<option>', {
-				value: '',
-				text: '-- pilih desa'
-			}));
-
-			$.get('/wilayah/getKabupatenByProvinsi/' + selectedProvinsiId, function (data) {
-				$.each(data, function (key, value) {
-					var option = $('<option>', {
-						value: value.kabupaten_id,
-						text: value.nama_kab
-					});
-
-					kabupatenSelect.append(option);
-				});
-			});
+			loadKabupaten(selectedProvinsiId);
 		});
 
-		kabupatenSelect.change(function () {
+		// Event listener untuk perubahan pada elemen <select> kabupaten
+		kabupatenSelect.change(function() {
 			var selectedKabupatenId = kabupatenSelect.val();
-			kecamatanSelect.empty();
-			desaSelect.empty();
-
-			kecamatanSelect.append($('<option>', {
-				value: '',
-				text: '-- pilih kecamatan'
-			}));
-			desaSelect.append($('<option>', {
-				value: '',
-				text: '-- pilih desa'
-			}));
-
-			$.get('/wilayah/getKecamatanByKabupaten/' + selectedKabupatenId, function (data) {
-				$.each(data, function (key, value) {
-					var option = $('<option>', {
-						value: value.kecamatan_id,
-						text: value.nama_kecamatan
-					});
-					kecamatanSelect.append(option);
-				});
-			});
+			loadKecamatan(selectedKabupatenId);
 		});
 
-		kecamatanSelect.change(function () {
+		// Event listener untuk perubahan pada elemen <select> kecamatan
+		kecamatanSelect.change(function() {
 			var selectedKecamatanId = kecamatanSelect.val();
-			desaSelect.empty();
-
-			desaSelect.append($('<option>', {
-				value: '',
-				text: '-- pilih desa'
-			}));
-
-			$.get('/wilayah/getDesaByKec/' + selectedKecamatanId, function (data) {
-				$.each(data, function (key, value) {
-					var option = $('<option>', {
-						value: value.kelurahan_id,
-						text: value.nama_desa
-					});
-					desaSelect.append(option);
-				});
-			});
+			loadDesa(selectedKecamatanId);
 		});
 	});
 </script>

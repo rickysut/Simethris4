@@ -12,12 +12,12 @@
 						Daftar <span class="fw-300"><i>CPCL</i></span>
 					</h2>
 					<div class="panel-toolbar">
-						<div class="btn-group">
+						{{-- <div class="btn-group">
 							<a href="{{route('2024.cpcl.anggota.create')}}" type="button" class="btn btn-sm btn-primary" data-toggle="tooltip" data-offset="0,10" data-original-title="Tambah CPCL">
 								<i class="fal fa-user-plus"></i>
 								Registrasi Anggota Baru
 							</a>
-						</div>
+						</div> --}}
 					</div>
 				</div>
 				<div class="panel-container show">

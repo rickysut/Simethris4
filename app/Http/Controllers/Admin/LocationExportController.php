@@ -32,23 +32,30 @@ class LocationExportController extends Controller
 	}
 
 	public function getCompaniesByYear($year)
-	{
-		$companies = PullRiph::select('no_ijin', 'user_id', 'npwp')->with('datauser')->has('datarealisasi')
-			->get()
-			->filter(function ($item) use ($year) {
-				return substr($item->no_ijin, -4) == $year;
-			})
-			->map(function ($item) {
-				return [
-					'no_ijin' => $item->no_ijin,
-					'user_id' => $item->user_id,
-					'npwp' => $item->npwp,
-					'company_name' => $item->datauser->company_name ?? null,
-				];
-			});
+{
+    // Retrieve the companies with the specified year in 'no_ijin'
+    $companies = PullRiph::with('datauser')
+        ->has('datarealisasi')
+        ->get()
+        ->filter(function ($item) use ($year) {
+            return substr($item->no_ijin, -4) == $year;
+        })
+        ->map(function ($item) {
+            return [
+                'no_ijin' => $item->no_ijin,
+                'user_id' => $item->user_id,
+                'npwp' => $item->npwp,
+                'company_name' => $item->datauser->company_name ?? null,
+            ];
+        })
+        ->sortBy('company_name')
+        ->values(); // Reset keys after sorting
 
-		return response()->json($companies);
-	}
+    return response()->json($companies);
+}
+
+
+
 
 	public function getLocationByIjin($noIjin)
 	{
@@ -109,12 +116,12 @@ class LocationExportController extends Controller
 	public function getRealisasiCompany($year)
 	{
 		$companies = PullRiph::where('periodetahun', $year)
-                ->has('datarealisasi')  // Filter companies that have datarealisasi
-                ->select('id', 'no_ijin', 'nama')
-                ->get();
+			->has('datarealisasi')  // Filter companies that have datarealisasi
+			->select('id', 'no_ijin', 'nama')
+			->get();
 
 		$count = $companies->count();
 
-    	return response()->json($count);
+		return response()->json($count);
 	}
 }

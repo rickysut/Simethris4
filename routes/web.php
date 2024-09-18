@@ -668,9 +668,11 @@ Route::group(['prefix' => '2024', 'as' => '2024.', 'namespace' => 'Admin', 'midd
 			Route::get('/', 'HomeController@index')->name('home');
 			Route::group(['prefix' => 'poktan', 'as' => 'poktan.'], function () {
 				Route::get('/list', 'MasterPoktanController@index')->name('index');
-				Route::get('/registrasi', 'MasterPoktanController@create')->name('create');
 				Route::get('/{id}/edit', 'MasterPoktanController@edit')->name('edit');
+				Route::get('/renderPrintAllPoktan', 'MasterPoktanController@renderPrintAllPoktan')->name('renderPrintAllPoktan');
+
 				// Route::get('/updateIdProvinsi', 'MasterPoktanController@updateIdProvinsi')->name('updateIdProvinsi');
+				Route::get('/registrasi', 'MasterPoktanController@create')->name('create');
 			});
 
 			Route::group(['prefix' => 'anggota', 'as' => 'anggota.'], function () {
