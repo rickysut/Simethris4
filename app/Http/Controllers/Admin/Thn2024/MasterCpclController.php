@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin\Thn2024;
 
 use App\Http\Controllers\Controller;
 use App\Models2024\MasterAnggota;
+use App\Models2024\MasterPoktan;
 use Illuminate\Http\Request;
 
 class MasterCpclController extends Controller

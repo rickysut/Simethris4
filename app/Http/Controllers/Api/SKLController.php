@@ -22,19 +22,58 @@ class SKLController extends Controller
 			'Surat Keterangan Lunas Wajib Tanam Simethris 4beta',
 		];
 
-		$no_riph = $request->no_ijin;
-		$nomor = Str::substr($no_riph, 0, 4) . '/' . Str::substr($no_riph, 4, 2) . '.' . Str::substr($no_riph, 6, 3) . '/' .
-			Str::substr($no_riph, 9, 1) . '/' . Str::substr($no_riph, 10, 2) . '/' . Str::substr($no_riph, 12, 4);
+		try {
+			// Validate incoming request
+			$validated = $request->validate([
+				'noIjin' => 'nullable|string',
+			]);
+			$no_riph = $validated['noIjin'] ?? null;
 
-		// Retrieve the completed records based on the formatted 'nomor'
-		$completedRecords = Completed::select('id','no_skl','periodetahun','no_ijin','npwp','published_date','luas_tanam','volume','status','url','created_at')->where('no_ijin', '=', $nomor)->get();
+			// Format 'noIjin' (if provided) to match the desired pattern
+			$ijin = null;
+			if ($no_riph) {
+				$ijin = Str::substr($no_riph, 0, 4) . '/' . Str::substr($no_riph, 4, 2) . '.' . Str::substr($no_riph, 6, 3) . '/' .
+					Str::substr($no_riph, 9, 1) . '/' . Str::substr($no_riph, 10, 2) . '/' . Str::substr($no_riph, 12, 4);
+			}
 
-		// Create a new instance of SKLResources with the completed records
-		$sklResources = new SKLResources($completedRecords);
+			// Start building the query
+			$query = Completed::select(
+				'id',
+				'no_skl',
+				'periodetahun',
+				'no_ijin',
+				'npwp',
+				'published_date',
+				'luas_tanam',
+				'volume',
+				'status',
+				'url',
+				'created_at'
+			);
 
-		return response()->json([
-			'about' => $about,
-			'data' => $sklResources
-		]);
+			if (!is_null($ijin)) {
+				$query->where('no_ijin', $ijin);
+			}
+			$completedRecords = $query->get();
+
+			$sklResources = new SKLResources($completedRecords);
+
+			return response()->json([
+				'success' => true,
+				'Status' => 'SUCCESS',
+				'Tentang' => $about,
+				'data' => $sklResources,
+			]);
+		} catch (\Exception $e) {
+			// Error handling
+			return response()->json([
+				'success' => false,
+				'error' => $e->getMessage(),
+				'message' => 'Failed to fetch skl data.',
+				'Status' => 'FAIL',
+				'Tentang' => $about,
+				'data' => [],
+			]);
+		}
 	}
 }

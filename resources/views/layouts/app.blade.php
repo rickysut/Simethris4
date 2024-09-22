@@ -119,43 +119,6 @@
 					console.log('Service Worker registration failed:', error);
 				});
 		}
-	</script>
-    {{-- <script>
-        $(document).ready(function() {
-            $(function() {
-                $(".select2-role").select2({
-                    maximumSelectionLength: 1,
-                    placeholder: "Select Role"
-                });
-                $(".select2-prov").select2({
-                    placeholder: "Select Province"
-                });
-                $(".select2-kab").select2({
-                    placeholder: "Select Kabupaten"
-                });
-                $(".select2-kec").select2({
-                    placeholder: "Select Kecamatan"
-                });
-                $(".select2-des").select2({
-                    placeholder: "Select Desa"
-                });
-            });
-        });
-    </script> --}}
-
-    {{-- <script>
-        const togglePassword = document.querySelector('#togglePassword');
-        const password = document.querySelector('#password');
-
-        togglePassword.addEventListener('click', function(e) {
-            // toggle the type attribute
-            const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
-            password.setAttribute('type', type);
-            // toggle the eye slash icon
-            this.classList.toggle('fa-eye-slash');
-        });
-    </script> --}}
-    <script>
         $("#js-login-btn").click(function(event) {
 
             // Fetch form to apply custom Bootstrap validation
@@ -169,7 +132,8 @@
             form.addClass('was-validated');
             // Perform ajax submit here...
         });
-    </script>
+
+	</script>
 
     @yield('scripts')
 </body>

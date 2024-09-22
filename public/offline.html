@@ -1,67 +1,76 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="title" content="InfyBonus">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta http-equiv="X-UA-Compatible" content="ie=edge" />
+		<title>Document</title>
 
-    <style>
-        .error_body {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            height: 100vh;
-            width: 100%;
-            background: #f9f9f9;
-        }
+		<style>
+			body {
+				width: 100%;
+				min-height: 100vh;
+				display: relative;
+				margin: 0;
+				padding: 0;
+				background: -webkit-linear-gradient(
+					-45deg,
+					#3b1850 0,
+					#371850 25%,
+					#2e1946 50%,
+					#38224c 75%,
+					#3a224c 100%
+				);
+			}
+			.wrapper {
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				align-items: center;
+				justify-content: center;
+				-webkit-transform: translate(-50%, -50%);
+				-moz-transform: translate(-50%, -50%);
+				-ms-transform: translate(-50%, -50%);
+				-o-transform: translate(-50%, -50%);
+				transform: translate(-50%, -50%);
+				text-align: center;
+			}
+			h1 {
+				color: white;
+				font-family: arial;
+				font-weight: bold;
+				font-size: 50px;
+				letter-spacing: 5px;
+				line-height: 1rem;
+				text-shadow: 0 0 3px white;
+			}
+			h4 {
+				color: #f1f1f1;
+				font-family: arial;
+				font-weight: 300;
+				font-size: 16px;
+			}
+			.button {
+				display: block;
+				margin: 20px 0 0;
+				padding: 15px 30px;
+				background: #22254c;
+				color: white;
+				font-family: arial;
+				letter-spacing: 5px;
+				border-radius: 0.4rem;
+				text-decoration: none;
+				box-shadow: 0 0 15px #22254c;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="wrapper">
+			<img src="img\logo-simet.png" alt="" style="max-height: 70px;">
+			<h1>OFFLINE</h1>
+			<h4>Aplikasi tidak dapat dijalankan. Mohon periksa koneksi internet Anda.</h4>
 
-        .error_container .error_heading {
-            color: transparent;
-            font-size: 160px;
-            margin: 0;
-            font-weight: 900;
-            letter-spacing: 20px;
-            background-size: 100% 100%;
-            background: linear-gradient(90deg, #6b719b 38%, #9da3cc 53%, #979dce 65%);
-            -webkit-background-clip: text;
-            -moz-background-clip: text;
-            -ms-background-clip: text;
-        }
-
-        @media (max-width: 540px) {
-            .error_container .error_heading {
-                font-size: 120px;
-                letter-spacing: 10px;
-            }
-        }
-
-        .error_container .error_btn {
-            background-color: #6e749e !important;
-            border: none;
-            outline: none;
-        }
-
-        .error_container .error_btn:focus {
-            box-shadow: none !important;
-        }
-
-        .error_container .error_message,
-        .error_container .error_paragraph {
-            color: #787878;
-        }
-    </style>
-</head>
-<body>
-<div class="error_body">
-    <div
-        class="container error_container d-flex justify-content-center align-items-center flex-column w-100 h-100 p-5 text-center">
-        <h2 class="error_message text-center mb-3">Boo! You don't have an internet connection</h2>
-        <p class="error_paragraph text-center mb-5">
-            Please check your network connection and try again.
-        </p>
-        <a href="/" class="btn btn-primary error_btn">Back to Home Page</a>
-    </div>
-</div>
-</body>
+			<a href="#" class="button">RETRY</a>
+		</div>
+	</body>
 </html>

@@ -116,66 +116,66 @@
 <script>
 	$(document).ready(function(){
 		$('#printPoktan').on('click', function() {
-    // Get the values from the form inputs or elements
-    const provinsiId = $('#idProv').val();
-    const kabupatenId = $('#idKab').val();
-    const kecamatanId = $('#idKec').val();
-    const status = $('#status').val();
+			// Get the values from the form inputs or elements
+			const provinsiId = $('#idProv').val();
+			const kabupatenId = $('#idKab').val();
+			const kecamatanId = $('#idKec').val();
+			const status = $('#status').val();
 
-    console.log('id :', provinsiId, kabupatenId, kecamatanId, status);
+			console.log('id :', provinsiId, kabupatenId, kecamatanId, status);
 
-    // Create the URL with query parameters
-    const url = `{{ route('2024.cpcl.poktan.renderPrintAllPoktan') }}`;
+			// Create the URL with query parameters
+			const url = `{{ route('2024.cpcl.poktan.renderPrintAllPoktan') }}`;
 
-    // Show spinner and change button text
-    $('#spinner').show();
-    $('#buttonText').text('Mempersiapkan Unduhan');
+			// Show spinner and change button text
+			$('#spinner').show();
+			$('#buttonText').text('Mempersiapkan Unduhan');
 
-    // Use AJAX to request the PDF
-    $.ajax({
-        url: url,
-        method: 'GET',
-        data: {
-            provinsi_id: provinsiId,
-            kabupaten_id: kabupatenId,
-            kecamatan_id: kecamatanId,
-            status: status
-        },
-        xhrFields: {
-            responseType: 'blob'  // Important for binary file handling
-        },
-        success: function(data, status, xhr) {
-            // Create a URL for the blob and initiate download
-            const blob = new Blob([data], { type: 'application/pdf' });
-            const link = document.createElement('a');
-            link.href = window.URL.createObjectURL(blob);
-            link.download = 'daftar_poktan.pdf';  // Specify the filename
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+			// Use AJAX to request the PDF
+			$.ajax({
+				url: url,
+				method: 'GET',
+				data: {
+					provinsi_id: provinsiId,
+					kabupaten_id: kabupatenId,
+					kecamatan_id: kecamatanId,
+					status: status
+				},
+				xhrFields: {
+					responseType: 'blob'  // Important for binary file handling
+				},
+				success: function(data, status, xhr) {
+					// Create a URL for the blob and initiate download
+					const blob = new Blob([data], { type: 'application/pdf' });
+					const link = document.createElement('a');
+					link.href = window.URL.createObjectURL(blob);
+					link.download = 'daftar_poktan.pdf';  // Specify the filename
+					document.body.appendChild(link);
+					link.click();
+					document.body.removeChild(link);
 
-            // Show success message with Swal.fire
-            Swal.fire({
-                icon: 'success',
-                title: 'Unduhan Selesai',
-                text: 'Berkas PDF berhasil dibuat dan diunduh. Periksa direktori unduhan di perangkat Anda.'
-            });
-        },
-        error: function(xhr, status, error) {
-            // Show error message with Swal.fire
-            Swal.fire({
-                icon: 'error',
-                title: 'Gagal Mengunduh',
-                text: 'Terjadi kesalahan saat mengunduh file: ' + error
-            });
-        },
-        complete: function() {
-            // Hide spinner and revert button text
-            $('#spinner').hide();
-            $('#buttonText').text('Cetak Daftar');
-        }
-    });
-});
+					// Show success message with Swal.fire
+					Swal.fire({
+						icon: 'success',
+						title: 'Unduhan Selesai',
+						text: 'Berkas PDF berhasil dibuat dan diunduh. Periksa direktori unduhan di perangkat Anda.'
+					});
+				},
+				error: function(xhr, status, error) {
+					// Show error message with Swal.fire
+					Swal.fire({
+						icon: 'error',
+						title: 'Gagal Mengunduh',
+						text: 'Terjadi kesalahan saat mengunduh file: ' + error
+					});
+				},
+				complete: function() {
+					// Hide spinner and revert button text
+					$('#spinner').hide();
+					$('#buttonText').text('Cetak Daftar');
+				}
+			});
+		});
 
 
 		var provinsiSelect = $('#idProv');

@@ -20,10 +20,67 @@
 						</div> --}}
 					</div>
 				</div>
+				<div class="card-header">
+					<div class="panel-content">
+						<h4 class="text-muted">Pencarian Kelompok Tani</h4>
+						<div class="row">
+							<div class="form-group col-md-3">
+								<label for="idProv">Provinsi</label>
+								<select name="idProv" id="idProv" class="custom-select form-control" aria-describedby="helpProv">
+								</select>
+								<small id="helpProv" class="text-muted">saring berdasarkan provinsi</small>
+							</div>
+							<div class="form-group col-md-3">
+								<label for="idKab">Kabupaten</label>
+								<select name="idKab" id="idKab" class="custom-select form-control" aria-describedby="helpKab">
+								</select>
+								<small id="helpKab" class="text-muted">saring berdasarkan kabupaten/kota</small>
+							</div>
+							<div class="form-group col-md-3">
+								<label for="idKec">Kecamatan</label>
+								<select name="idKec" id="idKec" class="custom-select form-control" aria-describedby="helpKec">
+								</select>
+								<small id="helpKec" class="text-muted">saring data berdasarkan kecamatan</small>
+							</div>
+							<div class="form-group col-md-3">
+								<label for="poktan">Kelompok Tani</label>
+								<select name="poktan" id="poktan" class="custom-select form-control" aria-describedby="helpPoktan">
+								</select>
+								<small id="helpPoktan" class="text-muted">saring data berdasarkan nama kelompok</small>
+							</div>
+						</div>
+						<div class="row">
+							<div class="form-group col-12">
+								<label class="form-label">Cari data</label>
+								<div class="input-group bg-white shadow-inset-2">
+									<div class="input-group-prepend">
+										<span class="input-group-text bg-transparent border-right-0 py-1 px-3 text-success">
+											<i class="fal fa-search"></i>
+										</span>
+									</div>
+									<input type="text" name="searchValue" id="searchValue" aria-describedby="searchValue" class="form-control border-left-0 bg-transparent pl-0" placeholder="kata kunci...">
+									<div class="input-group-append">
+										<button class="btn btn-default waves-effect waves-themed" type="button">Temukan</button>
+									</div>
+								</div>
+								<small for="searchValue" class="text-muted">Temukan data berdasarkan kata kunci</small>
+							</div>
+						</div>
+						<div class="d-flex justify-content-between align-items-center">
+							<div></div>
+							<div class="ml-auto">
+								<button id="printPoktan" class="btn btn-primary">
+									<span id="spinner" class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>
+    								<span id="buttonText">Cetak Daftar</span>
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
 				<div class="panel-container show">
 					<div class="panel-content">
 						<!-- datatable start -->
-						<table id="tblPoktan" class="table table-bordered table-hover table-sm table-striped w-100">
+						<table id="tblAnggota" class="table table-bordered table-hover table-sm table-striped w-100">
 							<thead class="thead-themed">
 								<th>Nama Petani</th>
 								<th>NIK</th>
@@ -55,7 +112,12 @@
 <script>
 	$(document).ready(function(){
 
-		$('#tblPoktan').dataTable(
+		var provinsiSelect = $('#idProv');
+		var kabupatenSelect = $('#idKab');
+		var kecamatanSelect = $('#idKec');
+		var desaSelect = $('#idDesa');
+
+		$('#tblAnggota').dataTable(
 		{
 			responsive: true,
 			lengthChange: true,
@@ -64,8 +126,31 @@
 			ordering: true,
 			processing: true,
 			serverSide: true,
+			language: {
+				"processing": "Sedang memproses...",
+				"lengthMenu": "Tampilkan _MENU_ entri",
+				"zeroRecords": "Tidak ditemukan data yang sesuai",
+				"info": "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
+				"infoEmpty": "Menampilkan 0 sampai 0 dari 0 entri",
+				"infoFiltered": "(disaring dari _MAX_ entri keseluruhan)",
+				"search": "Cari:",
+				"paginate": {
+					"first": "Pertama",
+					"last": "Terakhir",
+					"next": "Berikutnya",
+					"previous": "Sebelumnya"
+				},
+				"emptyTable": "Tidak ada data di dalam tabel",
+				"loadingRecords": "Sedang memuat...",
+				"thousands": ".",
+				"decimal": ",",
+				"aria": {
+					"sortAscending": ": aktifkan untuk mengurutkan kolom naik",
+					"sortDescending": ": aktifkan untuk mengurutkan kolom turun"
+				}
+			},
 			dom:
-				"<'row mb-3'<'col-sm-12 col-md-6 d-flex align-items-center justify-content-start'f><'col-sm-12 col-md-6 d-flex align-items-center justify-content-end'lB>>" +
+				"<'row mb-3'<'col-sm-12 col-md-6 d-flex align-items-center justify-content-start'><'col-sm-12 col-md-6 d-flex align-items-center justify-content-end'>>" +
 				"<'row'<'col-sm-12'tr>>" +
 				"<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
 			ajax: {

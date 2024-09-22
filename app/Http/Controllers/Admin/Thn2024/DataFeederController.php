@@ -918,116 +918,141 @@ class DataFeederController extends Controller
 	}
 
 	public function getAllPoktan(Request $request)
-{
-    $draw = $request->input('draw', 1);
-    $start = $request->input('start', 0);
-    $length = $request->input('length', 10);
-    $searchValue = $request->input('searchValue', '');
+	{
+		$draw = $request->input('draw', 1);
+		$start = $request->input('start', 0);
+		$length = $request->input('length', 10);
+		$searchValue = $request->input('searchValue', '');
 
-    // Filter parameters
-    $provinsiId = $request->input('provinsi_id');
-    $kabupatenId = $request->input('kabupaten_id');
-    $kecamatanId = $request->input('kecamatan_id');
-    $status = $request->input('status');
+		// Filter parameters
+		$provinsiId = $request->input('provinsi_id');
+		$kabupatenId = $request->input('kabupaten_id');
+		$kecamatanId = $request->input('kecamatan_id');
+		$kelurahanId = $request->input('kelurahan_id');
+		$status = $request->input('status');
 
-    // Sorting
-    $orderColumnIndex = $request->input('order.0.column', 0);
-    $orderDirection = $request->input('order.0.dir', 'asc');
-    $orderableColumns = ['nama_kelompok', 'nama_pimpinan', 'hp_pimpinan', 'provinsi', 'kabupaten', 'kecamatan', 'desa'];
-    $orderColumn = $orderableColumns[$orderColumnIndex];
+		// Sorting
+		$orderColumnIndex = $request->input('order.0.column', 0);
+		$orderDirection = $request->input('order.0.dir', 'asc');
+		$orderableColumns = ['nama_kelompok', 'nama_pimpinan', 'hp_pimpinan', 'provinsi', 'kabupaten', 'kecamatan', 'desa'];
+		$orderColumn = $orderableColumns[$orderColumnIndex];
 
-    $query = MasterPoktan::with([
-        'provinsi:provinsi_id,nama',
-        'kabupaten:kabupaten_id,nama_kab',
-        'kecamatan:kecamatan_id,nama_kecamatan',
-        'desa:kelurahan_id,nama_desa',
-    ]);
+		$query = MasterPoktan::with([
+			'provinsi:provinsi_id,nama',
+			'kabupaten:kabupaten_id,nama_kab',
+			'kecamatan:kecamatan_id,nama_kecamatan',
+			'desa:kelurahan_id,nama_desa',
+		]);
 
-    // Searching
-    if ($searchValue) {
-        $query->where(function ($q) use ($searchValue) {
-            $q->where('nama_kelompok', 'like', "%$searchValue%")
-                ->orWhere('nama_pimpinan', 'like', "%$searchValue%")
-                ->orWhere('hp_pimpinan', 'like', "%$searchValue%")
-                ->orWhereHas('provinsi', function ($q) use ($searchValue) {
-                    $q->where('nama', 'like', "%$searchValue%");
-                })
-                ->orWhereHas('kabupaten', function ($q) use ($searchValue) {
-                    $q->where('nama_kab', 'like', "%$searchValue%");
-                })
-                ->orWhereHas('kecamatan', function ($q) use ($searchValue) {
-                    $q->where('nama_kecamatan', 'like', "%$searchValue%");
-                })
-                ->orWhereHas('desa', function ($q) use ($searchValue) {
-                    $q->where('nama_desa', 'like', "%$searchValue%");
-                });
-        });
-    }
+		// Searching
+		if ($searchValue) {
+			$query->where(function ($q) use ($searchValue) {
+				$q->where('nama_kelompok', 'like', "%$searchValue%")
+					->orWhere('nama_pimpinan', 'like', "%$searchValue%")
+					->orWhere('hp_pimpinan', 'like', "%$searchValue%")
+					->orWhereHas('provinsi', function ($q) use ($searchValue) {
+						$q->where('nama', 'like', "%$searchValue%");
+					})
+					->orWhereHas('kabupaten', function ($q) use ($searchValue) {
+						$q->where('nama_kab', 'like', "%$searchValue%");
+					})
+					->orWhereHas('kecamatan', function ($q) use ($searchValue) {
+						$q->where('nama_kecamatan', 'like', "%$searchValue%");
+					})
+					->orWhereHas('desa', function ($q) use ($searchValue) {
+						$q->where('nama_desa', 'like', "%$searchValue%");
+					});
+			});
+		}
 
-    // Apply filters
-    if ($provinsiId) {
-        $query->where('provinsi_id', $provinsiId);
-    }
-    if ($kabupatenId) {
-        $query->where('kabupaten_id', $kabupatenId);
-    }
-    if ($kecamatanId) {
-        $query->where('kecamatan_id', $kecamatanId);
-    }
-    if ($status) {
-        $query->where('status', $status);
-    }
+		// Apply filters
+		if ($provinsiId) {
+			$query->where('provinsi_id', $provinsiId);
+		}
+		if ($kabupatenId) {
+			$query->where('kabupaten_id', $kabupatenId);
+		}
+		if ($kecamatanId) {
+			$query->where('kecamatan_id', $kecamatanId);
+		}
+		if ($kelurahanId) {
+			$query->where('kelurahan_id', $kelurahanId);
+		}
+		if ($status) {
+			$query->where('status', $status);
+		}
 
-    // Sorting
-    if ($orderColumn === 'provinsi') {
-        $query->join('data_provinsis', 't2024_master_poktans.provinsi_id', '=', 'data_provinsis.provinsi_id')
-            ->orderBy('data_provinsis.nama', $orderDirection);
-    } elseif ($orderColumn === 'kabupaten') {
-        $query->join('data_kabupatens', 't2024_master_poktans.kabupaten_id', '=', 'data_kabupatens.kabupaten_id')
-            ->orderBy('data_kabupatens.nama_kab', $orderDirection);
-    } elseif ($orderColumn === 'kecamatan') {
-        $query->join('data_kecamatans', 't2024_master_poktans.kecamatan_id', '=', 'data_kecamatans.kecamatan_id')
-            ->orderBy('data_kecamatans.nama_kecamatan', $orderDirection);
-    } elseif ($orderColumn === 'desa') {
-        $query->join('data_desas', 't2024_master_poktans.kelurahan_id', '=', 'data_desas.kelurahan_id')
-            ->orderBy('data_desas.nama_desa', $orderDirection);
-    } else {
-        $query->orderBy($orderColumn, $orderDirection);
-    }
+		// Sorting
+		if ($orderColumn === 'provinsi') {
+			$query->join('data_provinsis', 't2024_master_poktans.provinsi_id', '=', 'data_provinsis.provinsi_id')
+				->orderBy('data_provinsis.nama', $orderDirection);
+		} elseif ($orderColumn === 'kabupaten') {
+			$query->join('data_kabupatens', 't2024_master_poktans.kabupaten_id', '=', 'data_kabupatens.kabupaten_id')
+				->orderBy('data_kabupatens.nama_kab', $orderDirection);
+		} elseif ($orderColumn === 'kecamatan') {
+			$query->join('data_kecamatans', 't2024_master_poktans.kecamatan_id', '=', 'data_kecamatans.kecamatan_id')
+				->orderBy('data_kecamatans.nama_kecamatan', $orderDirection);
+		} elseif ($orderColumn === 'desa') {
+			$query->join('data_desas', 't2024_master_poktans.kelurahan_id', '=', 'data_desas.kelurahan_id')
+				->orderBy('data_desas.nama_desa', $orderDirection);
+		} else {
+			$query->orderBy($orderColumn, $orderDirection);
+		}
 
-    // Count total records and filtered records
-    $totalRecords = MasterPoktan::count();
-    $filteredRecords = $query->count();
+		// Count total records and filtered records
+		$totalRecords = MasterPoktan::count();
+		$filteredRecords = $query->count();
 
-    // Fetch paginated data
-    $poktans = $query->offset($start)->limit($length)->get()->map(function ($item) {
-        return [
-            'id' => $item->id,
-            'nama_kelompok' => $item->nama_kelompok,
-            'nama_pimpinan' => $item->nama_pimpinan,
-            'hp_pimpinan' => $item->hp_pimpinan,
-            'nama_provinsi' => $item->provinsi ? $item->provinsi->nama : null,
-            'nama_kabupaten' => $item->kabupaten ? $item->kabupaten->nama_kab : null,
-            'nama_kecamatan' => $item->kecamatan ? $item->kecamatan->nama_kecamatan : null,
-            'nama_desa' => $item->desa ? $item->desa->nama_desa : null,
-            'status' => $item->status,
-        ];
-    });
+		// Fetch paginated data
+		$poktans = $query->offset($start)->limit($length)->get()->map(function ($item) {
+			return [
+				'id' => $item->id,
+				'nama_kelompok' => $item->nama_kelompok,
+				'nama_pimpinan' => $item->nama_pimpinan,
+				'hp_pimpinan' => $item->hp_pimpinan,
+				'nama_provinsi' => $item->provinsi ? $item->provinsi->nama : null,
+				'nama_kabupaten' => $item->kabupaten ? $item->kabupaten->nama_kab : null,
+				'nama_kecamatan' => $item->kecamatan ? $item->kecamatan->nama_kecamatan : null,
+				'nama_desa' => $item->desa ? $item->desa->nama_desa : null,
+				'status' => $item->status,
+			];
+		});
 
-    return response()->json([
-        'draw' => $draw,
-        'recordsTotal' => $totalRecords,
-        'recordsFiltered' => $filteredRecords,
-        'data' => $poktans,
-    ]);
-}
+		return response()->json([
+			'draw' => $draw,
+			'recordsTotal' => $totalRecords,
+			'recordsFiltered' => $filteredRecords,
+			'data' => $poktans,
+		]);
+	}
 
 	public function getAllCpcl(Request $request)
 	{
 		$draw = $request->input('draw', 1);
 		$start = $request->input('start', 0);
 		$length = $request->input('length', 10);
-		$searchValue = $request->input('search.value', '');
+		$searchValue = $request->input('searchValue', '');
+
+		// Filter parameters
+		$provinsiId = $request->input('provinsi_id');
+		$kabupatenId = $request->input('kabupaten_id');
+		$kecamatanId = $request->input('kecamatan_id');
+		$kelurahanId = $request->input('kelurahan_id');
+		$poktan = $request->input('kode_poktan');
+
+		// Sorting
+		$orderColumnIndex = $request->input('order.0.column', 0);
+		$orderDirection = $request->input('order.0.dir', 'asc');
+		$orderableColumns = ['nama_kelompok', 'nama_petani', 'ktp_petani', 'provinsi', 'kabupaten', 'kecamatan', 'desa', 'masterpoktan'];
+		$orderColumn = $orderableColumns[$orderColumnIndex];
+
+		$query = MasterPoktan::with([
+			'provinsi:provinsi_id,nama',
+			'kabupaten:kabupaten_id,nama_kab',
+			'kecamatan:kecamatan_id,nama_kecamatan',
+			'desa:kelurahan_id,nama_desa',
+			'spatial:id,kode_spatial,ktp_petani,luas_lahan,is_active',
+		]);
 
 		$data = MasterAnggota::with([
 			'provinsi' => function ($query) {

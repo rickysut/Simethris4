@@ -1,10 +1,5 @@
 @extends('layouts.app')
 @section('style')
-{{-- <style>
-	.grecaptcha-badge{
-		display: block ;
-	}
-</style> --}}
 @endsection
 @section('content')
 	<div class="row">
@@ -19,18 +14,6 @@
 					</small>
 				</h1>
 			</div>
-			{{-- <a href="#" class="fs-lg fw-500 text-white opacity-70">Learn more &gt;&gt;</a> --}}
-			{{-- <div class="d-sm-flex flex-column align-items-center justify-content-center d-md-block" hidden style="display: none">
-				<div class="px-0 py-1 mt-5 text-white fs-nano opacity-50">
-					Associate
-				</div>
-				<div class="d-flex flex-row opacity-70 align-items-center">
-					<a href="https://riph.pertanian.go.id/" class="text-white mr-2">
-						<img src="/img/riphonline.svg" alt="simethris" aria-roledescription="logo" style="width:25px; height:auto;">
-					</a>
-
-				</div>
-			</div> --}}
 		</div>
 		<div class="col-12 text-center hidden-sm-down">
 			<div class="col-5 ml-auto">
@@ -54,7 +37,6 @@
 					@endif
 				</div>
 			</div>
-
 		</div>
 		<div class="col-sm-12  ml-auto align hidden-md-up">
 			<div class="d-flex align-items-center justify-content-center mb-6 mt-6">
@@ -62,7 +44,6 @@
 			</div>
 			<div class="mt-4">
 				<div class="p-4">
-
 					<form  id="js-login" novalidate="" method="POST" action="{{ route('mobile.login') }}">
 						@csrf
 						<div class="form-group">
@@ -73,12 +54,9 @@
 										<span class="fal fa-user"></span>
 									</div>
 								</div>
-
 								<input id="usernamemob" name="usernamemob" type="text" class="form-control form-control-lg {{ $errors->has('username') ? ' is-invalid' : '' }}" required autocomplete="{{ trans('global.login_username') }}" autofocus placeholder="{{ trans('global.login_username') }}" value="{{ old('username', null) }}" />
-
 							</div>
 						</div>
-
 						<div class="form-group">
 							<label class="form-label text-white" for="password">Password</label>
 							<div class="input-group bg-white shadow-inset-2" data-toggle="tooltip" title data-original-title="Your password" data-title="Password" data-intro="Type your password" data-step="4">
@@ -95,7 +73,6 @@
 								</div>
 							</div>
 						</div>
-
 						<div class="row no-gutters">
 							<div class="col-lg-12 pl-lg-1 my-2" >
 								<button id="js-login-btn" type="submit" class="btn btn-block btn-info btn-lg">{{ trans('global.login') }}</button>
@@ -104,7 +81,6 @@
 					</form>
 				</div>
 			</div>
-
 		</div>
 	</div>
 	<div class="modal fade" id="login1" tabindex="-1" role="dialog" style="display: none;" aria-modal="true">
@@ -117,7 +93,6 @@
 					</button>
 				</div>
 				<div class="modal-body">
-
 					<form id="js-login" novalidate="" method="POST" action="{{ route('login') }}">
 						@csrf
 						<input id="roleaccess" name="roleaccess" type="hidden" value=""/>
@@ -129,7 +104,6 @@
 										<span class="fal fa-user"></span>
 									</div>
 								</div>
-
 								<input id="username" name="username" type="text" class="form-control form-control-md {{ $errors->has('username') ? ' is-invalid' : '' }}" required autocomplete="{{ trans('global.login_username') }}" autofocus placeholder="{{ trans('global.login_username') }}" value="{{ old('username', null) }}" />
 								@if($errors->has('username'))
 								<div class="invalid-feedback">
@@ -194,39 +168,28 @@
 			</div>
 		</div>
 	</div>
-
 @endsection
-@push('scripts')
-	{{-- <script>
-		function onSubmit(token) {
-			document.getElementById("js-login").submit();
-		}
-	</script> --}}
-@endpush
 @section('scripts')
+	@if ($errors->any())
+		<script>
+			document.addEventListener('DOMContentLoaded', function() {
+				let errorMessages = '<ul>';
+				@foreach ($errors->all() as $error)
+					errorMessages += '<li>{{ $error }}</li>';
+				@endforeach
+				errorMessages += '</ul>';
 
-@if ($errors->any())
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            let errorMessages = '<ul>';
-            @foreach ($errors->all() as $error)
-                errorMessages += '<li>{{ $error }}</li>';
-            @endforeach
-            errorMessages += '</ul>';
-
-            Swal.fire({
-                icon: 'error',
-                title: 'Validation Errors',
-                html: errorMessages
-            });
-        });
-    </script>
-@endif
+				Swal.fire({
+					icon: 'error',
+					title: 'Validation Errors',
+					html: errorMessages
+				});
+			});
+		</script>
+	@endif
 <script>
 	$(document).ready(function () {
-
 		@if ($errors->any())
-
 			$('#login1').modal('show');
 			document.querySelector('#roleaccess').value = {{ $errors->first('roleaccess') }};
 		@endif

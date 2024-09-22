@@ -11,7 +11,8 @@ self.addEventListener("install", function (event) {
 
 const filesToCache = [
     '/',
-    '/offline.html'
+    '/offline.html',
+	'/img/logo-simet.png'
 ];
 
 const checkResponse = function (request) {
@@ -54,4 +55,42 @@ self.addEventListener("fetch", function (event) {
         event.waitUntil(addToCache(event.request));
     }
 });
+    let deferredPrompt;
+
+    // Mendaftar service worker
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('{{ url('/service-worker.js') }}')
+        .then(function(registration) {
+            console.log('Service Worker registered with scope:', registration.scope);
+        }).catch(function(error) {
+            console.log('Service Worker registration failed:', error);
+        });
+    }
+
+    // Tangkap event beforeinstallprompt
+    window.addEventListener('beforeinstallprompt', (e) => {
+        // Mencegah prompt muncul otomatis oleh browser
+        e.preventDefault();
+        // Simpan event untuk digunakan nanti
+        deferredPrompt = e;
+
+        // Memaksa prompt install otomatis tanpa perlu tombol
+        triggerInstallPrompt();
+    });
+
+    function triggerInstallPrompt() {
+        if (deferredPrompt) {
+            // Menampilkan prompt install
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === 'accepted') {
+                    console.log('User accepted the install prompt');
+                } else {
+                    console.log('User dismissed the install prompt');
+                }
+                // Reset deferredPrompt setelah digunakan
+                deferredPrompt = null;
+            });
+        }
+    }
 
