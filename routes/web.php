@@ -416,6 +416,9 @@ Route::group(['prefix' => 'test', 'as' => 'test.', 'namespace' => 'Admin', 'midd
 });
 
 
+
+
+
 //Route untuk simethris 2024
 Route::group(['prefix' => '2024', 'as' => '2024.', 'namespace' => 'Admin', 'middleware' => ['auth']], function () {
 	Route::group(['namespace' => 'Thn2024'], function () {

@@ -72,11 +72,11 @@
 		<div class="page-wrapper">
 			<div class="page-inner">
 				<!-- begin sidebar -->
-				@include('t2024.partials.menu')
+				@include('partials.menu')
 				<!-- end sidebar -->
 				<div class="page-content-wrapper">
 					<!-- begin page header -->
-					@include('t2024.partials.header')
+					@include('partials.header')
 					<!-- end page header -->
 					<!-- begin page content -->
 					<main id="js-page-content" role="main" class="page-content">

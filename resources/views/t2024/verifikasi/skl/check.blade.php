@@ -1,4 +1,4 @@
-@extends('t2024.layouts.admin')
+@extends('layouts.admin')
 @section('content')
 {{-- @include('t2024.partials.breadcrumb') --}}
 @section('content')

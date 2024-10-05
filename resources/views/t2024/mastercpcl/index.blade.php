@@ -1,4 +1,4 @@
-@extends('t2024.layouts.admin')
+@extends('layouts.admin')
 @section('content')
 {{-- @include('t2024.partials.breadcrumb') --}}
 @include('t2024.partials.subheader')
@@ -7,19 +7,6 @@
 	<div class="row">
 		<div class="col">
 			<div class="panel" id="panel-1">
-				<div class="panel-hdr">
-					<h2>
-						Daftar <span class="fw-300"><i>CPCL</i></span>
-					</h2>
-					<div class="panel-toolbar">
-						{{-- <div class="btn-group">
-							<a href="{{route('2024.cpcl.anggota.create')}}" type="button" class="btn btn-sm btn-primary" data-toggle="tooltip" data-offset="0,10" data-original-title="Tambah CPCL">
-								<i class="fal fa-user-plus"></i>
-								Registrasi Anggota Baru
-							</a>
-						</div> --}}
-					</div>
-				</div>
 				<div class="card-header">
 					<div class="panel-content">
 						<h4 class="text-muted">Pencarian Kelompok Tani</h4>

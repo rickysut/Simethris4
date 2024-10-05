@@ -1,4 +1,4 @@
-@extends('t2024.layouts.admin')
+@extends('layouts.admin')
 @section ('styles')
 <link rel="stylesheet" media="screen, print" href="{{ asset('css/smartadmin/notifications/sweetalert2/sweetalert2.bundle.css') }}">
 @endsection
